@@ -139,6 +139,7 @@ public:
 			{
 				ListFormatter list(source.GetAccount());
 				list.AddColumn(_("Number")).AddColumn(_("Service")).AddColumn(_("Command")).AddColumn(_("Method"));
+				list.SetFlexible(_("{number}: {command} on {service}: {method}"));
 
 				for (unsigned i = 0; i < (*ls)->size(); ++i)
 				{

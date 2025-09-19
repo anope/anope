@@ -114,6 +114,8 @@ private:
 
 		ListFormatter list(source.nc);
 		list.AddColumn(_("Number")).AddColumn(_("Message"));
+		list.SetFlexible(_("{number}: {message}"));
+
 		for (size_t i = 0; i < q->size(); ++i)
 		{
 			ListFormatter::ListEntry entry;

@@ -205,6 +205,7 @@ protected:
 		{
 			ListFormatter lflist(source.GetAccount());
 			lflist.AddColumn(_("Number")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Text"));
+			lflist.SetFlexible(_("{number}: {text} -- created by {creator} on {created}"));
 
 			for (unsigned i = 0, end = list.size(); i < end; ++i)
 			{

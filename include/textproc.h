@@ -139,11 +139,15 @@ class CoreExport ListFormatter final
 {
 public:
 	using ListEntry = std::map<Anope::string, Anope::string>;
+	using FlexibleFormatFn = std::function<Anope::string(ListEntry &)>;
 
 private:
 	std::vector<Anope::string> columns;
 	std::vector<ListEntry> entries;
+	FlexibleFormatFn flexiblerow;
 	NickCore *nc;
+	void SendFixed(CommandSource &source);
+	void SendFlexible(CommandSource &source);
 
 public:
 	ListFormatter(NickCore *nc);
@@ -151,4 +155,6 @@ public:
 	void AddEntry(const ListEntry &entry);
 	bool IsEmpty() const;
 	void SendTo(CommandSource &source);
+	void SetFlexible(const Anope::string &format);
+	void SetFlexible(const FlexibleFormatFn &formatter);
 };

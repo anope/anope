@@ -109,7 +109,7 @@ private:
 		entry["Number"] = Anope::ToString(number);
 		entry["Level"] = access->AccessSerialize();
 		entry["Mask"] = access->Mask();
-		entry["By"] = access->creator;
+		entry["Creator"] = access->creator;
 		entry["Last seen"] = timebuf;
 		entry["Description"] = access->description;
 		list.AddEntry(entry);
@@ -453,6 +453,13 @@ private:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("Description"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Description"].empty()
+				? _("{number}: \002{mask}\002 = {level}")
+				: _("{number}: \002{mask}\002 = {level} ({description})");
+		});
+
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -465,7 +472,14 @@ private:
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Last seen")).AddColumn(_("Description"));
+		list.AddColumn(_("Number")).AddColumn(_("Level")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Last seen")).AddColumn(_("Description"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Description"].empty()
+				? _("{number}: \002{mask}\002 = {level} -- created by {creator}; last seen {last_seen}")
+				: _("{number}: \002{mask}\002 = {level} -- created by {creator}; last seen {last_seen} ({description})");
+		});
+
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -718,6 +732,7 @@ class CommandCSLevels final
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Level"));
+		list.SetFlexible(_("\002{name}\002 = {level}"));
 
 		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 
@@ -815,6 +830,7 @@ public:
 
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Name")).AddColumn(_("Description"));
+			list.SetFlexible(_("\002{name}\002: {description}"));
 
 			for (const auto &p : PrivilegeManager::GetPrivileges())
 			{

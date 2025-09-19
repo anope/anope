@@ -113,6 +113,13 @@ class CommandNSAJoin final
 		{
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Key"));
+			list.SetFlexible([](ListFormatter::ListEntry &row)
+			{
+				return row["Key"].empty()
+					? _("{number}: \002{channel}\002")
+					: _("{number}: \002{channel}\002 (key: {key})");
+			});
+
 			for (unsigned i = 0; i < (*channels)->size(); ++i)
 			{
 				AJoinEntry *aj = (*channels)->at(i);

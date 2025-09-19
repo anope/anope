@@ -278,6 +278,12 @@ private:
 		{
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Reason")).AddColumn(_("Expires"));
+			list.SetFlexible([](ListFormatter::ListEntry &row)
+			{
+				return row["Reason"].empty()
+					? _("\002{mask}\002 -- created by {creator}; {expires}")
+					: _("\002{mask}\002 -- created by {creator}; {expires} ({reason})");
+			});
 
 			for (unsigned i = ignores.size(); i > 0; --i)
 			{

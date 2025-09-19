@@ -397,6 +397,12 @@ private:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Description"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Description"].empty()
+				? _("{number}: \002{mask}\002")
+				: _("{number}: \002{mask}\002 ({description})");
+		});
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{

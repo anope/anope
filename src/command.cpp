@@ -148,6 +148,9 @@ void Command::SetSyntax(const Anope::string &s, const std::function<bool(Command
 
 void Command::SendSyntax(CommandSource &source)
 {
+	const auto *sourcenc = source.GetAccount();
+	const auto flexible = sourcenc ? sourcenc->HasExt("NS_FLEXIBLE") : false;
+
 	auto first = true;
 	Anope::string prefix = Language::Translate(source.GetAccount(), _("Syntax"));
 	Anope::string padding(prefix.utf8length(), ' ');
@@ -156,21 +159,21 @@ void Command::SendSyntax(CommandSource &source)
 		if (predicate && !predicate(source))
 			continue; // Not for this user.
 
-		if (first)
+		if (first || flexible)
 		{
 			first = false;
-			source.Reply("%s: \002%s %s\002", prefix.c_str(), source.command.nobreak().c_str(),
+			source.Reply(_("%s: \002%s %s\002"), prefix.c_str(), source.command.nobreak().c_str(),
 				Language::Translate(source.GetAccount(), syntax.c_str()));
 		}
 		else
 		{
-			source.Reply("%s  \002%s %s\002", padding.c_str(), source.command.nobreak().c_str(),
+			source.Reply(_("%s  \002%s %s\002"), padding.c_str(), source.command.nobreak().c_str(),
 				Language::Translate(source.GetAccount(), syntax.c_str()));
 		}
 	}
 
 	if (first)
-		source.Reply("%s: \002%s\002", prefix.c_str(), source.command.nobreak().c_str());
+		source.Reply(_("%s: \002%s\002"), prefix.c_str(), source.command.nobreak().c_str());
 }
 
 void Command::AllowUnregistered(bool b)

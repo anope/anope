@@ -352,6 +352,7 @@ private:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Reason"));
+		list.SetFlexible(_("{number}: \002{mask}\002 ({reason})"));
 
 		this->ProcessList(source, params, list);
 	}
@@ -364,11 +365,19 @@ private:
 			return;
 		}
 
+		const auto akillids = Config->GetModule("operserv").Get<bool>("akillids");
+
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Expires"));
-		if (Config->GetModule("operserv").Get<bool>("akillids"))
+		if (akillids)
 			list.AddColumn(_("ID"));
 		list.AddColumn(_("Reason"));
+		list.SetFlexible([akillids](ListFormatter::ListEntry &row)
+		{
+			return akillids
+				? _("{number}: [{id}] \002{mask}\002 -- created by {creator} on {created}; {expires} ({reason})")
+				: _("{number}: \002{mask}\002 -- created by {creator} on {created}; {expires} ({reason})");
+		});
 
 		this->ProcessList(source, params, list);
 	}

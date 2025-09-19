@@ -41,11 +41,11 @@ public:
 			}
 		}
 
-		unsigned count = 0;
 		ListFormatter list(source.GetAccount());
-
 		list.AddColumn(_("Nick")).AddColumn(_("Mask")).AddColumn(_("Real name"));
+		list.SetFlexible(_("\002{nick}\002 ({mask}) [{real_name}]"));
 
+		unsigned count = 0;
 		for (const auto &[_, bi] : *BotListByNick)
 		{
 			if (is_admin || !bi->oper_only)

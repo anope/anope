@@ -71,9 +71,15 @@ public:
 		}
 
 		mync = source.nc;
-		ListFormatter list(source.GetAccount());
 
+		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Nick")).AddColumn(_("Last mask"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Last mask"].empty()
+				? _("\002{nick}\002")
+				: _("\002{nick}\002 (last mask: {last_mask})");
+		});
 
 		Anope::map<NickAlias *> ordered_map;
 		for (const auto &[nick, na] : *NickAliasList)

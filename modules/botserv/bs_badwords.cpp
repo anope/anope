@@ -246,11 +246,12 @@ private:
 	{
 		bool override = !source.AccessFor(ci).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "LIST";
+
 		ListFormatter list(source.GetAccount());
-		BadWords *bw = ci->GetExt<BadWords>("badwords");
-
 		list.AddColumn(_("Number")).AddColumn(_("Word")).AddColumn(_("Type"));
+		list.SetFlexible(_("{number}: \002{word}\002 -- type: {type}"));
 
+		BadWords *bw = ci->GetExt<BadWords>("badwords");
 		if (!bw || !bw->GetBadWordCount())
 		{
 			source.Reply(_("%s bad words list is empty."), ci->name.c_str());

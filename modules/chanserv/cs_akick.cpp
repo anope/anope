@@ -394,6 +394,13 @@ class CommandCSAKick final
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Reason"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Reason"].empty()
+				? _("{number}: \002{mask}\002")
+				: _("{number}: \002{mask}\002 ({reason})");
+		});
+
 		this->ProcessList(source, ci, params, list);
 	}
 
@@ -407,6 +414,13 @@ class CommandCSAKick final
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Last used")).AddColumn(_("Reason"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Reason"].empty()
+				? _("{number}: \002{mask}\002 -- added by {creator} on {created}; last used: {last_used}")
+				: _("{number}: \002{mask}\002 -- added by {creator} on {created}; last used: {last_used} ({reason})");
+		});
+
 		this->ProcessList(source, ci, params, list);
 	}
 

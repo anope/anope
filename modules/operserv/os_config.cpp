@@ -62,6 +62,7 @@ public:
 
 				ListFormatter lflist(source.GetAccount());
 				lflist.AddColumn(_("Name")).AddColumn(_("Value"));
+				lflist.SetFlexible(_("\002{name}\002 = {value}"));
 
 				for (const auto &[name, value] : items)
 				{
@@ -78,6 +79,7 @@ public:
 
 			ListFormatter lflist(source.GetAccount());
 			lflist.AddColumn(_("Module Name")).AddColumn(_("Name")).AddColumn(_("Value"));
+			lflist.SetFlexible(_("\002{}{module_name}}:{name}\002 = {value}"));
 
 			for (int i = 0; i < Config->CountBlock("module"); ++i)
 			{

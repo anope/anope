@@ -61,8 +61,8 @@ public:
 		else
 		{
 			ListFormatter list(source.GetAccount());
-
 			list.AddColumn(_("Number")).AddColumn(_("Sender")).AddColumn(_("Date/Time"));
+			list.SetFlexible(_("{number}: sent by \002{sender}\002 at {date/time}"));
 
 			if (!param.empty() && isdigit(param[0]))
 			{

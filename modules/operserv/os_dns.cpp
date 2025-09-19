@@ -241,6 +241,8 @@ class CommandOSDNS final
 
 		ListFormatter lf(source.GetAccount());
 		lf.AddColumn(_("Server")).AddColumn(_("IP")).AddColumn(_("Limit")).AddColumn(_("State"));
+		lf.SetFlexible(_("Server: \002{server}\002 = {ip} -- limit: {limit}; state: {state}"));
+
 		for (auto *s : *dns_servers)
 		{
 			Server *srv = Server::Find(s->GetName(), true);
@@ -275,6 +277,12 @@ class CommandOSDNS final
 		{
 			ListFormatter lf2(source.GetAccount());
 			lf2.AddColumn(_("Zone")).AddColumn(_("Servers"));
+			lf2.SetFlexible([](ListFormatter::ListEntry &row)
+			{
+				return row["Servers"].equals_cs("None")
+					? _("Zone: \002{zone}\002")
+					: _("Zone: \002{zone}\002 = {servers}");
+			});
 
 			for (auto *z : *zones)
 			{

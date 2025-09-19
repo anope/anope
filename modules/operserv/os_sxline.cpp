@@ -154,7 +154,7 @@ private:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(number);
 					entry["Mask"] = x->mask;
-					entry["By"] = x->by;
+					entry["Creator"] = x->by;
 					entry["Created"] = Anope::strftime(x->created, NULL, true);
 					entry["Expires"] = Anope::Expires(x->expires, source.nc);
 					entry["ID"] = x->id;
@@ -176,7 +176,7 @@ private:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(i + 1);
 					entry["Mask"] = x->mask;
-					entry["By"] = x->by;
+					entry["Creator"] = x->by;
 					entry["Created"] = Anope::strftime(x->created, NULL, true);
 					entry["Expires"] = Anope::Expires(x->expires, source.nc);
 					entry["ID"] = x->id;
@@ -199,17 +199,27 @@ private:
 	{
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Reason"));
+		list.SetFlexible(_("{number}: \002{mask}\002 ({reason})"));
 
 		this->ProcessList(source, params, list);
 	}
 
 	void OnView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		const auto akillids = Config->GetModule("operserv").Get<bool>("akillids");
+
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Created")).AddColumn(_("Expires"));
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Expires"));
 		if (Config->GetModule("operserv").Get<bool>("akillids"))
 			list.AddColumn(_("ID"));
 		list.AddColumn(_("Reason"));
+		list.SetFlexible([akillids](ListFormatter::ListEntry &row)
+		{
+			return akillids
+				? _("{number}: [{id}] \002{mask}\002 -- created by {creator} on {created}; {expires} ({reason})")
+				: _("{number}: \002{mask}\002 -- created by {creator} on {created}; {expires} ({reason})");
+		});
+
 
 		this->ProcessList(source, params, list);
 	}

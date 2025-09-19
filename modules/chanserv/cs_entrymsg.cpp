@@ -128,6 +128,8 @@ private:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Message"));
+		list.SetFlexible(_("{number}: {message} -- created by {creator} at {created}"));
+
 		for (unsigned i = 0; i < (*messages)->size(); ++i)
 		{
 			EntryMsg *msg = (*messages)->at(i);

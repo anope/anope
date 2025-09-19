@@ -333,6 +333,13 @@ public:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Nick")).AddColumn(_("Expires"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Expires"].equals_cs(NO_EXPIRE)
+				? _("\002{nick}\002")
+				: _("\002{nick}\002: expires in {expires}");
+		});
+
 		time_t nickserv_expire = Config->GetModule("nickserv").Get<time_t>("expire", "90d"),
 		       unconfirmed_expire = Config->GetModule("ns_register").Get<time_t>("unconfirmedexpire", "1d");
 		for (auto *na2 : *nc->aliases)

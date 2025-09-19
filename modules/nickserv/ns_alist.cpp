@@ -38,10 +38,16 @@ public:
 			nc = na->nc;
 		}
 
-		ListFormatter list(source.GetAccount());
 		int chan_count = 0;
 
+		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Channel")).AddColumn(_("Access")).AddColumn(_("Description"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Description"].empty()
+				? _("{number}: \002{channel}\002 = {access}")
+				: _("{number}: \002{channel}\002 = {access} ({description})");
+		});
 
 		std::deque<ChannelInfo *> queue;
 		nc->GetChannelReferences(queue);

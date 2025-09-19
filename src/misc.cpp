@@ -143,6 +143,15 @@ bool ListFormatter::IsEmpty() const
 
 void ListFormatter::SendTo(CommandSource &source)
 {
+	const auto *sourcenc = flexiblerow ? source.GetAccount() : nullptr;
+	if (sourcenc ? sourcenc->HasExt("NS_FLEXIBLE") : false)
+		SendFlexible(source);
+	else
+		SendFixed(source);
+}
+
+void ListFormatter::SendFixed(CommandSource &source)
+{
 	std::vector<Anope::string> tcolumns;
 	std::map<Anope::string, size_t> lengths;
 	std::set<Anope::string> breaks;
@@ -215,19 +224,55 @@ void ListFormatter::SendTo(CommandSource &source)
 	}
 }
 
+void ListFormatter::SendFlexible(CommandSource &source)
+{
+	for (auto &entry : entries)
+	{
+		// Build a map that we can template from.
+		Anope::map<Anope::string> variables;
+		for (const auto &[ekey, evalue] : entry)
+		{
+			const auto tkey = ekey.lower().replace_all_cs(" ", "_");
+			variables[tkey] = evalue;
+		}
+
+		const auto row = this->flexiblerow(entry);
+		const auto *translated_row = Language::Translate(this->nc, row.c_str());
+		source.Reply(Anope::Template(translated_row, variables));
+	}
+}
+
+void ListFormatter::SetFlexible(const Anope::string &format)
+{
+	this->flexiblerow = [format](const ListEntry &) { return format; };
+}
+
+void ListFormatter::SetFlexible(const FlexibleFormatFn &formatter)
+{
+	this->flexiblerow = formatter;
+}
+
 InfoFormatter::InfoFormatter(NickCore *acc) : nc(acc)
 {
 }
 
 void InfoFormatter::SendTo(CommandSource &source)
 {
+	const auto *sourcenc = source.GetAccount();
+	const auto flexible = sourcenc ? sourcenc->HasExt("NS_FLEXIBLE") : false;
 	for (const auto &[key, value] : this->replies)
 	{
-		auto line = key;
-		line += ": ";
-		line += Anope::string(longest - key.utf8length(), ' ');
-		line += Language::Translate(this->nc, value.c_str());
-		source.Reply(line);
+		if (flexible)
+		{
+			source.Reply("\002%s\002: %s", key.c_str(),
+				Language::Translate(this->nc, value.c_str()));
+		}
+		else
+		{
+			Anope::string padding(longest - key.utf8length(), ' ');
+			source.Reply("%s: %s%s", key.c_str(), padding.c_str(),
+				Language::Translate(this->nc, value.c_str()));
+		}
 	}
 }
 
@@ -270,17 +315,28 @@ void HelpWrapper::AddEntry(const Anope::string &name, const Anope::string &desc)
 
 void HelpWrapper::SendTo(CommandSource &source)
 {
+	const auto *sourcenc = source.GetAccount();
+	const auto flexible = sourcenc ? sourcenc->HasExt("NS_FLEXIBLE") : false;
+
 	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100") - longest - 8;
+
 	for (const auto &[entry_name, entry_desc] :  entries)
 	{
-		LineWrapper lw(Language::Translate(source.nc, entry_desc.c_str()), max_length);
+		if (flexible)
+		{
+			source.Reply("\002%s\002: %s", entry_name.c_str(), entry_desc.c_str());
+		}
+		else
+		{
+			LineWrapper lw(Language::Translate(source.nc, entry_desc.c_str()), max_length);
 
-		Anope::string line;
-		if (lw.GetLine(line))
-			source.Reply("    %-*s    %s", (int)longest, entry_name.c_str(), line.c_str());
+			Anope::string line;
+			if (lw.GetLine(line))
+				source.Reply("    %-*s    %s", (int)longest, entry_name.c_str(), line.c_str());
 
-		while (lw.GetLine(line))
-			source.Reply("    %-*s    %s", (int)longest, "", line.c_str());
+			while (lw.GetLine(line))
+				source.Reply("    %-*s    %s", (int)longest, "", line.c_str());
+		}
 	}
 };
 

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-12 15:43+0100\n"
-"PO-Revision-Date: 2025-09-12 15:43+0100\n"
+"POT-Creation-Date: 2025-09-19 18:50+0100\n"
+"PO-Revision-Date: 2025-09-19 18:50+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -342,6 +342,63 @@ msgstr ""
 msgid "[auto-memo] The memo you sent to %s has been viewed."
 msgstr ""
 
+msgid "{host}: {session} sessions"
+msgstr ""
+
+msgid "{mask}"
+msgstr ""
+
+msgid "{mask} -- created by {creator}; {expires}"
+msgstr ""
+
+msgid "{mask} -- created by {creator}; {expires} ({reason})"
+msgstr ""
+
+msgid "{mask} on {type} -- created by {creator}; expires in {expires}"
+msgstr ""
+
+msgid "{mask} on {type} -- created by {creator}; expires in {expires} ({reason})"
+msgstr ""
+
+msgid "{name}"
+msgstr ""
+
+msgid "{name} ({description})"
+msgstr ""
+
+msgid "{name} ({mask}) [{realname}]"
+msgstr ""
+
+msgid "{name} -- {users} user(s); +{modes}"
+msgstr ""
+
+msgid "{name} -- {users} user(s); +{modes} ({topic})"
+msgstr ""
+
+msgid "{name} = {level}"
+msgstr ""
+
+msgid "{name} = {value}"
+msgstr ""
+
+msgid "{name}: {description}"
+msgstr ""
+
+msgid "{nick}"
+msgstr ""
+
+msgid "{nick} (last mask: {last_mask})"
+msgstr ""
+
+msgid "{nick} ({mask}) [{real_name}]"
+msgstr ""
+
+msgid "{nick}: expires in {expires}"
+msgstr ""
+
+msgid "{}{module_name}}:{name} = {value}"
+msgstr ""
+
 msgid "[target] [password]"
 msgstr ""
 
@@ -600,6 +657,9 @@ msgstr ""
 msgid "nickname {EMAIL | STATUS | MASK | QUIT} {ON | OFF}"
 msgstr ""
 
+msgid "nickname {FIXED | FLEXIBLE}"
+msgstr ""
+
 msgid "nickname {ON | delay | OFF}"
 msgstr ""
 
@@ -747,6 +807,10 @@ msgstr[1] ""
 
 #, c-format
 msgid "%lu nicks are stored in the database, using %.2Lf kB of memory."
+msgstr ""
+
+#, c-format
+msgid "%s  %s %s"
 msgstr ""
 
 #, c-format
@@ -1068,6 +1132,14 @@ msgstr ""
 
 #, c-format
 msgid "%s's memo limit is %d."
+msgstr ""
+
+#, c-format
+msgid "%s: %s"
+msgstr ""
+
+#, c-format
+msgid "%s: %s %s"
 msgstr ""
 
 #, c-format
@@ -1906,9 +1978,6 @@ msgstr ""
 msgid "Bot won't kick for repeats anymore."
 msgstr ""
 
-msgid "By"
-msgstr ""
-
 msgid "CLEAR target"
 msgstr ""
 
@@ -2197,6 +2266,15 @@ msgid "Configures repeat kicker"
 msgstr ""
 
 msgid "Configures reverses kicker"
+msgstr ""
+
+msgid "Configures the layout used by the account for services messages. When the layout is set to FIXED services will use tables and position text such that it looks good in a client that uses a fixed-width font. When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font."
+msgstr ""
+
+msgid "Configures the layout used for services messages"
+msgstr ""
+
+msgid "Configures the layout used for services messages. When the layout is set to FIXED services will use tables and position text such that it looks good in a client that uses a fixed-width font. When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font."
 msgstr ""
 
 msgid "Configures the time bot bans expire in"
@@ -2881,6 +2959,9 @@ msgstr ""
 msgid "Fingerprint %s is already in use."
 msgstr ""
 
+msgid "Fixed layout"
+msgstr ""
+
 msgid "Flags"
 msgstr ""
 
@@ -2890,6 +2971,9 @@ msgstr ""
 
 #, c-format
 msgid "Flags list for %s"
+msgstr ""
+
+msgid "Flexible layout"
 msgstr ""
 
 msgid "Flood kicker"
@@ -3149,6 +3233,14 @@ msgid "Last topic"
 msgstr ""
 
 msgid "Last used"
+msgstr ""
+
+#, c-format
+msgid "Layout is now fixed for %s."
+msgstr ""
+
+#, c-format
+msgid "Layout is now flexible for %s."
 msgstr ""
 
 msgid "Level"
@@ -4495,6 +4587,9 @@ msgstr ""
 
 #, c-format
 msgid "Server %s must be quit before it can be deleted."
+msgstr ""
+
+msgid "Server: {server} = {ip} -- limit: {limit}; state: {state}"
 msgstr ""
 
 msgid "Servers"
@@ -6314,6 +6409,12 @@ msgstr ""
 msgid "Zone %s removed."
 msgstr ""
 
+msgid "Zone: {zone}"
+msgstr ""
+
+msgid "Zone: {zone} = {servers}"
+msgstr ""
+
 msgid "[1|2|3|4|5]"
 msgstr ""
 
@@ -6446,4 +6547,88 @@ msgid "{nick | channel} memo-text"
 msgstr ""
 
 msgid "{ON | delay | OFF}"
+msgstr ""
+
+msgid "{mode} -- created by {creator} on {created}"
+msgstr ""
+
+msgid "{mode} {param} -- created by {creator} on {created}"
+msgstr ""
+
+msgid "{number}: {channel}"
+msgstr ""
+
+msgid "{number}: {channel} (key: {key})"
+msgstr ""
+
+msgid "{number}: {channel} = {access}"
+msgstr ""
+
+msgid "{number}: {channel} = {access} ({description})"
+msgstr ""
+
+msgid "{number}: {mask}"
+msgstr ""
+
+msgid "{number}: {mask} ({description})"
+msgstr ""
+
+msgid "{number}: {mask} ({reason})"
+msgstr ""
+
+msgid "{number}: {mask} -- added by {creator} on {created}; last used: {last_used}"
+msgstr ""
+
+msgid "{number}: {mask} -- added by {creator} on {created}; last used: {last_used} ({reason})"
+msgstr ""
+
+msgid "{number}: {mask} -- created by {creator} on {created}; {expires} ({reason})"
+msgstr ""
+
+msgid "{number}: {mask} -- {limit} sessions"
+msgstr ""
+
+msgid "{number}: {mask} -- {limit} sessions; created by {creator} on {created}; {expires} ({reason})"
+msgstr ""
+
+msgid "{number}: {mask} = {flags} -- added by {creator} at {created}"
+msgstr ""
+
+msgid "{number}: {mask} = {flags} -- added by {creator} at {created} ({description})"
+msgstr ""
+
+msgid "{number}: {mask} = {level}"
+msgstr ""
+
+msgid "{number}: {mask} = {level} ({description})"
+msgstr ""
+
+msgid "{number}: {mask} = {level} -- created by {creator}; last seen {last_seen}"
+msgstr ""
+
+msgid "{number}: {mask} = {level} -- created by {creator}; last seen {last_seen} ({description})"
+msgstr ""
+
+msgid "{number}: {nick} = {vhost} -- created by {creator} at {created}"
+msgstr ""
+
+msgid "{number}: {word} -- type: {type}"
+msgstr ""
+
+msgid "{number}: [{id}] {mask} -- created by {creator} on {created}; {expires} ({reason})"
+msgstr ""
+
+msgid "{number}: sent by {sender} at {date/time}"
+msgstr ""
+
+msgid "{number}: {command} on {service}: {method}"
+msgstr ""
+
+msgid "{number}: {message}"
+msgstr ""
+
+msgid "{number}: {message} -- created by {creator} at {created}"
+msgstr ""
+
+msgid "{number}: {text} -- created by {creator} on {created}"
 msgstr ""

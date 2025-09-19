@@ -450,6 +450,12 @@ class CommandCSMode final
 			{
 				ListFormatter list(source.GetAccount());
 				list.AddColumn(_("Mode")).AddColumn(_("Param")).AddColumn(_("Creator")).AddColumn(_("Created"));
+				list.SetFlexible([](ListFormatter::ListEntry &row)
+				{
+					return row["Param"].empty()
+						? _("{mode} -- created by {creator} on {created}")
+						: _("{mode} {param} -- created by {creator} on {created}");
+				});
 
 				for (auto *ml : mlocks)
 				{

@@ -309,8 +309,13 @@ class CommandCSFlags final
 		}
 
 		ListFormatter list(source.GetAccount());
-
 		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Flags")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Description"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Description"].empty()
+				? _("{number}: \002{mask}\002 = {flags} -- added by {creator} at {created}")
+				: _("{number}: \002{mask}\002 = {flags} -- added by {creator} at {created} ({description})");
+		});
 
 		unsigned count = 0;
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)

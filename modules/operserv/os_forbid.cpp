@@ -402,6 +402,12 @@ public:
 			{
 				ListFormatter list(source.GetAccount());
 				list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Creator")).AddColumn(_("Expires")).AddColumn(_("Reason"));
+				list.SetFlexible([](ListFormatter::ListEntry &row)
+				{
+					return row["Reason"].empty()
+						? _("\002{mask}\002 on {type} -- created by {creator}; expires in {expires}")
+						: _("\002{mask}\002 on {type} -- created by {creator}; expires in {expires} ({reason})");
+				});
 
 				size_t shown = 0;
 				for (auto *forbid : forbids)

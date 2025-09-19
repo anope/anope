@@ -236,6 +236,7 @@ private:
 		{
 			ListFormatter list(source.GetAccount());
 			list.AddColumn(_("Session")).AddColumn(_("Host"));
+			list.SetFlexible(_("\002{host}\002: {session} sessions"));
 
 			for (const auto &[_, session] : session_service->GetSessions())
 			{
@@ -492,7 +493,7 @@ private:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(Number);
 					entry["Mask"] = e->mask;
-					entry["By"] = e->who;
+					entry["Creator"] = e->who;
 					entry["Created"] = Anope::strftime(e->time, NULL, true);
 					entry["Expires"] = Anope::Expires(e->expires, source.GetAccount());
 					entry["Limit"] = Anope::ToString(e->limit);
@@ -513,7 +514,7 @@ private:
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(i + 1);
 					entry["Mask"] = e->mask;
-					entry["By"] = e->who;
+					entry["Creator"] = e->who;
 					entry["Created"] = Anope::strftime(e->time, NULL, true);
 					entry["Expires"] = Anope::Expires(e->expires, source.GetAccount());
 					entry["Limit"] = Anope::ToString(e->limit);
@@ -536,6 +537,7 @@ private:
 	{
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Limit")).AddColumn(_("Mask"));
+		list.SetFlexible(_("{number}: \002{mask}\002 -- {limit} sessions"));
 
 		this->ProcessList(source, params, list);
 	}
@@ -543,7 +545,8 @@ private:
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("By")).AddColumn(_("Created")).AddColumn(_("Expires")).AddColumn(_("Limit")).AddColumn(_("Reason"));
+		list.AddColumn(_("Number")).AddColumn(_("Mask")).AddColumn(_("Creator")).AddColumn(_("Created")).AddColumn(_("Expires")).AddColumn(_("Limit")).AddColumn(_("Reason"));
+		list.SetFlexible(_("{number}: \002{mask}\002 -- {limit} sessions; created by {creator} on {created}; {expires} ({reason})"));
 
 		this->ProcessList(source, params, list);
 	}

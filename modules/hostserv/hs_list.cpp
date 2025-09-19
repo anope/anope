@@ -52,8 +52,10 @@ public:
 		}
 
 		unsigned display_counter = 0, listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
+
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Number")).AddColumn(_("Nick")).AddColumn(_("VHost")).AddColumn(_("Creator")).AddColumn(_("Created"));
+		list.SetFlexible(_("{number}: \002{nick}\002 = {vhost} -- created by {creator} at {created}"));
 
 		for (const auto &[_, na] : *NickAliasList)
 		{

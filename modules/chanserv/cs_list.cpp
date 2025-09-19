@@ -76,6 +76,12 @@ public:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Description"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Description"].empty()
+				? _("\002{name}\002")
+				: _("\002{name}\002 ({description})");
+		});
 
 		Anope::map<ChannelInfo *> ordered_map;
 		for (const auto &[cname, ci] : *RegisteredChannelList)

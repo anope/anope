@@ -42,6 +42,13 @@ public:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Users")).AddColumn(_("Modes")).AddColumn(_("Topic"));
+		list.SetFlexible([](ListFormatter::ListEntry &row)
+		{
+			return row["Topic"].empty()
+				? _("\002{name}\002 -- {users} user(s); +{modes}")
+				: _("\002{name}\002 -- {users} user(s); +{modes} ({topic})");
+		});
+
 
 		if (!pattern.empty() && (u2 = User::Find(pattern, true)))
 		{
@@ -157,6 +164,7 @@ public:
 
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Name")).AddColumn(_("Mask")).AddColumn(_("Realname"));
+		list.SetFlexible(_("\002{name}\002 ({mask}) [{realname}]"));
 
 		if (!pattern.empty() && (c = Channel::Find(pattern)))
 		{

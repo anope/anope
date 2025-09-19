@@ -77,6 +77,8 @@ public:
 			{
 				ListFormatter list(source.GetAccount());
 				list.AddColumn(_("Mask"));
+				list.SetFlexible(_("\002{mask}\002"));
+
 				for (const auto &ignore : mi->ignores)
 				{
 					ListFormatter::ListEntry entry;

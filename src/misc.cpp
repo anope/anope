@@ -152,6 +152,8 @@ void ListFormatter::SendTo(CommandSource &source)
 
 void ListFormatter::SendFixed(CommandSource &source)
 {
+	const auto *monospace = source.nc && source.GetAccount()->HasExt("NS_MONOSPACE") ? "\021" : "";
+
 	std::vector<Anope::string> tcolumns;
 	std::map<Anope::string, size_t> lengths;
 	std::set<Anope::string> breaks;
@@ -185,13 +187,13 @@ void ListFormatter::SendFixed(CommandSource &source)
 	/* Only put a list header if more than 1 column */
 	if (this->columns.size() > 1)
 	{
-		Anope::string s;
+		Anope::string s = monospace;
 		for (unsigned i = 0; i < this->columns.size(); ++i)
 		{
 			if (breaks.count(this->columns[i]))
 			{
 				source.Reply(s);
-				s = "  ";
+				s = Anope::Format("%s  ", monospace);
 			}
 			else if (!s.empty())
 				s += "  ";
@@ -205,13 +207,13 @@ void ListFormatter::SendFixed(CommandSource &source)
 
 	for (auto &entry : this->entries)
 	{
-		Anope::string s;
+		Anope::string s = monospace;
 		for (unsigned j = 0; j < this->columns.size(); ++j)
 		{
 			if (breaks.count(this->columns[j]))
 			{
 				source.Reply(s);
-				s = "  ";
+				s = Anope::Format("%s  ", monospace);
 			}
 			else if (!s.empty())
 				s += "  ";
@@ -260,6 +262,8 @@ void InfoFormatter::SendTo(CommandSource &source)
 {
 	const auto *sourcenc = source.GetAccount();
 	const auto flexible = sourcenc ? sourcenc->HasExt("NS_FLEXIBLE") : false;
+	const auto *monospace = !flexible && sourcenc && sourcenc->HasExt("NS_MONOSPACE") ? "\021" : "";
+
 	for (const auto &[key, value] : this->replies)
 	{
 		if (flexible)
@@ -270,7 +274,7 @@ void InfoFormatter::SendTo(CommandSource &source)
 		else
 		{
 			Anope::string padding(longest - key.utf8length(), ' ');
-			source.Reply("%s: %s%s", key.c_str(), padding.c_str(),
+			source.Reply("%s%s: %s%s", monospace, key.c_str(), padding.c_str(),
 				Language::Translate(this->nc, value.c_str()));
 		}
 	}
@@ -317,6 +321,7 @@ void HelpWrapper::SendTo(CommandSource &source)
 {
 	const auto *sourcenc = source.GetAccount();
 	const auto flexible = sourcenc ? sourcenc->HasExt("NS_FLEXIBLE") : false;
+	const auto *monospace = !flexible && sourcenc && sourcenc->HasExt("NS_MONOSPACE") ? "\021" : "";
 
 	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100") - longest - 8;
 
@@ -333,11 +338,14 @@ void HelpWrapper::SendTo(CommandSource &source)
 
 			Anope::string padding(longest - entry_name.utf8length(), ' ');
 			if (lw.GetLine(line))
-				source.Reply("    %s%s    %s", entry_name.nobreak().c_str(), padding.c_str(), line.c_str());
+			{
+				source.Reply("%s    %s%s    %s", monospace, entry_name.nobreak().c_str(),
+					padding.c_str(), line.c_str());
+			}
 
 			padding = Anope::string(longest, ' ');
 			while (lw.GetLine(line))
-				source.Reply("    %s    %s", padding.c_str(), line.c_str());
+				source.Reply("%s    %s    %s", monospace, padding.c_str(), line.c_str());
 		}
 	}
 };

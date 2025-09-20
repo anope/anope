@@ -19,7 +19,7 @@ public:
 		: Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Configures the layout used for services messages"));
-		this->SetSyntax("{FIXED | FLEXIBLE}");
+		this->SetSyntax("{FIXED | FLEXIBLE | MONOSPACE}");
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -45,15 +45,24 @@ public:
 
 		if (param.equals_ci("FIXED"))
 		{
-			nc->Shrink<time_t>("NS_FLEXIBLE");
+			nc->Shrink<bool>("NS_FLEXIBLE");
+			nc->Shrink<bool>("NS_MONOSPACE");
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the layout to fixed for " << nc->display;
 			source.Reply(_("Layout is now \002fixed\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("FLEXIBLE"))
 		{
 			nc->Extend<bool>("NS_FLEXIBLE");
+			nc->Shrink<bool>("NS_MONOSPACE");
 			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the layout to flexible for " << nc->display;
 			source.Reply(_("Layout is now \002flexible\002 for \002%s\002."), nc->display.c_str());
+		}
+		else if (param.equals_ci("MONOSPACE"))
+		{
+			nc->Shrink<bool>("NS_FLEXIBLE");
+			nc->Extend<bool>("NS_MONOSPACE");
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the layout to monospace for " << nc->display;
+			source.Reply(_("Layout is now \002monospace\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
 		{
@@ -71,11 +80,19 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Configures the layout used for services messages. When the layout is set to "
-			"\037FIXED\037 services will use tables and position text such that it looks "
-			"good in a client that uses a fixed-width font. When the layout is set to "
-			"\037FLEXIBLE\037 services will use an alternate format for messages and avoid "
-			"any positioning that might be broken by a variable-width font."
+			"Configures the layout used for services messages."
+			"\n\n"
+			"When the layout is set to \037FIXED\037 services will use tables and position "
+			"text such that it looks good in a client that uses a fixed-width font."
+			"\n\n"
+			"When the layout is set to \037FLEXIBLE\037 services will use an alternate "
+			"format for messages and avoid any positioning that might be broken by a "
+			"variable-width font."
+			"\n\n"
+			"When the layout is set to \037MONOSPACE\037 services will format messages "
+			"similar to \037FIXED\037 but will prefix all messages with a monospace "
+			"formatting character to force it to display correctly. This requires client "
+			"support for monospace text formatting."
 		));
 		return true;
 	}
@@ -89,7 +106,7 @@ public:
 		: CommandNSSetLayout(creator, "nickserv/saset/layout", 2)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 {FIXED | FLEXIBLE}"));
+		this->SetSyntax(_("\037nickname\037 {FIXED | FLEXIBLE | MONOSPACE}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -102,11 +119,19 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Configures the layout used by the account for services messages. When the "
-			"layout is set to \037FIXED\037 services will use tables and position text such "
-			"that it looks good in a client that uses a fixed-width font. When the layout is "
-			"set to \037FLEXIBLE\037 services will use an alternate format for messages and "
-			"avoid any positioning that might be broken by a variable-width font."
+			"Configures the layout used by the account for services messages."
+			"\n\n"
+			"When the layout is set to \037FIXED\037 services will use tables and position "
+			"text such that it looks good in a client that uses a fixed-width font."
+			"\n\n"
+			"When the layout is set to \037FLEXIBLE\037 services will use an alternate "
+			"format for messages and avoid any positioning that might be broken by a "
+			"variable-width font."
+			"\n\n"
+			"When the layout is set to \037MONOSPACE\037 services will format messages "
+			"similar to \037FIXED\037 but will prefix all messages with a monospace "
+			"formatting character to force it to display correctly. This requires client "
+			"support for monospace text formatting."
 		));
 		return true;
 	}
@@ -120,6 +145,7 @@ private:
 	CommandNSSASetLayout commandnssasetlayout;
 
 	SerializableExtensibleItem<bool> nsflexible;
+	SerializableExtensibleItem<bool> nsmonospace;
 
 public:
 	NSSetLayout(const Anope::string &modname, const Anope::string &creator)
@@ -127,18 +153,21 @@ public:
 		, commandnssetlayout(this)
 		, commandnssasetlayout(this)
 		, nsflexible(this, "NS_FLEXIBLE")
+		, nsmonospace(this, "NS_MONOSPACE")
 	{
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool show_hidden) override
 	{
-		if (nsflexible.HasExt(na->nc))
-			info.AddOption(_("Flexible layout"));
-		else
-			info.AddOption(_("Fixed layout"));
-
 		if (!show_hidden)
 			return;
+
+		if (nsflexible.HasExt(na->nc))
+			info.AddOption(_("Flexible layout"));
+		else if (nsmonospace.HasExt(na->nc))
+			info.AddOption(_("Monospace layout"));
+		else
+			info.AddOption(_("Fixed layout"));
 	}
 };
 

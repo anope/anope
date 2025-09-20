@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-19 18:50+0100\n"
-"PO-Revision-Date: 2025-09-19 18:50+0100\n"
+"POT-Creation-Date: 2025-09-20 14:56+0100\n"
+"PO-Revision-Date: 2025-09-20 14:56+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -393,7 +393,10 @@ msgstr ""
 msgid "{nick} ({mask}) [{real_name}]"
 msgstr ""
 
-msgid "{nick}: expires in {expires}"
+msgid "{nick}: registered on {registered}"
+msgstr ""
+
+msgid "{nick}: registered on {registered}; expires in {expires}"
 msgstr ""
 
 msgid "{}{module_name}}:{name} = {value}"
@@ -657,7 +660,7 @@ msgstr ""
 msgid "nickname {EMAIL | STATUS | MASK | QUIT} {ON | OFF}"
 msgstr ""
 
-msgid "nickname {FIXED | FLEXIBLE}"
+msgid "nickname {FIXED | FLEXIBLE | MONOSPACE}"
 msgstr ""
 
 msgid "nickname {ON | delay | OFF}"
@@ -807,10 +810,6 @@ msgstr[1] ""
 
 #, c-format
 msgid "%lu nicks are stored in the database, using %.2Lf kB of memory."
-msgstr ""
-
-#, c-format
-msgid "%s  %s %s"
 msgstr ""
 
 #, c-format
@@ -1132,14 +1131,6 @@ msgstr ""
 
 #, c-format
 msgid "%s's memo limit is %d."
-msgstr ""
-
-#, c-format
-msgid "%s: %s"
-msgstr ""
-
-#, c-format
-msgid "%s: %s %s"
 msgstr ""
 
 #, c-format
@@ -2268,13 +2259,27 @@ msgstr ""
 msgid "Configures reverses kicker"
 msgstr ""
 
-msgid "Configures the layout used by the account for services messages. When the layout is set to FIXED services will use tables and position text such that it looks good in a client that uses a fixed-width font. When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font."
+msgid ""
+"Configures the layout used by the account for services messages.\n"
+"\n"
+"When the layout is set to FIXED services will use tables and position text such that it looks good in a client that uses a fixed-width font.\n"
+"\n"
+"When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font.\n"
+"\n"
+"When the layout is set to MONOSPACE services will format messages similar to FIXED but will prefix all messages with a monospace formatting character to force it to display correctly. This requires client support for monospace text formatting."
 msgstr ""
 
 msgid "Configures the layout used for services messages"
 msgstr ""
 
-msgid "Configures the layout used for services messages. When the layout is set to FIXED services will use tables and position text such that it looks good in a client that uses a fixed-width font. When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font."
+msgid ""
+"Configures the layout used for services messages.\n"
+"\n"
+"When the layout is set to FIXED services will use tables and position text such that it looks good in a client that uses a fixed-width font.\n"
+"\n"
+"When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font.\n"
+"\n"
+"When the layout is set to MONOSPACE services will format messages similar to FIXED but will prefix all messages with a monospace formatting character to force it to display correctly. This requires client support for monospace text formatting."
 msgstr ""
 
 msgid "Configures the time bot bans expire in"
@@ -3243,6 +3248,10 @@ msgstr ""
 msgid "Layout is now flexible for %s."
 msgstr ""
 
+#, c-format
+msgid "Layout is now monospace for %s."
+msgstr ""
+
 msgid "Level"
 msgstr ""
 
@@ -3729,6 +3738,9 @@ msgstr ""
 
 #, c-format
 msgid "Module: %s [%s] [%s]"
+msgstr ""
+
+msgid "Monospace layout"
 msgstr ""
 
 #, c-format
@@ -6585,7 +6597,7 @@ msgstr ""
 msgid "{number}: {mask} -- created by {creator} on {created}; {expires} ({reason})"
 msgstr ""
 
-msgid "{number}: {mask} -- {limit} sessions"
+msgid "{number}: {mask} -- {limit} sessions ({reason})"
 msgstr ""
 
 msgid "{number}: {mask} -- {limit} sessions; created by {creator} on {created}; {expires} ({reason})"

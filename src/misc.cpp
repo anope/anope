@@ -1156,7 +1156,7 @@ Anope::string Anope::Template(const Anope::string &str, const Anope::map<Anope::
 			{
 				if (endidx - idx == 1)
 				{
-					// foo{{bar is an escape of foo{bar
+					// foo{}bar is an escape of foo{bar
 					out.push_back('{');
 					idx = endidx;
 					break;

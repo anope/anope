@@ -430,7 +430,7 @@ public:
 
 		auto *NickServ = Config->GetClient("NickServ");
 		u->SendMessage(NickServ, _("SSL certificate fingerprint accepted, you are now identified to \002%s\002."), nc->display.c_str());
-		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint";
+		Log(NickServ) << u->GetMask() << " automatically identified for account " << nc->display << " via SSL certificate fingerprint " << u->fingerprint;
 	}
 
 	void OnNickRegister(User *u, NickAlias *na, const Anope::string &pass) override

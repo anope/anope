@@ -1,6 +1,26 @@
 Anope Version 2.1.18-git
 --------------------
-No significant changes.
+Added a check that a non-deprecated database module is loaded.
+Added support for flexible and monospace layouts to make text easier to read on clients that use a variable-width font.
+Added support for logging about deprecated modules on boot.
+Added support for per-IRCd hints when a link fails.
+Added support for self-service validation of vhosts using DNS TXT records.
+Added support for separate bad password limits for pre-connection SASL authentication.
+Added support for SRV and TXT records to the dns module.
+Added the --nodb option to disable database and encrytption module checks.
+Added the nickname registration date to the nickserv/glist output.
+Changed db_flatfile to be import-only (migrate to db_json).
+Changed the default registration confirmation type to code validation.
+Changed the fantasy !help command to not require the FANTASY privilege by default.
+Changed various length measurement code to be UTF-8 aware.
+Disabled the nickname registration delay by default.
+Fixed reporting the MySQL version that the mysql module was built against.
+Improved the layout of the nickserv/info command.
+Modularised the ns_sasl module to make it easier to pick SASL mechanisms.
+Moved duration rounding logic from Anope::Expires to Anope::Duration.
+Removed support for importing old databases from 1.8.
+Removed support for verifying "old MD5" passwords from 1.7.
+Reworked how memory is allocated when formatting messages.
 
 Anope Version 2.1.17
 --------------------

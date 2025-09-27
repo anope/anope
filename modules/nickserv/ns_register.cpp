@@ -238,7 +238,7 @@ class CommandNSConfirmRegister final
 {
 public:
 	CommandNSConfirmRegister(Module *creator)
-		: Command(creator, "nickserv/confirm/register", 1, 2)
+		: Command(creator, "nickserv/confirm/register", 1, 1)
 	{
 		this->SetDesc(_("Confirm a previous account registration"));
 		this->SetSyntax(_("\037code\037"));
@@ -247,19 +247,17 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		auto has_priv = source.HasPriv("nickserv/confirm/register");
-
 		Anope::string code;
 		NickAlias *na;
-		if (params[0] == '@')
+		if (params[0][0] == '@')
 		{
-			if (!has_priv)
+			if (!source.HasPriv("nickserv/confirm/register"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
 			}
 
-			auto nick = params[0].substr(0);
+			auto nick = params[0].substr(1);
 			na = NickAlias::Find(nick);
 			if (!na)
 			{
@@ -287,14 +285,16 @@ public:
 				na->nick.c_str());
 			return;
 		}
-		if (has_priv || !code.equals_cs(*passcode))
+		if (!code.empty() && !code.equals_cs(*passcode))
 		{
 			source.Reply(_("The registration confirmation code you specified for %s is incorrect."),
 				na->nick.c_str());
 			return;
 		}
 
-		na->nc->Shrink<bool>("UNCONFIRMED");
+		nc->Shrink<Anope::string>("passcode");
+		nc->Shrink<bool>("UNCONFIRMED");
+
 		FOREACH_MOD(OnNickConfirm, (source.GetUser(), nc));
 
 		auto nonicknameownership = Config->GetModule("nickserv").Get<bool>("nonicknameownership");

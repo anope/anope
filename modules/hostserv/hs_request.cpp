@@ -544,7 +544,13 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		// TODO
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_(
+			"Validates a previously requested vhost using DNS. If you own the domain you "
+			"have requested as a vhost you can validate your ownership of it using a DNS "
+			"TXT record to approve your own vhost."
+		));
 		return true;
 	}
 };

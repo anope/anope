@@ -114,7 +114,8 @@ class CoreExport InfoFormatter final
 private:
 	size_t longest = 0;
 	NickCore *nc;
-	std::vector<std::pair<Anope::string, Anope::string> > replies;
+	std::vector<Anope::string> options;
+	std::vector<std::pair<Anope::string, Anope::string>> replies;
 
 public:
 	InfoFormatter(NickCore *nc);

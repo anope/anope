@@ -264,6 +264,19 @@ void InfoFormatter::SendTo(CommandSource &source)
 	const auto flexible = sourcenc ? sourcenc->HasExt("NS_FLEXIBLE") : false;
 	const auto *monospace = !flexible && sourcenc && sourcenc->HasExt("NS_MONOSPACE") ? "\021" : "";
 
+	if (!this->options.empty())
+	{
+		std::sort(this->options.begin(), this->options.end());
+
+		auto &optstr = (*this)[_("Options")];
+		for (const auto& option : this->options)
+		{
+			if (!optstr.empty())
+				optstr += ", ";
+			optstr += option;
+		}
+	}
+
 	for (const auto &[key, value] : this->replies)
 	{
 		if (flexible)
@@ -291,22 +304,7 @@ Anope::string &InfoFormatter::operator[](const Anope::string &key)
 
 void InfoFormatter::AddOption(const Anope::string &opt)
 {
-	Anope::string options = Language::Translate(this->nc, "Options");
-	Anope::string *optstr = NULL;
-	for (auto &[option, value] : this->replies)
-	{
-		if (option == options)
-		{
-			optstr = &value;
-			break;
-		}
-	}
-	if (!optstr)
-		optstr = &(*this)[_("Options")];
-
-	if (!optstr->empty())
-		*optstr += ", ";
-	*optstr += Language::Translate(nc, opt.c_str());
+	this->options.push_back(Language::Translate(nc, opt.c_str()));
 }
 
 

@@ -1,4 +1,4 @@
-Anope Version 2.1.18-git
+Anope Version 2.1.18
 --------------------
 Added a check that a non-deprecated database module is loaded.
 Added support for flexible and monospace layouts to make text easier to read on clients that use a variable-width font.

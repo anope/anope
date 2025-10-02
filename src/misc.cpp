@@ -619,12 +619,18 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc, bool round)
 
 Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 {
+	if (nc)
+		Language::SetLocale(nc->language.c_str());
+
 	char buf[BUFSIZE];
-	strftime(buf, sizeof(buf), Language::Translate(nc, _("%b %d %Y %H:%M:%S %Z")), gmtime(&t));
+	strftime(buf, sizeof(buf), "%b %d %Y %H:%M:%S %Z", gmtime(&t));
+
+	if (nc)
+		Language::ResetLocale();
+
 	if (short_output)
 		return buf;
-
-	if (t < Anope::CurTime)
+	else if (t < Anope::CurTime)
 		return Anope::Format(Language::Translate(nc, _("%s (%s ago)")), buf, Duration(Anope::CurTime - t, nc, true).c_str());
 	else if (t > Anope::CurTime)
 		return Anope::Format(Language::Translate(nc, _("%s (%s from now)")), buf, Duration(t - Anope::CurTime, nc, true).c_str(), nc);

@@ -89,6 +89,9 @@ public:
 			InfoFormatter info(source.nc);
 
 			info[_("Account")] = Anope::Format("%s (%zu)", na->nc->display.c_str(), na->nc->GetId());
+			info[_("Account registered")] = Anope::strftime(na->nc->registered, source.GetAccount());
+			info[_("Nick registered")] = Anope::strftime(na->registered, source.GetAccount());
+
 			if (nick_online)
 			{
 				bool shown = false;
@@ -104,6 +107,8 @@ public:
 			}
 			else
 			{
+				info[_("Last seen")] = Anope::strftime(na->last_seen, source.GetAccount());
+
 				Anope::string shown;
 				if (show_hidden || !na->nc->HasExt("HIDE_MASK"))
 				{
@@ -113,14 +118,6 @@ public:
 
 				if (show_hidden && !na->last_userhost_real.empty() && na->last_userhost_real != shown)
 					info[_("Last seen mask")] = na->last_userhost_real;
-			}
-
-			info[_("Account registered")] = Anope::strftime(na->nc->registered, source.GetAccount());
-			info[_("Nick registered")] = Anope::strftime(na->registered, source.GetAccount());
-
-			if (!nick_online)
-			{
-				info[_("Last seen")] = Anope::strftime(na->last_seen, source.GetAccount());
 
 				if (!na->last_quit.empty() && (show_hidden || !na->nc->HasExt("HIDE_QUIT")))
 					info[_("Last quit message")] = na->last_quit;
@@ -129,11 +126,8 @@ public:
 			if (!na->nc->email.empty() && (show_hidden || !na->nc->HasExt("HIDE_EMAIL")))
 				info[_("Email address")] = na->nc->email;
 
-			if (show_hidden)
-			{
-				if (na->HasVHost())
-					info[_("VHost")] = na->GetVHostMask();
-			}
+			if (show_hidden && na->HasVHost())
+				info[_("VHost")] = na->GetVHostMask();
 
 			FOREACH_MOD(OnNickInfo, (source, na, info, show_hidden));
 			info.SendTo(source);

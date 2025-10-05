@@ -184,7 +184,7 @@ public:
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.
 	 */
-	virtual bool IsServicesOper() const;
+	bool IsServicesOper() const;
 
 	/** Retrieves the account id for this user */
 	uint64_t GetId();

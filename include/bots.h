@@ -124,7 +124,7 @@ public:
 	 * @param message The users' message
 	 * @params tags Message tags
 	 */
-	virtual void OnMessage(User *u, const Anope::string &message, const Anope::map<Anope::string> &tags);
+	void OnMessage(User *u, const Anope::string &message, const Anope::map<Anope::string> &tags);
 
 	/** Link a command name to a command in services
 	 * @param cname The command name

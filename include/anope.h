@@ -53,6 +53,7 @@ namespace Anope
 		string(const char *_str, size_type n) : _string(_str, n) { }
 		string(const std::string &_str) : _string(_str) { }
 		string(const ci::string &_str) : _string(_str.c_str()) { }
+		string(const std::string_view &_sv) : _string(_sv.begin(), _sv.end()) { }
 		string(const string &_str, size_type pos, size_type n = npos) : _string(_str._string, pos, n) { }
 		template <class InputIterator> string(InputIterator first, InputIterator last) : _string(first, last) { }
 		string(const string &) = default;

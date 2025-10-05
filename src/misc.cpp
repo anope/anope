@@ -619,14 +619,23 @@ Anope::string Anope::Duration(time_t t, const NickCore *nc, bool round)
 
 Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 {
+	static ExtensibleRef<Anope::string> timezone("timezone");
 	if (nc)
+	{
 		Language::SetLocale(nc->language.c_str());
+		auto *tz = timezone ? timezone->Get(nc) : nullptr;
+		setenv("TZ", tz ? tz->c_str() : "UTC", 1);
+		tzset();
+	}
 
 	char buf[BUFSIZE];
-	strftime(buf, sizeof(buf), "%b %d %Y %H:%M:%S %Z", gmtime(&t));
+	strftime(buf, sizeof(buf), "%b %d %Y %H:%M:%S %Z", (nc ? localtime(&t) : gmtime(&t)));
 
 	if (nc)
+	{
+		unsetenv("TZ");
 		Language::ResetLocale();
+	}
 
 	if (short_output)
 		return buf;

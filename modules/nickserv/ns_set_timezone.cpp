@@ -105,6 +105,8 @@ public:
 			}
 
 			usertz = timezone;
+			if (usertz.equals_ci(param))
+				break; // Exact match.
 		}
 
 		if (usertz.empty())

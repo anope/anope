@@ -634,6 +634,7 @@ Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 	if (nc)
 	{
 		unsetenv("TZ");
+		tzset();
 		Language::ResetLocale();
 	}
 

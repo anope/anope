@@ -159,7 +159,8 @@ if(MSVC)
 # Otherwise, we're not using Visual Studio
 else()
   # Set the compile flags to have all warnings on (including shadowed variables)
-  set(CXXFLAGS "${CXXFLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wformat=2 -Wmissing-format-attribute -Wpedantic -Wno-format-nonliteral -Wno-format-zero-length -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
+  set(CXXFLAGS "${CXXFLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wformat=2 -Wmissing-format-attribute -Wpedantic")
+  set(CXXFLAGS "${CXXFLAGS} -Wno-format-nonliteral -Wno-format-zero-length -Wno-date-time -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
 endif()
 
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags

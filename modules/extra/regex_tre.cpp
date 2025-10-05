@@ -6,7 +6,10 @@
  * Please read COPYING and README for further details.
  */
 
-/* RequiredLibraries: tre */
+/// BEGIN CMAKE
+/// pkg_check_modules("TRE" IMPORTED_TARGET REQUIRED "tre")
+/// target_link_libraries(${SO} PRIVATE PkgConfig::TRE)
+/// END CMAKE
 
 #include "module.h"
 #include <tre/regex.h>

@@ -6,8 +6,14 @@
  * Please read COPYING and README for further details.
  */
 
-/* RequiredLibraries: mysqlclient */
-/* RequiredWindowsLibraries: libmysql */
+/// BEGIN CMAKE
+/// if(WIN32)
+///   target_link_libraries(${SO} PRIVATE CONAN_PKG::libmysqlclient)
+/// else()
+///   pkg_search_module("MYSQL" IMPORTED_TARGET REQUIRED "mysqlclient" "mariadb")
+///   target_link_libraries(${SO} PRIVATE PkgConfig::MYSQL)
+/// endif()
+/// END CMAKE
 
 #include "module.h"
 #include "modules/sql.h"

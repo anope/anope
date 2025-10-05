@@ -6,8 +6,14 @@
  * Please read COPYING and README for further details.
  */
 
-/* RequiredLibraries: pcre2-8 */
-/* RequiredWindowsLibraries: pcre2-8 */
+/// BEGIN CMAKE
+/// if(WIN32)
+///   target_link_libraries(${SO} PRIVATE CONAN_PKG::pcre2)
+/// else()
+///   pkg_check_modules("PCRE2" IMPORTED_TARGET REQUIRED "libpcre2-8")
+///   target_link_libraries(${SO} PRIVATE PkgConfig::PCRE2)
+/// endif()
+/// END CMAKE
 
 #include "module.h"
 

@@ -8,8 +8,14 @@
  *
  */
 
-/* RequiredLibraries: argon2 */
-/* RequiredWindowsLibraries: argon2 */
+/// BEGIN CMAKE
+/// if(WIN32)
+///   target_link_libraries(${SO} PRIVATE CONAN_PKG::argon2)
+/// else()
+///   pkg_check_modules("ARGON2" IMPORTED_TARGET REQUIRED "libargon2")
+///   target_link_libraries(${SO} PRIVATE PkgConfig::ARGON2)
+/// endif()
+/// END CMAKE
 
 #include <climits>
 #include <random>

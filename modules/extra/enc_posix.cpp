@@ -8,8 +8,6 @@
  *
  */
 
-/* RequiredLibraries: crypt */
-
 #include "module.h"
 
 class EPOSIX final

@@ -6,8 +6,10 @@
  * Please read COPYING and README for further details.
  */
 
-/* RequiredLibraries: ssl,crypto */
-/* RequiredWindowsLibraries: libssl,libcrypto */
+/// BEGIN CMAKE
+/// find_package("OpenSSL" REQUIRED)
+/// target_link_libraries(${SO} PRIVATE OpenSSL::Crypto OpenSSL::SSL)
+/// END CMAKE
 
 #include "module.h"
 #include "modules/ssl.h"

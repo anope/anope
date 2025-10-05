@@ -50,15 +50,15 @@ set_target_properties(${PROGRAM_NAME} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS 
 
 # On Windows, also link Anope to the wsock32 and Ws2_32 library, as well as set the version
 if(WIN32)
-  target_link_libraries(${PROGRAM_NAME} wsock32 Ws2_32 ${LINK_LIBS} ${WIN32_MEMORY})
+  target_link_libraries(${PROGRAM_NAME} PUBLIC wsock32 Ws2_32 ${LINK_LIBS} ${WIN32_MEMORY})
   set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
 else()
-  target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS})
+  target_link_libraries(${PROGRAM_NAME} PUBLIC ${LINK_LIBS})
 endif()
 
 # If being built with localisation we might need to link against libintl.
 if(HAVE_LOCALIZATION AND Intl_LIBRARY)
-  target_link_libraries(${PROGRAM_NAME} ${Intl_LIBRARY})
+  target_link_libraries(${PROGRAM_NAME} PUBLIC ${Intl_LIBRARY})
 endif()
 
 # Building the Anope executable requires the version.h header to be generated

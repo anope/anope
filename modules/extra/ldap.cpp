@@ -9,7 +9,12 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/* RequiredLibraries: ldap_r|ldap,lber */
+/// BEGIN CMAKE
+/// if(NOT WIN32)
+///   pkg_check_modules("OPENLDAP" IMPORTED_TARGET REQUIRED "lber" "ldap")
+///   target_link_libraries(${SO} PRIVATE PkgConfig::OPENLDAP)
+/// endif()
+/// END CMAKE
 
 #include "module.h"
 #include "modules/ldap.h"

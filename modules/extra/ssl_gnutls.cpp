@@ -7,8 +7,10 @@
  * Please read COPYING and README for further details.
  */
 
-/* RequiredLibraries: gnutls */
-/* RequiredWindowsLibraries: libgnutls-30 */
+/// BEGIN CMAKE
+/// find_package("GnuTLS" REQUIRED)
+/// target_link_libraries(${SO} PRIVATE GnuTLS::GnuTLS)
+/// END CMAKE
 
 #include "module.h"
 #include "modules/ssl.h"

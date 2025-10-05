@@ -107,6 +107,7 @@ include(CheckFunctionExists)
 include(CheckTypeSize)
 include(CheckLibraryExists)
 include(CheckCXXCompilerFlag)
+include(FindPkgConfig)
 
 # If extra include directories were specified, tell cmake about them.
 if(EXTRA_INCLUDE)
@@ -121,7 +122,7 @@ endif()
 # setup conan
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conanbuildinfo.cmake")
   include("${CMAKE_CURRENT_SOURCE_DIR}/conanbuildinfo.cmake")
-  conan_basic_setup()
+  conan_basic_setup(TARGETS)
 endif()
 
 # Find gettext

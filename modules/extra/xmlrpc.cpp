@@ -6,8 +6,11 @@
  * Please read COPYING and README for further details.
  */
 
-
-/* RequiredLibraries: xmlrpc */
+/// BEGIN CMAKE
+/// find_library("XMLRPC" "xmlrpc" REQUIRED)
+/// message(STATUS "Found XMLRPC: ${XMLRPC}")
+/// target_link_libraries(${SO} PRIVATE ${XMLRPC})
+/// END CMAKE
 
 #include <xmlrpc-c/base.h>
 

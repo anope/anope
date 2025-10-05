@@ -6,8 +6,10 @@
  * Please read COPYING and README for further details.
  */
 
-/* RequiredLibraries: sqlite3 */
-/* RequiredWindowsLibraries: sqlite3 */
+/// BEGIN CMAKE
+/// find_package("SQLite3" REQUIRED)
+/// target_link_libraries(${SO} PRIVATE SQLite::SQLite3)
+/// END CMAKE
 
 #include "module.h"
 #include "modules/sql.h"

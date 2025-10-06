@@ -14,9 +14,10 @@
 /// target_compile_features(${SO} PRIVATE "cxx_std_20")
 /// END CMAKE
 
-#if __cplusplus >= 202002L
+#include <version>
+#if __cpp_lib_chrono >= 201907L
 # include <chrono>
-# define HAS_CXX20
+# define HAS_CXX20_CHRONO
 #endif
 
 #include "module.h"
@@ -210,7 +211,7 @@ public:
 		, commandnssettimezone(this, timezone)
 		, commandnssasettimezone(this, timezone)
 	{
-#ifndef HAS_CXX20
+#ifndef HAS_CXX20_CHRONO
 		throw ModuleException("A compiler with C++20 support is required by this module");
 #else
 		// Build the zone list.

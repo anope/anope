@@ -14,6 +14,8 @@
 #include <signal.h>
 
 #include "hashcomp.h"
+
+#define UTF_CPP_CPLUSPLUS 201703L
 #include "utfcpp/unchecked.h"
 
 namespace Anope

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-02 15:29+0100\n"
-"PO-Revision-Date: 2025-09-29 13:00+0100\n"
+"POT-Creation-Date: 2025-10-08 13:45+0100\n"
+"PO-Revision-Date: 2025-10-08 13:45+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -645,6 +645,9 @@ msgstr ""
 msgid "nickname new-password"
 msgstr ""
 
+msgid "nickname timezone"
+msgstr ""
+
 msgid "nickname [code]"
 msgstr ""
 
@@ -706,6 +709,9 @@ msgid "server [message]"
 msgstr ""
 
 msgid "server [reason]"
+msgstr ""
+
+msgid "timezone"
 msgstr ""
 
 msgid "type parameters"
@@ -1780,6 +1786,10 @@ msgstr ""
 msgid "Available privileges for %s:"
 msgstr ""
 
+#, c-format
+msgid "Available timezones in the %s region:"
+msgstr ""
+
 msgid "BANS enforced by "
 msgstr ""
 
@@ -2051,6 +2061,12 @@ msgid "Changes the password used to identify you as the nick's owner."
 msgstr ""
 
 msgid "Changes the successor of a channel. If the founder's nickname expires or is dropped while the channel is still registered, the successor will become the new founder of the channel. The successor's nickname must be a registered one. If there's no successor set, then the first nickname on the access list (with the highest access, if applicable) will become the new founder, but if the access list is empty, the channel will be dropped."
+msgstr ""
+
+msgid "Changes the timezone services uses when sending messages to the given user (for example, when responding to a command they send). timezone should be chosen from an entry in one of the supported timezone regions:"
+msgstr ""
+
+msgid "Changes the timezone services uses when sending messages to you (for example, when responding to a command you send). timezone should be chosen from an entry in one of the supported timezone regions:"
 msgstr ""
 
 msgid "Changes when you will be notified about new memos (only for nicknames)"
@@ -3744,6 +3760,10 @@ msgstr ""
 msgid "Multiple languages matched %s. Please be more specific."
 msgstr ""
 
+#, c-format
+msgid "Multiple timezones matched %s. Please be more specific."
+msgstr ""
+
 msgid "NOTICE: In order to register a channel, you must have first registered your nickname."
 msgstr ""
 
@@ -4749,6 +4769,9 @@ msgstr ""
 msgid "Set the successor for a channel"
 msgstr ""
 
+msgid "Set the timezone services will use when messaging you"
+msgstr ""
+
 msgid "Set the vhost for all nicks in an account"
 msgstr ""
 
@@ -5590,6 +5613,14 @@ msgid "This option prevents a bot from being assigned to a channel by users that
 msgstr ""
 
 #, c-format
+msgid "Timezone changed to %s."
+msgstr ""
+
+#, c-format
+msgid "Timezone for %s changed to %s."
+msgstr ""
+
+#, c-format
 msgid "To delete, type: %s %d"
 msgstr ""
 
@@ -5701,6 +5732,10 @@ msgstr ""
 
 #, c-format
 msgid "Type %soption for more information on a specific option. The options will be set on the given nickname."
+msgstr ""
+
+#, c-format
+msgid "Type %sregion to list timezones for a region."
 msgstr ""
 
 msgid "Un-Load a module"

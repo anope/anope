@@ -1,7 +1,3 @@
-Anope Version 2.1.19-git
---------------------
-No significant changes.
-
 Anope Version 2.1.18
 --------------------
 Added a check that a non-deprecated database module is loaded.

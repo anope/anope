@@ -14,5 +14,6 @@ modules/ssl_openssl.cpp
 modules/stats
 modules/xmlrpc.cpp
 run/
+*.diff
 *.mo
 *.pot

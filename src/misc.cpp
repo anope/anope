@@ -629,7 +629,7 @@ Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 	}
 
 	char buf[BUFSIZE];
-	strftime(buf, sizeof(buf), "%b %d %Y %H:%M:%S %Z", (nc ? localtime(&t) : gmtime(&t)));
+	strftime(buf, sizeof(buf), "%c", (nc ? localtime(&t) : gmtime(&t)));
 
 	if (nc)
 	{

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: #anope.ro at TeraNova IRC Network\n"
-"POT-Creation-Date: 2025-08-08 01:05+0100\n"
-"PO-Revision-Date: 2025-10-08 16:50+0100\n"
+"POT-Creation-Date: 2025-10-09 17:10+0100\n"
+"PO-Revision-Date: 2025-10-09 17:10+0100\n"
 "Last-Translator: Cristian Anghel <kidprotect-cristian@yahoo.com>\n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2058,9 +2058,6 @@ msgstr "Botul nu va mai izgoni pentru inundări."
 msgid "Bot won't kick for repeats anymore."
 msgstr "Botul nu va mai izgoni pentru repetări."
 
-msgid "By"
-msgstr "De"
-
 msgid "CLEAR target"
 msgstr "CLEAR destinație"
 
@@ -2379,9 +2376,6 @@ msgstr ""
 
 msgid "Configures the layout used for services messages"
 msgstr "Configurează aspectul utilizat pentru mesajele de la servicii"
-
-msgid "Configures the layout used for services messages. When the layout is set to FIXED services will use tables and position text such that it looks good in a client that uses a fixed-width font. When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font."
-msgstr "Configurează aspectul utilizat pentru mesajele de la servicii. Când aspectul este setat la FIXED, serviciile vor folosi tabele și vor poziționa textul în așa fel încât să arate bine într-un client care folosește un font cu lățime fixă. Când aspectul este setat la FLEXIBLE, serviciile vor utiliza un format alternativ pentru mesaje și vor evita orice poziționare care ar putea fi întreruptă de un font cu lățime variabilă."
 
 msgid ""
 "Configures the layout used for services messages.\n"

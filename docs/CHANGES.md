@@ -17,7 +17,29 @@
 
 * Added support for associating a timezone with an account to allow users to receive timestamps in their local timezone.
 
+  ```
+  /NICKSERV SET TIMEZONE Europe/London
+  -NickServ- Timezone changed to Europe/Berlin.
+
+  /NICKSERV INFO test
+  -NickServ- Account registered: Thu 09 Oct 2025 15:22:45 CEST (45 seconds ago)
+  ```
+
+  NOTE: This requires a compiler with C++20 timezone support.
+
+---
+
 * Added support for language-specific time formats.
+
+  ```
+  /NICKSERV SET LANGUAGE tr_TR.UTF-8
+  -NickServ- Dil Türkçe olarak değiştirildi.
+  
+  /NICKSERV INFO test
+  -NickServ- Hesap kaydedildi: Prş 09 Eki 2025 15:22:45 (6 dakika, 16 saniye önce)
+  ```
+
+---
 
 * Reordered the information in the `nickserv/info` command output to show the registration dates before the seen information.
 

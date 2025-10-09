@@ -6340,7 +6340,7 @@ msgstr "Utilizatori (pseudonim): %lu intrări, %lu compartimente, cel mai lung l
 
 #, c-format
 msgid "Users (uid): %lu entries, %lu buckets, longest chain is %zu"
-msgstr ""
+msgstr "Utilizatori (uid): %lu intrări, %lu compartimente, cel mai lung lanț este %zu"
 
 msgid "Users list:"
 msgstr "Listă de utilizatori este după cum urmează:"

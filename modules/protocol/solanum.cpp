@@ -70,6 +70,11 @@ public:
 	void SendLogin(User *u, NickAlias *na) override { ratbox->SendLogin(u, na); }
 	void SendLogout(User *u) override { ratbox->SendLogout(u); }
 
+	bool IsTagValid(const Anope::string &tname, const Anope::string &tvalue) override
+	{
+		return !!Servers::Capab.count("STAG");
+	}
+
 	void SendSASLMechanisms(std::vector<Anope::string> &mechanisms) override
 	{
 		Anope::string mechlist;
@@ -108,7 +113,8 @@ public:
 		 * UNKLN    - Can do UNKLINE (encap only)
 		 * QS       - Can handle quit storm removal
 		*/
-		Uplink::Send("CAPAB", "BAN CHW CLUSTER EBMASK ECHO ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES TB UNKLN");
+		// TODO: review the caps we send here.
+		Uplink::Send("CAPAB", "BAN CHW CLUSTER EBMASK ECHO ENCAP EOPMOD EUID EX IE KLN KNOCK MLOCK QS RSFNC SERVICES STAG TB UNKLN");
 
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
@@ -447,6 +453,9 @@ class ProtoSolanum final
 	ServiceAlias message_bmask, message_join, message_nick, message_pong, message_sid, message_sjoin,
 		message_tb, message_tmode, message_uid;
 
+	/* Ignored message handlers. */
+	Message::Ignore message_echo;
+
 	/* Our message handlers */
 	IRCDMessageEBMask message_ebmask;
 	IRCDMessageEncap message_encap;
@@ -510,6 +519,7 @@ public:
 		, message_tb("IRCDMessage", "solanum/tb", "ratbox/tb")
 		, message_tmode("IRCDMessage", "solanum/tmode", "ratbox/tmode")
 		, message_uid("IRCDMessage", "solanum/uid", "ratbox/uid")
+		, message_echo(this, "ECHO")
 		, message_ebmask(this)
 		, message_encap(this)
 		, message_euid(this)

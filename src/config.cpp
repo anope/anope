@@ -1019,6 +1019,7 @@ Anope::string Conf::ReplaceVars(const Anope::string &str, const File &file, int 
 			continue;
 		}
 
+		auto found = false;
 		for (int i = 0; i < this->CountBlock("define"); ++i)
 		{
 			const auto &define = this->GetBlock("define", i);
@@ -1026,9 +1027,13 @@ Anope::string Conf::ReplaceVars(const Anope::string &str, const File &file, int 
 			if (defname == var)
 			{
 				ret.append(define.Get<const Anope::string>("value"));
+				found = true;
 				break;
 			}
 		}
+
+		if (!found)
+			throw ConfigException("Undefined variable: " + var + " at " + file.GetName() + ":" + Anope::ToString(linenumber));
 	}
 
 	if (!str.equals_cs(ret))

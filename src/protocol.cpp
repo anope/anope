@@ -388,18 +388,18 @@ Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 	return Entry("", mask).GetNUHMask();
 }
 
-void IRCDProto::SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg)
+void IRCDProto::SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 {
-	IRCD->SendNotice(bi, target->GetUID(), Anope::Format("[%s] %s", context->name.c_str(), msg.c_str()), {
-		{ "+draft/channel-context", context->name },
-	});
+	auto newtags = tags;
+	newtags["+draft/channel-context"] = context->name;
+	IRCD->SendNotice(bi, target->GetUID(), Anope::Format("[%s] %s", context->name.c_str(), msg.c_str()), newtags);
 }
 
-void IRCDProto::SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg)
+void IRCDProto::SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg, const Anope::map<Anope::string> &tags)
 {
-	IRCD->SendPrivmsg(bi, target->GetUID(), Anope::Format("[%s] %s", context->name.c_str(), msg.c_str()), {
-		{ "+draft/channel-context", context->name },
-	});
+	auto newtags = tags;
+	newtags["+draft/channel-context"] = context->name;
+	IRCD->SendPrivmsg(bi, target->GetUID(), Anope::Format("[%s] %s", context->name.c_str(), msg.c_str()), newtags);
 }
 
 MessageSource::MessageSource(const Anope::string &src) : source(src)

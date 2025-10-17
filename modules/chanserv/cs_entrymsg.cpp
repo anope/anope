@@ -296,12 +296,21 @@ public:
 			if (!messages)
 				return;
 
+			const auto timestamp = Config->GetModule(this).Get<bool>("timestamp", "yes");
 			for (const auto &message : *(*messages))
 			{
+				Anope::map<Anope::string> tags;
+				if (timestamp)
+				{
+					char timebuf[32];
+					strftime(timebuf, sizeof(timebuf), "%Y-%m-%dT%H:%M:%S.000Z", gmtime(&message->when));
+					tags["time"] = timebuf;
+				}
+
 				if (u->ShouldPrivmsg())
-					IRCD->SendContextPrivmsg(c->ci->WhoSends(), u, c, message->message);
+					IRCD->SendContextPrivmsg(c->ci->WhoSends(), u, c, message->message, tags);
 				else
-					IRCD->SendContextNotice(c->ci->WhoSends(), u, c, message->message);
+					IRCD->SendContextNotice(c->ci->WhoSends(), u, c, message->message, tags);
 			}
 		}
 	}

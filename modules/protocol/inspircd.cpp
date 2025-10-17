@@ -249,25 +249,25 @@ public:
 		Uplink::Send(bi, "PRIVMSG", "$" + dest->GetName(), msg);
 	}
 
-	void SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg) override
+	void SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg,  const Anope::map<Anope::string> &tags) override
 	{
 		if (spanningtree_proto_ver >= 1206)
 		{
-			IRCD->SendNotice(bi, target->GetUID(), msg, {
-				{ "~context", context->name },
-			});
+			auto newtags = tags;
+			newtags["~context"] = context->name;
+			IRCD->SendNotice(bi, target->GetUID(), msg, newtags);
 			return;
 		}
 		IRCDProto::SendContextNotice(bi, target, context, msg);
 	}
 
-	void SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg) override
+	void SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, const Anope::string &msg, const Anope::map<Anope::string> &tags) override
 	{
 		if (spanningtree_proto_ver >= 1206)
 		{
-			IRCD->SendPrivmsg(bi, target->GetUID(), msg, {
-				{ "~context", context->name },
-			});
+			auto newtags = tags;
+			newtags["~context"] = context->name;
+			IRCD->SendPrivmsg(bi, target->GetUID(), msg, newtags);
 			return;
 		}
 		IRCDProto::SendContextPrivmsg(bi, target, context, msg);

@@ -242,6 +242,26 @@ public:
 	}
 };
 
+struct IRCDMessageCapab final
+	: Message::Capab
+{
+	IRCDMessageCapab(Module *creator)
+		: Message::Capab(creator)
+	{
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		spacesepstream ss(params[0]);
+		for (Anope::string capab; ss.GetToken(capab); )
+		{
+			if (capab.equals_cs("STAG"))
+				IRCD->CanTagMessage = true;
+		}
+		Message::Capab::Run(source, params, tags);
+	}
+};
+
 struct IRCDMessageEBMask final
 	: IRCDMessage
 {
@@ -432,7 +452,6 @@ class ProtoSolanum final
 
 	/* Core message handlers */
 	Message::Away message_away;
-	Message::Capab message_capab;
 	Message::Error message_error;
 	Message::Invite message_invite;
 	Message::Kick message_kick;
@@ -457,6 +476,7 @@ class ProtoSolanum final
 	Message::Ignore message_echo;
 
 	/* Our message handlers */
+	IRCDMessageCapab message_capab;
 	IRCDMessageEBMask message_ebmask;
 	IRCDMessageEncap message_encap;
 	IRCDMessageEUID message_euid;
@@ -494,7 +514,6 @@ public:
 		: Module(modname, creator, PROTOCOL | VENDOR)
 		, ircd_proto(this)
 		, message_away(this)
-		, message_capab(this)
 		, message_error(this)
 		, message_invite(this)
 		, message_kick(this)
@@ -520,6 +539,7 @@ public:
 		, message_tmode("IRCDMessage", "solanum/tmode", "ratbox/tmode")
 		, message_uid("IRCDMessage", "solanum/uid", "ratbox/uid")
 		, message_echo(this, "ECHO")
+		, message_capab(this)
 		, message_ebmask(this)
 		, message_encap(this)
 		, message_euid(this)

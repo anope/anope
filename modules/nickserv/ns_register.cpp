@@ -169,15 +169,14 @@ public:
 			else if (nc->HasExt("UNCONFIRMED"))
 			{
 				if (nsregister.equals_ci("admin"))
-					source.Reply(_("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
+					source.Reply(CONFIRM_REGISTER_ADMIN);
 				else if (nsregister.equals_ci("code"))
 				{
 					const auto *code = GetCode(na->nc);
-					source.Reply(_("Your account is not confirmed. To confirm it, type \002%s\002."),
-						source.service->GetQueryCommand("nickserv/confirm/register", *code).c_str());
+					source.Reply(CONFIRM_REGISTER_CODE, source.service->GetQueryCommand("nickserv/confirm/register", *code).c_str());
 				}
 				else if (nsregister.equals_ci("mail"))
-					source.Reply(_("Your account is not confirmed. To confirm it, follow the instructions that were emailed to you."));
+					source.Reply(CONFIRM_REGISTER_MAIL);
 			}
 		}
 	}
@@ -464,15 +463,14 @@ public:
 		{
 			const Anope::string &nsregister = Config->GetModule(this).Get<const Anope::string>("registration");
 			if (nsregister.equals_ci("admin"))
-				u->SendMessage(NickServ, _("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
+				u->SendMessage(NickServ, CONFIRM_REGISTER_ADMIN);
 			else if (nsregister.equals_ci("code"))
 			{
 				const auto *code = GetCode(u->Account());
-				u->SendMessage(NickServ, _("Your account is not confirmed. To confirm it, type \002%s\002."),
-					NickServ->GetQueryCommand("nickserv/confirm/register", *code).c_str());
+				u->SendMessage(NickServ, CONFIRM_REGISTER_CODE, NickServ->GetQueryCommand("nickserv/confirm/register", *code).c_str());
 			}
 			else if (nsregister.equals_ci("mail"))
-				u->SendMessage(NickServ, _("Your account is not confirmed. To confirm it, follow the instructions that were emailed to you."));
+				u->SendMessage(NickServ, CONFIRM_REGISTER_MAIL);
 
 			const NickAlias *this_na = u->AccountNick();
 			time_t registered = Anope::CurTime - this_na->registered;

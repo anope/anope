@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 13:45+0100\n"
-"PO-Revision-Date: 2025-10-08 13:45+0100\n"
+"POT-Creation-Date: 2025-10-18 14:43+0100\n"
+"PO-Revision-Date: 2025-10-18 14:43+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1438,7 +1438,14 @@ msgstr ""
 msgid "All modes cleared on %s."
 msgstr ""
 
-msgid "All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."
+msgid "All new accounts must be confirmed by an administrator. Please wait for your registration to be confirmed."
+msgstr ""
+
+msgid "All new accounts must be confirmed. To confirm your account, follow the instructions that were emailed to you."
+msgstr ""
+
+#, c-format
+msgid "All new accounts must be confirmed. To confirm your account, type %s."
 msgstr ""
 
 msgid "All of your memos have been deleted."
@@ -6330,13 +6337,6 @@ msgstr ""
 
 #, c-format
 msgid "Your account %s has been successfully created."
-msgstr ""
-
-msgid "Your account is not confirmed. To confirm it, follow the instructions that were emailed to you."
-msgstr ""
-
-#, c-format
-msgid "Your account is not confirmed. To confirm it, type %s."
 msgstr ""
 
 #, c-format

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-18 14:43+0100\n"
-"PO-Revision-Date: 2025-10-18 14:43+0100\n"
+"POT-Creation-Date: 2025-10-21 11:13+0100\n"
+"PO-Revision-Date: 2025-10-21 11:13+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -889,6 +889,10 @@ msgstr ""
 
 #, c-format
 msgid "%s (%s) was last seen quitting (%s) %s ago (%s)."
+msgstr ""
+
+#, c-format
+msgid "%s (ID: %zu)"
 msgstr ""
 
 #, c-format

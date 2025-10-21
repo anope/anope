@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-02 23:10+0300\n"
-"PO-Revision-Date: 2025-08-26 12:37+0100\n"
+"POT-Creation-Date: 2025-10-21 11:39+0100\n"
+"PO-Revision-Date: 2025-10-21 11:42+0100\n"
 "Last-Translator: CaPaCuL <capacul@gmail.com>\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -344,6 +344,66 @@ msgstr "Kullanıcı erişim düzeyleri %s komutu kullanılarak görülebilir
 msgid "[auto-memo] The memo you sent to %s has been viewed."
 msgstr "[auto-memo] %s'e gönderdiğiniz not görüntülendi."
 
+msgid "{host}: {session} sessions"
+msgstr "{host}: {session} oturum"
+
+msgid "{mask}"
+msgstr "{mask}"
+
+msgid "{mask} -- created by {creator}; {expires}"
+msgstr "{mask} -- oluşturan {creator}; {expires}"
+
+msgid "{mask} -- created by {creator}; {expires} ({reason})"
+msgstr "{mask} -- oluşturan {creator}; {expires} ({reason})"
+
+msgid "{mask} on {type} -- created by {creator}; expires in {expires}"
+msgstr "{mask} {type}'de -- oluşturan {creator}; {expires}'de sona eriyor"
+
+msgid "{mask} on {type} -- created by {creator}; expires in {expires} ({reason})"
+msgstr "{mask} {type}'de -- oluşturan {creator}; {expires}'de sona eriyor ({reason})"
+
+msgid "{name}"
+msgstr "{name}"
+
+msgid "{name} ({description})"
+msgstr "{name} ({description})"
+
+msgid "{name} ({mask}) [{realname}]"
+msgstr "{name} ({mask}) [{realname}]"
+
+msgid "{name} -- {users} user(s); +{modes}"
+msgstr "{name} -- {users} kullanıcı(lar); +{modes}"
+
+msgid "{name} -- {users} user(s); +{modes} ({topic})"
+msgstr "{name} -- {users} kullanıcı(lar); +{modes} ({topic})"
+
+msgid "{name} = {level}"
+msgstr "{name} = {level}"
+
+msgid "{name} = {value}"
+msgstr "{name} = {value}"
+
+msgid "{name}: {description}"
+msgstr "{name}: {description}"
+
+msgid "{nick}"
+msgstr "{nick}"
+
+msgid "{nick} (last mask: {last_mask})"
+msgstr "{nick} (son maske: {last_mask})"
+
+msgid "{nick} ({mask}) [{real_name}]"
+msgstr "{nick} ({mask}) [{real_name}]"
+
+msgid "{nick}: registered on {registered}"
+msgstr "{nick}: {registered}'de kaydedildi"
+
+msgid "{nick}: registered on {registered}; expires in {expires}"
+msgstr "{nick}: {registered}'de kaydedildi; {expires}'de sona eriyor"
+
+msgid "{}{module_name}}:{name} = {value}"
+msgstr "{}{module_name}}:{name} = {value}"
+
 msgid "[target] [password]"
 msgstr "[hedef] [şifre]"
 
@@ -587,6 +647,9 @@ msgstr "rumuz yeni-afiş"
 msgid "nickname new-password"
 msgstr "rumuz yeni-şifre"
 
+msgid "nickname timezone"
+msgstr "rumuz saat-dilimi"
+
 msgid "nickname [code]"
 msgstr "rumuz [kod]"
 
@@ -601,6 +664,9 @@ msgstr "rumuz [+sona-erme] [sebep]"
 
 msgid "nickname {EMAIL | STATUS | MASK | QUIT} {ON | OFF}"
 msgstr "rumuz {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"
+
+msgid "nickname {FIXED | FLEXIBLE | MONOSPACE}"
+msgstr "rumuz {FIXED | FLEXIBLE | MONOSPACE}"
 
 msgid "nickname {ON | delay | OFF}"
 msgstr "rumuz {ON | gecikme | OFF}"
@@ -647,6 +713,9 @@ msgstr "sunucu [mesaj]"
 msgid "server [reason]"
 msgstr "sunucu [sebep]"
 
+msgid "timezone"
+msgstr "saat-dilimi"
+
 msgid "type parameters"
 msgstr "tip parametreler"
 
@@ -689,9 +758,6 @@ msgstr "%-8s %s"
 #, c-format
 msgid "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
 msgstr "%2d %-16s harf: %s, kelime: %s, satır: %s, smiley: %s, eylem: %s"
-
-msgid "%b %d %Y %H:%M:%S %Z"
-msgstr "%b %d %Y %H:%M:%S %Z"
 
 #, c-format
 msgid "%c is an unknown status mode."
@@ -930,10 +996,6 @@ msgstr "%s için memo yok."
 #, c-format
 msgid "%s has no new memos."
 msgstr "%s için yeni memo yok."
-
-#, c-format
-msgid "%s is %s"
-msgstr "%s gerçek adı: %s"
 
 #, c-format
 msgid "%s is a Services Operator of type %s."
@@ -1273,9 +1335,6 @@ msgstr "Hesap"
 msgid "Account %s has already reached the maximum number of simultaneous logins (%u)."
 msgstr "%s hesabı zaten maksimum eşzamanlı oturum açma sayısına (%u) ulaştı."
 
-msgid "Account id"
-msgstr "Hesap ID"
-
 msgid "Account registered"
 msgstr "Hesap kaydedildi"
 
@@ -1351,7 +1410,6 @@ msgstr "Ek olarak, nickserv/confirm iznine sahip Servis Operatörleri, doğrul
 msgid "Additionally, Services Operators with the nickserv/drop/override permission can replace code with OVERRIDE to drop without a confirmation code."
 msgstr "Ek olarak, nickserv/drop/override iznine sahip Servis Operatörleri, onay kodu olmadan drop etmek için kod'u OVERRIDE ile değiştirebilir."
 
-#: ../modules/nickserv/ns_register.cpp:428
 msgid "Additionally, Services Operators with the nickserv/resend permission can specify a nickname to resend a confirmation email for another account."
 msgstr "Ek olarak, nickserv/resend iznine sahip Servis Operatörleri, başka bir hesap için onay e-postasını yeniden göndermek üzere bir rumuz belirleyebilir."
 
@@ -1390,8 +1448,15 @@ msgstr "%s kanalına ait tüm memolar silindi."
 msgid "All modes cleared on %s."
 msgstr "%s tarihinde tüm memolar temizlendi."
 
-msgid "All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."
+msgid "All new accounts must be confirmed by an administrator. Please wait for your registration to be confirmed."
 msgstr "Tüm yeni hesapların bir yönetici tarafından doğrulanması gerekir. Lütfen kaydınızın onaylanmasını bekleyin."
+
+msgid "All new accounts must be confirmed. To confirm your account, follow the instructions that were emailed to you."
+msgstr "E-posta adresiniz onaylanmadı. Onaylamak için size e-postayla gönderilen talimatları izleyin."
+
+#, c-format
+msgid "All new accounts must be confirmed. To confirm your account, type %s."
+msgstr "Hesabınız onaylanmadı. Hesabınızı onaylamak için %s yazın."
 
 msgid "All of your memos have been deleted."
 msgstr "Tüm memolarınız silindi."
@@ -1776,7 +1841,7 @@ msgstr "Belirtilen e-posta adresini rumuzla ilişkilendirir."
 msgid "Associates the given email address with your nickname. This address will be displayed whenever someone requests information on the nickname with the INFO command."
 msgstr "Belirtilen E-posta adresini rumuzunuzla ilişkilendirir. Bu adres, birisi INFO komutuyla rumuz hakkında bilgi istediğinde görüntülenecektir."
 
-msgid "Auto-op"
+msgid "Auto op"
 msgstr "Oto-op"
 
 #, c-format
@@ -1810,6 +1875,10 @@ msgstr "Kullanılabilir oper-türleri:"
 
 #, c-format
 msgid "Available privileges for %s:"
+msgstr "%s için kullanılabilir yetkiler:"
+
+#, c-format
+msgid "Available timezones in the %s region:"
 msgstr "%s için kullanılabilir yetkiler:"
 
 msgid "BANS enforced by "
@@ -2001,9 +2070,6 @@ msgstr "Bot artık flood için kanaldan atmayacak."
 msgid "Bot won't kick for repeats anymore."
 msgstr "Bot artık repeats için kanaldan atmayacak."
 
-msgid "By"
-msgstr "Sahibi"
-
 msgid "CLEAR target"
 msgstr "CLEAR hedef"
 
@@ -2090,6 +2156,12 @@ msgstr "Rumuz sahibi olarak sizi tanımlamak için kullanılan şifreyi değişt
 
 msgid "Changes the successor of a channel. If the founder's nickname expires or is dropped while the channel is still registered, the successor will become the new founder of the channel. The successor's nickname must be a registered one. If there's no successor set, then the first nickname on the access list (with the highest access, if applicable) will become the new founder, but if the access list is empty, the channel will be dropped."
 msgstr "Bir kanalın vekilini değiştirir. Kurucunun rumuzunun geçerliliği sona ererse veya kanal kayıtlıyken silinirse, vekil, kanalın yeni kurucusu olacaktır. Vekilin rumuzu kayıtlı olmalıdır. Bir vekil ayarlanmadıysa, erişim listesindeki ilk rumuz (varsa en yüksek erişime sahip olan) yeni kurucu olur, ancak erişim listesi boşsa kanal düşürülür."
+
+msgid "Changes the timezone services uses when sending messages to the given user (for example, when responding to a command they send). timezone should be chosen from an entry in one of the supported timezone regions:"
+msgstr "Belirli bir kullanıcıya mesaj gönderirken (örneğin, gönderdikleri bir komuta yanıt verirken) Servislerin kullandığı dili değiştirir. dil, aşağıdaki desteklenen diller listesinden seçilmelidir:"
+
+msgid "Changes the timezone services uses when sending messages to you (for example, when responding to a command you send). timezone should be chosen from an entry in one of the supported timezone regions:"
+msgstr "Size mesaj gönderirken (örneğin, gönderdiğiniz bir komuta yanıt verirken) Servislerin kullandığı dili değiştirir. dil, aşağıdaki desteklenen diller listesinden seçilmelidir:"
 
 msgid "Changes when you will be notified about new memos (only for nicknames)"
 msgstr "Yeni memolar hakkında ne zaman bildirim alacağınızı değiştirir (sadece rumuzlar için)"
@@ -2296,6 +2368,43 @@ msgstr "Repeat yapanları (tekrar tekrar yazma) atmayı yapılandırır"
 
 msgid "Configures reverses kicker"
 msgstr "Reverse yapanları atmayı yapılandırır"
+
+msgid ""
+"Configures the layout used by the account for services messages.\n"
+"\n"
+"When the layout is set to FIXED services will use tables and position text such that it looks good in a client that uses a fixed-width font.\n"
+"\n"
+"When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font.\n"
+"\n"
+"When the layout is set to MONOSPACE services will format messages similar to FIXED but will prefix all messages with a monospace formatting character to force it to display correctly. This requires client support for monospace text formatting."
+msgstr ""
+"Hesap tarafından servis mesajları için kullanılan şablonu yapılandırır.\n"
+"\n"
+"Şablon FIXED olarak ayarlandığında, servisler tabloları kullanır ve metni sabit genişlikte bir yazı tipi kullanan bir istemcide iyi görünecek şekilde konumlandırır.\n"
+"\n"
+"Şablon FLEXIBLE olarak ayarlandığında, servisler mesajlar için alternatif bir biçim kullanır ve değişken genişlikte bir yazı tipi tarafından bozulabilecek herhangi bir konumlandırmadan kaçınır.\n"
+"\n"
+"Şablon MONOSPACE olarak ayarlandığında, servisler mesajları FIXED'yebenzer şekilde biçimlendirir, ancak doğru görüntülenmesini sağlamak için tüm mesajların önüne tek aralıklı bir biçimlendirme karakteri ekler. Bu, istemcinin tek aralıklı metin biçimlendirmesini desteklemesini gerektirir."
+
+msgid "Configures the layout used for services messages"
+msgstr "Servis mesajları için kullanılan şablonu yapılandırır"
+
+msgid ""
+"Configures the layout used for services messages.\n"
+"\n"
+"When the layout is set to FIXED services will use tables and position text such that it looks good in a client that uses a fixed-width font.\n"
+"\n"
+"When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font.\n"
+"\n"
+"When the layout is set to MONOSPACE services will format messages similar to FIXED but will prefix all messages with a monospace formatting character to force it to display correctly. This requires client support for monospace text formatting."
+msgstr ""
+"Servis mesajları için kullanılan şablonu yapılandırır.\n"
+"\n"
+"Şablon FIXED olarak ayarlandığında, servisler tabloları kullanır ve metni sabit genişlikte bir yazı tipi kullanan bir istemcide iyi görünecek şekilde konumlandırır.\n"
+"\n"
+"Şablon FLEXIBLE olarak ayarlandığında, servisler mesajlar için alternatif bir biçim kullanır ve değişken genişlikte bir yazı tipi tarafından bozulabilecek herhangi bir konumlandırmadan kaçınır.\n"
+"\n"
+"Şablon MONOSPACE olarak ayarlandığında, servisler mesajları FIXED'ye benzer şekilde biçimlendirir, ancak doğru görüntülenmesini sağlamak için tüm mesajların önüne tek aralıklı bir biçimlendirme karakteri ekler. Bu, istemcinin tek aralıklı metin biçimlendirmesini desteklemesini gerektirir."
 
 msgid "Configures the time bot bans expire in"
 msgstr "Bot banlarının sona ereceği zamanı yapılandırır"
@@ -3019,6 +3128,9 @@ msgstr "%s parmak izi zaten %s'in sertifika listesinde mevcut."
 msgid "Fingerprint %s is already in use."
 msgstr "%s parmak izi zaten kullanımda."
 
+msgid "Fixed layout"
+msgstr "Sabit şablon"
+
 msgid "Flags"
 msgstr "Bayraklar"
 
@@ -3030,11 +3142,14 @@ msgstr "%s için olan %s üzerindeki bayraklar +%s olarak ayarlandı"
 msgid "Flags list for %s"
 msgstr "%s için bayrak listesi"
 
+msgid "Flexible layout"
+msgstr "Esnek şablon"
+
 msgid "Flood kicker"
 msgstr "Flood yazı atma"
 
 msgid "Forbid allows you to forbid usage of certain nicknames, channels, and email addresses. Wildcards are accepted for all entries."
-msgstr "Bu forbid komutu, belirtilen rumuzların, kanalların ve e-posta adreslerinin kullanımını yasaklamanıza olanak tanır. Tüm girdilerde joker karakterler kabul edilir."
+msgstr "Forbid, belirli rumuzların, kanalların ve e-posta adreslerinin kullanımını yasaklamanıza olanak tanır. Tüm girdiler için joker karakterler kabul edilir."
 
 msgid "Forbid list is empty."
 msgstr "Forbid listesi boş."
@@ -3170,6 +3285,10 @@ msgid "Information about channel %s:"
 msgstr "%s kanalı ile ilgili bilgiler:"
 
 #, c-format
+msgid "Information about nick %s:"
+msgstr "%s rumuzu ile ilgili bilgiler:"
+
+#, c-format
 msgid "Invalid duration %s, using %d days."
 msgstr "Geçersiz süre %s, %d gün kullanılıyor."
 
@@ -3287,6 +3406,18 @@ msgstr "Son başlık"
 
 msgid "Last used"
 msgstr "Son kullanım"
+
+#, c-format
+msgid "Layout is now fixed for %s."
+msgstr ""
+
+#, c-format
+msgid "Layout is now flexible for %s."
+msgstr ""
+
+#, c-format
+msgid "Layout is now monospace for %s."
+msgstr ""
 
 msgid "Level"
 msgstr "Seviye"
@@ -3637,7 +3768,7 @@ msgstr ""
 msgid ""
 "Maintains the bad words list for a channel. The bad words list determines which words are to be kicked when the bad words kicker is enabled. For more information, type %sKICK%s.\n"
 "\n"
-"The ADD command adds the given word to the bad words list. If SINGLE is specified, a kick will be done only if a user says the entire word. If START is specified, a kick will be done if a user says a word that starts with word. If END is specified, a kick will be done if a user says a word that ends with word. If you don't specify anything, a kick will be issued every time word is said by a user.\n"
+"The ADD command adds the given word to the bad words list. If SINGLE is specified, a kick will be done only if a user says the entire word. If START is specified, a kick will be done if a user says a word that starts with word. If END is specified, a kick will be done if a user says a word that ends with word. If you don't specify anything, a kick will be issued every time word is said by a user. This will be shown in the LIST output as ANY.\n"
 "\n"
 "The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
@@ -3892,12 +4023,19 @@ msgstr "Modül: %s Sürüm: %s Yazar: %s Yüklenme: %s"
 msgid "Module: %s [%s] [%s]"
 msgstr "Modül: %s [%s] [%s]"
 
+msgid "Monospace layout"
+msgstr "Monospace şablonu"
+
 #, c-format
 msgid "Multiple languages matched %s. Please be more specific."
 msgstr "Birden fazla dil eşleşti: %s. Lütfen daha spesifik olun."
 
+#, c-format
+msgid "Multiple timezones matched %s. Please be more specific."
+msgstr "Birden fazla saat dilimi eşleşti: %s. Lütfen daha spesifik olun."
+
 msgid "NOTICE: In order to register a channel, you must have first registered your nickname."
-msgstr "DİKKAT: Bir kanalı kaydetmek için, ilk önce rumuzunuzu kaydettirdiniz."
+msgstr "DİKKAT: Bir kanalı kaydetmek için, ilk önce rumuzunuzu kaydetmelisiniz."
 
 msgid "Name"
 msgstr "Adı"
@@ -3912,8 +4050,8 @@ msgstr "%s için ağ istatistikleri:"
 msgid "Never"
 msgstr "Hiç"
 
-msgid "Never-op"
-msgstr "Hiç"
+msgid "Never op"
+msgstr "Hiç op değil"
 
 msgid "Nick"
 msgstr "Rumuz"
@@ -4035,7 +4173,6 @@ msgstr "Oto-Op yok"
 msgid "No bot"
 msgstr "Bot yok"
 
-#: ../modules/chanserv/cs_set.cpp:1336 ../modules/nickserv/ns_set.cpp:651
 msgid "No expiry"
 msgstr "Sona erme yok"
 
@@ -4663,7 +4800,7 @@ msgstr "Bayrak sistemi hakkında detaylı bilgi için %s komut çıktısına b
 
 #, c-format
 msgid "See the %s command (%sACCESS) for information on giving a subset of these privileges to other channel users."
-msgstr "Bu ayrıcalıkların bir alt kümesini diğer kanal kullanıcılarına verme hakkında bilgi için %s komutuna (%sACCESS) bakın."
+msgstr "Bu ayrıcalıkların bir alt kümesini diğer kanal kullanıcılarına verme hakkında bilgi için %s komutuna (%s HELP ACCESS) bakın."
 
 msgid "Send a memo to a nick or channel"
 msgstr "Bir rumuza veya kanala memo gönderme"
@@ -4762,6 +4899,9 @@ msgstr "%s sunucusu havuzda toplanmamış."
 #, c-format
 msgid "Server %s must be quit before it can be deleted."
 msgstr "Silinebilmesi için %s sunucusundan çıkılmalıdır."
+
+msgid "Server: {server} = {ip} -- limit: {limit}; state: {state}"
+msgstr "Sunucu: {server} = {ip} -- limit: {limit}; durum: {state}"
 
 msgid "Servers"
 msgstr "Sunucular"
@@ -4910,6 +5050,9 @@ msgstr "Rumuz şifresini ayarlayın"
 
 msgid "Set the successor for a channel"
 msgstr "Bir kanalın successorını (vekilini) ayarlama"
+
+msgid "Set the timezone services will use when messaging you"
+msgstr "Servislerin size mesaj gönderirken kullanacağı dili ayarlayın"
 
 msgid "Set the vhost for all nicks in an account"
 msgstr "Bir hesaptaki tüm rumuzların vhostunu ayarlayın"
@@ -5296,7 +5439,7 @@ msgstr ""
 "\n"
 "HARD eklenmesi kullanıcının sınırı değiştirmesini engeller. HARD'ı eklememek ters etkiye neden olur ve kullanıcının sınırı değiştirmesine olanak tanır (önceden bir sınır HARD ile ayarlanmış olsa bile).\n"
 "\n"
-"SETLIMIT komutunun bu kullanımı Servis Operatörleri ile sınırlıdır. Diğer kullanıcılar sadece kendileri veya bu ayrıcalıklara sahip oldukları kanal için limit girebilir, limitini kaldıramaz, %d'nin üzerinde limit belirleyemez, HARD limit belirleyemez."
+"SET LIMIT komutunun bu kullanımı Servis Operatörleri ile sınırlıdır. Diğer kullanıcılar sadece kendileri veya bu ayrıcalıklara sahip oldukları kanal için limit girebilir, limitini kaldıramaz, %d'nin üzerinde limit belirleyemez, HARD limit belirleyemez."
 
 #, c-format
 msgid ""
@@ -5588,7 +5731,6 @@ msgstr "AKILL listesi temizlendi."
 msgid "The Defcon level is now at: %d"
 msgstr "Defcon seviyesi şu anda: %d"
 
-#: ../modules/nickserv/ns_register.cpp:409
 #, c-format
 msgid "The confirmation code for %s has been re-sent to %s."
 msgstr "%s için onay kodu %s adresine yeniden gönderildi."
@@ -5909,7 +6051,6 @@ msgstr "Bu komut, rumuzunuzun veya belirtilmişse belirtilen rumuzun, içinde bu
 msgid "This command unloads the module named modname."
 msgstr "Bu komut mod-adı adlı modülü kaldırır."
 
-#: ../modules/nickserv/ns_register.cpp:422
 msgid "This command will resend a registration confirmation email."
 msgstr "Bu komut size kayıt onay e-postasını tekrar gönderecektir."
 
@@ -5937,6 +6078,14 @@ msgstr "Bu seçenek bir kanalı atanamaz hale getirir. Kanala zaten bir bot atan
 
 msgid "This option prevents a bot from being assigned to a channel by users that aren't Services Operators."
 msgstr "Bu seçenek, bir botun Servis Operatörü olmayan kullanıcılar tarafından bir kanala atanmasını engeller."
+
+#, c-format
+msgid "Timezone changed to %s."
+msgstr "Dil %s olarak değiştirildi."
+
+#, c-format
+msgid "Timezone for %s changed to %s."
+msgstr "%s için dil %s olarak değiştirildi."
 
 #, c-format
 msgid "To delete, type: %s %d"
@@ -6057,12 +6206,20 @@ msgstr ""
 msgid "Type %soption for more information on a specific option. The options will be set on the given nickname."
 msgstr "Belirli bir seçenek hakkında daha fazla bilgi için %sseçenek yazın. Seçenekler belirtilen rumuz'a göre ayarlanacaktır."
 
+#, c-format
+msgid "Type %sregion to list timezones for a region."
+msgstr "Bir bölgenin saat dilimlerini listelemek için %sregion yazın."
+
 msgid "Un-Load a module"
 msgstr "Bir modülün yüklemesini kaldır"
 
 #, c-format
 msgid "Unable to find regex engine %s."
 msgstr "%s regex motoru bulunamadı."
+
+#, c-format
+msgid "Unable to find the DNS record required to validate %s. If you have not already done this add a TXT record for %s with the value %s and re-execute this command."
+msgstr "%s doğrulaması için gereken DNS kaydı bulunamadı. Bunu daha önce yapmadıysanız, %s için %s değerine sahip bir TXT kaydı ekleyin ve bu komutu yeniden çalıştırın."
 
 #, c-format
 msgid "Unable to load module %s."
@@ -6223,6 +6380,10 @@ msgid "VHost for %s has been rejected."
 msgstr "%s için olan vHost reddedildi."
 
 #, c-format
+msgid "VHost for %s has been validated using DNS."
+msgstr "%s için olan vHost DNS kullnılarak doğrulandı."
+
+#, c-format
 msgid "VHost for account %s set to %s."
 msgstr "%s hesabı için vHost, %s olarak ayarlandı."
 
@@ -6238,6 +6399,12 @@ msgstr "VIEW [maske | liste | id]"
 
 msgid "VIEW [mask | list]"
 msgstr "VIEW [maske | liste]"
+
+msgid "Validates a previously requested vhost using DNS"
+msgstr "Daha önce talep edilen bir vhostu DNS kullanarak doğrular"
+
+msgid "Validates a previously requested vhost using DNS. If you own the domain you have requested as a vhost you can validate your ownership of it using a DNS TXT record to approve your own vhost."
+msgstr "Daha önce talep edilen bir vhostu DNS kullanarak doğrular. vHost olarak talep ettiğiniz alan adı size aitse, kendi vhostunuzu onaylamak için bir DNS TXT kaydı kullanarak sahipliğinizi doğrulayabilirsiniz."
 
 msgid "Value"
 msgstr "Değer"
@@ -6588,6 +6755,10 @@ msgstr "Şimdi rumuzunuz için bir e-posta girmelisiniz. Bu e-posta, unutmanız 
 msgid "You must wait %s before registering your nick."
 msgstr "Rumuzunuzu kaydetmeden önce %s beklemelisiniz."
 
+#, c-format
+msgid "You must wait for %s before trying DNS validation again."
+msgstr "Rumuzunuzu kaydetmeden önce %s beklemelisiniz."
+
 msgid "You need to be identified to use this command."
 msgstr "Bu komutu kullanabilmeniz için kendinizi tanıtmanız gerekmektedir."
 
@@ -6658,13 +6829,6 @@ msgstr "SSL sertifika parmak iziniz %s otomatik olarak sertifika listenize ekl
 #, c-format
 msgid "Your account %s has been successfully created."
 msgstr "Hesabınız %s başarıyla oluşturuldu."
-
-msgid "Your account is not confirmed. To confirm it, follow the instructions that were emailed to you."
-msgstr "E-posta adresiniz onaylanmadı. Onaylamak için size e-postayla gönderilen talimatları izleyin."
-
-#, c-format
-msgid "Your account is not confirmed. To confirm it, type %s."
-msgstr "Hesabınız onaylanmadı. Hesabınızı onaylamak için %s yazın."
 
 #, c-format
 msgid "Your account will expire, if not confirmed, in %s."
@@ -6750,8 +6914,16 @@ msgstr "Talep ettiğiniz vHost reddedildi."
 msgid "Your requested vhost has been rejected. Reason: %s"
 msgstr "Talep ettiğiniz vHost reddedildi. Sebep: %s"
 
-msgid "Your vhost has been requested."
-msgstr "VHost'unuz talep edildi."
+msgid "Your requested vhost has been validated via DNS."
+msgstr "Talep ettiğiniz vHost kabul edildi."
+
+#, c-format
+msgid "Your vhost %s has been requested."
+msgstr "VHost'unuz %s talep edildi."
+
+#, c-format
+msgid "Your vhost %s has been requested. If the requested vhost is for a valid DNS name you can add a TXT record for %s with the value %s and automatically approve your vhost using %s."
+msgstr "Vhost'unuz %s talep edildi. Talep edilen vhost geçerli bir DNS adına aitse, %s için %s değerine sahip bir TXT kaydı ekleyebilir ve vhost'unuzu %s kullanarak otomatik olarak onaylayabilirsiniz."
 
 #, c-format
 msgid "Your vhost of %s is now activated."
@@ -6774,6 +6946,12 @@ msgstr "%s bölgesi mevcut değil."
 #, c-format
 msgid "Zone %s removed."
 msgstr "%s bölgesi kaldırıldı."
+
+msgid "Zone: {zone}"
+msgstr "Bölge: {zone}"
+
+msgid "Zone: {zone} = {servers}"
+msgstr "Bölge: {zone} = {servers}"
 
 msgid "[1|2|3|4|5]"
 msgstr "[1|2|3|4|5]"
@@ -6908,3 +7086,87 @@ msgstr "{rumuz | kanal} memo-metni"
 
 msgid "{ON | delay | OFF}"
 msgstr "{ON | gecikme | OFF}"
+
+msgid "{mode} -- created by {creator} on {created}"
+msgstr "{mode} -- {created}'de oluşturan {creator}"
+
+msgid "{mode} {param} -- created by {creator} on {created}"
+msgstr "{mode} {param} -- {created}'de oluşturan {creator}"
+
+msgid "{number}: {channel}"
+msgstr "{number}: {channel}"
+
+msgid "{number}: {channel} (key: {key})"
+msgstr "{number}: {channel} (anahtar: {key})"
+
+msgid "{number}: {channel} = {access}"
+msgstr "{number}: {channel} = {access}"
+
+msgid "{number}: {channel} = {access} ({description})"
+msgstr "{number}: {channel} = {access} ({description})"
+
+msgid "{number}: {mask}"
+msgstr "{number}: {mask}"
+
+msgid "{number}: {mask} ({description})"
+msgstr "{number}: {mask} ({description})"
+
+msgid "{number}: {mask} ({reason})"
+msgstr "{number}: {mask} ({reason})"
+
+msgid "{number}: {mask} -- added by {creator} on {created}; last used: {last_used}"
+msgstr "{number}: {mask} -- {created}'de ekleyen {creator}; son kullanım: {last_used}"
+
+msgid "{number}: {mask} -- added by {creator} on {created}; last used: {last_used} ({reason})"
+msgstr "{number}: {mask} -- {created}'de ekleyen {creator}; son kullanım: {last_used}({reason})"
+
+msgid "{number}: {mask} -- created by {creator} on {created}; {expires} ({reason})"
+msgstr "{number}: {mask} -- {created}'de ekleyen {creator}; {expires} ({reason})"
+
+msgid "{number}: {mask} -- {limit} sessions ({reason})"
+msgstr "{number}: {mask} -- {limit} oturum ({reason})"
+
+msgid "{number}: {mask} -- {limit} sessions; created by {creator} on {created}; {expires} ({reason})"
+msgstr "{number}: {mask} -- {limit} oturum; {created}'de ekleyen {creator}; {expires} ({reason})"
+
+msgid "{number}: {mask} = {flags} -- added by {creator} at {created}"
+msgstr "{number}: {mask} = {flags} -- {created}'de ekleyen {creator}"
+
+msgid "{number}: {mask} = {flags} -- added by {creator} at {created} ({description})"
+msgstr "{number}: {mask} = {flags} -- {created}'de ekleyen {creator} ({description})"
+
+msgid "{number}: {mask} = {level}"
+msgstr "{number}: {mask} = {level}"
+
+msgid "{number}: {mask} = {level} ({description})"
+msgstr "{number}: {mask} = {level} ({description})"
+
+msgid "{number}: {mask} = {level} -- created by {creator}; last seen {last_seen}"
+msgstr "{number}: {mask} = {level} -- oluşturan {creator}; son görülme {last_seen}"
+
+msgid "{number}: {mask} = {level} -- created by {creator}; last seen {last_seen} ({description})"
+msgstr "{number}: {mask} = {level} -- oluşturan {creator}; son görülme {last_seen} ({description})"
+
+msgid "{number}: {nick} = {vhost} -- created by {creator} at {created}"
+msgstr "{number}: {nick} = {vhost} -- {created}'de oluşturan {creator}"
+
+msgid "{number}: {word} -- type: {type}"
+msgstr "{number}: {word} -- tip: {type}"
+
+msgid "{number}: [{id}] {mask} -- created by {creator} on {created}; {expires} ({reason})"
+msgstr "{number}: [{id}] {mask} -- {created}'de oluşturan {creator}; {expires} ({reason})"
+
+msgid "{number}: sent by {sender} at {date/time}"
+msgstr "{number}: {date/time}'de gönderen {sender}"
+
+msgid "{number}: {command} on {service}: {method}"
+msgstr "{number}: {service}'de {command}: {method}"
+
+msgid "{number}: {message}"
+msgstr "{number}: {message}"
+
+msgid "{number}: {message} -- created by {creator} at {created}"
+msgstr "{number}: {message} -- {created}'de oluşturan {creator}"
+
+msgid "{number}: {text} -- created by {creator} on {created}"
+msgstr "{number}: {text} -- {created}'de oluşturan {creator}"

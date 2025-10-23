@@ -178,17 +178,18 @@ public:
 		, SASL::ProtocolInterface(creator)
 		, maxlist(creator, "maxlist")
 	{
-		DefaultPseudoclientModes = "+oI";
-		CanSVSNick = true;
-		CanSVSJoin = true;
+		CanCertFP = true;
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSQLine = true;
+		CanSVSHold = true;
+		CanSVSJoin = true;
+		CanSVSNick = true;
 		CanSZLine = true;
-		CanCertFP = true;
 		RequiresID = true;
-		MaxModes = 0;
+		DefaultPseudoclientModes = "+oI";
 		MaxLine = 0;
+		MaxModes = 0;
 	}
 
 	void GetLinkAdvice(std::vector<Anope::string> &advice) override
@@ -334,19 +335,7 @@ public:
 
 	void SendTopic(const MessageSource &source, Channel *c) override
 	{
-		if (Servers::Capab.count("TOPICLOCK"))
-		{
-			Uplink::Send(c->WhoSends(), "SVSTOPIC", c->name, c->topic_ts, c->topic_setter, c->topic);
-		}
-		else
-		{
-			/* If the last time a topic was set is after the TS we want for this topic we must bump this topic's timestamp to now */
-			time_t ts = c->topic_ts;
-			if (c->topic_time > ts)
-				ts = Anope::CurTime;
-			/* But don't modify c->topic_ts, it should remain set to the real TS we want as ci->last_topic_time pulls from it */
-			Uplink::Send(source, "FTOPIC", c->name, c->created, ts, c->topic_setter, c->topic);
-		}
+		Uplink::Send(c->WhoSends(), "SVSTOPIC", c->name, c->topic_ts, c->topic_setter, c->topic);
 	}
 
 	void SendVHostDel(User *u) override
@@ -1211,7 +1200,6 @@ struct IRCDMessageCapab final
 			Servers::Capab.clear();
 			IRCD->CanClearModes.clear();
 			IRCD->CanSQLineChannel = false;
-			IRCD->CanSVSHold = false;
 			IRCD->CanTagMessage = false;
 			IRCD->DefaultPseudoclientModes = "+oI";
 		}
@@ -1502,11 +1490,7 @@ struct IRCDMessageCapab final
 				}
 
 				else if (modname.equals_cs("services"))
-				{
-					IRCD->CanSVSHold = true;
 					Servers::Capab.insert("SERVICES");
-					Servers::Capab.insert("TOPICLOCK");
-				}
 			}
 
 			const auto &anoperegex = Config->GetBlock("options").Get<const Anope::string>("regexengine");
@@ -1550,9 +1534,6 @@ struct IRCDMessageCapab final
 
 			if (!ModeManager::FindUserModeByName("PRIV"))
 				throw ProtocolException("The hidechans module is not loaded. This is required by Anope.");
-
-			if (!IRCD->CanSVSHold)
-				Log() << "The remote server does not have the svshold module; fake users will be used for nick protection until the module is loaded.";
 
 			if (!IRCD->CanSQLineChannel)
 				Log() << "The remote server does not have the cban module; services will manually enforce forbidden channels until the module is loaded.";
@@ -2548,11 +2529,8 @@ public:
 			SendChannelMetadata(ci->c, "mlock", modes);
 		}
 
-		if (Servers::Capab.count("TOPICLOCK") && ci->c)
-		{
-			if (ci->HasExt("TOPICLOCK"))
-				SendChannelMetadata(ci->c, "topiclock", "1");
-		}
+		if (ci->HasExt("TOPICLOCK"))
+			SendChannelMetadata(ci->c, "topiclock", "1");
 	}
 
 	void OnDelChan(ChannelInfo *ci) override
@@ -2561,8 +2539,7 @@ public:
 			return;
 
 		SendChannelMetadata(ci->c, "mlock", "");
-		if (Servers::Capab.count("TOPICLOCK"))
-			SendChannelMetadata(ci->c, "topiclock", "");
+		SendChannelMetadata(ci->c, "topiclock", "");
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override

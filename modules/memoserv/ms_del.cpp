@@ -121,7 +121,6 @@ public:
 					source.Reply(_("All of your memos have been deleted."));
 			}
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

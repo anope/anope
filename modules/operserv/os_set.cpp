@@ -27,8 +27,6 @@ private:
 		source.Reply(index.c_str(), "DEBUG");
 		index = Anope::NoExpire ? _("%s is enabled") : _("%s is disabled");
 		source.Reply(index.c_str(), "NOEXPIRE");
-
-		return;
 	}
 
 	void DoSetReadOnly(CommandSource &source, const std::vector<Anope::string> &params)
@@ -55,8 +53,6 @@ private:
 		}
 		else
 			source.Reply(_("Setting for READONLY must be \002ON\002 or \002OFF\002."));
-
-		return;
 	}
 
 	void DoSetSuperAdmin(CommandSource &source, const std::vector<Anope::string> &params)
@@ -94,8 +90,6 @@ private:
 		}
 		else
 			source.Reply(_("Setting for super admin must be \002ON\002 or \002OFF\002."));
-
-		return;
 	}
 
 	void DoSetDebug(CommandSource &source, const std::vector<Anope::string> &params)
@@ -133,8 +127,6 @@ private:
 
 			source.Reply(_("Setting for DEBUG must be \002ON\002, \002OFF\002, or a positive number."));
 		}
-
-		return;
 	}
 
 	void DoSetNoExpire(CommandSource &source, const std::vector<Anope::string> &params)
@@ -161,8 +153,6 @@ private:
 		}
 		else
 			source.Reply(_("Setting for NOEXPIRE must be \002ON\002 or \002OFF\002."));
-
-		return;
 	}
 public:
 	CommandOSSet(Module *creator) : Command(creator, "operserv/set", 1, 2)
@@ -187,8 +177,6 @@ public:
 			return this->DoSetSuperAdmin(source, params);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -221,8 +221,6 @@ protected:
 			lflist.SendTo(source);
 			source.Reply(_("End of news list."));
 		}
-
-		return;
 	}
 
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
@@ -247,8 +245,6 @@ protected:
 			source.Reply(msgs[MSG_ADDED]);
 			Log(LOG_ADMIN, source, this) << "to add a news item";
 		}
-
-		return;
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
@@ -288,8 +284,6 @@ protected:
 				}
 			}
 		}
-
-		return;
 	}
 
 	void DoNews(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype)
@@ -311,8 +305,6 @@ protected:
 			return this->DoDel(source, params, ntype, msgs);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 public:
 	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2), ns("NewsService", "news")

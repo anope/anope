@@ -59,8 +59,6 @@ public:
 
 		if (!found)
 			source.Reply(_("Nick %s doesn't have a memo from you."), na->nick.c_str());
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

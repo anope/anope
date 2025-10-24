@@ -447,8 +447,6 @@ public:
 		}
 		else
 			this->OnSyntaxError(source, command);
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

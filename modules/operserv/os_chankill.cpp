@@ -89,7 +89,6 @@ public:
 			else
 				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -267,8 +267,6 @@ private:
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
-
-		return;
 	}
 
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
@@ -428,8 +426,6 @@ public:
 			return this->DoClear(source);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

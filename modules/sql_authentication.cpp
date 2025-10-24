@@ -27,7 +27,6 @@ class SQLAuthenticationResult final
 	{
 		Log(LOG_DEBUG) << "sql_authentication: Unsuccessful authentication for " << req->GetAccount() << ": " << reason;
 		delete this;
-		return;
 	}
 
 public:

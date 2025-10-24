@@ -195,8 +195,6 @@ public:
 		source.Reply(_("Channel \002%s\002 is now released."), ci->name.c_str());
 
 		FOREACH_MOD(OnChanUnsuspend, (ci));
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

@@ -382,8 +382,6 @@ private:
 
 			source.Reply(_("\002%s\002 not found on %s access list."), mask.c_str(), ci->name.c_str());
 		}
-
-		return;
 	}
 
 	void ProcessList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, ListFormatter &list)
@@ -439,8 +437,6 @@ private:
 			list.SendTo(source);
 			source.Reply(_("End of access list"));
 		}
-
-		return;
 	}
 
 	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -498,8 +494,6 @@ private:
 			bool override = !source.IsFounder(ci);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
 		}
-
-		return;
 	}
 
 public:
@@ -567,8 +561,6 @@ public:
 			this->DoClear(source, ci);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -765,7 +757,6 @@ class CommandCSLevels final
 		FOREACH_MOD(OnLevelChange, (source, ci, "ALL", 0));
 
 		source.Reply(_("Access levels for \002%s\002 reset to defaults."), ci->name.c_str());
-		return;
 	}
 
 public:
@@ -818,8 +809,6 @@ public:
 			this->DoReset(source, ci);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

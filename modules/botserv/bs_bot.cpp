@@ -88,7 +88,6 @@ private:
 		source.Reply(_("%s!%s@%s (%s) added to the bot list."), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 
 		FOREACH_MOD(OnBotCreate, (bi));
-		return;
 	}
 
 	void DoChange(CommandSource &source, const std::vector<Anope::string> &params)
@@ -227,7 +226,6 @@ private:
 		Log(LOG_ADMIN, source, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
 		FOREACH_MOD(OnBotChange, (bi));
-		return;
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
@@ -259,7 +257,6 @@ private:
 
 		source.Reply(_("Bot \002%s\002 has been deleted."), nick.c_str());
 		delete bi;
-		return;
 	}
 public:
 	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6)
@@ -339,8 +336,6 @@ public:
 		}
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

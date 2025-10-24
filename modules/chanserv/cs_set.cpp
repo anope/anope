@@ -253,8 +253,6 @@ public:
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset the description";
 			source.Reply(_("Description of %s unset."), ci->name.c_str());
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -331,8 +329,6 @@ public:
 		ci->SetFounder(nc);
 
 		source.Reply(_("Founder of \002%s\002 changed to \002%s\002."), ci->name.c_str(), na->nick.c_str());
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -465,8 +461,6 @@ public:
 		}
 		else
 			this->OnSyntaxError(source, "PEACE");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -1004,8 +998,6 @@ public:
 			source.Reply(_("Successor for \002%s\002 changed to \002%s\002."), ci->name.c_str(), nc->display.c_str());
 		else
 			source.Reply(_("Successor for \002%s\002 unset."), ci->name.c_str());
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -1084,8 +1076,6 @@ public:
 		}
 		else
 			this->OnSyntaxError(source, "NOEXPIRE");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

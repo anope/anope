@@ -228,7 +228,6 @@ public:
 
 		/* Run any defcon functions, e.g. FORCE CHAN MODE */
 		runDefCon();
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

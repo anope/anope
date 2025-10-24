@@ -248,7 +248,6 @@ public:
 
 		list.SendTo(source);
 		source.Reply(_("End of users list. \002%u\002 users shown."), count);
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

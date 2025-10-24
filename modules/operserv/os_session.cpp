@@ -252,8 +252,6 @@ private:
 			source.Reply(_("Hosts with at least \002%d\002 sessions:"), mincount);
 			list.SendTo(source);
 		}
-
-		return;
 	}
 
 	static void DoView(CommandSource &source, const std::vector<Anope::string> &params)
@@ -421,8 +419,6 @@ private:
 					source.Reply(READ_ONLY_MODE);
 			}
 		}
-
-		return;
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
@@ -457,8 +453,6 @@ private:
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
-
-		return;
 	}
 
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)

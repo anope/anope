@@ -227,8 +227,6 @@ public:
 			source.Reply(_("No registrations matching \002%s\002 were found."), email.c_str());
 			return;
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

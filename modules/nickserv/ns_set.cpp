@@ -24,7 +24,6 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -80,7 +79,6 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->OnSyntaxError(source, "");
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

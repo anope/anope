@@ -124,7 +124,6 @@ private:
 		MaxUserTime = Anope::CurTime;
 		Stats::me->QueueUpdate();
 		source.Reply(_("Statistics reset."));
-		return;
 	}
 
 	static void DoStatsUptime(CommandSource &source)
@@ -133,8 +132,6 @@ private:
 		source.Reply(_("Current users: \002%zu\002 (\002%zu\002 ops)"), UserListByNick.size(), OperCount);
 		source.Reply(_("Maximum users: \002%zu\002 (%s)"), MaxUserCount, Anope::strftime(MaxUserTime, source.GetAccount()).c_str());
 		source.Reply(_("Services up %s."), Anope::Duration(uptime, source.GetAccount()).c_str());
-
-		return;
 	}
 
 	static void DoStatsUplink(CommandSource &source)
@@ -148,7 +145,6 @@ private:
 		source.Reply(_("Uplink server: %s"), Me->GetLinks().front()->GetName().c_str());
 		source.Reply(_("Uplink capab: %s"), buf.c_str());
 		source.Reply(_("Servers found: %zu"), Servers::ByName.size() - 1);
-		return;
 	}
 
 	template<typename T> void GetHashStats(const T &map, size_t &entries, size_t &buckets, size_t &max_chain)

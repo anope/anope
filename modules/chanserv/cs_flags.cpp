@@ -377,8 +377,6 @@ class CommandCSFlags final
 			bool override = !source.IsFounder(ci);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the access list";
 		}
-
-		return;
 	}
 
 public:

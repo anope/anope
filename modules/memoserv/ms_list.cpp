@@ -130,7 +130,6 @@ public:
 			source.Reply(_("Memos for %s:"), ci ? ci->name.c_str() : source.GetNick().c_str());
 			list.SendTo(source);
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

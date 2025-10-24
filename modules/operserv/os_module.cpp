@@ -35,8 +35,6 @@ public:
 			source.Reply(_("Module \002%s\002 is already loaded."), mname.c_str());
 		else
 			source.Reply(_("Unable to load module \002%s\002."), mname.c_str());
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -108,8 +106,6 @@ public:
 			else
 				source.Reply(_("Unable to load module \002%s\002."), mname.c_str());
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -159,8 +155,6 @@ public:
 		}
 		else
 			source.Reply(_("Unable to remove module \002%s\002."), mname.c_str());
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

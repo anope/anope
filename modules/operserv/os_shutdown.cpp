@@ -47,7 +47,6 @@ public:
 		Log(LOG_ADMIN, source, this);
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
 		Anope::Quitting = true;
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -84,7 +83,6 @@ public:
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
 		Anope::Quitting = Anope::Restarting = true;
 		Anope::SaveDatabases();
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -118,7 +116,6 @@ public:
 		Anope::QuitReason = source.command + " command received from " + source.GetNick();
 		Anope::Quitting = true;
 		Anope::SaveDatabases();
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

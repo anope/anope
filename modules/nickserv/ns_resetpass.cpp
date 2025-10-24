@@ -42,8 +42,6 @@ public:
 				source.Reply(_("Password reset email for \002%s\002 has been sent."), na->nick.c_str());
 			}
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

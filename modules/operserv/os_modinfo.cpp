@@ -56,8 +56,6 @@ public:
 		}
 		else
 			source.Reply(_("No information about module \002%s\002 is available."), file.c_str());
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

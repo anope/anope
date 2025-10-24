@@ -183,8 +183,6 @@ public:
 		}
 
 		FOREACH_MOD(OnPostHelp, (source, params));
-
-		return;
 	}
 };
 

@@ -114,8 +114,6 @@ private:
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
-
-		return;
 	}
 
 	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
@@ -238,8 +236,6 @@ private:
 		source.Reply(_("The %s list has been cleared."), source.command.nobreak().c_str());
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
-
-		return;
 	}
 public:
 	CommandOSSXLineBase(Module *creator, const Anope::string &cmd) : Command(creator, cmd, 1, 4)
@@ -267,8 +263,6 @@ public:
 			return this->OnClear(source);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override = 0;

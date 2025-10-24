@@ -59,7 +59,6 @@ public:
 			Log(LOG_ADMIN, source, this) << "to change " << nick << " to " << newnick;
 			IRCD->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

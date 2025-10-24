@@ -346,8 +346,6 @@ private:
 		ignore_service->ClearIgnores();
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
 		source.Reply(_("Ignore list has been cleared."));
-
-		return;
 	}
 
 public:
@@ -374,8 +372,6 @@ public:
 			return this->DoClear(source);
 		else
 			this->OnSyntaxError(source, "");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

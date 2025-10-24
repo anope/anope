@@ -191,7 +191,6 @@ private:
 			else
 				source.Reply(_("Memo limit \002disabled\002 for %s."), !chan.empty() ? chan.c_str() : user.c_str());
 		}
-		return;
 	}
 public:
 	CommandMSSet(Module *creator) : Command(creator, "memoserv/set", 2, 5)
@@ -215,8 +214,6 @@ public:
 		{
 			this->OnSyntaxError(source, "");
 		}
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

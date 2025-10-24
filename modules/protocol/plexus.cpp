@@ -257,8 +257,6 @@ struct IRCDMessageEncap final
 			m.data.assign(params.begin() + 5, params.end());
 			SASL::service->ProcessMessage(m);
 		}
-
-		return;
 	}
 };
 

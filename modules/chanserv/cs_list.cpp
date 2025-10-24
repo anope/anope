@@ -229,8 +229,6 @@ public:
 		}
 		else
 			this->OnSyntaxError(source, "PRIVATE");
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

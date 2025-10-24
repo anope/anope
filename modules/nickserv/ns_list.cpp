@@ -128,7 +128,6 @@ public:
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
 		list.SendTo(source);
 		source.Reply(_("End of list - %d/%d matches shown."), nnicks > listmax ? listmax : nnicks, nnicks);
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

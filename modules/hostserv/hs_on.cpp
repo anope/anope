@@ -42,8 +42,6 @@ public:
 		}
 		else
 			source.Reply(HOST_NOT_ASSIGNED);
-
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

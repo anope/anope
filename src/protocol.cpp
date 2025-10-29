@@ -233,7 +233,7 @@ void IRCDProto::SendGlobops(const MessageSource &source, const Anope::string &me
 	Uplink::Send(source, "GLOBOPS", message);
 }
 
-void IRCDProto::SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params)
+void IRCDProto::SendNumericInternal(unsigned numeric, const Anope::string &dest, const std::vector<Anope::string> &params)
 {
 	Anope::string n = Anope::ToString(numeric);
 	if (numeric < 10)

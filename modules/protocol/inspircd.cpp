@@ -410,7 +410,7 @@ public:
 		SendAddLine("G", x->GetUser() + "@" + x->GetHost(), timeleft, x->by, x->GetReason());
 	}
 
-	void SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params) override
+	void SendNumericInternal(unsigned numeric, const Anope::string &dest, const std::vector<Anope::string> &params) override
 	{
 		auto newparams = params;
 		newparams.insert(newparams.begin(), { Me->GetSID(), dest, Anope::ToString(numeric) });

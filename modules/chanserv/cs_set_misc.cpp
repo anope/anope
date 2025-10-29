@@ -15,7 +15,7 @@
 static Module *me;
 
 static Anope::map<Anope::string> descriptions;
-static Anope::map<uint16_t> numerics;
+static Anope::map<unsigned> numerics;
 
 struct CSMiscData;
 static Anope::map<ExtensibleItem<CSMiscData> *> items;

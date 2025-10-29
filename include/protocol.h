@@ -280,9 +280,9 @@ public:
 	virtual void SendServer(const Server *) = 0;
 	virtual void SendSquit(Server *, const Anope::string &message);
 
-	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const std::vector<Anope::string> &params);
+	virtual void SendNumericInternal(unsigned numeric, const Anope::string &dest, const std::vector<Anope::string> &params);
 	template <typename... Args>
-	void SendNumeric(int numeric, const Anope::string &dest, Args &&...args)
+	void SendNumeric(unsigned numeric, const Anope::string &dest, Args &&...args)
 	{
 		SendNumericInternal(numeric, dest, { Anope::ToString(args)... });
 	}

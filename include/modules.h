@@ -739,7 +739,7 @@ public:
 
 	/** Called when a nick is registered
 	 * @param user The user registering the nick, of any
-	 * @param The nick
+	 * @param na The nick
 	 * @param pass The password of the newly registered nick
 	 */
 	virtual void OnNickRegister(User *user, NickAlias *na, const Anope::string &pass) ATTR_NOT_NULL(3) { throw NotImplementedException(); }

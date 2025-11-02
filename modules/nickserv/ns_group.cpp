@@ -55,7 +55,7 @@ public:
 
 		if (u != NULL)
 		{
-			na->last_userhost = u->GetIdent() + "@" + u->GetDisplayedHost();
+			na->UpdateSeen(u);
 
 			IRCD->SendLogin(u, na); // protocol modules prevent this on unconfirmed accounts
 			u->Login(target->nc);

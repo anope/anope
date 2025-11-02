@@ -140,7 +140,7 @@ public:
 			nc->pass = encpass;
 
 			if (u)
-				na->last_userhost = u->GetIdent() + "@" + u->GetDisplayedHost();
+				na->UpdateSeen(u);
 
 			Log(LOG_COMMAND, source, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 

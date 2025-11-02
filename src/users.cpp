@@ -358,11 +358,7 @@ void User::SendMessage(CommandSource &source, const Anope::string &msg)
 void User::Identify(NickAlias *na)
 {
 	if (this->nick.equals_ci(na->nick))
-	{
-		na->last_userhost = this->GetIdent() + "@" + this->GetDisplayedHost();
-		na->last_userhost_real = this->GetIdent() + "@" + this->host;
-		na->last_seen = Anope::CurTime;
-	}
+		na->UpdateSeen(this);
 
 	IRCD->SendLogin(this, na);
 
@@ -515,10 +511,7 @@ void User::UpdateHost()
 
 	NickAlias *na = NickAlias::Find(this->nick);
 	if (na && this->IsIdentified(true))
-	{
-		na->last_userhost = this->GetIdent() + "@" + this->GetDisplayedHost();
-		na->last_userhost_real = this->GetIdent() + "@" + this->host;
-	}
+		na->UpdateSeen(this);
 }
 
 void User::SetAway(const Anope::string &msg, time_t ts)

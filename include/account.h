@@ -107,6 +107,11 @@ public:
 	 */
 	time_t GetVHostCreated() const;
 
+	/** Update the last seen time for the nickname.
+	 * @param u The user who is using the nickname.
+	 */
+	void UpdateSeen(User *u);
+
 	/** Finds a registered nick
 	 * @param nick The nick to lookup
 	 * @return the nick, if found

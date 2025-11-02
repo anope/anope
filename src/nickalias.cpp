@@ -127,6 +127,13 @@ time_t NickAlias::GetVHostCreated() const
 	return this->vhost_created;
 }
 
+void NickAlias::UpdateSeen(User *u)
+{
+	this->last_seen = Anope::CurTime;
+	this->last_userhost = u->GetIdent() + "@" + u->GetDisplayedHost();
+	this->last_userhost_real = u->GetIdent() + "@" + u->host;
+}
+
 NickAlias *NickAlias::Find(const Anope::string &nick)
 {
 	nickalias_map::const_iterator it = NickAliasList->find(nick);

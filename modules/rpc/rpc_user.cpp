@@ -82,9 +82,9 @@ private:
 				return;
 
 			if (NickAlias::Find(GetAccount()))
-				request.Error(ERR_INVALID_ACCOUNT, "Invalid account");
-			else
 				request.Error(ERR_INVALID_PASSWORD, "Invalid password");
+			else
+				request.Error(ERR_INVALID_ACCOUNT, "Invalid account");
 
 			rpcinterface->Reply(request);
 			client->SendReply(&request.reply);

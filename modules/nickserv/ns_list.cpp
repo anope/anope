@@ -44,7 +44,7 @@ public:
 			pattern = "*";
 		}
 
-		auto nsnoexpire = false, suspended = false, unconfirmed = false;
+		auto display = false, nsnoexpire = false, suspended = false, unconfirmed = false;
 		const auto is_servadmin = source.HasCommand("nickserv/list");
 		if (is_servadmin && params.size() > 1)
 		{
@@ -52,11 +52,13 @@ public:
 			spacesepstream keywords(params[1]);
 			while (keywords.GetToken(keyword))
 			{
-				if (keyword.equals_ci("NOEXPIRE"))
+				if (keyword.equals_ci("DISPLAY"))
+					display = true;
+				else if (keyword.equals_ci("NOEXPIRE"))
 					nsnoexpire = true;
-				if (keyword.equals_ci("SUSPENDED"))
+				else if (keyword.equals_ci("SUSPENDED"))
 					suspended = true;
-				if (keyword.equals_ci("UNCONFIRMED"))
+				else if (keyword.equals_ci("UNCONFIRMED"))
 					unconfirmed = true;
 			}
 		}
@@ -81,6 +83,8 @@ public:
 		{
 			/* Don't show private nicks to non-services admins. */
 			if (na->nc->HasExt("NS_PRIVATE") && !is_servadmin && na->nc != mync)
+				continue;
+			else if (display && na->nc->na != na)
 				continue;
 			else if (nsnoexpire && !na->HasExt("NS_NO_EXPIRE"))
 				continue;

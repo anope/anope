@@ -23,17 +23,8 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-
-		Anope::string pattern = params[0];
-		const NickCore *mync;
-		unsigned nnicks;
-		bool is_servadmin = source.HasCommand("nickserv/list");
-		int count = 0, from = 0, to = 0;
-		bool suspended, nsnoexpire, unconfirmed;
-		unsigned listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
-
-		suspended = nsnoexpire = unconfirmed = false;
-
+		auto from = 0u, to = 0u;
+		auto pattern = params[0];
 		if (pattern[0] == '#')
 		{
 			Anope::string n1, n2;
@@ -53,8 +44,8 @@ public:
 			pattern = "*";
 		}
 
-		nnicks = 0;
-
+		auto nsnoexpire = false, suspended = false, unconfirmed = false;
+		const auto is_servadmin = source.HasCommand("nickserv/list");
 		if (is_servadmin && params.size() > 1)
 		{
 			Anope::string keyword;
@@ -70,8 +61,6 @@ public:
 			}
 		}
 
-		mync = source.nc;
-
 		ListFormatter list(source.GetAccount());
 		list.AddColumn(_("Nick")).AddColumn(_("Last mask"));
 		list.SetFlexible([](ListFormatter::ListEntry &row)
@@ -85,6 +74,9 @@ public:
 		for (const auto &[nick, na] : *NickAliasList)
 			ordered_map[nick] = na;
 
+		const auto listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
+		const auto *mync = source.GetAccount();
+		auto count = 0u, nnicks = 0u;
 		for (const auto &[_, na] : ordered_map)
 		{
 			/* Don't show private nicks to non-services admins. */

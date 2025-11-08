@@ -59,7 +59,8 @@ private:
 			if (!na)
 				return; // Should never happen.
 
-			if (na->nc->HasExt("NS_SUSPENDED"))
+			NickCore *nc = na->nc;
+			if (nc->HasExt("NS_SUSPENDED"))
 			{
 				request.Error(ERR_ACCOUNT_SUSPENDED, "Account suspended");
 				rpcinterface->Reply(request);
@@ -68,9 +69,9 @@ private:
 			}
 
 			auto &root = request.Root();
-			root.Reply("account", na->nc->display)
-				.Reply("confirmed", !na->nc->HasExt("UNCONFIRMED"))
-				.Reply("uniqueid", na->nc->GetId());
+			root.Reply("account",nc->display)
+				.Reply("confirmed", !nc->HasExt("UNCONFIRMED"))
+				.Reply("uniqueid", nc->GetId());
 
 			rpcinterface->Reply(request);
 			client->SendReply(&request.reply);

@@ -1059,12 +1059,6 @@ class ModuleDNS final
 {
 	MyManager manager;
 
-	Anope::string nameserver;
-	Anope::string ip;
-	int port;
-
-	std::vector<std::pair<Anope::string, short> > notify;
-
 public:
 	ModuleDNS(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR), manager(this)
 	{
@@ -1087,14 +1081,15 @@ public:
 	{
 		const auto &block = conf.GetModule(this);
 
-		nameserver = block.Get<const Anope::string>("nameserver", "127.0.0.1");
+		auto nameserver = block.Get<const Anope::string>("nameserver", "127.0.0.1");
 		timeout =  block.Get<time_t>("timeout", "5");
-		ip = block.Get<const Anope::string>("ip", "0.0.0.0");
-		port = block.Get<int>("port", "53");
+		auto ip = block.Get<const Anope::string>("ip", "0.0.0.0");
+		auto port = block.Get<int>("port", "53");
 		admin = block.Get<const Anope::string>("admin", "admin@example.com");
 		nameservers = block.Get<const Anope::string>("nameservers", "ns1.example.com");
 		refresh = block.Get<int>("refresh", "3600");
 
+		std::vector<std::pair<Anope::string, short> > notify;
 		for (int i = 0; i < block.CountBlock("notify"); ++i)
 		{
 			const auto &n = block.GetBlock("notify", i);

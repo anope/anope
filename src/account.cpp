@@ -48,11 +48,11 @@ void IdentifyRequest::Release(Module *m)
 	}
 }
 
-void IdentifyRequest::Success(Module *m)
+void IdentifyRequest::Success(Module *m, NickAlias *na)
 {
 	if (!success)
 	{
-		this->OnSuccess();
+		this->OnSuccess(na);
 		success = true;
 	}
 }

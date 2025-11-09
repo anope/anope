@@ -34,24 +34,24 @@ public:
 	{
 	}
 
-	void OnSuccess() override
+	void OnSuccess(NickAlias *na) override
 	{
 		if (!SASL::service)
 			return;
 
-		auto *na = NickAlias::Find(GetAccount());
-		if (!na || na->nc->HasExt("NS_SUSPENDED") || na->nc->HasExt("UNCONFIRMED"))
+		NickCore *nc = na->nc;
+		if (nc->HasExt("NS_SUSPENDED") || nc->HasExt("UNCONFIRMED"))
 			return OnFail();
 
 		auto maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
-		if (maxlogins && na->nc->users.size() >= maxlogins)
+		if (maxlogins && nc->users.size() >= maxlogins)
 			return OnFail();
 
 		auto *s = SASL::service->GetSession(uid);
 		if (s)
 		{
-			Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " identified to account " << this->GetAccount() << " using SASL";
-			SASL::service->Succeed(s, na->nc);
+			Log(this->GetOwner(), "sasl", Config->GetClient("NickServ")) << GetUserInfo() << " identified to account " << nc->display << " using SASL";
+			SASL::service->Succeed(s, nc);
 			delete s;
 		}
 	}

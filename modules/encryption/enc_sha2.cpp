@@ -146,7 +146,7 @@ public:
 
 	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
-		const auto *na = NickAlias::Find(req->GetAccount());
+		auto *na = NickAlias::Find(req->GetAccount());
 		if (!na)
 			return;
 
@@ -207,7 +207,7 @@ public:
 			// password with the primary encryption method.
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this || !is_hmac || provider != defaultprovider)
 				Anope::Encrypt(req->GetPassword(), nc->pass);
-			req->Success(this);
+			req->Success(this, na);
 		}
 	}
 };

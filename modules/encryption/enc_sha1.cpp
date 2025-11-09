@@ -187,7 +187,7 @@ public:
 
 	void OnCheckAuthentication(User *, IdentifyRequest *req) override
 	{
-		const auto *na = NickAlias::Find(req->GetAccount());
+		auto *na = NickAlias::Find(req->GetAccount());
 		if (!na)
 			return;
 
@@ -207,7 +207,7 @@ public:
 			// the password with the primary encryption method.
 			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
 				Anope::Encrypt(req->GetPassword(), nc->pass);
-			req->Success(this);
+			req->Success(this, na);
 		}
 	}
 };

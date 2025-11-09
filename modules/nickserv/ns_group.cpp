@@ -32,7 +32,7 @@ public:
 	{
 	}
 
-	void OnSuccess() override
+	void OnSuccess(NickAlias *) override
 	{
 		User *u = source.GetUser();
 
@@ -188,7 +188,7 @@ public:
 				NSGroupRequest req(owner, source, this, source.GetNick(), target, pass);
 
 				if (ok)
-					req.OnSuccess();
+					req.OnSuccess(target);
 				else
 					req.OnFail();
 			}

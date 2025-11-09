@@ -39,14 +39,10 @@ public:
 	{
 	}
 
-	void OnSuccess() override
+	void OnSuccess(NickAlias *na) override
 	{
 		User *u = User::Find(user, true);
 		if (!source.GetUser() || !source.service)
-			return;
-
-		NickAlias *na = NickAlias::Find(user);
-		if (!na)
 			return;
 
 		Log(LOG_COMMAND, source, cmd) << "for " << na->nick;
@@ -174,8 +170,7 @@ public:
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(nick);
-
+		auto *na = NickAlias::Find(nick);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
@@ -209,7 +204,7 @@ public:
 			NSRecoverRequest req(owner, source, this, na->nick, pass);
 
 			if (ok)
-				req.OnSuccess();
+				req.OnSuccess(na);
 			else
 				req.OnFail();
 		}

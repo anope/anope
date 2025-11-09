@@ -230,7 +230,7 @@ protected:
 
 public:
 	/* One of these is called when the request goes through */
-	virtual void OnSuccess() = 0;
+	virtual void OnSuccess(NickAlias *na) = 0;
 	virtual void OnFail() = 0;
 
 	Module *GetOwner() const { return owner; }
@@ -256,7 +256,7 @@ public:
 	 * If this request is behind held it must still be Released after calling this.
 	 * @param m The module confirming authentication
 	 */
-	void Success(Module *m);
+	void Success(Module *m, NickAlias *na);
 
 	/** Used to either finalize this request or marks
 	 * it as dispatched and begins waiting for the module(s)

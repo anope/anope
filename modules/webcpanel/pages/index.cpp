@@ -29,16 +29,10 @@ public:
 	{
 	}
 
-	void OnSuccess() override
+	void OnSuccess(NickAlias *na) override
 	{
 		if (!client || !server)
 			return;
-		NickAlias *na = NickAlias::Find(this->GetAccount());
-		if (!na)
-		{
-			this->OnFail();
-			return;
-		}
 
 		if (na->nc->HasExt("NS_SUSPENDED"))
 		{

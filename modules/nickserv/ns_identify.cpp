@@ -25,25 +25,18 @@ public:
 	{
 	}
 
-	void OnSuccess() override
+	void OnSuccess(NickAlias *na) override
 	{
-		if (!source.GetUser())
+		auto *u = source.GetUser();
+		if (!u)
 			return;
 
-		User *u = source.GetUser();
-		NickAlias *na = NickAlias::Find(GetAccount());
+		if (u->IsIdentified())
+			Log(LOG_COMMAND, source, cmd) << "to log out of account " << u->Account()->display;
 
-		if (!na)
-			source.Reply(NICK_X_NOT_REGISTERED, GetAccount().c_str());
-		else
-		{
-			if (u->IsIdentified())
-				Log(LOG_COMMAND, source, cmd) << "to log out of account " << u->Account()->display;
-
-			Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->nc->display;
-			source.Reply(_("Password accepted - you are now recognized."));
-			u->Identify(na);
-		}
+		Log(LOG_COMMAND, source, cmd) << "and identified for account " << na->nc->display;
+		source.Reply(_("Password accepted - you are now recognized."));
+		u->Identify(na);
 	}
 
 	void OnFail() override

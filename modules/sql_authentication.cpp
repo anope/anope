@@ -90,7 +90,7 @@ public:
 				user->SendMessage(NickServ, _("Your email address has been updated to \002%s\002."), email.c_str());
 		}
 
-		req->Success(me);
+		req->Success(me, na);
 		delete this;
 	}
 

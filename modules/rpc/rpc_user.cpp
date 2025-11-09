@@ -50,14 +50,10 @@ private:
 		{
 		}
 
-		void OnSuccess() override
+		void OnSuccess(NickAlias *na) override
 		{
 			if (!rpcinterface || !client)
 				return;
-
-			auto *na = NickAlias::Find(GetAccount());
-			if (!na)
-				return; // Should never happen.
 
 			NickCore *nc = na->nc;
 			if (nc->HasExt("NS_SUSPENDED"))

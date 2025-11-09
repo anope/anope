@@ -116,7 +116,7 @@ public:
 					Anope::Encrypt(ii->req->GetPassword(), na->nc->pass);
 
 					na->nc->Extend<Anope::string>("ldap_authentication_dn", ii->dn);
-					ii->req->Success(me);
+					ii->req->Success(me, na);
 				}
 				break;
 			}

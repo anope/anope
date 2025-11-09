@@ -18,7 +18,7 @@ public:
 	CommandNSList(Module *creator) : Command(creator, "nickserv/list", 1, 2)
 	{
 		this->SetDesc(_("List all registered nicknames that match a given pattern"));
-		this->SetSyntax(_("\037pattern\037 [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
+		this->SetSyntax(_("\037pattern\037 [DISPLAY] [NOEXPIRE] [SUSPENDED] [UNCONFIRMED]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -139,10 +139,10 @@ public:
 			"\n\n"
 			"Note that a preceding '#' specifies a range."
 			"\n\n"
-			"If the SUSPENDED, UNCONFIRMED or NOEXPIRE options are given, only "
-			"nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the "
-			"NOEXPIRE flag set will be displayed. If multiple options are "
-			"given, all nicks matching at least one option will be displayed. "
+			"If the DISPLAY, NOEXPIRE, SUSPENDED, or UNCONFIRMED options are given "
+			"only nicks which, respectively, are display nicks, will not expire, are "
+			"suspended, or are unconfirmed will be shown. If multiple options are "
+			"given, nicks must match every option to be shown. "
 			"Note that these options are limited to \037Services Operators\037."
 			"\n\n"
 			"Examples:"

@@ -120,11 +120,6 @@ namespace Language
 #define READ_ONLY_MODE			_("Services are temporarily in read-only mode.")
 #define PASSWORD_INCORRECT		_("Password incorrect.")
 #define ACCESS_DENIED			_("Access denied.")
-#define MORE_OBSCURE_PASSWORD		_("Please try again with a more obscure password. Passwords should not be " \
-						"something that could be easily guessed (e.g. your real name or your nick) and " \
-						"cannot contain the space or tab characters.")
-#define PASSWORD_TOO_SHORT		_("Your password is too short. It must be longer than %u characters.")
-#define PASSWORD_TOO_LONG		_("Your password is too long. It must be shorter than %u characters.")
 #define NICK_X_NOT_REGISTERED		_("Nick \002%s\002 isn't registered.")
 #define NICK_X_NOT_IN_USE		_("Nick \002%s\002 isn't currently in use.")
 #define NICK_X_NOT_ON_CHAN		_("\002%s\002 is not currently on channel %s.")

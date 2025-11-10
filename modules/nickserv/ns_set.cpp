@@ -125,36 +125,21 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const Anope::string &param = params[0];
-		unsigned len = param.length();
-
 		if (Anope::ReadOnly)
 		{
 			source.Reply(READ_ONLY_MODE);
 			return;
 		}
 
-		if (source.GetNick().equals_ci(param))
-		{
-			source.Reply(MORE_OBSCURE_PASSWORD);
-			return;
-		}
+		const Anope::string &param = params[0];
+		NickCore *nc = source.nc;
 
-		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
-		if (len < minpasslen)
-		{
-			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnPasswordValidate, MOD_RESULT, (source, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
 			return;
-		}
 
-		unsigned int maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
-		if (len > maxpasslen)
-		{
-			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
-			return;
-		}
-
-		if (!Anope::Encrypt(param, source.nc->pass))
+		if (!Anope::Encrypt(param, nc->pass))
 		{
 			source.Reply(_("Passwords can not be changed right now. Please try again later."));
 			return;
@@ -197,9 +182,9 @@ public:
 			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
 			return;
 		}
-		NickCore *nc = setter_na->nc;
 
-		size_t len = params[1].length();
+		const Anope::string &param = params[0];
+		NickCore *nc = setter_na->nc;
 
 		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())
 		{
@@ -207,27 +192,13 @@ public:
 			return;
 		}
 
-		if (nc->display.equals_ci(params[1]))
-		{
-			source.Reply(MORE_OBSCURE_PASSWORD);
-			return;
-		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
-		if (len < minpasslen)
-		{
-			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnPasswordValidate, MOD_RESULT, (source, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
 			return;
-		}
 
-		unsigned int maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
-		if (len > maxpasslen)
-		{
-			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
-			return;
-		}
-
-		if (!Anope::Encrypt(params[1], nc->pass))
+		if (!Anope::Encrypt(param, nc->pass))
 		{
 			source.Reply(_("Passwords can not be changed right now. Please try again later."));
 			return;

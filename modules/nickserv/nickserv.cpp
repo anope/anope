@@ -11,6 +11,10 @@
 
 #include "module.h"
 
+#define MORE_OBSCURE_PASSWORD _("Please try again with a more obscure password. " \
+	"Passwords should not be something that could be easily guessed (e.g. your " \
+	"real name or your nick) and cannot contain a space character.")
+
 namespace
 {
 	Anope::string enforcer_user, enforcer_host, enforcer_real;
@@ -641,6 +645,44 @@ public:
 			time_t unconfirmed_expire = Config->GetModule("ns_register").Get<time_t>("unconfirmedexpire", "1d");
 			info[_("Expires")] = Anope::strftime(na->registered + unconfirmed_expire, source.GetAccount());
 		}
+	}
+
+	EventReturn OnPasswordValidate(CommandSource &source, NickCore *nc, const Anope::string &pass) override
+	{
+		if (pass.equals_ci(source.GetNick()))
+		{
+			source.Reply(MORE_OBSCURE_PASSWORD);
+			return EVENT_STOP;
+		}
+
+		const auto *u = source.GetUser();
+		if (u && (u->GetIdent().equals_ci(pass) || u->realname.equals_ci(pass)))
+		{
+			source.Reply(MORE_OBSCURE_PASSWORD);
+			return EVENT_STOP;
+		}
+
+		if (nc && nc->display.equals_ci(pass))
+		{
+			source.Reply(MORE_OBSCURE_PASSWORD);
+			return EVENT_STOP;
+		}
+
+		const auto minpasslen = Config->GetModule("nickserv").Get<size_t>("minpasslen", "10");
+		if (pass.length() < minpasslen)
+		{
+			source.Reply(_("Your password is too short. It must be longer than %zu characters."), minpasslen);
+			return EVENT_STOP;
+		}
+
+		const auto maxpasslen = Config->GetModule("nickserv").Get<size_t>("maxpasslen", "50");
+		if (pass.length() > maxpasslen)
+		{
+			source.Reply(_("Your password is too long. It must be shorter than %zu characters."), maxpasslen);
+			return EVENT_STOP;
+		}
+
+		return EVENT_CONTINUE;
 	}
 };
 

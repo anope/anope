@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-10 00:56+0000\n"
-"PO-Revision-Date: 2025-11-10 00:56+0000\n"
+"POT-Creation-Date: 2025-11-10 02:45+0000\n"
+"PO-Revision-Date: 2025-11-10 02:45+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -4134,7 +4134,7 @@ msgstr ""
 msgid "Please contact an Operator to get a vhost assigned to this nick."
 msgstr ""
 
-msgid "Please try again with a more obscure password. Passwords should not be something that could be easily guessed (e.g. your real name or your nick) and cannot contain the space or tab characters."
+msgid "Please try again with a more obscure password. Passwords should not be something that could be easily guessed (e.g. your real name or your nick) and cannot contain a space character."
 msgstr ""
 
 msgid "Please use a valid server name when juping."
@@ -6413,11 +6413,11 @@ msgid "Your oper block doesn't require logging in."
 msgstr ""
 
 #, c-format
-msgid "Your password is too long. It must be shorter than %u characters."
+msgid "Your password is too long. It must be shorter than %zu characters."
 msgstr ""
 
 #, c-format
-msgid "Your password is too short. It must be longer than %u characters."
+msgid "Your password is too short. It must be longer than %zu characters."
 msgstr ""
 
 msgid "Your requested vhost has been approved."

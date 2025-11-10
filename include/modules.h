@@ -1067,6 +1067,13 @@ public:
 	 * @return EVENT_STOP to force the user off of the nick
 	 */
 	virtual EventReturn OnNickValidate(User *u, NickAlias *na) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
+
+	/** Called when a password needs to be validated.
+	 * @param source The source that is trying to use the password.
+	 * @param nc The account the password is being validated for, or nullptr if not registered yet.
+	 * @param pass The password which needs to be validated.
+	 */
+	virtual EventReturn OnPasswordValidate(CommandSource &source, NickCore *nc, const Anope::string &pass) { throw NotImplementedException(); }
 };
 
 enum Implementation
@@ -1159,6 +1166,7 @@ enum Implementation
 	I_OnNickUpdate,
 	I_OnNickValidate,
 	I_OnPartChannel,
+	I_OnPasswordValidate,
 	I_OnPostCommand,
 	I_OnPostHelp,
 	I_OnPostInit,

@@ -103,9 +103,6 @@ public:
 			}
 		}
 
-		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
-		unsigned int maxpasslen = Config->GetModule("nickserv").Get<unsigned>("maxpasslen", "50");
-
 		if (Config->GetModule("nickserv").Get<bool>("forceemail", "yes") && email.empty())
 			this->OnSyntaxError(source, "");
 		else if (u && Anope::CurTime < u->lastnickreg + reg_delay)
@@ -116,16 +113,15 @@ public:
 		}
 		else if (NickAlias::Find(u_nick) != NULL)
 			source.Reply(NICK_ALREADY_REGISTERED, u_nick.c_str());
-		else if (pass.equals_ci(u_nick))
-			source.Reply(MORE_OBSCURE_PASSWORD);
-		else if (pass.length() < minpasslen)
-			source.Reply(PASSWORD_TOO_SHORT, minpasslen);
-		else if (pass.length() > maxpasslen)
-			source.Reply(PASSWORD_TOO_LONG, maxpasslen);
 		else if (!email.empty() && !Mail::Validate(email))
 			source.Reply(MAIL_X_INVALID, email.c_str());
 		else
 		{
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(OnPasswordValidate, MOD_RESULT, (source, nullptr, pass));
+			if (MOD_RESULT == EVENT_STOP)
+				return;
+
 			Anope::string encpass;
 			if (!Anope::Encrypt(pass, encpass))
 			{

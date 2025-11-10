@@ -1357,8 +1357,6 @@ struct IRCDMessageCapab final
 					um = new UserModeOperOnly("HIDEOPER", mode.letter);
 				else if (mode.name.equals_cs("invisible"))
 					um = new UserMode("INVIS", mode.letter);
-				else if (mode.name.equals_cs("invis-oper"))
-					um = new UserModeOperOnly("INVISIBLE_OPER", mode.letter);
 				else if (mode.name.equals_cs("oper"))
 					um = new UserModeOperOnly("OPER", mode.letter);
 				else if (mode.name.equals_cs("regdeaf"))

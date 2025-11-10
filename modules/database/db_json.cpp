@@ -363,6 +363,10 @@ public:
 
 	void OnSaveDatabase() override
 	{
+		// Step 0: clear the old data if we don't want to preserve it.
+		if (!Config->GetModule(this).Get<bool>("preserve_unknown_data", "yes"))
+			databases.clear();
+
 		// Step 1: clear the old data.
 		for (const auto &type : Serialize::Type::GetTypeOrder())
 		{

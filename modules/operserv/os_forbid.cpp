@@ -423,7 +423,7 @@ public:
 					entry["Mask"] = forbid->mask;
 					entry["Type"] = stype;
 					entry["Creator"] = forbid->creator;
-					entry["Expires"] = forbid->expires ? Anope::strftime(forbid->expires, NULL, true).c_str() : Language::Translate(source.GetAccount(), _("Never"));
+					entry["Expires"] = forbid->expires ? Anope::strftime(forbid->expires, NULL, true).c_str() : TIME_NEVER;
 					entry["Reason"] = forbid->reason;
 					list.AddEntry(entry);
 					++shown;

@@ -314,11 +314,11 @@ class CommandCSAKick final
 					if (akick->addtime)
 						timebuf = Anope::strftime(akick->addtime, NULL, true);
 					else
-						timebuf = UNKNOWN;
+						timebuf = TIME_UNKNOWN;
 					if (akick->last_used)
 						lastused = Anope::strftime(akick->last_used, NULL, true);
 					else
-						lastused = UNKNOWN;
+						lastused = TIME_NEVER;
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(number);
@@ -354,11 +354,11 @@ class CommandCSAKick final
 				if (akick->addtime)
 					timebuf = Anope::strftime(akick->addtime, NULL, true);
 				else
-					timebuf = UNKNOWN;
+					timebuf = TIME_UNKNOWN;
 				if (akick->last_used)
 					lastused = Anope::strftime(akick->last_used, NULL, true);
 				else
-					lastused = UNKNOWN;
+					lastused = TIME_NEVER;
 
 				ListFormatter::ListEntry entry;
 				entry["Number"] = Anope::ToString(i + 1);

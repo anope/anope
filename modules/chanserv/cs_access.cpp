@@ -94,13 +94,13 @@ private:
 			{
 				ChannelInfo *p;
 				if (access->Matches(cuc->user, cuc->user->Account(), p))
-					timebuf = "Now";
+					timebuf = TIME_NOW;
 			}
 		}
 		if (timebuf.empty())
 		{
 			if (access->last_seen == 0)
-				timebuf = "Never";
+				timebuf = TIME_NEVER;
 			else
 				timebuf = Anope::strftime(access->last_seen, NULL, true);
 		}

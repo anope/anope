@@ -49,7 +49,7 @@ public:
 		else if (c && u && !c->HasUserStatus(u, "OP"))
 			source.Reply(_("You must be a channel operator to register the channel."));
 		else if (maxregistered && nc->channelcount >= maxregistered && !source.HasPriv("chanserv/no-register-limit"))
-			source.Reply(nc->channelcount > maxregistered ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, maxregistered);
+			source.Reply(nc->channelcount > maxregistered ? CHAN_LIMIT_EXCEEDED : CHAN_LIMIT_REACHED, maxregistered);
 		else
 		{
 			ci = new ChannelInfo(chan);

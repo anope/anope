@@ -66,20 +66,20 @@ public:
 			}
 			else if (!IRCD->IsIdentValid(user))
 			{
-				source.Reply(HOST_SET_IDENT_ERROR);
+				source.Reply(HOST_SET_VIDENT_ERROR);
 				return;
 			}
 		}
 
 		if (host.length() > IRCD->MaxHost)
 		{
-			source.Reply(HOST_SET_TOOLONG, IRCD->MaxHost);
+			source.Reply(HOST_SET_VHOST_TOO_LONG, IRCD->MaxHost);
 			return;
 		}
 
 		if (!IRCD->IsHostValid(host))
 		{
-			source.Reply(HOST_SET_ERROR);
+			source.Reply(HOST_SET_VHOST_ERROR);
 			return;
 		}
 
@@ -171,20 +171,20 @@ public:
 			}
 			else if (!IRCD->IsIdentValid(user))
 			{
-				source.Reply(HOST_SET_IDENT_ERROR);
+				source.Reply(HOST_SET_VIDENT_ERROR);
 				return;
 			}
 		}
 
 		if (host.length() > IRCD->MaxHost)
 		{
-			source.Reply(HOST_SET_TOOLONG, IRCD->MaxHost);
+			source.Reply(HOST_SET_VHOST_TOO_LONG, IRCD->MaxHost);
 			return;
 		}
 
 		if (!IRCD->IsHostValid(host))
 		{
-			source.Reply(HOST_SET_ERROR);
+			source.Reply(HOST_SET_VHOST_ERROR);
 			return;
 		}
 

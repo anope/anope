@@ -12,6 +12,43 @@
 #include "module.h"
 #include "modules/chanserv/mode.h"
 
+class ModeFormatter final
+{
+private:
+	Anope::string addmodes;
+	Anope::string addparams;
+	Anope::string delmodes;
+	Anope::string delparams;
+
+public:
+	void Push(ChannelMode* cm, const Anope::string &param, bool adding)
+	{
+		if (adding)
+		{
+			this->addmodes.push_back(cm->mchar);
+			if (!param.empty())
+				this->addparams.append(" ").append(param);
+		}
+		else
+		{
+			this->delmodes.push_back(cm->mchar);
+			if (!param.empty())
+				this->delparams.append(" ").append(param);
+
+		}
+	}
+
+	Anope::string ToString() const
+	{
+		Anope::string buffer;
+		if (!addmodes.empty())
+			buffer.append("+").append(addmodes).append(addparams);
+		if (!delmodes.empty())
+			buffer.append("-").append(delmodes).append(delparams);
+		return buffer;
+	}
+};
+
 struct ModeLockImpl final
 	: ModeLock
 	, Serializable
@@ -178,30 +215,14 @@ struct ModeLocksImpl final
 
 	Anope::string GetMLockAsString(bool complete) const override
 	{
-		Anope::string pos = "+", neg = "-", params;
-
+		ModeFormatter formatter;
 		for (auto *ml : *this->mlocks)
 		{
-			ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
-
-			if (!cm || cm->type == MODE_LIST || cm->type == MODE_STATUS)
-				continue;
-
-			if (ml->set)
-				pos += cm->mchar;
-			else
-				neg += cm->mchar;
-
-			if (complete && ml->set && !ml->param.empty() && cm->type == MODE_PARAM)
-				params += " " + ml->param;
+			auto *cm = ModeManager::FindChannelModeByName(ml->name);
+			if (cm && cm->type != MODE_LIST && cm->type != MODE_STATUS)
+				formatter.Push(cm, ml->param, ml->set);
 		}
-
-		if (pos.length() == 1)
-			pos.clear();
-		if (neg.length() == 1)
-			neg.clear();
-
-		return pos + neg + params;
+		return formatter.ToString();
 	}
 
 	void Check() override
@@ -298,9 +319,9 @@ class CommandCSMode final
 
 			sep.GetToken(modes);
 
-			Anope::string pos = "+", neg = "-", pos_params, neg_params;
+			ModeFormatter formatter;
 
-			int adding = 1;
+			int adding = -1;
 			bool needreply = true;
 			for (auto mode : modes)
 			{
@@ -351,32 +372,17 @@ class CommandCSMode final
 							continue;
 						}
 
-						modelocks->SetMLock(cm, adding, mode_param, source.GetNick());
-
-						if (adding)
-						{
-							pos += cm->mchar;
-							if (!mode_param.empty())
-								pos_params += " " + mode_param;
-						}
+						if (modelocks->SetMLock(cm, adding, mode_param, source.GetNick()))
+							formatter.Push(cm, mode_param, adding);
 						else
-						{
-							neg += cm->mchar;
-							if (!mode_param.empty())
-								neg_params += " " + mode_param;
-						}
+							source.Reply(_("%c%c can not be locked on %s."), adding == 1 ? '+' : '-', cm->mchar, ci->name.c_str());
 				}
 			}
 
-			if (pos == "+")
-				pos.clear();
-			if (neg == "-")
-				neg.clear();
-			Anope::string reply = pos + neg + pos_params + neg_params;
-
+			const auto reply = formatter.ToString();
 			if (!reply.empty())
 			{
-				source.Reply(_("%s locked on %s."), reply.c_str(), ci->name.c_str());
+				source.Reply(_("%s has been locked on %s."), reply.c_str(), ci->name.c_str());
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
 			}
 			else if (needreply)
@@ -391,6 +397,8 @@ class CommandCSMode final
 			Anope::string modes;
 
 			sep.GetToken(modes);
+
+			ModeFormatter formatter;
 
 			int adding = 1;
 			bool needreply = true;
@@ -424,19 +432,20 @@ class CommandCSMode final
 						else
 						{
 							if (modelocks->RemoveMLock(cm, adding, mode_param))
-							{
-								if (!mode_param.empty())
-									mode_param = " " + mode_param;
-								source.Reply(_("%c%c%s has been unlocked from %s."), adding == 1 ? '+' : '-', cm->mchar, mode_param.c_str(), ci->name.c_str());
-								Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->mchar << mode_param;
-							}
+								formatter.Push(cm, mode_param, adding);
 							else
 								source.Reply(_("%c%c is not locked on %s."), adding == 1 ? '+' : '-', cm->mchar, ci->name.c_str());
 						}
 				}
 			}
 
-			if (needreply)
+			const auto reply = formatter.ToString();
+			if (!reply.empty())
+			{
+				source.Reply(_("%s has been unlocked from %s."), reply.c_str(), ci->name.c_str());
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
+			}
+			else if (needreply)
 				source.Reply(_("Nothing to do."));
 		}
 		else if (subcommand.equals_ci("LIST"))

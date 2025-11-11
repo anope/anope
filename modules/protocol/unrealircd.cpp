@@ -715,6 +715,23 @@ public:
 	}
 };
 
+class ChannelModeFloodProfile final
+	: public ChannelModeParam
+{
+public:
+	ChannelModeFloodProfile(char modeChar) : ChannelModeParam("FLOODPROFILE", modeChar, true) { }
+
+	bool IsValid(Anope::string &value) const override
+	{
+		return value == "very-strict"
+			|| value == "strict"
+			|| value == "normal"
+			|| value == "relaxed"
+			|| value == "very-relaxed"
+			|| value == "off";
+	}
+};
+
 class ChannelModeHistory final
 	: public ChannelModeParam
 {
@@ -910,6 +927,9 @@ private:
 			{
 				case 'l':
 					ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", mode, true));
+					break;
+				case 'F':
+					ModeManager::AddChannelMode(new ChannelModeFloodProfile(mode));
 					break;
 				case 'H':
 					ModeManager::AddChannelMode(new ChannelModeHistory(mode));

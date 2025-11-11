@@ -443,7 +443,7 @@ class CommandCSMode final
 			if (!reply.empty())
 			{
 				source.Reply(_("%s has been unlocked from %s."), reply.c_str(), ci->name.c_str());
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << reply;
 			}
 			else if (needreply)
 				source.Reply(_("Nothing to do."));

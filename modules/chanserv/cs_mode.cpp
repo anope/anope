@@ -321,17 +321,17 @@ class CommandCSMode final
 
 			ModeFormatter formatter;
 
-			int adding = -1;
+			auto adding = true;
 			bool needreply = true;
 			for (auto mode : modes)
 			{
 				switch (mode)
 				{
 					case '+':
-						adding = 1;
+						adding = true;
 						break;
 					case '-':
-						adding = 0;
+						adding = false;
 						break;
 					default:
 						needreply = false;
@@ -375,7 +375,7 @@ class CommandCSMode final
 						if (modelocks->SetMLock(cm, adding, mode_param, source.GetNick()))
 							formatter.Push(cm, mode_param, adding);
 						else
-							source.Reply(_("%c%c can not be locked on %s."), adding == 1 ? '+' : '-', cm->mchar, ci->name.c_str());
+							source.Reply(_("%c%c can not be locked on %s."), adding ? '+' : '-', cm->mchar, ci->name.c_str());
 				}
 			}
 
@@ -400,17 +400,17 @@ class CommandCSMode final
 
 			ModeFormatter formatter;
 
-			int adding = 1;
+			auto adding = true;
 			bool needreply = true;
 			for (auto mode : modes)
 			{
 				switch (mode)
 				{
 					case '+':
-						adding = 1;
+						adding = true;
 						break;
 					case '-':
-						adding = 0;
+						adding = true;
 						break;
 					default:
 						needreply = false;
@@ -434,7 +434,7 @@ class CommandCSMode final
 							if (modelocks->RemoveMLock(cm, adding, mode_param))
 								formatter.Push(cm, mode_param, adding);
 							else
-								source.Reply(_("%c%c is not locked on %s."), adding == 1 ? '+' : '-', cm->mchar, ci->name.c_str());
+								source.Reply(_("%c%c is not locked on %s."), adding ? '+' : '-', cm->mchar, ci->name.c_str());
 						}
 				}
 			}

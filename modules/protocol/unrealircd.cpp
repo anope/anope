@@ -678,7 +678,7 @@ class ChannelModeFlood final
 	: public ChannelModeParam
 {
 public:
-	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam("FLOOD", modeChar, minusNoArg) { }
+	ChannelModeFlood(char modeChar) : ChannelModeParam("FLOOD", modeChar, false) { }
 
 	/* Borrowed part of this check from UnrealIRCd */
 	bool IsValid(Anope::string &value) const override
@@ -758,6 +758,249 @@ public:
 struct IRCDMessageCapab final
 	: Message::Capab
 {
+private:
+	void ParseChannelFlagModes(const Anope::string &modebuf)
+	{
+		for (auto mode : modebuf)
+		{
+			switch (mode)
+			{
+				case 'C':
+					ModeManager::AddChannelMode(new ChannelMode("NOCTCP", mode));
+					break;
+				case 'c':
+					ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", mode));
+					break;
+				case 'D':
+					ModeManager::AddChannelMode(new ChannelMode("DELAYEDJOIN", mode));
+					break;
+				case 'd':
+					ModeManager::AddChannelMode(new ChannelModeNoone("POSTDELAYEDJOIN", mode));
+					break;
+				case 'G':
+					ModeManager::AddChannelMode(new ChannelMode("CENSOR", mode));
+					break;
+				case 'i':
+					ModeManager::AddChannelMode(new ChannelMode("INVITE", mode));
+					break;
+				case 'K':
+					ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", mode));
+					break;
+				case 'M':
+					ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", mode));
+					break;
+				case 'm':
+					ModeManager::AddChannelMode(new ChannelMode("MODERATED", mode));
+					break;
+				case 'N':
+					ModeManager::AddChannelMode(new ChannelMode("NONICK", mode));
+					break;
+				case 'n':
+					ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", mode));
+					break;
+				case 'O':
+					ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", mode));
+					break;
+				case 'P':
+					ModeManager::AddChannelMode(new ChannelModeOperOnly("PERM", mode));
+					break;
+				case 'p':
+					ModeManager::AddChannelMode(new ChannelMode("PRIVATE", mode));
+					break;
+				case 'Q':
+					ModeManager::AddChannelMode(new ChannelMode("NOKICK", mode));
+					break;
+				case 'R':
+					ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", mode));
+					break;
+				case 'r':
+					ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", mode));
+					break;
+				case 'S':
+					ModeManager::AddChannelMode(new ChannelMode("STRIPCOLOR", mode));
+					break;
+				case 's':
+					ModeManager::AddChannelMode(new ChannelMode("SECRET", mode));
+					break;
+				case 'T':
+					ModeManager::AddChannelMode(new ChannelMode("NONOTICE", mode));
+					break;
+				case 't':
+					ModeManager::AddChannelMode(new ChannelMode("TOPIC", mode));
+					break;
+				case 'V':
+					ModeManager::AddChannelMode(new ChannelMode("NOINVITE", mode));
+					break;
+				case 'Z':
+					ModeManager::AddChannelMode(new ChannelModeUnrealSSL("ALLSSL", mode));
+					break;
+				case 'z':
+					ModeManager::AddChannelMode(new ChannelMode("SSL", mode));
+					break;
+				default:
+					Log(LOG_DEBUG) << "Unknown channel flag mode: " << mode;
+					ModeManager::AddChannelMode(new ChannelMode("", mode));
+					break;
+			}
+		}
+	}
+	void ParseChannelListModes(const Anope::string &modebuf)
+	{
+		// https://www.unrealircd.org/docs/Channel_modes
+		for (auto mode : modebuf)
+		{
+			switch (mode)
+			{
+				case 'b':
+					ModeManager::AddChannelMode(new ChannelModeList("BAN", mode));
+					ModeManager::AddChannelMode(new UnrealExtBan::ChannelMatcher());
+					ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("JOINBAN", "join", 'j'));
+					ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("NONICKBAN", "nickchange", 'n'));
+					ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("QUIET", "quiet", 'q'));
+					ModeManager::AddChannelMode(new UnrealExtBan::RealnameMatcher());
+					ModeManager::AddChannelMode(new UnrealExtBan::AccountMatcher());
+					ModeManager::AddChannelMode(new UnrealExtBan::FingerprintMatcher());
+					ModeManager::AddChannelMode(new UnrealExtBan::TimedBanMatcher());
+					ModeManager::AddChannelMode(new UnrealExtBan::OperclassMatcher());
+					ModeManager::AddChannelMode(new UnrealExtBan::CountryMatcher());
+					break;
+				case 'e':
+					ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", mode));
+					break;
+				case 'I':
+					ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", mode));
+					break;
+				default:
+					Log(LOG_DEBUG) << "Unknown channel list mode: " << mode;
+					ModeManager::AddChannelMode(new ChannelModeList("", mode));
+					break;
+			}
+		}
+	}
+
+	void ParseChannelParamBothModes(const Anope::string &modebuf)
+	{
+		// https://www.unrealircd.org/docs/Channel_modes
+		for (auto mode : modebuf)
+		{
+			switch (mode)
+			{
+				case 'k':
+					ModeManager::AddChannelMode(new ChannelModeKey(mode));
+					break;
+				case 'f':
+					ModeManager::AddChannelMode(new ChannelModeFlood(mode));
+					break;
+				case 'L':
+					ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", mode));
+					break;
+				default:
+					Log(LOG_DEBUG) << "Unknown channel param-both mode: " << mode;
+					ModeManager::AddChannelMode(new ChannelModeParam("", mode));
+					break;
+			}
+		}
+	}
+
+	void ParseChannelParamSetModes(const Anope::string &modebuf)
+	{
+		for (auto mode : modebuf)
+		{
+			switch (mode)
+			{
+				case 'l':
+					ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", mode, true));
+					break;
+				case 'H':
+					ModeManager::AddChannelMode(new ChannelModeHistory(mode));
+					break;
+				default:
+					Log(LOG_DEBUG) << "Unknown channel param-set mode: " << mode;
+					ModeManager::AddChannelMode(new ChannelModeParam("", mode, true));
+					break;
+			}
+		}
+	}
+
+	void ParseUserModes(const Anope::string &modebuf)
+	{
+		// https://www.unrealircd.org/docs/User_modes
+		for (auto mode : modebuf)
+		{
+			switch (mode)
+			{
+				case 'B':
+					ModeManager::AddUserMode(new UserMode("BOT", mode));
+					break;
+				case 'D':
+					ModeManager::AddUserMode(new UserMode("PRIVDEAF", mode));
+					break;
+				case 'd':
+					ModeManager::AddUserMode(new UserMode("DEAF", mode));
+					break;
+				case 'G':
+					ModeManager::AddUserMode(new UserMode("CENSOR", mode));
+					break;
+				case 'H':
+					ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", mode));
+					break;
+				case 'I':
+					ModeManager::AddUserMode(new UserModeOperOnly("HIDEIDLE", mode));
+					break;
+				case 'i':
+					ModeManager::AddUserMode(new UserMode("INVIS", mode));
+					break;
+				case 'o':
+					ModeManager::AddUserMode(new UserModeOperOnly("OPER", mode));
+					break;
+				case 'p':
+					ModeManager::AddUserMode(new UserMode("PRIV", mode));
+					break;
+				case 'q':
+					ModeManager::AddUserMode(new UserModeOperOnly("GOD", mode));
+					break;
+				case 'R':
+					ModeManager::AddUserMode(new UserMode("REGPRIV", mode));
+					break;
+				case 'r':
+					ModeManager::AddUserMode(new UserModeNoone("REGISTERED", mode));
+					break;
+				case 'S':
+					ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", mode));
+					break;
+				case 's':
+					ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", mode));
+					break;
+				case 'T':
+					ModeManager::AddUserMode(new UserMode("NOCTCP", mode));
+					break;
+				case 't':
+					ModeManager::AddUserMode(new UserModeNoone("VHOST", mode));
+					break;
+				case 'W':
+					ModeManager::AddUserMode(new UserModeOperOnly("WHOIS", mode));
+					break;
+				case 'w':
+					ModeManager::AddUserMode(new UserMode("WALLOPS", mode));
+					break;
+				case 'x':
+					ModeManager::AddUserMode(new UserMode("CLOAK", mode));
+					break;
+				case 'Z':
+					ModeManager::AddUserMode(new UserMode("SSLPRIV", mode));
+					break;
+				case 'z':
+					ModeManager::AddUserMode(new UserModeNoone("SSL", mode));
+					break;
+				default:
+					Log(LOG_DEBUG) << "Unknown user mode: " << mode;
+					ModeManager::AddUserMode(new UserMode("", mode));
+					break;
+			}
+		}
+	}
+
+public:
 	IRCDMessageCapab(Module *creator) : Message::Capab(creator, "PROTOCTL") { }
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
@@ -766,231 +1009,24 @@ struct IRCDMessageCapab final
 		{
 			if (capab.find("USERMODES=") != Anope::string::npos)
 			{
-				Anope::string modebuf(capab.begin() + 10, capab.end());
-				for (auto mode : modebuf)
-				{
-					switch (mode)
-					{
-						case 'B':
-							ModeManager::AddUserMode(new UserMode("BOT", 'B'));
-							continue;
-						case 'G':
-							ModeManager::AddUserMode(new UserMode("CENSOR", 'G'));
-							continue;
-						case 'H':
-							ModeManager::AddUserMode(new UserModeOperOnly("HIDEOPER", 'H'));
-							continue;
-						case 'I':
-							ModeManager::AddUserMode(new UserModeOperOnly("HIDEIDLE", 'I'));
-							continue;
-						case 'R':
-							ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
-							continue;
-						case 'S':
-							ModeManager::AddUserMode(new UserModeOperOnly("PROTECTED", 'S'));
-							continue;
-						case 'T':
-							ModeManager::AddUserMode(new UserMode("NOCTCP", 'T'));
-							continue;
-						case 'W':
-							ModeManager::AddUserMode(new UserModeOperOnly("WHOIS", 'W'));
-							continue;
-						case 'd':
-							ModeManager::AddUserMode(new UserMode("DEAF", 'd'));
-							continue;
-						case 'D':
-							ModeManager::AddUserMode(new UserMode("PRIVDEAF", 'D'));
-							continue;
-						case 'i':
-							ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
-							continue;
-						case 'o':
-							ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
-							continue;
-						case 'p':
-							ModeManager::AddUserMode(new UserMode("PRIV", 'p'));
-							continue;
-						case 'q':
-							ModeManager::AddUserMode(new UserModeOperOnly("GOD", 'q'));
-							continue;
-						case 'r':
-							ModeManager::AddUserMode(new UserModeNoone("REGISTERED", 'r'));
-							continue;
-						case 's':
-							ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
-							continue;
-						case 't':
-							ModeManager::AddUserMode(new UserModeNoone("VHOST", 't'));
-							continue;
-						case 'w':
-							ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
-							continue;
-						case 'x':
-							ModeManager::AddUserMode(new UserMode("CLOAK", 'x'));
-							continue;
-						case 'z':
-							ModeManager::AddUserMode(new UserModeNoone("SSL", 'z'));
-							continue;
-						case 'Z':
-							ModeManager::AddUserMode(new UserMode("SSLPRIV", 'Z'));
-							continue;
-						default:
-							ModeManager::AddUserMode(new UserMode("", mode));
-					}
-				}
+				ParseUserModes(capab.substr(10));
 			}
 			else if (capab.find("CHANMODES=") != Anope::string::npos)
 			{
-				Anope::string modes(capab.begin() + 10, capab.end());
-				commasepstream sep(modes);
+				commasepstream sep(capab.substr(10));
 				Anope::string modebuf;
 
 				sep.GetToken(modebuf);
-				for (auto mode : modebuf)
-				{
-					switch (mode)
-					{
-						case 'b':
-							ModeManager::AddChannelMode(new ChannelModeList("BAN", 'b'));
-
-							ModeManager::AddChannelMode(new UnrealExtBan::ChannelMatcher());
-							ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("JOINBAN", "join", 'j'));
-							ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("NONICKBAN", "nickchange", 'n'));
-							ModeManager::AddChannelMode(new UnrealExtBan::EntryMatcher("QUIET", "quiet", 'q'));
-							ModeManager::AddChannelMode(new UnrealExtBan::RealnameMatcher());
-							ModeManager::AddChannelMode(new UnrealExtBan::AccountMatcher());
-							ModeManager::AddChannelMode(new UnrealExtBan::FingerprintMatcher());
-							ModeManager::AddChannelMode(new UnrealExtBan::TimedBanMatcher());
-							ModeManager::AddChannelMode(new UnrealExtBan::OperclassMatcher());
-							ModeManager::AddChannelMode(new UnrealExtBan::CountryMatcher());
-							continue;
-						case 'e':
-							ModeManager::AddChannelMode(new ChannelModeList("EXCEPT", 'e'));
-							continue;
-						case 'I':
-							ModeManager::AddChannelMode(new ChannelModeList("INVITEOVERRIDE", 'I'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeList("", mode));
-					}
-				}
+				ParseChannelListModes(modebuf);
 
 				sep.GetToken(modebuf);
-				for (auto mode : modebuf)
-				{
-					switch (mode)
-					{
-						case 'k':
-							ModeManager::AddChannelMode(new ChannelModeKey('k'));
-							continue;
-						case 'f':
-							ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
-							continue;
-						case 'L':
-							ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", 'L'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeParam("", mode));
-					}
-				}
+				ParseChannelParamBothModes(modebuf);
 
 				sep.GetToken(modebuf);
-				for (auto mode : modebuf)
-				{
-					switch (mode)
-					{
-						case 'l':
-							ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
-							continue;
-						case 'H':
-							ModeManager::AddChannelMode(new ChannelModeHistory('H'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeParam("", mode, true));
-					}
-				}
+				ParseChannelParamSetModes(modebuf);
 
 				sep.GetToken(modebuf);
-				for (auto mode : modebuf)
-				{
-					switch (mode)
-					{
-						case 'p':
-							ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
-							continue;
-						case 's':
-							ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
-							continue;
-						case 'm':
-							ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
-							continue;
-						case 'n':
-							ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
-							continue;
-						case 't':
-							ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
-							continue;
-						case 'i':
-							ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
-							continue;
-						case 'r':
-							ModeManager::AddChannelMode(new ChannelModeNoone("REGISTERED", 'r'));
-							continue;
-						case 'R':
-							ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'R'));
-							continue;
-						case 'c':
-							ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
-							continue;
-						case 'O':
-							ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
-							continue;
-						case 'Q':
-							ModeManager::AddChannelMode(new ChannelMode("NOKICK", 'Q'));
-							continue;
-						case 'K':
-							ModeManager::AddChannelMode(new ChannelMode("NOKNOCK", 'K'));
-							continue;
-						case 'V':
-							ModeManager::AddChannelMode(new ChannelMode("NOINVITE", 'V'));
-							continue;
-						case 'C':
-							ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
-							continue;
-						case 'z':
-							ModeManager::AddChannelMode(new ChannelMode("SSL", 'z'));
-							continue;
-						case 'N':
-							ModeManager::AddChannelMode(new ChannelMode("NONICK", 'N'));
-							continue;
-						case 'S':
-							ModeManager::AddChannelMode(new ChannelMode("STRIPCOLOR", 'S'));
-							continue;
-						case 'M':
-							ModeManager::AddChannelMode(new ChannelMode("REGMODERATED", 'M'));
-							continue;
-						case 'T':
-							ModeManager::AddChannelMode(new ChannelMode("NONOTICE", 'T'));
-							continue;
-						case 'G':
-							ModeManager::AddChannelMode(new ChannelMode("CENSOR", 'G'));
-							continue;
-						case 'Z':
-							ModeManager::AddChannelMode(new ChannelModeUnrealSSL("ALLSSL", 'Z'));
-							continue;
-						case 'd':
-							// post delayed. means that channel is -D but invisible users still exist.
-							continue;
-						case 'D':
-							ModeManager::AddChannelMode(new ChannelMode("DELAYEDJOIN", 'D'));
-							continue;
-						case 'P':
-							ModeManager::AddChannelMode(new ChannelModeOperOnly("PERM", 'P'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelMode("", mode));
-					}
-				}
+				ParseChannelFlagModes(modebuf);
 			}
 			else if (!capab.find("SID="))
 			{

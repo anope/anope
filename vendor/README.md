@@ -22,6 +22,16 @@ This directory contains vendored dependencies that are shipped with Anope to avo
 
 **Website** &mdash; [https://openwall.info/wiki/people/solar/software/public-domain-source-code/md5](https://openwall.info/wiki/people/solar/software/public-domain-source-code/md5)
 
+## sha1
+
+**Author** &mdash; Steve Reid
+
+**License** &mdash; Public Domain
+
+**Version** &mdash; 0.1.0
+
+**Website** &mdash; [https://github.com/clibs/sha1](https://github.com/clibs/sha1)
+
 ## sha2
 
 **Author** &mdash; [Olivier Gay](mailto:olivier.gay@a3.epfl.ch)

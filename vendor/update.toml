@@ -17,6 +17,12 @@ tarball = "https://www.openwall.com/blists/blists-2.0.tar.gz"
 version = "v2.0"
 website = "https://openwall.info/wiki/people/solar/software/public-domain-source-code/md5"
 
+[sha1]
+author  = "Steve Reid"
+git     = "https://github.com/clibs/sha1"
+files   = "sha1.[ch]"
+license = "Public Domain"
+
 [sha2]
 author  = "Olivier Gay"
 email   = "olivier.gay@a3.epfl.ch"

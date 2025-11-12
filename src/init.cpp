@@ -594,9 +594,6 @@ bool Anope::Init(int ac, char **av)
 
 	FOREACH_MOD(OnPostInit, ());
 
-	for (const auto &[_, ci] : ChannelList)
-		ci->Sync();
-
 	Serialize::CheckTypes();
 	return true;
 }

@@ -288,6 +288,12 @@ void Server::Sync(bool sync_links)
 
 		FOREACH_MOD(OnUplinkSync, (this));
 
+		for (const auto &[_, c] : ChannelList)
+		{
+			if (c->syncing)
+				c->Sync();
+		}
+
 		if (!Anope::NoFork)
 		{
 			Log(LOG_TERMINAL) << "Successfully linked, launching into background...";

@@ -797,7 +797,7 @@ public:
 				"modify the existing mode lock."
 				"\n\n"
 				"Example:\n"
-				"     \002%s\032#channel\032%s\032ADD\032+bmnt\032*!*@*aol*\002\n"
+				"     \002%s\032#channel\032LOCK\032ADD\032+bmnt\032*!*@*.example.com\002\n"
 				"\n\n"
 				"The \002%s\032SET\002 command allows you to set modes through services. Wildcards * and ? may "
 				"be given as parameters for list and status modes."
@@ -813,7 +813,6 @@ public:
 				"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037 "
 				"is not given then all basic modes are removed."
 			),
-			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),

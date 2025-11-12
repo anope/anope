@@ -1,4 +1,4 @@
-Since the first commit in March 2004 88 people have submitted patches, commits,
+Since the first commit in March 2004 90 people have submitted patches, commits,
 and other useful contributions to Anope. These people, ordered by the number of
 contributions they have made, are:
 
@@ -20,9 +20,9 @@ contributions they have made, are:
   * Adam Kramer <ribosome@anope.org>
   * Attila Molnar <attilamolnar@hush.com>
   * Michael Wobst <wobst.michael@web.de>
+  * PeGaSuS <droider.pc@gmail.com>
   * Mark Summers <mark@goopler.net>
   * Matt Schatz <genius3000@g3k.solutions>
-  * PeGaSuS <droider.pc@gmail.com>
   * Daniel Vassdal <shutter@canternet.org>
   * MatthewM <mcm@they-got.us>
   * Sebastian V. <hal9000@denorastats.org>
@@ -33,11 +33,11 @@ contributions they have made, are:
   * Hendrik Jäger <gitcommit@henk.geekmail.org>
   * k4be <k4be@pirc.pl>
   * Thomas Fargeix <t.fargeix@gmail.com>
+  * CaPa CuL <capacul@gmail.com>
   * Val Lorentz <progval+git@progval.net>
   * Bram Matthys <syzop@vulnscan.org>
   * Federico G. Schwindt <fgsch@lodoss.net>
   * Alexander Barton <alex@barton.de>
-  * CaPa CuL <capacul@gmail.com>
   * Cronus <cronus@nite-serv.com>
   * H7-25 <simos@simosnap.org>
   * Jyzee <jyzee.git@gmail.com>
@@ -64,12 +64,14 @@ contributions they have made, are:
   * BoGu5 <bogus@onzin.org>
   * Chris Langsenkamp <chris@langsenkamp.com>
   * Clem Morton
+  * crazycatdevs
   * Daniel Oaks <danneh@danneh.net>
   * Fabio Scotoni <cculex@gmail.com>
   * ItsOnlyBinary
   * Jason Foster <retsofaj@gmail.com>
   * Jeremy <jeremy@ssnet.ca>
   * Josh Soref
+  * KidProtect
   * KindOne <ineedalifetoday@live.com>
   * linuxdaemon
   * Mantas Mikulėnas <grawity@gmail.com>

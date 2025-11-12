@@ -355,7 +355,7 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
   set(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}${VERSION_EXTRA}")
   set(CPACK_PACKAGE_FILE_NAME "anope-${VERSION_FULL_NOBUILD}")
-  set(CPACK_RESOURCE_FILE_LICENSE "${Anope_SOURCE_DIR}/docs/COPYING")
+  set(CPACK_RESOURCE_FILE_LICENSE "${Anope_SOURCE_DIR}/docs/LICENSE.txt")
   # The following doesn't actually do anything. :(
   #set(CPACK_RESOURCE_FILE_README "${Anope_SOURCE_DIR}/docs/README")
   # The following is primarily for NSIS

@@ -430,7 +430,7 @@ class CommandCSMode final
 						}
 
 						Anope::string mode_param;
-						if (cm->type != MODE_REGULAR && !sep.GetToken(mode_param))
+						if ((cm->type == MODE_LIST || cm->type == MODE_STATUS) && !sep.GetToken(mode_param))
 							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
 						else
 						{

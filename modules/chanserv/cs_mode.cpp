@@ -288,6 +288,23 @@ class CommandCSMode final
 		return source.AccessFor(ci).HasPriv(cm->name + (self ? "ME" : ""));
 	}
 
+	static bool NeedsParam(ChannelMode *cm, bool adding)
+	{
+		switch (cm->type)
+		{
+			case MODE_REGULAR:
+				return false;
+
+			case MODE_LIST:
+			case MODE_STATUS:
+				return true;
+
+			case MODE_PARAM:
+				return !anope_dynamic_static_cast<ChannelModeParam *>(cm)->minus_no_arg;
+		}
+		return false;
+	}
+
 	void DoLock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.GetUser();
@@ -351,7 +368,7 @@ class CommandCSMode final
 						}
 
 						Anope::string mode_param;
-						if (((cm->type == MODE_STATUS || cm->type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
+						if (NeedsParam(cm, adding) && !sep.GetToken(mode_param))
 						{
 							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
 							continue;
@@ -430,7 +447,7 @@ class CommandCSMode final
 						}
 
 						Anope::string mode_param;
-						if ((cm->type == MODE_LIST || cm->type == MODE_STATUS) && !sep.GetToken(mode_param))
+						if (NeedsParam(cm, adding) && !sep.GetToken(mode_param))
 							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
 						else
 						{

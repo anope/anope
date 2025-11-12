@@ -223,7 +223,7 @@ struct ModeLocksImpl final
 		{
 			auto *cm = ModeManager::FindChannelModeByName(ml->name);
 			if (cm && cm->type != MODE_LIST && cm->type != MODE_STATUS)
-				formatter.Push(cm, ml->param, ml->set);
+				formatter.Push(cm, complete ? ml->param : Anope::string(), ml->set);
 		}
 		return formatter.ToString();
 	}

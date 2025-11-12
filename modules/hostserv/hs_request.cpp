@@ -1,18 +1,16 @@
-/* hs_request.c - Add request and activate functionality to HostServ
- *
- * (C) 2003-2025 Anope Team
- * Contact us at team@anope.org
- *
- * Based on the original module by Rob <rob@anope.org>
- * Included in the Anope module pack since Anope 1.7.11
- * Anope Coder: GeniusDex <geniusdex@anope.org>
- *
- * Please read COPYING and README for further details.
- *
- * Send bug reports to the Anope Coder instead of the module
- * author, because any changes since the inclusion into anope
- * are not supported by the original author.
- */
+// Anope IRC Services <https://www.anope.org/>
+//
+// Copyright (C) 2003-2025 Anope Contributors
+//
+// Anope is free software. You can use, modify, and/or distribute it under the
+// terms of version 2 of the GNU General Public License. See docs/LICENSE.txt
+// for the complete terms of this license and docs/AUTHORS.txt for a list of
+// contributors.
+//
+// Based on the original code of Epona by Lara
+// Based on the original code of Services by Andy Church
+//
+// SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
 #include "modules/dns.h"

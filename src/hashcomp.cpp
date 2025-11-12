@@ -1,10 +1,18 @@
-/*
- *
- * (C) 2002-2011 InspIRCd Development Team
- * (C) 2008-2025 Anope Team <team@anope.org>
- *
- * Please read COPYING and README for further details.
- */
+// Anope IRC Services <https://www.anope.org/>
+//
+// Copyright (C) 2003-2025 Anope Contributors
+// Copyright (C) 2008-2011 InspIRCd Development Team
+//
+// Anope is free software. You can use, modify, and/or distribute it under the
+// terms of version 2 of the GNU General Public License. See docs/LICENSE.txt
+// for the complete terms of this license and docs/AUTHORS.txt for a list of
+// contributors.
+//
+// Based on the original code of Epona by Lara
+// Based on the original code of Services by Andy Church
+//
+// SPDX-License-Identifier: GPL-2.0-only
+
 
 #include "services.h"
 #include "hashcomp.h"

@@ -1,13 +1,16 @@
-/* Routines to maintain a list of connected servers
- *
- * (C) 2003-2025 Anope Team
- * Contact us at team@anope.org
- *
- * Please read COPYING and README for further details.
- *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church.
- */
+// Anope IRC Services <https://www.anope.org/>
+//
+// Copyright (C) 2003-2025 Anope Contributors
+//
+// Anope is free software. You can use, modify, and/or distribute it under the
+// terms of version 2 of the GNU General Public License. See docs/LICENSE.txt
+// for the complete terms of this license and docs/AUTHORS.txt for a list of
+// contributors.
+//
+// Based on the original code of Epona by Lara
+// Based on the original code of Services by Andy Church
+//
+// SPDX-License-Identifier: GPL-2.0-only
 
 #include "services.h"
 #include "modules.h"

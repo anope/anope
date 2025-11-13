@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-12 19:50+0000\n"
-"PO-Revision-Date: 2025-11-12 19:50+0000\n"
+"POT-Creation-Date: 2025-11-13 12:39+0000\n"
+"PO-Revision-Date: 2025-11-13 12:39+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -771,14 +771,6 @@ msgid "%c is an unknown status mode."
 msgstr ""
 
 #, c-format
-msgid "%c%c can not be locked on %s."
-msgstr ""
-
-#, c-format
-msgid "%c%c is not locked on %s."
-msgstr ""
-
-#, c-format
 msgid "%d access entries from %s have been cloned to %s."
 msgstr ""
 
@@ -937,6 +929,10 @@ msgid "%s can no longer be added to channel access lists."
 msgstr ""
 
 #, c-format
+msgid "%s can not be locked on %s."
+msgstr ""
+
+#, c-format
 msgid "%s can now be added to channel access lists."
 msgstr ""
 
@@ -1071,6 +1067,10 @@ msgstr ""
 
 #, c-format
 msgid "%s is not a valid logging method."
+msgstr ""
+
+#, c-format
+msgid "%s is not locked on %s."
 msgstr ""
 
 #, c-format
@@ -3311,7 +3311,7 @@ msgid "List channels you have access on"
 msgstr ""
 
 #, c-format
-msgid "List for mode %c is full."
+msgid "List for modes %s is full."
 msgstr ""
 
 msgid "List loaded modules"
@@ -3674,7 +3674,7 @@ msgid "Method"
 msgstr ""
 
 #, c-format
-msgid "Missing parameter for mode %c."
+msgid "Missing parameter for modes %s."
 msgstr ""
 
 #, c-format
@@ -5399,7 +5399,7 @@ msgid "The memo limit for %s may not be changed."
 msgstr ""
 
 #, c-format
-msgid "The mode lock list of %s is full."
+msgid "The mode lock list of %s is full, unable to lock %s."
 msgstr ""
 
 #, c-format
@@ -5817,7 +5817,7 @@ msgid "Unknown command %s. Type %s for help."
 msgstr ""
 
 #, c-format
-msgid "Unknown mode character %c ignored."
+msgid "Unknown modes %s ignored."
 msgstr ""
 
 #, c-format
@@ -6221,7 +6221,7 @@ msgid "You may drop any nick within your account."
 msgstr ""
 
 #, c-format
-msgid "You may not (un)lock mode %c."
+msgid "You may not (un)lock modes %s from %s."
 msgstr ""
 
 msgid "You may not change the email address of an unconfirmed account."

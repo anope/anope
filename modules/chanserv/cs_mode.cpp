@@ -24,30 +24,46 @@ private:
 	Anope::string delparams;
 
 public:
-	void Push(ChannelMode* cm, const Anope::string &param, bool adding)
+	bool GetString(Anope::string &out, bool complete = true) const
+	{
+		if (addmodes.empty() && delmodes.empty())
+			return false;
+
+		out = ToString(complete);
+		return true;
+	}
+
+	void Push(ChannelMode *cm, const Anope::string &param, bool adding)
+	{
+		Push(cm->mchar, param, adding);
+	}
+
+	void Push(char mchar, const Anope::string &param, bool adding)
 	{
 		if (adding)
 		{
-			this->addmodes.push_back(cm->mchar);
+			this->addmodes.push_back(mchar);
 			if (!param.empty())
 				this->addparams.append(" ").append(param);
 		}
 		else
 		{
-			this->delmodes.push_back(cm->mchar);
+			this->delmodes.push_back(mchar);
 			if (!param.empty())
 				this->delparams.append(" ").append(param);
 
 		}
 	}
 
-	Anope::string ToString() const
+	Anope::string ToString(bool complete) const
 	{
 		Anope::string buffer;
 		if (!addmodes.empty())
-			buffer.append("+").append(addmodes).append(addparams);
+			buffer.append("+").append(addmodes);
 		if (!delmodes.empty())
-			buffer.append("-").append(delmodes).append(delparams);
+			buffer.append("-").append(delmodes);
+		if (complete)
+			buffer.append(addparams).append(delparams);
 		return buffer;
 	}
 };
@@ -218,14 +234,14 @@ struct ModeLocksImpl final
 
 	Anope::string GetMLockAsString(bool complete) const override
 	{
-		ModeFormatter formatter;
+		ModeFormatter mlock;
 		for (auto *ml : *this->mlocks)
 		{
 			auto *cm = ModeManager::FindChannelModeByName(ml->name);
 			if (cm && cm->type != MODE_LIST && cm->type != MODE_STATUS)
-				formatter.Push(cm, complete ? ml->param : Anope::string(), ml->set);
+				mlock.Push(cm, ml->param, ml->set);
 		}
-		return formatter.ToString();
+		return mlock.ToString(complete);
 	}
 
 	void Check() override
@@ -307,7 +323,6 @@ class CommandCSMode final
 
 	void DoLock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.GetUser();
 		const Anope::string &subcommand = params[2];
 		const Anope::string &param = params.size() > 3 ? params[3] : "";
 
@@ -334,139 +349,14 @@ class CommandCSMode final
 				}
 			}
 
-			spacesepstream sep(param);
-			Anope::string modes;
-
-			sep.GetToken(modes);
-
-			ModeFormatter formatter;
-
-			auto adding = true;
-			bool needreply = true;
-			for (auto mode : modes)
-			{
-				switch (mode)
-				{
-					case '+':
-						adding = true;
-						break;
-					case '-':
-						adding = false;
-						break;
-					default:
-						needreply = false;
-						ChannelMode *cm = ModeManager::FindChannelModeByChar(mode);
-						if (!cm)
-						{
-							source.Reply(_("Unknown mode character %c ignored."), mode);
-							break;
-						}
-						else if (u && !cm->CanSet(u, ci->c))
-						{
-							source.Reply(_("You may not (un)lock mode %c."), mode);
-							break;
-						}
-
-						Anope::string mode_param;
-						if (NeedsParam(cm, adding) && !sep.GetToken(mode_param))
-						{
-							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
-							continue;
-						}
-
-						if (cm->type == MODE_STATUS && !CanSet(source, ci, cm, false))
-						{
-							source.Reply(ACCESS_DENIED);
-							continue;
-						}
-
-						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c, cm) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c, cm))
-						{
-							source.Reply(_("List for mode %c is full."), cm->mchar);
-							continue;
-						}
-
-						if (modelocks->GetMLock().size() >= Config->GetModule(this->owner).Get<unsigned>("max", "50"))
-						{
-							source.Reply(_("The mode lock list of \002%s\002 is full."), ci->name.c_str());
-							continue;
-						}
-
-						if (modelocks->SetMLock(cm, adding, mode_param, source.GetNick()))
-							formatter.Push(cm, mode_param, adding);
-						else
-							source.Reply(_("%c%c can not be locked on %s."), adding ? '+' : '-', cm->mchar, ci->name.c_str());
-				}
-			}
-
-			const auto reply = formatter.ToString();
-			if (!reply.empty())
-			{
-				source.Reply(_("%s has been locked on %s."), reply.c_str(), ci->name.c_str());
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
-			}
-			else if (needreply)
-				source.Reply(_("Nothing to do."));
+			DoLockChange(source, ci, modelocks, param, override, true);
 
 			if (ci->c)
 				ci->c->CheckModes();
 		}
 		else if (subcommand.equals_ci("DEL") && !param.empty())
 		{
-			spacesepstream sep(param);
-			Anope::string modes;
-
-			sep.GetToken(modes);
-
-			ModeFormatter formatter;
-
-			auto adding = true;
-			bool needreply = true;
-			for (auto mode : modes)
-			{
-				switch (mode)
-				{
-					case '+':
-						adding = true;
-						break;
-					case '-':
-						adding = true;
-						break;
-					default:
-						needreply = false;
-						ChannelMode *cm = ModeManager::FindChannelModeByChar(mode);
-						if (!cm)
-						{
-							source.Reply(_("Unknown mode character %c ignored."), mode);
-							break;
-						}
-						else if (u && !cm->CanSet(u, ci->c))
-						{
-							source.Reply(_("You may not (un)lock mode %c."), mode);
-							break;
-						}
-
-						Anope::string mode_param;
-						if (NeedsParam(cm, adding) && !sep.GetToken(mode_param))
-							source.Reply(_("Missing parameter for mode %c."), cm->mchar);
-						else
-						{
-							if (modelocks->RemoveMLock(cm, adding, mode_param))
-								formatter.Push(cm, mode_param, adding);
-							else
-								source.Reply(_("%c%c is not locked on %s."), adding ? '+' : '-', cm->mchar, ci->name.c_str());
-						}
-				}
-			}
-
-			const auto reply = formatter.ToString();
-			if (!reply.empty())
-			{
-				source.Reply(_("%s has been unlocked from %s."), reply.c_str(), ci->name.c_str());
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << reply;
-			}
-			else if (needreply)
-				source.Reply(_("Nothing to do."));
+			DoLockChange(source, ci, modelocks, param, override, false);
 		}
 		else if (subcommand.equals_ci("LIST"))
 		{
@@ -506,6 +396,113 @@ class CommandCSMode final
 		}
 		else
 			this->OnSyntaxError(source, subcommand);
+	}
+
+	void DoLockChange(CommandSource &source, ChannelInfo *ci, ModeLocks *modelocks, const Anope::string &param, bool override, bool setting)
+	{
+		spacesepstream sep(param);
+		Anope::string modes;
+		sep.GetToken(modes);
+
+		ModeFormatter cannotset, missingparam, unknownmode; // ADD/DEL/SET
+		ModeFormatter cannotlock, listfull, locked, locklistfull; // ADD/SET
+		ModeFormatter notlocked, unlocked; // DEL
+
+		auto adding = true;
+		auto *u = source.GetUser();
+		for (auto mode : modes)
+		{
+			switch (mode)
+			{
+				case '+':
+					adding = true;
+					continue;
+				case '-':
+					adding = false;
+					continue;
+				default:
+					auto *cm = ModeManager::FindChannelModeByChar(mode);
+					if (!cm)
+					{
+						unknownmode.Push(mode, {}, adding);
+						break;
+					}
+					Anope::string mode_param;
+					if (NeedsParam(cm, adding) && !sep.GetToken(mode_param))
+					{
+						missingparam.Push(cm, mode_param, adding);
+						break;
+					}
+					if (u && !cm->CanSet(u, ci->c))
+					{
+						cannotset.Push(cm, mode_param, adding);
+						continue;
+					}
+					if (setting)
+					{
+						if (cm->type == MODE_STATUS && !CanSet(source, ci, cm, false))
+						{
+							cannotset.Push(cm, mode_param, adding);
+							continue;
+						}
+						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c, cm) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c, cm))
+						{
+							listfull.Push(cm, mode_param, adding);
+							continue;
+						}
+						if (modelocks->GetMLock().size() >= Config->GetModule(this->owner).Get<unsigned>("max", "50"))
+						{
+							locklistfull.Push(cm, mode_param, adding);
+							continue;
+						}
+						if (modelocks->SetMLock(cm, adding, mode_param, source.GetNick()))
+							locked.Push(cm, mode_param, adding);
+						else
+							cannotlock.Push(cm, mode_param , adding);
+					}
+					else
+					{
+						if (modelocks->RemoveMLock(cm, adding, mode_param))
+							unlocked.Push(cm, mode_param, adding);
+						else
+							notlocked.Push(cm, mode_param, adding);
+					}
+					continue;
+			}
+		}
+
+		Anope::string reply;
+		if (unknownmode.GetString(reply))
+			source.Reply(_("Unknown modes %s ignored."), reply.c_str());
+		if (missingparam.GetString(reply))
+			source.Reply(_("Missing parameter for modes %s."), reply.c_str());
+		if (cannotset.GetString(reply))
+			source.Reply(_("You may not (un)lock modes %s from %s."), reply.c_str(), ci->name.c_str());
+
+		// ADD/SET
+		if (listfull.GetString(reply, false))
+			source.Reply(_("List for modes %s is full."), reply.c_str());
+		if (locklistfull.GetString(reply, false))
+			source.Reply(_("The mode lock list of \002%s\002 is full, unable to lock %s."), ci->name.c_str(), reply.c_str());
+		if (cannotlock.GetString(reply))
+			source.Reply(_("%s can not be locked on %s."), reply.c_str(), ci->name.c_str());
+		if (locked.GetString(reply))
+		{
+			source.Reply(_("%s has been locked on %s."), reply.c_str(), ci->name.c_str());
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to lock " << reply;
+		}
+
+		// DEL
+		if (notlocked.GetString(reply))
+			source.Reply(_("%s is not locked on %s."), reply.c_str(), ci->name.c_str());
+		if (unlocked.GetString(reply))
+		{
+			source.Reply(_("%s has been unlocked from %s."), reply.c_str(), ci->name.c_str());
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unlock " << reply;
+		}
+
+		if (reply.empty())
+			source.Reply(_("Nothing to do."));
 	}
 
 	void DoSet(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)

@@ -110,6 +110,9 @@ struct ModeLocksImpl : ModeLocks
 
 			if (m->name == mode->name)
 			{
+				if (m->set != status)
+					continue;
+
 				// For list or status modes, we must check the parameter
 				if (mode->type == MODE_LIST || mode->type == MODE_STATUS)
 					if (m->param != param)

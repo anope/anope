@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-13 12:39+0000\n"
-"PO-Revision-Date: 2025-11-13 12:39+0000\n"
+"POT-Creation-Date: 2025-11-15 16:29+0000\n"
+"PO-Revision-Date: 2025-11-15 16:29+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -594,9 +594,6 @@ msgstr ""
 msgid "email"
 msgstr ""
 
-msgid "language"
-msgstr ""
-
 msgid "memo-text"
 msgstr ""
 
@@ -642,9 +639,6 @@ msgstr ""
 msgid "nickname email"
 msgstr ""
 
-msgid "nickname language"
-msgstr ""
-
 msgid "nickname message"
 msgstr ""
 
@@ -654,16 +648,19 @@ msgstr ""
 msgid "nickname new-password"
 msgstr ""
 
-msgid "nickname timezone"
+msgid "nickname [code]"
 msgstr ""
 
-msgid "nickname [code]"
+msgid "nickname [language]"
 msgstr ""
 
 msgid "nickname [parameter]"
 msgstr ""
 
 msgid "nickname [password]"
+msgstr ""
+
+msgid "nickname [timezone]"
 msgstr ""
 
 msgid "nickname [+expiry] [reason]"
@@ -718,9 +715,6 @@ msgid "server [message]"
 msgstr ""
 
 msgid "server [reason]"
-msgstr ""
-
-msgid "timezone"
 msgstr ""
 
 msgid "type parameters"
@@ -6539,6 +6533,9 @@ msgstr ""
 msgid "[key|#X-Y]"
 msgstr ""
 
+msgid "[language]"
+msgstr ""
+
 msgid "[message]"
 msgstr ""
 
@@ -6558,6 +6555,9 @@ msgid "[nickname] code"
 msgstr ""
 
 msgid "[parameter]"
+msgstr ""
+
+msgid "[timezone]"
 msgstr ""
 
 msgid "[+daysd] [+limitl] pattern"

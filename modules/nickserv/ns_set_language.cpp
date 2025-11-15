@@ -21,12 +21,12 @@ protected:
 	Anope::map<Anope::string> &languages;
 
 public:
-	CommandNSSetLanguage(Module *creator, Anope::map<Anope::string> &langs, const Anope::string &sname = "nickserv/set/language", size_t min = 1)
+	CommandNSSetLanguage(Module *creator, Anope::map<Anope::string> &langs, const Anope::string &sname = "nickserv/set/language", size_t min = 0)
 		: Command(creator, sname, min, min + 1)
 		, languages(langs)
 	{
 		this->SetDesc(_("Set the language services will use when messaging you"));
-		this->SetSyntax(_("\037language\037"));
+		this->SetSyntax(_("[\037language\037]"));
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -37,7 +37,7 @@ public:
 			return;
 		}
 
-		const NickAlias *na = NickAlias::Find(user);
+		const auto *na = NickAlias::Find(user);
 		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
@@ -50,40 +50,52 @@ public:
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		auto lang = languages.end();
-		for (auto it = languages.begin(); it != languages.end(); ++it)
-		{
-			auto &[langcode, langname] = *it;
-			if (langcode.find_ci(param) != 0)
-				continue; // Language does not match.
+		Log() << "PARAM-EMPTY: " << param;
 
-			if (lang != languages.end())
+		Anope::string langname;
+		if (param.empty())
+		{
+			langname = Language::Translate(_("English"));
+			nc->language.clear();
+		}
+		else
+		{
+			auto lang = languages.end();
+			for (auto it = languages.begin(); it != languages.end(); ++it)
 			{
-				source.Reply(_("Multiple languages matched \002%s\002. Please be more specific."), param.c_str());
+				auto &[langcode, langname] = *it;
+				if (langcode.find_ci(param) != 0)
+					continue; // Language does not match.
+
+				if (lang != languages.end())
+				{
+					source.Reply(_("Multiple languages matched \002%s\002. Please be more specific."), param.c_str());
+					return;
+				}
+
+				lang = it;
+			}
+
+			if (lang == languages.end())
+			{
+				this->OnSyntaxError(source, "");
 				return;
 			}
 
-			lang = it;
+			langname = lang->second;
+			nc->language = lang->first;
 		}
 
-		if (lang == languages.end())
-		{
-			this->OnSyntaxError(source, "");
-			return;
-		}
-
-		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the language of " << nc->display << " to " << lang->first;
-
-		nc->language = lang->first;
+		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the language of " << nc->display << " to " << langname;
 		if (source.GetAccount() == nc)
-			source.Reply(_("Language changed to \002%s\002."), lang->second.c_str());
+			source.Reply(_("Language changed to \002%s\002."), langname.c_str());
 		else
-			source.Reply(_("Language for \002%s\002 changed to \002%s\002."), nc->display.c_str(), lang->second.c_str());
+			source.Reply(_("Language for \002%s\002 changed to \002%s\002."), nc->display.c_str(), langname.c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &param) override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, source.nc->display, param[0]);
+		this->Run(source, source.nc->display, params.empty() ? "" : params[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
@@ -109,15 +121,15 @@ class CommandNSSASetLanguage final
 {
 public:
 	CommandNSSASetLanguage(Module *creator, Anope::map<Anope::string> &langs)
-		: CommandNSSetLanguage(creator, langs, "nickserv/saset/language", 2)
+		: CommandNSSetLanguage(creator, langs, "nickserv/saset/language", 1)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037language\037"));
+		this->SetSyntax(_("\037nickname\037 [\037language\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, params[0], params[1]);
+		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override

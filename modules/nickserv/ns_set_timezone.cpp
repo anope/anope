@@ -67,12 +67,12 @@ protected:
 	}
 
 public:
-	CommandNSSetTimezone(Module *creator, SerializableExtensibleItem<Anope::string> &tz, const Anope::string &sname = "nickserv/set/timezone", size_t min = 1)
+	CommandNSSetTimezone(Module *creator, SerializableExtensibleItem<Anope::string> &tz, const Anope::string &sname = "nickserv/set/timezone", size_t min = 0)
 		: Command(creator, sname, min, min + 1)
 		, timezone(tz)
 	{
 		this->SetDesc(_("Set the timezone services will use when messaging you"));
-		this->SetSyntax(_("\037timezone\037"));
+		this->SetSyntax(_("[\037timezone\037]"));
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -97,40 +97,48 @@ public:
 			return;
 
 		Anope::string usertz;
-		for (const auto &timezone : timezones)
+		if (param.empty())
 		{
-			if (timezone.find_ci(param) != 0)
-				continue; // Timezone does not match.
-
-			if (!usertz.empty())
+			usertz = "UTC";
+			timezone.Unset(nc);
+		}
+		else
+		{
+			for (const auto &timezone : timezones)
 			{
-				source.Reply(_("Multiple timezones matched \002%s\002. Please be more specific."), param.c_str());
+				if (timezone.find_ci(param) != 0)
+					continue; // Timezone does not match.
+
+				if (!usertz.empty())
+				{
+					source.Reply(_("Multiple timezones matched \002%s\002. Please be more specific."), param.c_str());
+					return;
+				}
+
+				usertz = timezone;
+				if (usertz.equals_ci(param))
+					break; // Exact match.
+			}
+
+			if (usertz.empty())
+			{
+				this->OnSyntaxError(source, "");
 				return;
 			}
 
-			usertz = timezone;
-			if (usertz.equals_ci(param))
-				break; // Exact match.
-		}
-
-		if (usertz.empty())
-		{
-			this->OnSyntaxError(source, "");
-			return;
+			timezone.Set(nc, usertz);
 		}
 
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to change the timezone of " << nc->display << " to " << usertz;
-
-		timezone.Set(nc, usertz);
 		if (source.GetAccount() == nc)
 			source.Reply(_("Timezone changed to \002%s\002."), usertz.c_str());
 		else
 			source.Reply(_("Timezone for \002%s\002 changed to \002%s\002."), nc->display.c_str(), usertz.c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &param) override
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, source.nc->display, param[0]);
+		this->Run(source, source.nc->display, params.empty() ? "" : params[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -163,15 +171,15 @@ class CommandNSSASetTimezone final
 {
 public:
 	CommandNSSASetTimezone(Module *creator, SerializableExtensibleItem<Anope::string> &tz)
-		: CommandNSSetTimezone(creator, tz, "nickserv/saset/timezone", 2)
+		: CommandNSSetTimezone(creator, tz, "nickserv/saset/timezone", 1)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037timezone\037"));
+		this->SetSyntax(_("\037nickname\037 [\037timezone\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		this->Run(source, params[0], params[1]);
+		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

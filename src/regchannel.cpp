@@ -334,6 +334,8 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 	// Begin 2.0 compatibility.
 	if (ci->registered == Anope::CurTime)
 		data["time_registered"] >> ci->registered;
+	if (ci->registered == 0)
+		ci->registered = ci->last_used ? ci->last_used : Anope::CurTime; // Probably corrupt database.
 	// End 2.0 compatibility.
 
 	return ci;

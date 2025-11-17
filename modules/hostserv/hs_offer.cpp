@@ -719,7 +719,7 @@ private:
 
 			if (!ho)
 			{
-				source.Reply(_("%s is an invalid host offer entry number"), match.c_str());
+				source.Reply(_("%s is an invalid host offer entry number."), match.c_str());
 				return;
 			}
 		}

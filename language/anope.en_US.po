@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-15 16:29+0000\n"
-"PO-Revision-Date: 2025-11-15 16:29+0000\n"
+"POT-Creation-Date: 2025-11-17 22:17+0000\n"
+"PO-Revision-Date: 2025-11-17 22:17+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -71,6 +71,10 @@ msgstr ""
 
 #, c-format
 msgid "%s added to the AKILL list."
+msgstr ""
+
+#, c-format
+msgid "%s added to the host offer list."
 msgstr ""
 
 #, c-format
@@ -147,6 +151,10 @@ msgstr ""
 
 #, c-format
 msgid "%s deleted from the AKILL list."
+msgstr ""
+
+#, c-format
+msgid "%s deleted from the host offer list."
 msgstr ""
 
 #, c-format
@@ -302,6 +310,10 @@ msgstr ""
 
 #, c-format
 msgid "%s not found on the AKILL list."
+msgstr ""
+
+#, c-format
+msgid "%s not found on the host offer list."
 msgstr ""
 
 #, c-format
@@ -899,6 +911,10 @@ msgid "%s (now)"
 msgstr ""
 
 #, c-format
+msgid "%s [Invalid]"
+msgstr ""
+
+#, c-format
 msgid "%s access list is empty."
 msgstr ""
 
@@ -1020,6 +1036,10 @@ msgstr ""
 
 #, c-format
 msgid "%s is already on %s's auto join list."
+msgstr ""
+
+#, c-format
+msgid "%s is an invalid host offer entry number."
 msgstr ""
 
 #, c-format
@@ -1266,6 +1286,9 @@ msgid "ADD [+expiry] mask reason"
 msgstr ""
 
 msgid "ADD [+expiry] mask:reason"
+msgstr ""
+
+msgid "ADD [+expiry] vhost reason"
 msgstr ""
 
 msgid "ADD {NICK|CHAN|EMAIL|REGISTER} [+expiry] entry reason"
@@ -1991,6 +2014,9 @@ msgstr ""
 msgid "Bot won't kick for repeats anymore."
 msgstr ""
 
+msgid "CLEAR"
+msgstr ""
+
 msgid "CLEAR target"
 msgstr ""
 
@@ -2380,6 +2406,9 @@ msgstr ""
 msgid "Current Session Limit Exception list:"
 msgstr ""
 
+msgid "Current host offer list:"
+msgstr ""
+
 msgid "Current module list:"
 msgstr ""
 
@@ -2424,6 +2453,9 @@ msgid "DEL {nick|mask}"
 msgstr ""
 
 msgid "DEL {num | ALL}"
+msgstr ""
+
+msgid "DEL {vhost | entry-num | list}"
 msgstr ""
 
 msgid "DEL {NICK|CHAN|EMAIL|REGISTER} entry"
@@ -2612,8 +2644,18 @@ msgid "Deleted %s from the AKILL list."
 msgstr ""
 
 #, c-format
+msgid "Deleted %s from the host offer list."
+msgstr ""
+
+#, c-format
 msgid "Deleted %u entry from your message queue."
 msgid_plural "Deleted %u entries from your message queue."
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
+msgid "Deleted %zu entry from the host offer list."
+msgid_plural "Deleted %zu entries from the host offer list."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2888,6 +2930,9 @@ msgstr ""
 msgid "End of forbid list."
 msgstr ""
 
+msgid "End of host offer list."
+msgstr ""
+
 #, c-format
 msgid "End of list - %d channels shown."
 msgstr ""
@@ -3102,6 +3147,16 @@ msgid "Host"
 msgstr ""
 
 #, c-format
+msgid "Host offer %s already exists."
+msgstr ""
+
+msgid "Host offer list has been cleared."
+msgstr ""
+
+msgid "Host offer list is empty."
+msgstr ""
+
+#, c-format
 msgid "Hosts with at least %d sessions:"
 msgstr ""
 
@@ -3238,6 +3293,9 @@ msgstr ""
 msgid "LIST [nickname]"
 msgstr ""
 
+msgid "LIST [vhost-mask | entry-num | list]"
+msgstr ""
+
 #, c-format
 msgid "Language changed to %s."
 msgstr ""
@@ -3320,6 +3378,24 @@ msgid "List of nicknames belonging to %s:"
 msgstr ""
 
 msgid "List of nicknames belonging to your account:"
+msgstr ""
+
+msgid "List or take a vhost from the host offer list"
+msgstr ""
+
+#, c-format
+msgid ""
+"List or take an offered vhost.\n"
+"\n"
+"With no parameters, a user@host or host mask, an entry number, or a list (e.g. 1-3,5) offered vhosts will be shown. If ALL is specified vhosts that can not be taken will be labelled with [Invalid] instead of being omitted.\n"
+"The offered vhosts may contain template variables. The supported template variables are:\n"
+"  {account}  - Your current account.\n"
+"  {network}  - The name of this IRC network.\n"
+"  {nick}     - Your current nickname.\n"
+"  {regdate}  - The YYYY-MM-DD date at which your nick was registered.\n"
+"  {regepoch} - The UNIX time at which your nick was registered.\n"
+"\n"
+"With %sTAKE an offered vhost will be applied. You must specify the offered template variable or the entry number for the offered vhost you want to use. Once a vhost is taken you can not take another one for %s."
 msgstr ""
 
 msgid "List the options"
@@ -3595,6 +3671,9 @@ msgid "Manipulate the AKILL list"
 msgstr ""
 
 msgid "Manipulate the DefCon system"
+msgstr ""
+
+msgid "Manipulate the host offer list"
 msgstr ""
 
 msgid "Manipulate the topic of the specified channel"
@@ -3966,6 +4045,9 @@ msgstr ""
 msgid "No matching entries on the AKILL list."
 msgstr ""
 
+msgid "No matching entries on the host offer list."
+msgstr ""
+
 msgid "No memo was cancelable."
 msgstr ""
 
@@ -4037,6 +4119,28 @@ msgid "Now"
 msgstr ""
 
 msgid "Number"
+msgstr ""
+
+#, c-format
+msgid ""
+"Offer stock vhosts to unprivileged users.\n"
+"The %sADD command adds an offered vhost. If expiry is provided then the offered vhost will only be available for a limited time. The vhost field may contain template variables. The supported template variables are:\n"
+"  {account}  - Your current account.\n"
+"  {network}  - The name of this IRC network.\n"
+"  {nick}     - Your current nickname.\n"
+"  {regdate}  - The YYYY-MM-DD date at which your nick was registered.\n"
+"  {regepoch} - The UNIX time at which your nick was registered.\n"
+"\n"
+"The %sCLEAR command removes all offered vhosts.\n"
+"\n"
+"The %sDEL command removes an offered vhost.\n"
+"\n"
+"The %sLIST command displays the offered vhosts, or optionally only those offered vhosts which match the given mask.\n"
+"\n"
+"The %sVIEW command is a more verbose version of the %sLIST command."
+msgstr ""
+
+msgid "Offered vhost"
 msgstr ""
 
 msgid "Online from"
@@ -4156,6 +4260,10 @@ msgstr ""
 
 #, c-format
 msgid "Please wait %s before requesting a new vhost."
+msgstr ""
+
+#, c-format
+msgid "Please wait %s before taking a new vhost."
 msgstr ""
 
 #, c-format
@@ -5152,6 +5260,9 @@ msgid ""
 "This option is not persistent, and should only be used when needed, and set back to OFF when no longer needed."
 msgstr ""
 
+msgid "TAKE {vhost | entry-num}"
+msgstr ""
+
 #, c-format
 msgid "Tells %s that you are really the owner of this nick. Many commands require you to authenticate yourself with this command before you use them. The password should be the same one you sent with the REGISTER command."
 msgstr ""
@@ -5949,6 +6060,9 @@ msgstr ""
 msgid "VIEW [mask | list]"
 msgstr ""
 
+msgid "VIEW [vhost-mask | entry-num | list]"
+msgstr ""
+
 msgid "Validates a previously requested vhost using DNS"
 msgstr ""
 
@@ -6260,10 +6374,16 @@ msgstr ""
 msgid "You must confirm your account before you can register a channel."
 msgstr ""
 
+msgid "You must confirm your account before you can view the host offer list."
+msgstr ""
+
 msgid "You must confirm your account before you may request a vhost."
 msgstr ""
 
 msgid "You must confirm your account before you may send a memo."
+msgstr ""
+
+msgid "You must confirm your account before you may take a vhost."
 msgstr ""
 
 #, c-format
@@ -6440,6 +6560,9 @@ msgstr ""
 msgid "Your requested vhost has been validated via DNS."
 msgstr ""
 
+msgid "Your vhost"
+msgstr ""
+
 #, c-format
 msgid "Your vhost %s has been requested."
 msgstr ""
@@ -6560,6 +6683,9 @@ msgstr ""
 msgid "[timezone]"
 msgstr ""
 
+msgid "[vhost-mask | entry-num | list] [ALL]"
+msgstr ""
+
 msgid "[+daysd] [+limitl] pattern"
 msgstr ""
 
@@ -6677,6 +6803,24 @@ msgid "{number}: {mask} = {level} -- created by {creator}; last seen {last_see
 msgstr ""
 
 msgid "{number}: {nick} = {vhost} -- created by {creator} at {created}"
+msgstr ""
+
+msgid "{number}: {offered_vhost} / {your_vhost} -- {expires}"
+msgstr ""
+
+msgid "{number}: {offered_vhost} / {your_vhost} -- {expires} ({reason})"
+msgstr ""
+
+msgid "{number}: {vhost}"
+msgstr ""
+
+msgid "{number}: {vhost} ({reason})"
+msgstr ""
+
+msgid "{number}: {vhost} -- created by {creator} on {created}; {expires}"
+msgstr ""
+
+msgid "{number}: {vhost} -- created by {creator} on {created}; {expires} ({reason})"
 msgstr ""
 
 msgid "{number}: {word} -- type: {type}"

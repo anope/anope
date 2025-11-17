@@ -148,9 +148,11 @@ public:
 			this->SendSyntax(source);
 			source.Reply(" ");
 			source.Reply(_(
-				"Changes the timezone services uses when sending messages to you (for example, "
-				"when responding to a command you send). \037timezone\037 should be chosen from "
-				"an entry in one of the supported timezone regions:"
+				"Changes the timezone services uses when sending messages to you "
+				"(for example, when responding to a command you send). If "
+				"\037timezone\037 is not specified the default (UTC) will be "
+				"used. Otherwise, \037timezone\037 should be chosen from an "
+				"entry in one of the supported timezone regions:"
 			));
 
 			for (const auto &[timeregion, timezone] : timeregions)
@@ -189,9 +191,11 @@ public:
 			this->SendSyntax(source);
 			source.Reply(" ");
 			source.Reply(_(
-				"Changes the timezone services uses when sending messages to the given user (for "
-				"example, when responding to a command they send). \037timezone\037 should be "
-				"chosen from an entry in one of the supported timezone regions:"
+				"Changes the timezone services uses when sending messages to the "
+				"given user (for example, when responding to a command they "
+				"send). If \037timezone\037 is not specified the default (UTC) "
+				"will be used. Otherwise, \037timezone\037 should be chosen from "
+				"an entry in one of the supported timezone regions:"
 			));
 
 			for (const auto &[timeregion, timezone] : timeregions)

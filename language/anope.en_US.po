@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-17 22:17+0000\n"
-"PO-Revision-Date: 2025-11-17 22:17+0000\n"
+"POT-Creation-Date: 2025-11-17 23:13+0000\n"
+"PO-Revision-Date: 2025-11-17 23:13+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -2089,10 +2089,12 @@ msgstr ""
 msgid "Changes the founder of a channel. The new nickname must be a registered one."
 msgstr ""
 
-msgid "Changes the language services uses when sending messages to the given user (for example, when responding to a command they send). language should be chosen from the following list of supported languages:"
+#, c-format
+msgid "Changes the language services uses when sending messages to the given user (for example, when responding to a command they send). If language is not specified the default (%s) will be used. Otherwise, language should be chosen from the following list of supported languages:"
 msgstr ""
 
-msgid "Changes the language services uses when sending messages to you (for example, when responding to a command you send). language should be chosen from the following list of supported languages:"
+#, c-format
+msgid "Changes the language services uses when sending messages to you (for example, when responding to a command you send). If language is not specified the default (%s) will be used. Otherwise, language should be chosen from the following list of supported languages:"
 msgstr ""
 
 msgid "Changes the password used to identify as the nick's owner."
@@ -2104,10 +2106,10 @@ msgstr ""
 msgid "Changes the successor of a channel. If the founder's nickname expires or is dropped while the channel is still registered, the successor will become the new founder of the channel. The successor's nickname must be a registered one. If there's no successor set, then the first nickname on the access list (with the highest access, if applicable) will become the new founder, but if the access list is empty, the channel will be dropped."
 msgstr ""
 
-msgid "Changes the timezone services uses when sending messages to the given user (for example, when responding to a command they send). timezone should be chosen from an entry in one of the supported timezone regions:"
+msgid "Changes the timezone services uses when sending messages to the given user (for example, when responding to a command they send). If timezone is not specified the default (UTC) will be used. Otherwise, timezone should be chosen from an entry in one of the supported timezone regions:"
 msgstr ""
 
-msgid "Changes the timezone services uses when sending messages to you (for example, when responding to a command you send). timezone should be chosen from an entry in one of the supported timezone regions:"
+msgid "Changes the timezone services uses when sending messages to you (for example, when responding to a command you send). If timezone is not specified the default (UTC) will be used. Otherwise, timezone should be chosen from an entry in one of the supported timezone regions:"
 msgstr ""
 
 msgid "Changes when you will be notified about new memos (only for nicknames)"

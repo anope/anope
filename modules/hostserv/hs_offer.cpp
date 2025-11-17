@@ -710,7 +710,7 @@ private:
 			return;
 		}
 
-		const HostOffer *ho;
+		const HostOffer *ho = nullptr;
 		if (match.find_first_not_of("1234567890") == Anope::string::npos)
 		{
 			const auto number = Anope::TryConvert<size_t>(match);

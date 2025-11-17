@@ -14,11 +14,21 @@
 
 #include "module.h"
 
+#define ENGLISH _("English")
+
 class CommandNSSetLanguage
 	: public Command
 {
 protected:
 	Anope::map<Anope::string> &languages;
+
+	const char *GetDefaultLanguage() const
+	{
+		auto it = languages.find(Config->DefLanguage);
+		if (it != languages.end())
+			return it->second.c_str();
+		return ENGLISH;
+	}
 
 public:
 	CommandNSSetLanguage(Module *creator, Anope::map<Anope::string> &langs, const Anope::string &sname = "nickserv/set/language", size_t min = 0)
@@ -55,7 +65,7 @@ public:
 		Anope::string langname;
 		if (param.empty())
 		{
-			langname = Language::Translate(_("English"));
+			langname = Language::Translate(ENGLISH);
 			nc->language.clear();
 		}
 		else
@@ -109,7 +119,7 @@ public:
 				"used. Otherwise, \037language\037 should be chosen from the "
 				"following list of supported languages:"
 			),
-			Config->DefLanguage.c_str());
+			GetDefaultLanguage());
 
 		for (const auto &[langcode, langname] : languages)
 			source.Reply("    %s (%s)", langcode.c_str(), langname.c_str());
@@ -145,7 +155,7 @@ public:
 				"will be used. Otherwise, \037language\037 should be chosen from "
 				"the following list of supported languages:"
 			),
-			Config->DefLanguage.c_str());
+			GetDefaultLanguage());
 
 		for (const auto &[langcode, langname] : languages)
 			source.Reply("    %s (%s)", langcode.c_str(), langname.c_str());
@@ -174,9 +184,9 @@ public:
 
 		// Build a list of languages. This only needs to happen once as we
 		// only load the languages on boot.
-		languages.emplace("en_US.UTF-8", "English");
+		languages.emplace("en_US.UTF-8", ENGLISH);
 		for (const auto &language : Language::Languages)
-			languages.emplace(language, Language::Translate(language.c_str(), _("English")));
+			languages.emplace(language, Language::Translate(language.c_str(), ENGLISH));
 	}
 };
 

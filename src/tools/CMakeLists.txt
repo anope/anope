@@ -22,7 +22,7 @@ foreach(SRC ${TOOLS_SRCS})
     )
     # Add the executable to the list of files for CPack to ignore
     set(EXE_BINARY "$<TARGET_FILE:${EXE}>")
-    get_filename_component(EXE_BINARY ${EXE_BINARY} NAME)
+    cmake_path(GET EXE_BINARY FILENAME EXE_BINARY)
     add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
   endif()
 endforeach()
@@ -38,7 +38,8 @@ if(NOT WIN32)
   endif()
 
   configure_file(${Anope_SOURCE_DIR}/src/tools/anoperc.in ${Anope_BINARY_DIR}/src/tools/anoperc)
-  install (PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anoperc
+  install(
+    PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anoperc
     DESTINATION ${BIN_DIR}
   )
 endif()

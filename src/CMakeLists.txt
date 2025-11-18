@@ -39,18 +39,22 @@ if(MSVC)
   set_source_files_properties(win32/win32_memory.cpp PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
   add_library(win32_memory STATIC win32/win32_memory.cpp)
   set(WIN32_MEMORY win32_memory)
-  set(EXTRA_LDFLAGS "/OPT:NOREF") # https://sourceware.org/bugzilla/show_bug.cgi?id=12633
 else()
   set(WIN32_MEMORY)
 endif()
 
 # Generate the Anope executable and set it's linker flags, also set it to export it's symbols even though it's not a module
 add_executable(${PROGRAM_NAME} ${SRC_SRCS})
-set_target_properties(${PROGRAM_NAME} PROPERTIES LINK_FLAGS "${LDFLAGS} ${EXTRA_LDFLAGS}" ENABLE_EXPORTS ON INSTALL_RPATH_USE_LINK_PATH ON BUILD_WITH_INSTALL_RPATH ON)
+set_target_properties(${PROGRAM_NAME} PROPERTIES
+  BUILD_WITH_INSTALL_RPATH ON
+  ENABLE_EXPORTS ON
+  INSTALL_RPATH_USE_LINK_PATH ON
+  LINK_FLAGS "${LDFLAGS}"
+)
 
-# On Windows, also link Anope to the wsock32 and Ws2_32 library, as well as set the version
+# On Windows, also link Anope to the Winsock library
 if(WIN32)
-  target_link_libraries(${PROGRAM_NAME} PUBLIC wsock32 Ws2_32 ${LINK_LIBS} ${WIN32_MEMORY})
+  target_link_libraries(${PROGRAM_NAME} PUBLIC "Ws2_32" ${LINK_LIBS} ${WIN32_MEMORY})
   set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
 else()
   target_link_libraries(${PROGRAM_NAME} PUBLIC ${LINK_LIBS})
@@ -70,7 +74,7 @@ endif()
 
 # Get the filename of the Anope executable as it is in on this system
 set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
-get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
+cmake_path(GET SERVICES_BINARY FILENAME SERVICES_BINARY)
 # Add the Anope executable to the list of files for CPack to ignore
 add_to_cpack_ignored_files("${SERVICES_BINARY}$" TRUE)
 

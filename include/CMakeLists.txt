@@ -11,7 +11,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h ${CMAKE_CURRENT_
   DEPENDS version-bin ${SRC_SRCS}
 )
 # Add version-bin to list of files for CPack to ignore
-get_filename_component(version_BINARY ${version_BINARY} NAME)
+cmake_path(GET version_BINARY FILENAME version_BINARY)
 add_to_cpack_ignored_files("${version_BINARY}$" TRUE)
 if(NOT WIN32)
   add_to_cpack_ignored_files("version.h$" TRUE)

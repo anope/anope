@@ -54,17 +54,10 @@ macro(build_module SRC MODULE_SRC)
     add_library(${SO} MODULE ${MODULE_SRC})
     # Execute inline CMake code for the module
     inline_cmake(${SO} ${MODULE_SRC})
-    # Windows requires this because it's weird
-    if(WIN32)
-      set(WIN32_NO_LIBS "/nodefaultlib:\"libcmt.lib\" /OPT:NOREF")
-    else()
-      set(WIN32_NO_LIBS)
-    endif()
     set_target_properties(${SO} PROPERTIES
       BUILD_WITH_INSTALL_RPATH ON
       FOLDER "Modules"
       INSTALL_RPATH_USE_LINK_PATH ON
-      LINK_FLAGS "${WIN32_NO_LIBS}"
       PREFIX ""
       SUFFIX ""
     )
@@ -72,9 +65,9 @@ macro(build_module SRC MODULE_SRC)
     if(HAVE_LOCALIZATION)
       add_dependencies(${SO} module_language)
     endif()
-    # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set its version
+    # For Windows only, have the module link to the export library of Anope as well as Winsock (most of the modules probably don't need this, but this is to be on the safe side)
     if(WIN32)
-      target_link_libraries(${SO} PUBLIC ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY})
+      target_link_libraries(${SO} PUBLIC ${PROGRAM_NAME} "Ws2_32" ${WIN32_MEMORY})
       set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
     elseif(APPLE)
       target_link_libraries(${SO} PUBLIC ${PROGRAM_NAME})
@@ -105,16 +98,11 @@ macro(build_subdir)
   file(GLOB_RECURSE MODULES_SUBDIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS "*.cpp")
   list(SORT MODULES_SUBDIR_SRCS)
 
-  GET_FILENAME_COMPONENT(FOLDER_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+  cmake_path(GET CMAKE_CURRENT_SOURCE_DIR FILENAME FOLDER_NAME)
   set(SO "${FOLDER_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
   # Set all the files to use C++ as well as set their compile flags (use the module-specific compile flags, though)
   set_source_files_properties(${MODULES_SUBDIR_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
-
-  # Remove duplicates from the linker flags
-  if(SUBDIR_LDFLAGS)
-    list(REMOVE_DUPLICATES SUBDIR_LDFLAGS)
-  endif()
 
   # For Visual Studio only, include win32_memory static library, required to override Visual Studio's overrides of the new/delete operators
   if(MSVC)
@@ -129,7 +117,6 @@ macro(build_subdir)
     BUILD_WITH_INSTALL_RPATH ON
     FOLDER "Modules"
     INSTALL_RPATH_USE_LINK_PATH ON
-    LINK_FLAGS "${SUBDIR_LDFLAGS}"
     PREFIX ""
     SUFFIX ""
   )
@@ -137,10 +124,10 @@ macro(build_subdir)
   if(HAVE_LOCALIZATION)
     add_dependencies(${SO} module_language)
   endif()
-  # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
+  # For Windows only, have the module link to the export library of Anope as well Winsock (most of the modules probably don't need this, but this is to be on the safe side)
   if(WIN32)
-    target_link_libraries(${SO} PUBLIC ${PROGRAM_NAME} PUBLIC wsock32 Ws2_32 ${WIN32_MEMORY})
-    set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
+    target_link_libraries(${SO} PUBLIC ${PROGRAM_NAME} PUBLIC "Ws2_32" ${WIN32_MEMORY})
+    set_target_properties(${SO} PROPERTIES VERSION "${VERSION_DOTTED}")
   elseif(APPLE)
     target_link_libraries(${SO} PUBLIC ${PROGRAM_NAME})
   endif()

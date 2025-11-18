@@ -14,6 +14,9 @@
 #
 # SPDX-License-Identifier: GPL-2.0-only
 
+SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
+. $SOURCE_DIR/src/version.sh
+
 Load_Cache () {
 	if [ -f $SOURCE_DIR/config.cache -a -r $SOURCE_DIR/config.cache -a ! "$IGNORE_CACHE" ] ; then
 		echo "Using defaults from config.cache. To ignore, $SOURCE_DIR/Config -nocache"
@@ -81,7 +84,7 @@ Run_Build_System () {
 # Init values
 ###########################################################################
 
-INSTDIR=$HOME/anope
+INSTDIR="${HOME}/anope-${VERSION_MAJOR}.${VERSION_MINOR}"
 RUNGROUP=
 UMASK=
 DEBUG="no"
@@ -89,7 +92,6 @@ EXTRA_INCLUDE_DIRS=
 EXTRA_LIB_DIRS=
 EXTRA_CONFIG_ARGS=
 CAN_QUICK="no"
-SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 ###########################################################################
 # Check out the options
@@ -141,7 +143,6 @@ fi
 
 if [ ! "$NO_INTRO" ] ; then
 	export MORE='-e'
-	. $SOURCE_DIR/src/version.sh
 	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | more
 	echo ""
 else

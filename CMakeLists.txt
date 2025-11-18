@@ -153,7 +153,7 @@ endif()
 if(INSTDIR)
   set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
 elseif(NOT CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/anope")
+  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/anope-@VERSION_MAJOR@-@VERSION_MINOR@")
 endif()
 
 # Set default paths for various directories if not already defined

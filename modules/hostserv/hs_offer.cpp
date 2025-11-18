@@ -19,6 +19,7 @@
 
 namespace
 {
+	Anope::string network_name;
 	time_t take_delay = 0;
 
 	Anope::string GetVHostMask(const Anope::string &ident, const Anope::string &host)
@@ -47,12 +48,14 @@ namespace
 			return Anope::string(buf);
 		};
 
+		// NOTE: when updating this also update dummy_template.
 		return Anope::Template(ih, {
-			{ "account",  na ? na->nc->display : ""                                               },
-			{ "nick",     na ? na->nick : ""                                                      },
-			{ "network",  Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
-			{ "regdate",  na ? Anope::ToString(na->registered) : ""                               },
-			{ "regepoch", na ? regdate(na) : ""                                                   },
+			{ "account",  na ? na->nc->display : ""                 },
+			{ "nick",     na ? na->nick : ""                        },
+			{ "network",  network_name                              },
+			{ "regdate",  na ? regdate(na) : ""                     },
+			{ "regepoch", na ? Anope::ToString(na->registered) : "" },
+
 		});
 	}
 }
@@ -334,7 +337,7 @@ private:
 		const size_t vhost_idx = expiry_idx ? 2 : 1;
 		const size_t reason_idx = expiry_idx ? 3 : 2;
 
-		if (params.size() <= reason_idx)
+		if (params.size() <= vhost_idx)
 		{
 			this->OnSyntaxError(source, "ADD");
 			return;
@@ -371,6 +374,17 @@ private:
 			return;
 		}
 
+		auto dummy_template = [](const Anope::string &v)
+		{
+			return Anope::Template(v, {
+				{ "account",  "a"          },
+				{ "nick",     "a"          },
+				{ "network",  network_name },
+				{ "regdate",  "1111-11-11" },
+				{ "regepoch", "1111111111" },
+			});
+		};
+
 		if (!ident.empty())
 		{
 			if (!IRCD->CanSetVIdent)
@@ -379,7 +393,7 @@ private:
 				return;
 			}
 
-			const auto sub_ident = Template(ident, "");
+			const auto sub_ident = dummy_template(ident);
 			if (sub_ident.length() > IRCD->MaxUser)
 			{
 				source.Reply(HOST_SET_VIDENT_TOO_LONG, IRCD->MaxUser);
@@ -392,7 +406,7 @@ private:
 			}
 		}
 
-		const auto sub_host = Template(host, "");
+		const auto sub_host = dummy_template(host);
 		if (sub_host.length() > IRCD->MaxHost)
 		{
 			source.Reply(HOST_SET_VHOST_TOO_LONG, IRCD->MaxHost);
@@ -412,9 +426,8 @@ private:
 		}
 
 		Anope::string reason;
-		for (auto idx = reason_idx; idx <= params.size(); ++idx)
-			reason += " " + params[idx];
-		reason.erase(reason.begin());
+		for (auto idx = reason_idx; idx < params.size(); ++idx)
+			reason.append(reason.empty() ? "" : " ").append(params[idx]);
 
 		auto *ho = new HostOffer(ident, host, source.GetNick(), reason, Anope::CurTime, expiry);
 		HostOffersList.Add(ho);
@@ -556,7 +569,7 @@ public:
 		: Command(creator, "hostserv/offer", 1, 4)
 	{
 		this->SetDesc(_("Manipulate the host offer list"));
-		this->SetSyntax(_("ADD [+\037expiry\037] \037vhost\037 \037reason\037"));
+		this->SetSyntax(_("ADD [+\037expiry\037] \037vhost\037 [\037reason\037]"));
 		this->SetSyntax(_("CLEAR"));
 		this->SetSyntax(_("DEL {\037vhost\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("LIST [\037vhost-mask\037 | \037entry-num\037 | \037list\037]"));
@@ -913,8 +926,8 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		auto &modconf = conf.GetModule(this);
-		take_delay = modconf.Get<time_t>("takedelay");
+		network_name = Config->GetBlock("networkinfo").Get<const Anope::string>("networkname");
+		take_delay = conf.GetModule(this).Get<time_t>("takedelay");
 	}
 };
 

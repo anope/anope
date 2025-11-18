@@ -67,3 +67,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ github.event.release.tag_name }} $(Get-ChildItem anope-*.exe)
+
+      - name: Upload artifact
+        if: "${{ github.event_name != 'release' }}"
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: ${{ github.workspace }}\build\\anope-*.exe

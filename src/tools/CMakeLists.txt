@@ -2,9 +2,6 @@
 file(GLOB TOOLS_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 list(SORT TOOLS_SRCS)
 
-# Set all the files to use C++ as well as set their compile flags
-set_source_files_properties(${TOOLS_SRCS} PROPERTIES LANGUAGE CXX COMPILE_FLAGS "${CXXFLAGS}")
-
 # Iterate through all the source files
 foreach(SRC ${TOOLS_SRCS})
   # Convert the source file extension to have no extension
@@ -13,31 +10,32 @@ foreach(SRC ${TOOLS_SRCS})
   if(NOT SKIP)
     # Generate the executable and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
     add_executable(${EXE} ${SRC})
-    set_target_properties(${EXE} PROPERTIES LINK_FLAGS "${LDFLAGS}")
     add_dependencies(${EXE} ${PROGRAM_NAME})
     # Set the executable to be installed to the bin directory under the main directory
     install(TARGETS ${EXE}
       DESTINATION ${BIN_DIR}
       RUNTIME
     )
-    # Add the executable to the list of files for CPack to ignore
-    set(EXE_BINARY "$<TARGET_FILE:${EXE}>")
-    cmake_path(GET EXE_BINARY FILENAME EXE_BINARY)
-    add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
   endif()
 endforeach()
 
 # If not on Windows, generate anope.service and anoperc
 if(NOT WIN32)
   if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    configure_file(${Anope_SOURCE_DIR}/src/tools/anope.service.in ${Anope_BINARY_DIR}/src/tools/anope.service)
+    configure_file(
+      ${Anope_SOURCE_DIR}/src/tools/anope.service.in
+      ${Anope_BINARY_DIR}/src/tools/anope.service
+    )
     install(
       PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anope.service
       DESTINATION ${BIN_DIR}
     )
   endif()
 
-  configure_file(${Anope_SOURCE_DIR}/src/tools/anoperc.in ${Anope_BINARY_DIR}/src/tools/anoperc)
+  configure_file(
+    ${Anope_SOURCE_DIR}/src/tools/anoperc.in
+    ${Anope_BINARY_DIR}/src/tools/anoperc
+  )
   install(
     PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/anoperc
     DESTINATION ${BIN_DIR}

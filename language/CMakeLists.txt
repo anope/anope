@@ -23,10 +23,6 @@ if(HAVE_LOCALIZATION)
       COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} -c ${CMAKE_CURRENT_SOURCE_DIR}/${LANG_PO} -o ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO}
       MAIN_DEPENDENCY ${LANG_PO}
     )
-    # Add to cpack ignored files if not on Windows.
-    if(NOT WIN32)
-      add_to_cpack_ignored_files("${LANG_MO}")
-    endif()
 
     # Install the new language file
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO} DESTINATION ${LOCALE_DIR}/${LANG_LANG}/LC_MESSAGES RENAME ${LANG_DOMAIN}.mo PERMISSIONS ${PERMS})

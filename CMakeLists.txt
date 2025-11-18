@@ -4,11 +4,6 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 # Set the project as C++ primarily
 project(Anope CXX)
 
-# Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
-set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR}/cmake)
-
-include(Anope)
-
 # Force the locale to C for later uses of things like gcc so the messages come up in English, not the user's default language
 set(ENV{LC_ALL} C)
 
@@ -54,6 +49,7 @@ find_package(Intl)
 if(GETTEXT_FOUND AND Intl_FOUND)
   set(HAVE_LOCALIZATION ON)
   include_directories(${Intl_INCLUDE_DIRS})
+  link_libraries(${Intl_LIBRARY})
 else()
   message("Unable to find gettext and libintl; disabling localization")
   set(HAVE_LOCALIZATION OFF)
@@ -73,29 +69,33 @@ endif()
 
 # If using Visual Studio, set the C++ flags accordingly
 if(MSVC)
-  # Remove the default exception handling flags, also remove default warning level flag
-  string(REPLACE "/EHsc " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-  string(REPLACE "/GX " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-  string(REPLACE "/W3 " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-  # Set the compile flags to have warnings on the max setting (but disable a few annoying ones), exception handling turned on, the proper defines
-  set(CXXFLAGS "${CXXFLAGS} /W4 /wd4100 /wd4127 /wd4250 /wd4251 /wd4267 /wd4275 /wd4355 /wd4706 /wd4800 /wd4996 /EHs")
+  # Set the compile flags to have warnings on the max setting (but disable a few annoying ones), exception handling turned on
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /wd4100 /wd4127 /wd4250 /wd4251 /wd4267 /wd4275 /wd4355 /wd4706 /wd4800 /wd4996 /EHs")
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 # Otherwise, we're not using Visual Studio
 else()
   # Set the compile flags to have all warnings on (including shadowed variables)
-  set(CXXFLAGS "${CXXFLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wformat=2 -Wmissing-format-attribute -Wpedantic")
-  set(CXXFLAGS "${CXXFLAGS} -Wno-format-nonliteral -Wno-format-y2k -Wno-format-zero-length -Wno-date-time -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wformat=2 -Wmissing-format-attribute -Wpedantic")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-nonliteral -Wno-format-y2k -Wno-format-zero-length -Wno-date-time -Wno-unused-parameter")
 endif()
 
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags
 if(CMAKE_DL_LIBS)
-  list(APPEND LINK_LIBS ${CMAKE_DL_LIBS})
+  link_libraries(${CMAKE_DL_LIBS})
 endif()
 
 # Find the linker flags required for using threads.
 find_package("Threads" REQUIRED)
 if(CMAKE_THREAD_LIBS_INIT)
-  list(APPEND LINK_LIBS ${CMAKE_THREAD_LIBS_INIT})
+  link_libraries(${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+# On Windows, also link Anope to the memory library and Winsock.
+if(WIN32)
+  link_libraries("Ws2_32")
+  if(MSVC)
+    link_libraries("win32_memory")
+  endif()
 endif()
 
 if(NOT PROGRAM_NAME)
@@ -108,7 +108,7 @@ if(NOT MSVC)
   check_cxx_compiler_flag(-pipe HAVE_PIPE_FLAG)
   # If the flag was accepted, add it to the list of flags
   if(HAVE_PIPE_FLAG)
-    set(CXXFLAGS "${CXXFLAGS} -pipe")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
   endif()
 endif()
 
@@ -134,15 +134,6 @@ check_function_exists(epoll_wait HAVE_EPOLL)
 check_function_exists(poll HAVE_POLL)
 check_function_exists(kqueue HAVE_KQUEUE)
 
-# Strip the leading and trailing spaces from the compile flags
-if(CXXFLAGS)
-  string(STRIP ${CXXFLAGS} CXXFLAGS)
-endif()
-# Strip the leading and trailing spaces from the linker flags
-if(LDFLAGS)
-  string(STRIP ${LDFLAGS} LDFLAGS)
-endif()
-
 # Search for the following programs
 if(NOT WIN32 AND RUNGROUP)
   find_program(CHGRP "chgrp" REQUIRED)
@@ -153,7 +144,7 @@ endif()
 if(INSTDIR)
   set(CMAKE_INSTALL_PREFIX "${INSTDIR}")
 elseif(NOT CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/anope-@VERSION_MAJOR@-@VERSION_MINOR@")
+  set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/anope-${VERSION_MAJOR}-${VERSION_MINOR}")
 endif()
 
 # Set default paths for various directories if not already defined
@@ -225,22 +216,6 @@ if(WIN32)
   configure_file(${Anope_SOURCE_DIR}/src/win32/win32.rc.cmake ${Anope_BINARY_DIR}/src/win32/win32.rc)
 endif()
 
-# Add the initial files to ignore which will be ignored regardless of if you are building in-source or out-of-source
-add_to_cpack_ignored_files(".git\;config.cache\;CMakeFiles\;sysconf.h$\;build" TRUE)
-# Add the files we don't want the periods converted for
-add_to_cpack_ignored_files(".\\\\\\\\.so$;.\\\\\\\\.o$;.\\\\\\\\.s$;${Anope_SOURCE_DIR}/Makefile$")
-# If the two directories are the same, we are building in-source, thus we need to ignore more files from the build
-if(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
-  # Add the files that need their periods converted
-  add_to_cpack_ignored_files("Makefile\;cmake_install.cmake\;sysconf.h$\;CMakeCache.txt\;install_manifest.txt" TRUE)
-  # Add the files we don't want the periods converted for
-  add_to_cpack_ignored_files(".\\\\\\\\.so$;CPack.;anope-${VERSION_FULL_NOBUILD}-source\\\\\\\\..")
-  # If using Visual Studio, add these files as well
-  if(MSVC)
-    add_to_cpack_ignored_files(".vcproj$\;.sln$\;.ncb$\;.suo$\;.dir$\;.ilk$\;.exp$\;.pdb$\;.lib$\;/debug$;/release$;/relwithdebinfo$;/minsizerel$" TRUE)
-  endif()
-endif()
-
 # Get the filename of the Anope binary, to use later
 set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 cmake_path(GET SERVICES_BINARY FILENAME SERVICES_BINARY)
@@ -309,7 +284,6 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   endif()
   set(CPACK_SOURCE_PACKAGE_FILE_NAME "anope-${VERSION_FULL_NOBUILD}-source")
   set(CPACK_SOURCE_GENERATOR "TGZ")
-  set(CPACK_SOURCE_IGNORE_FILES "$ENV{CPACK_IGNORED_FILES}")
   set(CPACK_MONOLITHIC_INSTALL TRUE)
   include(CPack)
 endif()

@@ -15,6 +15,7 @@
 /// BEGIN CMAKE
 /// pkg_check_modules("TRE" IMPORTED_TARGET REQUIRED "tre")
 /// target_link_libraries(${SO} PRIVATE PkgConfig::TRE)
+/// target_compile_options(${SO} PRIVATE "-Wno-error=date-time") # Workaround for TRE bug 117
 /// END CMAKE
 
 #include "module.h"

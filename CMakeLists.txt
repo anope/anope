@@ -1,9 +1,8 @@
 # This usage of CMake requires at least version 3.20
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-# Set the project as C++ primarily, but have C enabled for the checks required later
+# Set the project as C++ primarily
 project(Anope CXX)
-enable_language(C)
 
 # Override the module include path to include our directory, for our Anope.cmake, as well as we are using our own version of the NSIS template
 set(CMAKE_MODULE_PATH ${Anope_SOURCE_DIR}/cmake)
@@ -13,10 +12,6 @@ include(Anope)
 # Force the locale to C for later uses of things like gcc so the messages come up in English, not the user's default language
 set(ENV{LC_ALL} C)
 
-# Start with empty defaults for library and include directories, to be used by GNU compilers only
-set(DEFAULT_LIBRARY_DIRS)
-set(DEFAULT_INCLUDE_DIRS)
-
 # We require C++17 to build
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
@@ -25,81 +20,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Put modules in their own folder
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# If we are using a GNU compiler (have to use CXX because it seems to fail on C), we will be able to determine it's default paths for libraries and includes
-if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang$")
-  # First look for the compiler's default library directories
-  execute_process(COMMAND ${CMAKE_C_COMPILER} -print-search-dirs OUTPUT_VARIABLE LINES OUTPUT_STRIP_TRAILING_WHITESPACE)
-  # Find only the part after "libraries: "
-  string(REGEX REPLACE ".*\nlibraries: (.*)$" "\\1" LINE "${LINES}")
-  # Replace the colons in the list with semicolons
-  string(REGEX REPLACE ":" ";" LIBRARIES ${LINE})
-  # Iterate through the libraries
-  foreach(LIBRARY ${LIBRARIES})
-    # Check if the first character is an equal sign, and skip that library directory as it is (I believe) the primary default and shows up later in the list anyways
-    string(SUBSTRING ${LIBRARY} 0 1 FIRST_CHAR)
-    if(NOT FIRST_CHAR STREQUAL "=")
-      # If the directory had no = in front of it, make sure it's absolute and add it to the list of default library directories
-      get_filename_component(LIBRARY ${LIBRARY} ABSOLUTE)
-      list(APPEND DEFAULT_LIBRARY_DIRS ${LIBRARY})
-    endif()
-  endforeach()
-  # Remove duplicate entries from the list
-  if(DEFAULT_LIBRARY_DIRS)
-    list(REMOVE_DUPLICATES DEFAULT_LIBRARY_DIRS)
-  endif()
-  # Create a temporary file to test for the default include directories
-  FILE(WRITE empty.cpp "")
-  # Next, we look for the compiler's default include directories
-  # Run the command to find the default include directories
-  execute_process(COMMAND ${CMAKE_C_COMPILER} -v -x c++ -E ${CMAKE_CURRENT_SOURCE_DIR}/empty.cpp ERROR_VARIABLE LINES OUTPUT_QUIET ERROR_STRIP_TRAILING_WHITESPACE)
-  # Remove the empty file, it is no longer needed
-  FILE(REMOVE empty.cpp)
-  # Convert the new lines to semicolons
-  string(REGEX REPLACE "\n" ";" LINES ${LINES})
-  # Temporary variable saying if we are in the search list or not
-  set(IN_SEARCH_LIST FALSE)
-  # Iterate through the lines
-  foreach(LINE ${LINES})
-    # If the line has the following on it, the next lines will contain directory names
-    if(LINE STREQUAL "#include <...> search starts here:")
-      set(IN_SEARCH TRUE)
-    else()
-      # If the line has the following on it, we hit the end of the list
-      if(LINE STREQUAL "End of search list.")
-        set(IN_SEARCH FALSE)
-      else()
-        # If we are within the block between the above two lines...
-        if(IN_SEARCH)
-          # Get everything but the first character of the line
-          string(LENGTH ${LINE} LINE_LENGTH)
-          math(EXPR LINE_LENGTH "${LINE_LENGTH} - 1")
-          string(SUBSTRING ${LINE} 1 ${LINE_LENGTH} INCLUDE)
-          # For systems like Mac OS X, look for include paths that say " (framework directory)" at the end of them and strip that off
-          string(REGEX REPLACE " \\(framework directory\\)$" "" INCLUDE ${INCLUDE})
-          # Convert the path to an absolute one, just in case it wasn't
-          get_filename_component(INCLUDE ${INCLUDE} ABSOLUTE)
-          # Add that directory to the list of default include directories
-          list(APPEND DEFAULT_INCLUDE_DIRS ${INCLUDE})
-        endif()
-      endif()
-    endif()
-  endforeach()
-  # Remove duplicate entries from the list
-  if(DEFAULT_INCLUDE_DIRS)
-    list(REMOVE_DUPLICATES DEFAULT_INCLUDE_DIRS)
-  endif()
-endif()
-
-# If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
-# and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
-# to Debug
-# Only do this if not using Visual Studio
-if(NOT MSVC)
-  if(CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-  else()
-    set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-  endif()
+if(CMAKE_BUILD_TYPE STREQUAL "")
+  message(STATUS "CMAKE_BUILD_TYPE has not been specified; defaulting to Debug")
+  set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 # Include the checking functions used later in this CMakeLists.txt
@@ -199,7 +122,7 @@ if(NOT DEFUMASK)
 endif()
 
 # Set the DEBUG_BUILD for sysconf.h
-if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
   set(DEBUG_BUILD TRUE)
 endif()

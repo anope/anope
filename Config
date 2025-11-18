@@ -45,9 +45,9 @@ Run_Build_System () {
 	fi
 
 	if [ "$DEBUG" = "yes" ] ; then
-		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=DEBUG"
+		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=Debug"
 	else
-		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE"
+		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=Release"
 	fi
 
 	if [ "$EXTRA_INCLUDE_DIRS" != "" ] ; then

@@ -13,7 +13,7 @@ foreach(SRC ${TOOLS_SRCS})
   if(NOT SKIP)
     # Generate the executable and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
     add_executable(${EXE} ${SRC})
-    set_target_properties(${EXE} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
+    set_target_properties(${EXE} PROPERTIES LINK_FLAGS "${LDFLAGS}")
     add_dependencies(${EXE} ${PROGRAM_NAME})
     # Set the executable to be installed to the bin directory under the main directory
     install(TARGETS ${EXE}

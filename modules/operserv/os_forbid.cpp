@@ -62,6 +62,20 @@ struct ForbidDataImpl final
 	ForbidDataImpl() : Serializable("ForbidData") { }
 };
 
+struct ForbidDataFile final
+	: ForbidData
+{
+	ForbidDataFile(ForbidType t, const Anope::string &c, const Anope::string &m, const Anope::string &r)
+	{
+		created = Anope::CurTime;
+		creator = c;
+		immutable = true;
+		mask = m;
+		reason = r;
+		type = t;
+	}
+};
+
 struct ForbidDataTypeImpl final
 	: Serialize::Type
 {
@@ -392,10 +406,14 @@ public:
 			{
 				if (Anope::ReadOnly)
 					source.Reply(READ_ONLY_MODE);
-
-				Log(LOG_ADMIN, source, this) << "to remove forbid on " << d->mask << " of type " << subcommand;
-				source.Reply(_("%s deleted from the %s forbid list."), d->mask.c_str(), subcommand.c_str());
-				this->fs->RemoveForbid(d);
+				else if (d->immutable)
+					source.Reply(_("Forbid on %s can not be removed as it is from a file."), entry.c_str());
+				else
+				{
+					Log(LOG_ADMIN, source, this) << "to remove forbid on " << d->mask << " of type " << subcommand;
+					source.Reply(_("%s deleted from the %s forbid list."), d->mask.c_str(), subcommand.c_str());
+					this->fs->RemoveForbid(d);
+				}
 			}
 			else
 				source.Reply(_("Forbid on %s was not found."), entry.c_str());
@@ -483,9 +501,11 @@ public:
 class OSForbid final
 	: public Module
 {
+private:
 	MyForbidService forbidService;
 	ForbidDataTypeImpl forbiddata_type;
 	CommandOSForbid commandosforbid;
+	std::vector<ForbidData *> fileforbids;
 
 public:
 	OSForbid(const Anope::string &modname, const Anope::string &creator)
@@ -493,6 +513,55 @@ public:
 		, forbidService(this)
 		, commandosforbid(this)
 	{
+	}
+
+	void OnReload(Configuration::Conf &conf) override
+	{
+		for (auto* fileforbid : fileforbids)
+			forbidService.RemoveForbid(fileforbid);
+		fileforbids.clear();
+
+		const auto &modconf = conf.GetModule(this);
+		for (auto i = 0; i < modconf.CountBlock("file"); ++i)
+		{
+			const auto &fileblock = modconf.GetBlock("file", i);
+
+			const auto reasonstr = fileblock.Get<const Anope::string>("reason");
+
+			const auto typestr = fileblock.Get<const Anope::string>("type");
+			auto type = StringToType(typestr);
+			if (type == FT_SIZE)
+			{
+				Log(this) << "Unknown forbid file type: " << typestr << ", ignoring.";
+				continue;
+			}
+
+			const auto filestr = Anope::ExpandConfig(fileblock.Get<const Anope::string>("file"));
+			std::ifstream file(filestr.str());
+			if (!file.is_open())
+			{
+				Log(this) << "Unable to read " << filestr << ", ignoring.";
+				continue;
+			}
+			for (Anope::string forbidstr; std::getline(file, forbidstr.str()); )
+			{
+				forbidstr = forbidstr.trim();
+				if (forbidstr.empty())
+					continue;
+
+				auto *forbid = forbidService.FindForbidExact(forbidstr, type);
+				if (forbid != nullptr)
+				{
+					Log(this) << "Forbid on " << forbidstr << " already exists, ignoring.";
+					continue;
+				}
+
+				forbid = new ForbidDataFile(type, filestr, forbidstr, reasonstr);
+				forbidService.AddForbid(forbid);
+				fileforbids.push_back(forbid);
+				Log(LOG_DEBUG) << "Added a file forbid on " << forbidstr << ": " << reasonstr;
+			}
+		}
 	}
 
 	void OnUserConnect(User *u, bool &exempt) override

@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-20 12:43+0000\n"
-"PO-Revision-Date: 2025-11-20 12:43+0000\n"
+"POT-Creation-Date: 2025-11-20 15:05+0000\n"
+"PO-Revision-Date: 2025-11-20 15:05+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -3066,6 +3066,10 @@ msgid "Forbid list is empty."
 msgstr ""
 
 msgid "Forbid list:"
+msgstr ""
+
+#, c-format
+msgid "Forbid on %s can not be removed as it is from a file."
 msgstr ""
 
 #, c-format

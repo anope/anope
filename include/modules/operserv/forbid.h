@@ -31,6 +31,7 @@ struct ForbidData
 	Anope::string reason;
 	time_t created = 0;
 	time_t expires = 0;
+	bool immutable = false;
 	ForbidType type;
 
 	virtual ~ForbidData() = default;

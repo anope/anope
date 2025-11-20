@@ -29,6 +29,8 @@ namespace
 				return "EMAIL";
 			case FT_REGISTER:
 				return "REGISTER";
+			case FT_PASSWORD:
+				return "PASSWORD";
 			default:
 				return "UNKNOWN"; // Should never happen.
 		}
@@ -44,6 +46,8 @@ namespace
 			return FT_EMAIL;
 		if (ft.equals_ci("REGISTER") || ft.equals_ci("4"))
 			return FT_REGISTER;
+		if (ft.equals_ci("PASSWORD"))
+			return FT_PASSWORD;
 
 		return FT_SIZE; // Should never happen.
 	}
@@ -212,9 +216,9 @@ public:
 	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("ForbidService", "forbid")
 	{
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
-		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL|REGISTER} [+\037expiry\037] \037entry\037 \037reason\037"));
-		this->SetSyntax(_("DEL {NICK|CHAN|EMAIL|REGISTER} \037entry\037"));
-		this->SetSyntax("LIST [NICK|CHAN|EMAIL|REGISTER]");
+		this->SetSyntax(_("ADD {CHAN|EMAIL|NICK|PASSWORD|REGISTER} [+\037expiry\037] \037entry\037 \037reason\037"));
+		this->SetSyntax(_("DEL {CHAN|EMAIL|NICK|PASSWORD|REGISTER} \037entry\037"));
+		this->SetSyntax("LIST {CHAN|EMAIL|NICK|PASSWORD|REGISTER}");
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -543,6 +547,20 @@ public:
 			return EVENT_STOP;
 		}
 
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnPasswordValidate(CommandSource &source, NickCore *nc, const Anope::string &pass) override
+	{
+		const auto* forbid = this->forbidService.FindForbid(pass, FT_PASSWORD);
+		if (forbid != nullptr)
+		{
+			if (source.IsOper())
+				source.Reply(_("The password you specified is forbidden by %s: %s"), forbid->creator.c_str(), forbid->reason.c_str());
+			else
+				source.Reply(_("The password you specified is forbidden."));
+			return EVENT_STOP;
+		}
 		return EVENT_CONTINUE;
 	}
 

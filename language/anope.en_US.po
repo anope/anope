@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 01:12+0000\n"
-"PO-Revision-Date: 2025-11-18 01:12+0000\n"
+"POT-Creation-Date: 2025-11-20 12:43+0000\n"
+"PO-Revision-Date: 2025-11-20 12:43+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1291,7 +1291,7 @@ msgstr ""
 msgid "ADD [+expiry] vhost [reason]"
 msgstr ""
 
-msgid "ADD {NICK|CHAN|EMAIL|REGISTER} [+expiry] entry reason"
+msgid "ADD {CHAN|EMAIL|NICK|PASSWORD|REGISTER} [+expiry] entry reason"
 msgstr ""
 
 msgid "ADDIP server.name ip"
@@ -2460,7 +2460,7 @@ msgstr ""
 msgid "DEL {vhost | entry-num | list}"
 msgstr ""
 
-msgid "DEL {NICK|CHAN|EMAIL|REGISTER} entry"
+msgid "DEL {CHAN|EMAIL|NICK|PASSWORD|REGISTER} entry"
 msgstr ""
 
 msgid "DELIP server.name ip"
@@ -5542,6 +5542,13 @@ msgstr ""
 
 #, c-format
 msgid "The password reset request for %s has expired."
+msgstr ""
+
+#, c-format
+msgid "The password you specified is forbidden by %s: %s"
+msgstr ""
+
+msgid "The password you specified is forbidden."
 msgstr ""
 
 #, c-format

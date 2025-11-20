@@ -20,6 +20,7 @@ enum ForbidType
 	FT_CHAN,
 	FT_EMAIL,
 	FT_REGISTER,
+	FT_PASSWORD,
 	FT_SIZE
 };
 

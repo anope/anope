@@ -353,11 +353,12 @@ public:
 		if (!db)
 			return EVENT_STOP;
 
+		auto it = databases.emplace(nullptr, std::move(db.value())).first;
 		for (const auto &type : Serialize::Type::GetTypeOrder())
 		{
 			auto *s_type = Serialize::Type::Find(type);
 			if (s_type && !s_type->GetOwner())
-				LoadType(s_type, db.value());
+				LoadType(s_type, it->second);
 		}
 
 		loaded = true;

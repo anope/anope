@@ -17,8 +17,11 @@
 
 #define HOSTOFFER_TYPE "HostOffer"
 
+class HostOfferList;
+
 namespace
 {
+	HostOfferList* host_offers = nullptr;
 	Anope::string network_name;
 	time_t take_delay = 0;
 
@@ -95,18 +98,18 @@ public:
 	~HostOffer();
 };
 
-class HostOffersList
+class HostOfferList final
 {
 protected:
 	Serialize::Checker<std::vector<HostOffer *>> offers;
 
 public:
-	HostOffersList()
+	HostOfferList()
 		: offers(HOSTOFFER_TYPE)
 	{
 	}
 
-	~HostOffersList()
+	~HostOfferList()
 	{
 		Clear();
 	}
@@ -185,11 +188,11 @@ public:
 		std::reverse(list.begin(), list.end());
 		return list;
 	}
-} HostOffersList;
+};
 
 HostOffer::~HostOffer()
 {
-	HostOffersList.Del(this);
+	host_offers->Del(this);
 }
 
 class HostOfferType final
@@ -228,7 +231,7 @@ public:
 		data["expires"] >> ho->expires;
 
 		if (!obj)
-			HostOffersList.Add(ho);
+			host_offers->Add(ho);
 
 		return ho;
 	}
@@ -274,7 +277,7 @@ public:
 		if (!number)
 			return;
 
-		const auto *ho = HostOffersList.Get(number - 1);
+		const auto *ho = host_offers->Get(number - 1);
 		if (!ho)
 			return;
 
@@ -306,7 +309,7 @@ public:
 		if (!number)
 			return;
 
-		const auto *ho = HostOffersList.Get(number - 1);
+		const auto *ho = host_offers->Get(number - 1);
 		if (!ho)
 			return;
 
@@ -419,7 +422,7 @@ private:
 		}
 
 		const auto full_vhost = GetVHostMask(ident, host);
-		if (HostOffersList.Get(full_vhost))
+		if (host_offers->Get(full_vhost))
 		{
 			source.Reply(_("Host offer \002%s\002 already exists."), full_vhost.c_str());
 			return;
@@ -430,7 +433,7 @@ private:
 			reason.append(reason.empty() ? "" : " ").append(params[idx]);
 
 		auto *ho = new HostOffer(ident, host, source.GetNick(), reason, Anope::CurTime, expiry);
-		HostOffersList.Add(ho);
+		host_offers->Add(ho);
 
 		Log(LOG_ADMIN, source, this) << "to add a host offer of " << full_vhost << " (reason: " << reason << ")";
 		source.Reply(_("\002%s\002 added to the host offer list."), full_vhost.c_str());
@@ -451,7 +454,7 @@ private:
 			return;
 		}
 
-		if (HostOffersList.GetCount() == 0)
+		if (host_offers->GetCount() == 0)
 		{
 			source.Reply(_("Host offer list is empty."));
 			return;
@@ -464,7 +467,7 @@ private:
 		}
 		else
 		{
-			const auto *ho = HostOffersList.Get(match);
+			const auto *ho = host_offers->Get(match);
 			if (!ho)
 			{
 				source.Reply(_("\002%s\002 not found on the host offer list."), match.c_str());
@@ -481,7 +484,7 @@ private:
 
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params, bool view)
 	{
-		if (HostOffersList.GetCount() == 0)
+		if (host_offers->GetCount() == 0)
 		{
 			source.Reply(_("Host offer list is empty."));
 			return;
@@ -515,7 +518,7 @@ private:
 		}
 		else
 		{
-			const auto &list_offers = HostOffersList.GetAll();
+			const auto &list_offers = host_offers->GetAll();
 			for (size_t i = 0; i < list_offers.size(); ++i)
 			{
 				const auto *ho = list_offers.at(i);
@@ -552,13 +555,13 @@ private:
 			return;
 		}
 
-		if (HostOffersList.GetCount() == 0)
+		if (host_offers->GetCount() == 0)
 		{
 			source.Reply(_("Host offer list is empty."));
 			return;
 		}
 
-		HostOffersList.Clear();
+		host_offers->Clear();
 
 		Log(LOG_ADMIN, source, this) << "to clear the list";
 		source.Reply(_("Host offer list has been cleared."));
@@ -654,7 +657,7 @@ public:
 		if (!number)
 			return;
 
-		const auto *ho = HostOffersList.Get(number - 1);
+		const auto *ho = host_offers->Get(number - 1);
 		if (!ho)
 			return;
 
@@ -717,7 +720,7 @@ private:
 			return;
 		}
 
-		if (HostOffersList.GetCount() == 0)
+		if (host_offers->GetCount() == 0)
 		{
 			source.Reply(_("Host offer list is empty."));
 			return;
@@ -728,7 +731,7 @@ private:
 		{
 			const auto number = Anope::TryConvert<size_t>(match);
 			if (number)
-				ho = HostOffersList.Get(*number - 1);
+				ho = host_offers->Get(*number - 1);
 
 			if (!ho)
 			{
@@ -738,7 +741,7 @@ private:
 		}
 		else
 		{
-			ho = HostOffersList.Get(match);
+			ho = host_offers->Get(match);
 			if (!ho)
 			{
 				source.Reply(_("\002%s\002 not found on the host offer list."), match.c_str());
@@ -791,7 +794,7 @@ private:
 			return;
 		}
 
-		if (HostOffersList.GetCount() == 0)
+		if (host_offers->GetCount() == 0)
 		{
 			source.Reply(_("Host offer list is empty."));
 			return;
@@ -817,7 +820,7 @@ private:
 		}
 		else
 		{
-			const auto &list_offers = HostOffersList.GetAll();
+			const auto &list_offers = host_offers->GetAll();
 			for (size_t i = 0; i < list_offers.size(); ++i)
 			{
 				const auto *ho = list_offers.at(i);
@@ -910,6 +913,7 @@ class HSOffer final
 	: public Module
 {
 private:
+	HostOfferList hostoffers;
 	HostOfferType hostoffer_type;
 	CommandHSOffer commandhsoffer;
 	CommandHSOfferList commandhsofferlist;
@@ -922,6 +926,7 @@ public:
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
+		host_offers = &hostoffers;
 	}
 
 	void OnReload(Configuration::Conf &conf) override

@@ -215,7 +215,7 @@ public:
 		data["expires"] << ho->expires;
 	}
 
-	Serializable* Unserialize(Serializable *obj, Serialize::Data &data) const override
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		HostOffer *ho;
 		if (obj)
@@ -913,8 +913,8 @@ class HSOffer final
 	: public Module
 {
 private:
-	HostOfferList hostoffers;
 	HostOfferType hostoffer_type;
+	HostOfferList hostoffers;
 	CommandHSOffer commandhsoffer;
 	CommandHSOfferList commandhsofferlist;
 

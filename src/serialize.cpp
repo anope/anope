@@ -38,14 +38,19 @@ void Serialize::RegisterTypes()
 	static AutoKick::Type akick;
 	static Memo::Type memo;
 	static XLine::Type xline;
+	CreateTypes();
+}
+
+void Serialize::CreateTypes()
+{
+	for (const auto &[_, s_type] : Serialize::Type::GetTypes())
+		s_type->Create();
 }
 
 void Serialize::CheckTypes()
 {
-	for (const auto &[_, t] : Serialize::Type::GetTypes())
-	{
-		t->Check();
-	}
+	for (const auto &[_, s_type] : Serialize::Type::GetTypes())
+		s_type->Check();
 }
 
 Serializable::Serializable(const Anope::string &serialize_type)
@@ -138,8 +143,6 @@ Type::Type(const Anope::string &n, Module *o)
 {
 	TypeOrder.push_back(this->name);
 	Types[this->name] = this;
-
-	FOREACH_MOD(OnSerializeTypeCreate, (this));
 }
 
 Type::~Type()
@@ -158,6 +161,15 @@ Type::~Type()
 	if (it != TypeOrder.end())
 		TypeOrder.erase(it);
 	Types.erase(this->name);
+}
+
+void Type::Create()
+{
+	if (created)
+		return;
+
+	FOREACH_MOD(OnSerializeTypeCreate, (this));
+	created = true;
 }
 
 void Type::Check()

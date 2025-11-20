@@ -222,6 +222,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	for (auto &mods : EventHandlers)
 		mods.push_back(m);
 
+	Serialize::CreateTypes();
 	m->Prioritize();
 
 	FOREACH_MOD(OnModuleLoad, (u, m));

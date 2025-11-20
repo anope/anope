@@ -76,6 +76,7 @@ namespace Serialize
 
 	extern void RegisterTypes();
 	extern void CheckTypes();
+	extern void CreateTypes();
 
 	class Type;
 	template<typename T> class Checker;
@@ -148,8 +149,11 @@ class CoreExport Serialize::Type
 	: public Base
 {
 private:
+	/** Whether modules have been informed about the creation of this type yet. */
+	bool created = false;
+
 	/** The name of this type in the database (e.g. NickAlias). */
-	Anope::string name;
+	const Anope::string name;
 
 	/** The module which owns this type, or nullptr if it belongs to the core.
 	 * Some database backends use this to put third-party module data into their
@@ -183,6 +187,9 @@ public:
 
 	/** Destroys a serializable type. */
 	~Type();
+
+	/** Informs modules about the creation of this type. */
+	void Create();
 
 	/** Checks for and applies any pending object updates for this type. */
 	void Check();

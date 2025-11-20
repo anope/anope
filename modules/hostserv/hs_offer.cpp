@@ -207,12 +207,12 @@ public:
 	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
 		const auto *ho = static_cast<const HostOffer *>(obj);
-		data["ident"] << ho->ident;
-		data["host"] << ho->host;
-		data["creator"] << ho->creator;
-		data["reason"] << ho->reason;
-		data["created"] << ho->created;
-		data["expires"] << ho->expires;
+		data.Store("ident", ho->ident);
+		data.Store("host", ho->host);
+		data.Store("creator", ho->creator);
+		data.Store("reason", ho->reason);
+		data.Store("created", ho->created);
+		data.Store("expires", ho->expires);
 	}
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override

@@ -43,14 +43,22 @@ void Serialize::RegisterTypes()
 
 void Serialize::CreateTypes()
 {
-	for (const auto &[_, s_type] : Serialize::Type::GetTypes())
-		s_type->Create();
+	for (const auto &type : Serialize::Type::GetTypeOrder())
+	{
+		auto *s_type = Serialize::Type::Find(type);
+		if (s_type)
+			s_type->Create();
+	}
 }
 
 void Serialize::CheckTypes()
 {
-	for (const auto &[_, s_type] : Serialize::Type::GetTypes())
-		s_type->Check();
+	for (const auto &type : Serialize::Type::GetTypeOrder())
+	{
+		auto *s_type = Serialize::Type::Find(type);
+		if (s_type)
+			s_type->Check();
+	}
 }
 
 Serializable::Serializable(const Anope::string &serialize_type)

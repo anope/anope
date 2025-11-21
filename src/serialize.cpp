@@ -104,7 +104,7 @@ void Serializable::QueueUpdate()
 	FOREACH_MOD(OnSerializableUpdate, (this));
 
 	/* Check for modifications now - this can delete this object! */
-	FOREACH_MOD(OnSerializeCheck, (this->GetSerializableType()));
+	FOREACH_MOD(OnSerializeTypeCheck, (this->GetSerializableType()));
 }
 
 bool Serializable::IsCached(Serialize::Data &data)
@@ -182,7 +182,7 @@ void Type::Create()
 
 void Type::Check()
 {
-	FOREACH_MOD(OnSerializeCheck, (this));
+	FOREACH_MOD(OnSerializeTypeCheck, (this));
 }
 
 void Type::UpdateTimestamp()

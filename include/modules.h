@@ -1016,10 +1016,11 @@ public:
 	 */
 	virtual void OnSetCorrectModes(User *user, Channel *chan, AccessGroup &access, bool &give_modes, bool &take_modes) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
-	virtual void OnSerializeCheck(Serialize::Type *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 	virtual void OnSerializableConstruct(Serializable *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 	virtual void OnSerializableDestruct(Serializable *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 	virtual void OnSerializableUpdate(Serializable *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+
+	virtual void OnSerializeTypeCheck(Serialize::Type *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 	virtual void OnSerializeTypeCreate(Serialize::Type *st) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called when a chanserv/set command is used
@@ -1191,7 +1192,7 @@ enum Implementation
 	I_OnSerializableConstruct,
 	I_OnSerializableDestruct,
 	I_OnSerializableUpdate,
-	I_OnSerializeCheck,
+	I_OnSerializeTypeCheck,
 	I_OnSerializeTypeCreate,
 	I_OnServerConnect,
 	I_OnServerDisconnect,

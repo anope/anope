@@ -175,7 +175,7 @@ public:
 		this->updated_items.erase(obj);
 	}
 
-	void OnSerializeCheck(Serialize::Type *obj) override
+	void OnSerializeTypeCheck(Serialize::Type *obj) override
 	{
 		if (!this->CheckInit() || obj->GetTimestamp() == Anope::CurTime)
 			return;

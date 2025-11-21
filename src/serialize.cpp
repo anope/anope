@@ -62,26 +62,27 @@ void Serialize::CheckTypes()
 }
 
 Serializable::Serializable(const Anope::string &serialize_type)
+	: s_name(serialize_type)
+	, s_type(Type::Find(serialize_type))
 {
 	if (SerializableItems == NULL)
 		SerializableItems = new std::list<Serializable *>();
+
 	SerializableItems->push_back(this);
+	this->s_iter = std::prev(SerializableItems->end());
 
-	this->s_type = Type::Find(serialize_type);
-
-	this->s_iter = SerializableItems->end();
-	--this->s_iter;
+	if (!s_type)
+		Log(LOG_DEBUG) << "Created orphan " << this->s_name << " object: " << this;
 
 	FOREACH_MOD(OnSerializableConstruct, (this));
 }
 
 Serializable::Serializable(const Serializable &other)
+	: s_name(other.s_name)
+	, s_type(other.s_type)
 {
 	SerializableItems->push_back(this);
-	this->s_iter = SerializableItems->end();
-	--this->s_iter;
-
-	this->s_type = other.s_type;
+	this->s_iter = std::prev(SerializableItems->end());
 
 	FOREACH_MOD(OnSerializableConstruct, (this));
 }
@@ -151,24 +152,40 @@ Type::Type(const Anope::string &n, Module *o)
 {
 	TypeOrder.push_back(this->name);
 	Types[this->name] = this;
+
+	if (Serializable::SerializableItems == nullptr)
+		return;
+
+	// Rehook objects from before a reload to this type.
+	for (auto *s : *Serializable::SerializableItems)
+	{
+		if (s->s_type != nullptr || s->s_name != n)
+			continue;
+
+		Log(LOG_DEBUG) << "Adopting " << s->s_name << " object: " << this;
+		s->s_type = this;
+	}
 }
 
 Type::~Type()
 {
-	/* null the type of existing serializable objects of this type */
-	if (Serializable::SerializableItems != NULL)
-	{
-		for (auto *s : *Serializable::SerializableItems)
-		{
-			if (s->s_type == this)
-				s->s_type = NULL;
-		}
-	}
-
-	std::vector<Anope::string>::iterator it = std::find(TypeOrder.begin(), TypeOrder.end(), this->name);
+	auto it = std::find(TypeOrder.begin(), TypeOrder.end(), this->name);
 	if (it != TypeOrder.end())
 		TypeOrder.erase(it);
 	Types.erase(this->name);
+
+	if (Serializable::SerializableItems == nullptr)
+		return;
+
+	// Orphan objects of this type. They will be rehooked later if reloaded.
+	for (auto *s : *Serializable::SerializableItems)
+	{
+		if (s->s_type != this)
+			continue;
+
+		Log(LOG_DEBUG) << "Orphaning " << s->s_name << " object: " << this;
+		s->s_type = nullptr;
+	}
 }
 
 void Type::Create()

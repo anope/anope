@@ -99,6 +99,7 @@ private:
 	static std::list<Serializable *> *SerializableItems;
 	friend class Serialize::Type;
 	/* The type of item this object is */
+	const Anope::string s_name;
 	Serialize::Type *s_type;
 	/* Iterator into serializable_items */
 	std::list<Serializable *>::iterator s_iter;

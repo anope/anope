@@ -17,13 +17,11 @@
 class AccessGroup;
 class BotInfo;
 namespace BotServ { class BadWord; }
-namespace ChanServ { class AutoKick; class ModeLock; }
-class CallBack;
 class ChanAccess;
 class Channel;
 class ChannelInfo;
 class ChannelStatus;
-struct ModeData;
+namespace ChanServ { class AutoKick; class ModeLock; }
 struct ChanUserContainer;
 class ClientSocket;
 class Command;
@@ -38,14 +36,18 @@ class IRCDProto;
 class ListenSocket;
 class Log;
 class Memo;
+struct MemoInfo;
 class MessageSource;
+struct ModeData;
 class Module;
 class NickAlias;
 class NickCore;
+struct Oper;
 namespace OperServ { struct Exception; }
 class OperType;
 class ReferenceBase;
 class Regex;
+namespace SASL { struct Message; }
 class Serializable;
 class Server;
 class Socket;
@@ -53,6 +55,3 @@ class Thread;
 class User;
 class XLine;
 class XLineManager;
-struct MemoInfo;
-struct Oper;
-namespace SASL { struct Message; }

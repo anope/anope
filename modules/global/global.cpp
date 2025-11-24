@@ -13,10 +13,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/global/service.h"
 
 class GlobalCore final
 	: public Module
-	, public GlobalService
+	, public Global::Service
 {
 private:
 	Reference<BotInfo> global;
@@ -37,7 +38,7 @@ private:
 public:
 	GlobalCore(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, PSEUDOCLIENT | VENDOR)
-		, GlobalService(this)
+		, Global::Service(this)
 		, queue(this, "global-queue")
 	{
 	}

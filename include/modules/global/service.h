@@ -17,12 +17,21 @@
 #define GLOBAL_NO_MESSAGE     _("You do not have any messages queued and did not specify a message to send.")
 #define GLOBAL_QUEUE_CONFLICT _("You can not send a single message while you have messages queued.")
 
-class GlobalService
-	: public Service
+#define GLOBAL_SERVICE "Global::Service"
+
+namespace Global
+{
+	class Service;
+
+	ServiceReference<Global::Service> service(GLOBAL_SERVICE, GLOBAL_SERVICE);
+}
+
+class Global::Service
+	: public ::Service
 {
 public:
-	GlobalService(Module *m)
-		: Service(m, "GlobalService", "Global")
+	Service(Module *m)
+		: ::Service(m, GLOBAL_SERVICE, GLOBAL_SERVICE)
 	{
 	}
 

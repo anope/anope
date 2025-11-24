@@ -13,18 +13,17 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/global/service.h"
 
 class CommandGLGlobal final
 	: public Command
 {
 private:
-	ServiceReference<GlobalService> global;
-
 	BotInfo *GetSender(CommandSource &source)
 	{
 		Reference<BotInfo> sender;
-		if (global)
-			sender = global->GetDefaultSender();
+		if (Global::service)
+			sender = Global::service->GetDefaultSender();
 		if (!sender)
 			sender = source.service;
 		return sender;
@@ -33,7 +32,6 @@ private:
 public:
 	CommandGLGlobal(Module *creator)
 		: Command(creator, "global/global", 0, 1)
-		, global("GlobalService", "Global")
 	{
 		this->SetDesc(_("Send a message to all users"));
 		this->SetSyntax(_("[\037message\037]"));
@@ -41,13 +39,13 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (!global)
+		if (!Global::service)
 		{
 			source.Reply(SERVICE_UNAVAILABLE, source.service->nick.c_str());
 			return;
 		}
 
-		auto queuesize = global->CountQueue(source.nc);
+		auto queuesize = Global::service->CountQueue(source.nc);
 		if (!queuesize && params.empty())
 		{
 			source.Reply(GLOBAL_NO_MESSAGE);
@@ -63,12 +61,12 @@ public:
 		if (params.empty())
 		{
 			// We are sending the message queue.
-			global->SendQueue(source, GetSender(source));
+			Global::service->SendQueue(source, GetSender(source));
 		}
 		else
 		{
 			// We are sending a single message.
-			global->SendSingle(params[0], &source, GetSender(source));
+			Global::service->SendSingle(params[0], &source, GetSender(source));
 			queuesize = 1;
 		}
 

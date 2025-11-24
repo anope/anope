@@ -16,14 +16,16 @@
 #include "modules/chanserv/entrymsg.h"
 
 struct EntryMsgImpl final
-	: EntryMsg
+	: ChanServ::EntryMessage
 	, Serializable
 {
-	EntryMsgImpl() : Serializable("EntryMsg")
+	EntryMsgImpl()
+		: Serializable(CHANSERV_ENTRY_MESSAGE_TYPE)
 	{
 	}
 
-	EntryMsgImpl(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime) : Serializable("EntryMsg")
+	EntryMsgImpl(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime)
+		: Serializable(CHANSERV_ENTRY_MESSAGE_TYPE)
 	{
 		this->chan = c->name;
 		this->creator = cname;
@@ -38,7 +40,7 @@ struct EntryMsgTypeImpl final
 	: Serialize::Type
 {
 	EntryMsgTypeImpl()
-		: Serialize::Type("EntryMsg")
+		: Serialize::Type(CHANSERV_ENTRY_MESSAGE_TYPE)
 	{
 	}
 
@@ -55,11 +57,11 @@ struct EntryMsgTypeImpl final
 };
 
 struct EntryMessageListImpl final
-	: EntryMessageList
+	: ChanServ::EntryMessageList
 {
 	EntryMessageListImpl(Extensible *) { }
 
-	EntryMsg *Create() override
+	ChanServ::EntryMessage *Create() override
 	{
 		return new EntryMsgImpl();
 	}
@@ -71,11 +73,11 @@ EntryMsgImpl::~EntryMsgImpl()
 	if (!ci)
 		return;
 
-	EntryMessageList *messages = ci->GetExt<EntryMessageList>("entrymsg");
+	auto *messages = ci->GetExt<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
 	if (!messages)
 		return;
 
-	std::vector<EntryMsg *>::iterator it = std::find((*messages)->begin(), (*messages)->end(), this);
+	auto it = std::find((*messages)->begin(), (*messages)->end(), this);
 	if (it != (*messages)->end())
 		(*messages)->erase(it);
 }
@@ -104,7 +106,7 @@ Serializable *EntryMsgTypeImpl::Unserialize(Serializable *obj, Serialize::Data &
 		return msg;
 	}
 
-	EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
+	auto *messages = ci->Require<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
 
 	data["when"] >> swhen;
 
@@ -119,7 +121,7 @@ class CommandEntryMessage final
 private:
 	static void DoList(CommandSource &source, ChannelInfo *ci)
 	{
-		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
+		auto *messages = ci->Require<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
 
 		if ((*messages)->empty())
 		{
@@ -135,7 +137,7 @@ private:
 
 		for (unsigned i = 0; i < (*messages)->size(); ++i)
 		{
-			EntryMsg *msg = (*messages)->at(i);
+			auto *msg = (*messages)->at(i);
 
 			ListFormatter::ListEntry entry;
 			entry["Number"] = Anope::ToString(i + 1);
@@ -151,7 +153,7 @@ private:
 
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
+		auto *messages = ci->Require<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
 
 		if ((*messages)->size() >= Config->GetModule(this->owner).Get<unsigned>("maxentries"))
 			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
@@ -165,7 +167,7 @@ private:
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		EntryMessageList *messages = ci->Require<EntryMessageList>("entrymsg");
+		auto *messages = ci->Require<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
 
 		if (!message.is_pos_number_only())
 			source.Reply(("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
@@ -178,7 +180,7 @@ private:
 			{
 				delete (*messages)->at(i - 1);
 				if ((*messages)->empty())
-					ci->Shrink<EntryMessageList>("entrymsg");
+					ci->Shrink<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
 				Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove a message";
 				source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
 			}
@@ -191,7 +193,7 @@ private:
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
-		ci->Shrink<EntryMessageList>("entrymsg");
+		ci->Shrink<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
 
 		Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to remove all messages";
 		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
@@ -287,7 +289,7 @@ public:
 	CSEntryMessage(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, VENDOR)
 		, commandentrymsg(this)
-		, eml(this, "entrymsg")
+		, eml(this, CHANSERV_ENTRY_MESSAGE_EXT)
 	{
 	}
 
@@ -295,7 +297,7 @@ public:
 	{
 		if (u && c && c->ci && u->server->IsSynced())
 		{
-			EntryMessageList *messages = c->ci->GetExt<EntryMessageList>("entrymsg");
+			auto *messages = c->ci->GetExt<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
 			if (!messages)
 				return;
 

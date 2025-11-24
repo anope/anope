@@ -69,10 +69,11 @@ public:
 };
 
 struct ModeLockImpl final
-	: ModeLock
+	: ChanServ::ModeLock
 	, Serializable
 {
-	ModeLockImpl() : Serializable("ModeLock")
+	ModeLockImpl()
+		: Serializable(CHANSERV_MODE_LOCK_TYPE)
 	{
 	}
 
@@ -81,7 +82,7 @@ struct ModeLockImpl final
 		ChannelInfo *chan = ChannelInfo::Find(ci);
 		if (chan)
 		{
-			ModeLocks *ml = chan->GetExt<ModeLocks>("modelocks");
+			auto *ml = chan->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 			if (ml)
 				ml->RemoveMLock(this);
 		}
@@ -92,7 +93,7 @@ struct ModeLockTypeImpl final
 	: Serialize::Type
 {
 	ModeLockTypeImpl()
-		: Serialize::Type("ModeLock")
+		: Serialize::Type(CHANSERV_MODE_LOCK_TYPE)
 	{
 	}
 	void Serialize(Serializable *obj, Serialize::Data &data) const override;
@@ -100,18 +101,20 @@ struct ModeLockTypeImpl final
 };
 
 struct ModeLocksImpl final
-	: ModeLocks
+	: ChanServ::ModeLocks
 {
 	Serialize::Reference<ChannelInfo> ci;
-	Serialize::Checker<ModeList> mlocks;
+	Serialize::Checker<ChanServ::ModeLockList> mlocks;
 
-	ModeLocksImpl(Extensible *obj) : ci(anope_dynamic_static_cast<ChannelInfo *>(obj)), mlocks("ModeLock")
+	ModeLocksImpl(Extensible *obj)
+		: ci(anope_dynamic_static_cast<ChannelInfo *>(obj))
+		, mlocks(CHANSERV_MODE_LOCK_TYPE)
 	{
 	}
 
 	~ModeLocksImpl() override
 	{
-		ModeList modelist;
+		ChanServ::ModeLockList modelist;
 		mlocks->swap(modelist);
 		for (auto *ml : modelist)
 		{
@@ -193,38 +196,38 @@ struct ModeLocksImpl final
 		return false;
 	}
 
-	void RemoveMLock(ModeLock *mlock) override
+	void RemoveMLock(ChanServ::ModeLock *mlock) override
 	{
-		ModeList::iterator it = std::find(this->mlocks->begin(), this->mlocks->end(), mlock);
+		auto it = std::find(this->mlocks->begin(), this->mlocks->end(), mlock);
 		if (it != this->mlocks->end())
 			this->mlocks->erase(it);
 	}
 
 	void ClearMLock() override
 	{
-		ModeList ml;
+		ChanServ::ModeLockList ml;
 		this->mlocks->swap(ml);
 		for (const auto *lock : ml)
 			delete lock;
 	}
 
-	const ModeList &GetMLock() const override
+	const ChanServ::ModeLockList &GetMLock() const override
 	{
 		return this->mlocks;
 	}
 
-	std::list<ModeLock *> GetModeLockList(const Anope::string &name) override
+	std::list<ChanServ::ModeLock *> GetModeLockList(const Anope::string &name) override
 	{
-		std::list<ModeLock *> mlist;
+		std::list<ChanServ::ModeLock *> mlist;
 		for (auto *m : *this->mlocks)
 		{
-				if (m->name == name)
+			if (m->name == name)
 				mlist.push_back(m);
 		}
 		return mlist;
 	}
 
-	const ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") override
+	const ChanServ::ModeLock *GetMLock(const Anope::string &mname, const Anope::string &param = "") override
 	{
 		for (auto *m : *this->mlocks)
 		{
@@ -250,7 +253,7 @@ struct ModeLocksImpl final
 	void Check() override
 	{
 		if (this->mlocks->empty())
-			ci->Shrink<ModeLocks>("modelocks");
+			ci->Shrink<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 	}
 };
 
@@ -291,7 +294,7 @@ Serializable *ModeLockTypeImpl::Unserialize(Serializable *obj, Serialize::Data &
 	data["param"] >> ml->param;
 
 	if (!obj)
-		ci->Require<ModeLocksImpl>("modelocks")->mlocks->push_back(ml);
+		ci->Require<ModeLocksImpl>(CHANSERV_MODE_LOCK_EXT)->mlocks->push_back(ml);
 
 	return ml;
 }
@@ -330,7 +333,7 @@ class CommandCSMode final
 		const Anope::string &param = params.size() > 3 ? params[3] : "";
 
 		bool override = !source.AccessFor(ci).HasPriv("MODE");
-		ModeLocks *modelocks = ci->Require<ModeLocks>("modelocks");
+		auto *modelocks = ci->Require<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 
 		if (Anope::ReadOnly && !subcommand.equals_ci("LIST"))
 		{
@@ -343,7 +346,7 @@ class CommandCSMode final
 			/* If setting, remove the existing locks */
 			if (subcommand.equals_ci("SET"))
 			{
-				const ModeLocks::ModeList mlocks = modelocks->GetMLock();
+				const auto mlocks = modelocks->GetMLock();
 				for (auto *ml : mlocks)
 				{
 					ChannelMode *cm = ModeManager::FindChannelModeByName(ml->name);
@@ -363,7 +366,7 @@ class CommandCSMode final
 		}
 		else if (subcommand.equals_ci("LIST"))
 		{
-			const ModeLocks::ModeList mlocks = modelocks->GetMLock();
+			const auto mlocks = modelocks->GetMLock();
 			if (mlocks.empty())
 			{
 				source.Reply(_("Channel %s has no mode locks."), ci->name.c_str());
@@ -401,7 +404,7 @@ class CommandCSMode final
 			this->OnSyntaxError(source, subcommand);
 	}
 
-	void DoLockChange(CommandSource &source, ChannelInfo *ci, ModeLocks *modelocks, const Anope::string &param, bool override, bool setting)
+	void DoLockChange(CommandSource &source, ChannelInfo *ci, ChanServ::ModeLocks *modelocks, const Anope::string &param, bool override, bool setting)
 	{
 		spacesepstream sep(param);
 		Anope::string modes;
@@ -992,7 +995,7 @@ public:
 		: Module(modname, creator, VENDOR)
 		, commandcsmode(this)
 		, commandcsmodes(this)
-		, modelocks(this, "modelocks")
+		, modelocks(this, CHANSERV_MODE_LOCK_EXT)
 	{
 	}
 
@@ -1025,7 +1028,7 @@ public:
 		if (!c || !c->ci)
 			return;
 
-		ModeLocks *locks = modelocks.Get(c->ci);
+		auto *locks = modelocks.Get(c->ci);
 		if (locks)
 		{
 			for (auto *ml : locks->GetMLock())
@@ -1072,7 +1075,7 @@ public:
 
 	void OnChanRegistered(ChannelInfo *ci) override
 	{
-		ModeLocks *ml = modelocks.Require(ci);
+		ChanServ::ModeLocks *ml = modelocks.Require(ci);
 		Anope::string mlock;
 		spacesepstream sep(Config->GetModule(this).Get<const Anope::string>("mlock", "+nt"));
 		if (sep.GetToken(mlock))
@@ -1125,7 +1128,7 @@ public:
 		if (!show_hidden)
 			return;
 
-		ModeLocks *ml = modelocks.Get(ci);
+		auto *ml = modelocks.Get(ci);
 		if (ml)
 			info[_("Mode lock")] = ml->GetMLockAsString(true);
 	}

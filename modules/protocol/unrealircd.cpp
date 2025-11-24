@@ -1868,7 +1868,7 @@ public:
 		if (!c->ci)
 			return;
 
-		ModeLocks *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
+		auto *modelocks = c->ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 		if (Servers::Capab.count("MLOCK") > 0 && modelocks)
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
@@ -1878,7 +1878,7 @@ public:
 
 	void OnChanRegistered(ChannelInfo *ci) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+		auto *modelocks = ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 		if (!ci->c || !modelocks || !Servers::Capab.count("MLOCK"))
 			return;
 		Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
@@ -1892,9 +1892,9 @@ public:
 		Uplink::Send("MLOCK", ci->c->created, ci->name, "");
 	}
 
-	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnMLock(ChannelInfo *ci, ChanServ::ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+		auto *modelocks = ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{
@@ -1905,9 +1905,9 @@ public:
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnUnMLock(ChannelInfo *ci, ChanServ::ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+		auto *modelocks = ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
 		if (cm && modelocks && ci->c && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM) && Servers::Capab.count("MLOCK") > 0)
 		{

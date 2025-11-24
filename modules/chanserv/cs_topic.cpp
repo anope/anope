@@ -276,8 +276,8 @@ public:
 		if (topiclock.HasExt(ci))
 			info.AddOption(_("Topic lock"));
 
-		ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
-		const ModeLock *secret = ml ? ml->GetMLock("SECRET") : NULL;
+		auto *ml = ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
+		const auto *secret = ml ? ml->GetMLock("SECRET") : nullptr;
 		if (!ci->last_topic.empty() && (show_all || ((!secret || !secret->set) && (!ci->c || !ci->c->HasMode("SECRET")))))
 		{
 			info[_("Last topic")] = ci->last_topic;

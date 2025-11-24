@@ -418,13 +418,13 @@ public:
 	 * @param ci The channel
 	 * @param bw The badword
 	 */
-	virtual void OnBadWordAdd(ChannelInfo *ci, const BadWord *bw) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
+	virtual void OnBadWordAdd(ChannelInfo *ci, const BotServ::BadWord *bw) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called before a badword is deleted from a channel
 	 * @param ci The channel
 	 * @param bw The badword
 	 */
-	virtual void OnBadWordDel(ChannelInfo *ci, const BadWord *bw) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
+	virtual void OnBadWordDel(ChannelInfo *ci, const BotServ::BadWord *bw) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a bot is created or destroyed
 	 */
@@ -533,13 +533,13 @@ public:
 	 * @param ex The exception
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnExceptionAdd(Exception *ex) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual EventReturn OnExceptionAdd(OperServ::Exception *ex) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
 
 	/** Called before an exception is deleted
 	 * @param source The source deleting it
 	 * @param ex The exception
 	 */
-	virtual void OnExceptionDel(CommandSource &source, Exception *ex) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
+	virtual void OnExceptionDel(CommandSource &source, OperServ::Exception *ex) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called before a XLine is added
 	 * @param source The source of the XLine
@@ -919,14 +919,14 @@ public:
 	 * @param lock The mode lock
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 	 */
-	virtual EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
+	virtual EventReturn OnMLock(ChannelInfo *ci, ChanServ::ModeLock *lock) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a mode is about to be unlocked
 	 * @param ci The channel the mode is being unlocked from
 	 * @param lock The mode lock
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 	 */
-	virtual EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
+	virtual EventReturn OnUnMLock(ChannelInfo *ci, ChanServ::ModeLock *lock) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called after a module is loaded
 	 * @param u The user loading the module, can be NULL

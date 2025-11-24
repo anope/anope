@@ -22,30 +22,30 @@
 
 namespace
 {
-	Anope::string TypeToString(NewsType nt)
+	Anope::string TypeToString(OperServ::NewsType nt)
 	{
 		switch (nt)
 		{
-			case NEWS_LOGON:
+			case OperServ::NEWS_LOGON:
 				return "LOGON";
-			case NEWS_RANDOM:
+			case OperServ::NEWS_RANDOM:
 				return "RANDOM";
-			case NEWS_OPER:
+			case OperServ::NEWS_OPER:
 				return "OPER";
 		}
 		return ""; // Should never happen.
 	}
 
-	NewsType StringToType(const Anope::string &nt)
+	OperServ::NewsType StringToType(const Anope::string &nt)
 	{
 		if (nt.equals_ci("LOGON") || nt.equals_ci("0"))
-			return NEWS_LOGON;
+			return OperServ::NEWS_LOGON;
 		if (nt.equals_ci("RANDOM") || nt.equals_ci("1"))
-			return NEWS_RANDOM;
+			return OperServ::NEWS_RANDOM;
 		if (nt.equals_ci("OPER") || nt.equals_ci("2"))
-			return NEWS_OPER;
+			return OperServ::NEWS_OPER;
 
-		return NEWS_LOGON; // Should never happen.
+		return OperServ::NEWS_LOGON; // Should never happen.
 	}
 }
 
@@ -64,13 +64,13 @@ enum
 
 struct NewsMessages final
 {
-	NewsType type;
+	OperServ::NewsType type;
 	Anope::string name;
 	const char *msgs[MSG_END];
 };
 
 struct NewsMessages msgarray[] = {
-	{NEWS_LOGON, "LOGON",
+	{OperServ::NEWS_LOGON, "LOGON",
 	 {_("[\002Logon News\002] %s"),
 	  _("[\002Logon News\002 - %s] %s"),
 	  _("Logon news items:"),
@@ -80,7 +80,7 @@ struct NewsMessages msgarray[] = {
 	  _("Logon news item #%u deleted."),
 	  _("All logon news items deleted.")}
 	 },
-	{NEWS_OPER, "OPER",
+	{OperServ::NEWS_OPER, "OPER",
 	 {_("[\002Oper News\002] %s"),
 	  _("[\002Oper News\002 - %s] %s"),
 	  _("Oper news items:"),
@@ -90,7 +90,7 @@ struct NewsMessages msgarray[] = {
 	  _("Oper news item #%u deleted."),
 	  _("All oper news items deleted.")}
 	 },
-	{NEWS_RANDOM, "RANDOM",
+	{OperServ::NEWS_RANDOM, "RANDOM",
 	 {_("[\002Random News\002] %s"),
 	  _("[\002Random News\002 - %s] %s"),
 	  _("Random news items:"),
@@ -106,13 +106,13 @@ struct NewsItemType final
 	: Serialize::Type
 {
 	NewsItemType()
-		: Serialize::Type("NewsItem")
+		: Serialize::Type(OPERSERV_NEWS_ITEM_TYPE)
 	{
 	}
 
 	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		const auto *ni = static_cast<const NewsItem *>(obj);
+		const auto *ni = static_cast<const OperServ::NewsItem *>(obj);
 		data.Store("type", TypeToString(ni->type));
 		data.Store("text", ni->text);
 		data.Store("who", ni->who);
@@ -121,14 +121,14 @@ struct NewsItemType final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		if (!news_service)
+		if (!OperServ::news_service)
 			return NULL;
 
-		NewsItem *ni;
+		OperServ::NewsItem *ni;
 		if (obj)
-			ni = anope_dynamic_static_cast<NewsItem *>(obj);
+			ni = anope_dynamic_static_cast<OperServ::NewsItem *>(obj);
 		else
-			ni = new NewsItem();
+			ni = new OperServ::NewsItem();
 
 		Anope::string t;
 		data["type"] >> t;
@@ -138,15 +138,15 @@ struct NewsItemType final
 		data["time"] >> ni->time;
 
 		if (!obj)
-			news_service->AddNewsItem(ni);
+			OperServ::news_service->AddNewsItem(ni);
 		return ni;
 	}
 };
 
 class MyNewsService final
-	: public NewsService
+	: public OperServ::NewsService
 {
-	std::vector<NewsItem *> newsItems[3];
+	std::vector<OperServ::NewsItem *> newsItems[3];
 public:
 	MyNewsService(Module *m) : NewsService(m) { }
 
@@ -159,33 +159,33 @@ public:
 		}
 	}
 
-	NewsItem *CreateNewsItem() override
+	OperServ::NewsItem *CreateNewsItem() override
 	{
-		return new NewsItem();
+		return new OperServ::NewsItem();
 	}
 
-	void AddNewsItem(NewsItem *n) override
+	void AddNewsItem(OperServ::NewsItem *n) override
 	{
 		this->newsItems[n->type].push_back(n);
 	}
 
-	void DelNewsItem(NewsItem *n) override
+	void DelNewsItem(OperServ::NewsItem *n) override
 	{
-		std::vector<NewsItem *> &list = this->GetNewsList(n->type);
-		std::vector<NewsItem *>::iterator it = std::find(list.begin(), list.end(), n);
+		auto &list = this->GetNewsList(n->type);
+		auto it = std::find(list.begin(), list.end(), n);
 		if (it != list.end())
 			list.erase(it);
 		delete n;
 	}
 
-	std::vector<NewsItem *> &GetNewsList(NewsType t) override
+	std::vector<OperServ::NewsItem *> &GetNewsList(OperServ::NewsType t) override
 	{
 		return this->newsItems[t];
 	}
 };
 
 #define lenof(a)        (sizeof(a) / sizeof(*(a)))
-static const char **findmsgs(NewsType type)
+static const char **findmsgs(OperServ::NewsType type)
 {
 	for (auto &msg : msgarray)
 		if (msg.type == type)
@@ -196,12 +196,10 @@ static const char **findmsgs(NewsType type)
 class NewsBase
 	: public Command
 {
-	ServiceReference<NewsService> ns;
-
 protected:
-	void DoList(CommandSource &source, NewsType ntype, const char **msgs)
+	void DoList(CommandSource &source, OperServ::NewsType ntype, const char **msgs)
 	{
-		std::vector<NewsItem *> &list = this->ns->GetNewsList(ntype);
+		auto &list = OperServ::news_service->GetNewsList(ntype);
 		if (list.empty())
 			source.Reply(msgs[MSG_LIST_NONE]);
 		else
@@ -226,7 +224,7 @@ protected:
 		}
 	}
 
-	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
+	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params, OperServ::NewsType ntype, const char **msgs)
 	{
 		const Anope::string text = params.size() > 1 ? params[1] : "";
 
@@ -237,20 +235,20 @@ protected:
 			if (Anope::ReadOnly)
 				source.Reply(READ_ONLY_MODE);
 
-			NewsItem *news = new NewsItem();
+			auto *news = new OperServ::NewsItem();
 			news->type = ntype;
 			news->text = text;
 			news->time = Anope::CurTime;
 			news->who = source.GetNick();
 
-			this->ns->AddNewsItem(news);
+			OperServ::news_service->AddNewsItem(news);
 
 			source.Reply(msgs[MSG_ADDED]);
 			Log(LOG_ADMIN, source, this) << "to add a news item";
 		}
 	}
 
-	void DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
+	void DoDel(CommandSource &source, const std::vector<Anope::string> &params, OperServ::NewsType ntype, const char **msgs)
 	{
 		const Anope::string &text = params.size() > 1 ? params[1] : "";
 
@@ -258,7 +256,7 @@ protected:
 			this->OnSyntaxError(source, "DEL");
 		else
 		{
-			std::vector<NewsItem *> &list = this->ns->GetNewsList(ntype);
+			auto list = OperServ::news_service->GetNewsList(ntype);
 			if (list.empty())
 				source.Reply(msgs[MSG_LIST_NONE]);
 			else
@@ -270,7 +268,7 @@ protected:
 					unsigned num = Anope::Convert<unsigned>(text, 0);
 					if (num > 0 && num <= list.size())
 					{
-						this->ns->DelNewsItem(list[num - 1]);
+						OperServ::news_service->DelNewsItem(list[num - 1]);
 						source.Reply(msgs[MSG_DELETED], num);
 						Log(LOG_ADMIN, source, this) << "to delete a news item";
 						return;
@@ -281,7 +279,7 @@ protected:
 				else
 				{
 					for (unsigned i = list.size(); i > 0; --i)
-						this->ns->DelNewsItem(list[i - 1]);
+						OperServ::news_service->DelNewsItem(list[i - 1]);
 					source.Reply(msgs[MSG_DELETED_ALL]);
 					Log(LOG_ADMIN, source, this) << "to delete all news items";
 				}
@@ -289,9 +287,9 @@ protected:
 		}
 	}
 
-	void DoNews(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype)
+	void DoNews(CommandSource &source, const std::vector<Anope::string> &params, OperServ::NewsType ntype)
 	{
-		if (!this->ns)
+		if (!OperServ::news_service)
 			return;
 
 		const Anope::string &cmd = params[0];
@@ -310,7 +308,8 @@ protected:
 			this->OnSyntaxError(source, "");
 	}
 public:
-	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2), ns("NewsService", "news")
+	NewsBase(Module *creator, const Anope::string &newstype)
+		: Command(creator, newstype, 1, 2)
 	{
 		this->SetSyntax(_("ADD \037text\037"));
 		this->SetSyntax(_("DEL {\037num\037 | ALL}"));
@@ -337,7 +336,7 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		return this->DoNews(source, params, NEWS_LOGON);
+		return this->DoNews(source, params, OperServ::NEWS_LOGON);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -367,7 +366,7 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		return this->DoNews(source, params, NEWS_OPER);
+		return this->DoNews(source, params, OperServ::NEWS_OPER);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -397,7 +396,7 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		return this->DoNews(source, params, NEWS_RANDOM);
+		return this->DoNews(source, params, OperServ::NEWS_RANDOM);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
@@ -428,15 +427,15 @@ class OSNews final
 	Anope::string oper_announcer, announcer;
 	unsigned news_count;
 
-	void DisplayNews(User *u, NewsType Type)
+	void DisplayNews(User *u, OperServ::NewsType Type)
 	{
-		std::vector<NewsItem *> &newsList = this->newsservice.GetNewsList(Type);
+		auto &newsList = this->newsservice.GetNewsList(Type);
 		if (newsList.empty())
 			return;
 
 		const auto &modconf = Config->GetModule(this);
 		BotInfo *bi = NULL;
-		if (Type == NEWS_OPER)
+		if (Type == OperServ::NEWS_OPER)
 			bi = BotInfo::Find(modconf.Get<const Anope::string>("oper_announcer", "OperServ"), true);
 		else
 			bi = BotInfo::Find(modconf.Get<const Anope::string>("announcer", "Global"), true);
@@ -449,7 +448,7 @@ class OSNews final
 
 		int start = 0;
 
-		if (Type != NEWS_RANDOM)
+		if (Type != OperServ::NEWS_RANDOM)
 		{
 			start = newsList.size() - news_count;
 			if (start < 0)
@@ -459,7 +458,7 @@ class OSNews final
 		const auto showdate = modconf.Get<bool>("showdate", "yes");
 		for (unsigned i = start, end = newsList.size(); i < end; ++i)
 		{
-			if (Type == NEWS_RANDOM && i != cur_rand_news)
+			if (Type == OperServ::NEWS_RANDOM && i != cur_rand_news)
 				continue;
 
 			const auto *news = newsList[i];
@@ -468,7 +467,7 @@ class OSNews final
 			else
 				u->SendMessage(bi, msgs[MSG_NEWS_SHORT], news->text.c_str());
 
-			if (Type == NEWS_RANDOM)
+			if (Type == OperServ::NEWS_RANDOM)
 			{
 				++cur_rand_news;
 				break;
@@ -476,7 +475,7 @@ class OSNews final
 		}
 
 		/* Reset to head of list to get first random news value */
-		if (Type == NEWS_RANDOM && cur_rand_news >= newsList.size())
+		if (Type == OperServ::NEWS_RANDOM && cur_rand_news >= newsList.size())
 			cur_rand_news = 0;
 	}
 
@@ -500,7 +499,7 @@ public:
 	void OnUserModeSet(const MessageSource &setter, User *u, const Anope::string &mname) override
 	{
 		if (mname == "OPER")
-			DisplayNews(u, NEWS_OPER);
+			DisplayNews(u, OperServ::NEWS_OPER);
 	}
 
 	void OnUserConnect(User *user, bool &) override
@@ -508,8 +507,8 @@ public:
 		if (user->Quitting() || !user->server->IsSynced())
 			return;
 
-		DisplayNews(user, NEWS_LOGON);
-		DisplayNews(user, NEWS_RANDOM);
+		DisplayNews(user, OperServ::NEWS_LOGON);
+		DisplayNews(user, OperServ::NEWS_RANDOM);
 	}
 };
 

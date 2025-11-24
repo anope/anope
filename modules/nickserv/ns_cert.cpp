@@ -18,9 +18,12 @@
 static Anope::unordered_map<NickCore *> certmap;
 
 struct CertServiceImpl final
-	: CertService
+	: NickServ::CertService
 {
-	CertServiceImpl(Module *o) : CertService(o) { }
+	CertServiceImpl(Module *o)
+		: NickServ::CertService(o)
+	{
+	}
 
 	NickCore *FindAccountFromCert(const Anope::string &cert) override
 	{
@@ -36,14 +39,14 @@ struct CertServiceImpl final
 		if (!nc)
 			return;
 
-		auto *cl = nc->GetExt<NSCertList>("certificates");
+		auto *cl = nc->GetExt<NickServ::CertList>(NICKSERV_CERT_EXT);
 		if (cl)
 			cl->ReplaceCert(oldcert, newcert);
 	}
 };
 
 struct NSCertListImpl final
-	: NSCertList
+	: NickServ::CertList
 {
 	Serialize::Reference<NickCore> nc;
 	std::vector<Anope::string> certs;
@@ -153,7 +156,7 @@ public:
 	void Check() override
 	{
 		if (this->certs.empty())
-			nc->Shrink<NSCertList>("certificates");
+			nc->Shrink<NickServ::CertList>(NICKSERV_CERT_EXT);
 	}
 
 	struct ExtensibleItem final
@@ -167,7 +170,7 @@ public:
 				return;
 
 			const NickCore *n = anope_dynamic_static_cast<const NickCore *>(e);
-			NSCertList *c = this->Get(n);
+			auto *c = this->Get(n);
 			if (c == NULL || !c->GetCertCount())
 				return;
 
@@ -183,7 +186,7 @@ public:
 				return;
 
 			NickCore *n = anope_dynamic_static_cast<NickCore *>(e);
-			NSCertListImpl *c = this->Require(n);
+			auto *c = this->Require(n);
 
 			Anope::string buf;
 			data["cert"] >> buf;
@@ -206,7 +209,7 @@ class CommandNSCert final
 private:
 	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
 	{
-		NSCertList *cl = nc->Require<NSCertList>("certificates");
+		auto *cl = nc->Require<NickServ::CertList>(NICKSERV_CERT_EXT);
 		unsigned max = Config->GetModule(this->owner).Get<unsigned>("max", "5");
 
 		if (cl->GetCertCount() >= max)
@@ -247,7 +250,7 @@ private:
 
 	void DoDel(CommandSource &source, NickCore *nc, Anope::string certfp)
 	{
-		NSCertList *cl = nc->Require<NSCertList>("certificates");
+		auto *cl = nc->Require<NickServ::CertList>(NICKSERV_CERT_EXT);
 
 		if (certfp.empty())
 		{
@@ -276,7 +279,7 @@ private:
 
 	static void DoList(CommandSource &source, const NickCore *nc)
 	{
-		NSCertList *cl = nc->GetExt<NSCertList>("certificates");
+		auto *cl = nc->GetExt<NickServ::CertList>(NICKSERV_CERT_EXT);
 
 		if (!cl || !cl->GetCertCount())
 		{
@@ -409,8 +412,11 @@ class NSCert final
 	}
 
 public:
-	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandnscert(this), certs(this, "certificates"), cs(this)
+	NSCert(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandnscert(this)
+		, certs(this, NICKSERV_CERT_EXT)
+		, cs(this)
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
@@ -450,7 +456,7 @@ public:
 
 	EventReturn OnNickValidate(User *u, NickAlias *na) override
 	{
-		NSCertList *cl = certs.Get(na->nc);
+		auto *cl = certs.Get(na->nc);
 		if (!u->fingerprint.empty() && cl && cl->FindCert(u->fingerprint))
 		{
 			if (!CanLogin(u, na->nc))

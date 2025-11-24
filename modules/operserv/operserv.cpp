@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/nickserv/service.h"
 
 class SGLineManager final
 	: public XLineManager
@@ -70,10 +71,11 @@ public:
 class SQLineManager final
 	: public XLineManager
 {
-	ServiceReference<NickServService> nickserv;
-
 public:
-	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q'), nickserv("NickServService", "NickServ") { }
+	SQLineManager(Module *creator)
+		: XLineManager(creator, "xlinemanager/sqline", 'Q')
+	{
+	}
 
 	void OnMatch(User *u, XLine *x) override
 	{
@@ -91,8 +93,8 @@ public:
 		{
 			if (!u)
 				;
-			else if (nickserv)
-				nickserv->Collide(u, NULL);
+			else if (NickServ::service)
+				NickServ::service->Collide(u, NULL);
 			else
 				u->Kill(Config->GetClient("OperServ"), "Q-Lined: " + x->reason);
 		}

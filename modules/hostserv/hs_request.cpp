@@ -15,9 +15,9 @@
 #include "module.h"
 #include "modules/dns.h"
 #include "modules/hostserv/request.h"
+#include "modules/memoserv/service.h"
 
 static ServiceReference<DNS::Manager> dnsmanager("DNS::Manager", "dns/manager");
-static ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
 
 static void req_send_memos(Module *me, CommandSource &source, const Anope::string &vident, const Anope::string &vhost);
 
@@ -28,7 +28,7 @@ namespace
 }
 
 struct HostRequestImpl final
-	: HostRequest
+	: HostServ::HostRequest
 	, Serializable
 {
 	HostRequestImpl(Extensible *)
@@ -38,7 +38,7 @@ struct HostRequestImpl final
 
 	static HostRequestImpl *Get(NickAlias *na)
 	{
-		return na ? na->GetExt<HostRequestImpl>("hostrequest") : nullptr;
+		return na ? na->GetExt<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT) : nullptr;
 	}
 
 	Anope::string Mask() const
@@ -86,7 +86,7 @@ struct HostRequestTypeImpl final
 		if (obj)
 			req = anope_dynamic_static_cast<HostRequestImpl *>(obj);
 		else
-			req = na->Extend<HostRequestImpl>("hostrequest");
+			req = na->Extend<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT);
 		if (req)
 		{
 			req->nick = na->nick;
@@ -122,7 +122,7 @@ private:
 	}
 
 public:
-	DNSHostResolver(Command *cmd, HostRequest *hr, NickAlias *na, const CommandSource &src)
+	DNSHostResolver(Command *cmd, HostServ::HostRequest *hr, NickAlias *na, const CommandSource &src)
 		: Request(dnsmanager, cmd->module, hr->host, DNS::QUERY_TXT, false)
 		, command(cmd)
 		, nickalias(na)
@@ -169,12 +169,12 @@ public:
 			na->SetVHost(hr->ident, hr->host, source.GetNick(), hr->time);
 			FOREACH_MOD(OnSetVHost, (na));
 
-			if (Config->GetModule(command->module).Get<bool>("memouser") && memoserv)
-				memoserv->Send(source.service->nick, na->nick, _("Your requested vhost has been validated via DNS."), true);
+			if (Config->GetModule(command->module).Get<bool>("memouser") && MemoServ::service)
+				MemoServ::service->Send(source.service->nick, na->nick, _("Your requested vhost has been validated via DNS."), true);
 
 			source.Reply(_("VHost for %s has been validated using DNS."), na->nick.c_str());
 			Log(LOG_COMMAND, source, command) << "for " << na->nick << " for vhost " << hr->Mask();
-			na->Shrink<HostRequestImpl>("hostrequest");
+			na->Shrink<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT);
 
 			return; // We're done.
 		}
@@ -281,7 +281,7 @@ public:
 		req.host = host;
 		req.time = Anope::CurTime;
 		req.validation_token = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
-		na->Extend<HostRequestImpl>("hostrequest", req);
+		na->Extend<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT, req);
 
 		BotInfo *bi;
 		Anope::string cmd;
@@ -340,18 +340,18 @@ public:
 		const Anope::string &nick = params[0];
 
 		NickAlias *na = NickAlias::Find(nick);
-		HostRequestImpl *req = na ? na->GetExt<HostRequestImpl>("hostrequest") : NULL;
+		auto *req = HostRequestImpl::Get(na);
 		if (req)
 		{
 			na->SetVHost(req->ident, req->host, source.GetNick(), req->time);
 			FOREACH_MOD(OnSetVHost, (na));
 
-			if (Config->GetModule(this->owner).Get<bool>("memouser") && memoserv)
-				memoserv->Send(source.service->nick, na->nick, _("Your requested vhost has been approved."), true);
+			if (Config->GetModule(this->owner).Get<bool>("memouser") && MemoServ::service)
+				MemoServ::service->Send(source.service->nick, na->nick, _("Your requested vhost has been approved."), true);
 
 			source.Reply(_("VHost for %s has been activated."), na->nick.c_str());
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
-			na->Shrink<HostRequestImpl>("hostrequest");
+			na->Shrink<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT);
 		}
 		else
 			source.Reply(_("No request for nick %s found."), nick.c_str());
@@ -391,12 +391,12 @@ public:
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
 		NickAlias *na = NickAlias::Find(nick);
-		HostRequestImpl *req = na ? na->GetExt<HostRequestImpl>("hostrequest") : NULL;
+		auto *req = HostRequestImpl::Get(na);
 		if (req)
 		{
-			na->Shrink<HostRequestImpl>("hostrequest");
+			na->Shrink<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT);
 
-			if (Config->GetModule(this->owner).Get<bool>("memouser") && memoserv)
+			if (Config->GetModule(this->owner).Get<bool>("memouser") && MemoServ::service)
 			{
 				Anope::string message;
 				if (!reason.empty())
@@ -404,7 +404,7 @@ public:
 				else
 					message = _("Your requested vhost has been rejected.");
 
-				memoserv->Send(source.service->nick, nick, Language::Translate(source.GetAccount(), message.c_str()), true);
+				MemoServ::service->Send(source.service->nick, nick, Language::Translate(source.GetAccount(), message.c_str()), true);
 			}
 
 			source.Reply(_("VHost for %s has been rejected."), nick.c_str());
@@ -446,7 +446,7 @@ public:
 
 		for (const auto &[nick, na] : *NickAliasList)
 		{
-			HostRequestImpl *hr = na->GetExt<HostRequestImpl>("hostrequest");
+			auto *hr = HostRequestImpl::Get(na);
 			if (!hr)
 				continue;
 
@@ -572,7 +572,7 @@ public:
 		, commandhsreject(this)
 		, commandhswaiting(this)
 		, commandhsvalidate(this)
-		, hostrequest(this, "hostrequest")
+		, hostrequest(this, HOSTSERV_HOST_REQUEST_EXT)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
@@ -594,7 +594,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 	else
 		host = vhost;
 
-	if (Config->GetModule(me).Get<bool>("memooper") && memoserv)
+	if (Config->GetModule(me).Get<bool>("memooper") && MemoServ::service)
 	{
 		for (auto *o : Oper::opers)
 		{
@@ -604,7 +604,7 @@ static void req_send_memos(Module *me, CommandSource &source, const Anope::strin
 
 			Anope::string message = Anope::Format(_("VHost \002%s\002 has been requested by %s."), host.c_str(), source.GetNick().c_str());
 
-			memoserv->Send(source.service->nick, na->nick, message, true);
+			MemoServ::service->Send(source.service->nick, na->nick, message, true);
 		}
 	}
 }

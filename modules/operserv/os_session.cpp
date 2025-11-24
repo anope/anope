@@ -42,13 +42,13 @@ struct ExceptionType final
 	: public Serialize::Type
 {
 	ExceptionType()
-		: Serialize::Type("Exception")
+		: Serialize::Type(OPERSERV_SESSION_EXCEPTION_TYPE)
 	{
 	}
 
 	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		const auto *ex = static_cast<const Exception *>(obj);
+		const auto *ex = static_cast<const OperServ::Exception *>(obj);
 		data.Store("mask", ex->mask);
 		data.Store("limit", ex->limit);
 		data.Store("who", ex->who);
@@ -58,14 +58,14 @@ struct ExceptionType final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		if (!session_service)
+		if (!OperServ::session_service)
 			return NULL;
 
-		Exception *ex;
+		OperServ::Exception *ex;
 		if (obj)
-			ex = anope_dynamic_static_cast<Exception *>(obj);
+			ex = anope_dynamic_static_cast<OperServ::Exception *>(obj);
 		else
-			ex = new Exception;
+			ex = new OperServ::Exception();
 		data["mask"] >> ex->mask;
 		data["limit"] >> ex->limit;
 		data["who"] >> ex->who;
@@ -74,37 +74,43 @@ struct ExceptionType final
 		data["expires"] >> ex->expires;
 
 		if (!obj)
-			session_service->AddException(ex);
+			OperServ::session_service->AddException(ex);
 		return ex;
 	}
 };
 
 class MySessionService final
-	: public SessionService
+	: public OperServ::SessionService
 {
-	SessionMap Sessions;
-	Serialize::Checker<ExceptionVector> Exceptions;
-public:
-	MySessionService(Module *m) : SessionService(m), Exceptions("Exception") { }
+private:
+	OperServ::SessionMap Sessions;
+	Serialize::Checker<OperServ::ExceptionVector> Exceptions;
 
-	Exception *CreateException() override
+public:
+	MySessionService(Module *m)
+		: OperServ::SessionService(m)
+		, Exceptions(OPERSERV_SESSION_EXCEPTION_TYPE)
 	{
-		return new Exception();
 	}
 
-	void AddException(Exception *e) override
+	OperServ::Exception *CreateException() override
+	{
+		return new OperServ::Exception();
+	}
+
+	void AddException(OperServ::Exception *e) override
 	{
 		this->Exceptions->push_back(e);
 	}
 
-	void DelException(Exception *e) override
+	void DelException(OperServ::Exception *e) override
 	{
-		ExceptionVector::iterator it = std::find(this->Exceptions->begin(), this->Exceptions->end(), e);
+		auto it = std::find(this->Exceptions->begin(), this->Exceptions->end(), e);
 		if (it != this->Exceptions->end())
 			this->Exceptions->erase(it);
 	}
 
-	Exception *FindException(User *u) override
+	OperServ::Exception *FindException(User *u) override
 	{
 		for (auto *e : *this->Exceptions)
 		{
@@ -117,7 +123,7 @@ public:
 		return NULL;
 	}
 
-	Exception *FindException(const Anope::string &host) override
+	OperServ::Exception *FindException(const Anope::string &host) override
 	{
 		for (auto *e : *this->Exceptions)
 		{
@@ -131,28 +137,28 @@ public:
 		return NULL;
 	}
 
-	ExceptionVector &GetExceptions() override
+	OperServ::ExceptionVector &GetExceptions() override
 	{
 		return this->Exceptions;
 	}
 
-	void DelSession(Session *s)
+	void DelSession(OperServ::Session *s)
 	{
 		this->Sessions.erase(s->addr);
 	}
 
-	Session *FindSession(const Anope::string &ip) override
+	OperServ::Session *FindSession(const Anope::string &ip) override
 	{
 		cidr c(ip, ip.find(':') != Anope::string::npos ? ipv6_cidr : ipv4_cidr);
 		if (!c.valid())
 			return NULL;
-		SessionMap::iterator it = this->Sessions.find(c);
+		auto it = this->Sessions.find(c);
 		if (it != this->Sessions.end())
 			return it->second;
 		return NULL;
 	}
 
-	SessionMap::iterator FindSessionIterator(const sockaddrs &ip)
+	OperServ::SessionMap::iterator FindSessionIterator(const sockaddrs &ip)
 	{
 		cidr c(ip, ip.ipv6() ? ipv6_cidr : ipv4_cidr);
 		if (!c.valid())
@@ -160,12 +166,12 @@ public:
 		return this->Sessions.find(c);
 	}
 
-	Session *&FindOrCreateSession(const cidr &ip)
+	OperServ::Session *&FindOrCreateSession(const cidr &ip)
 	{
 		return this->Sessions[ip];
 	}
 
-	SessionMap &GetSessions() override
+	OperServ::SessionMap &GetSessions() override
 	{
 		return this->Sessions;
 	}
@@ -204,10 +210,10 @@ public:
 
 	void HandleNumber(unsigned number) override
 	{
-		if (!number || number > session_service->GetExceptions().size())
+		if (!number || number > OperServ::session_service->GetExceptions().size())
 			return;
 
-		lastdeleted = session_service->GetExceptions()[number - 1]->mask;
+		lastdeleted = OperServ::session_service->GetExceptions()[number - 1]->mask;
 		Log(LOG_ADMIN, source, cmd) << "to remove the session limit exception for " << lastdeleted;
 
 		++deleted;
@@ -216,10 +222,10 @@ public:
 
 	static void DoDel(CommandSource &source, unsigned index)
 	{
-		Exception *e = session_service->GetExceptions()[index];
+		auto *e = OperServ::session_service->GetExceptions()[index];
 		FOREACH_MOD(OnExceptionDel, (source, e));
 
-		session_service->DelException(e);
+		OperServ::session_service->DelException(e);
 		delete e;
 	}
 };
@@ -241,7 +247,7 @@ private:
 			list.AddColumn(_("Session")).AddColumn(_("Host"));
 			list.SetFlexible(_("\002{host}\002: {session} sessions"));
 
-			for (const auto &[_, session] : session_service->GetSessions())
+			for (const auto &[_, session] : OperServ::session_service->GetSessions())
 			{
 				if (session->count >= mincount)
 				{
@@ -260,9 +266,9 @@ private:
 	static void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
-		Session *session = session_service->FindSession(param);
+		auto *session = OperServ::session_service->FindSession(param);
 
-		Exception *exception = session_service->FindException(param);
+		auto *exception = OperServ::session_service->FindException(param);
 		Anope::string entry = "no entry";
 		unsigned limit = session_limit;
 		if (exception)
@@ -386,7 +392,7 @@ private:
 				return;
 			}
 
-			for (auto *e : session_service->GetExceptions())
+			for (auto *e : OperServ::session_service->GetExceptions())
 			{
 				if (e->mask.equals_ci(mask))
 				{
@@ -401,7 +407,7 @@ private:
 				}
 			}
 
-			auto *exception = new Exception();
+			auto *exception = new OperServ::Exception();
 			exception->mask = mask;
 			exception->limit = limit;
 			exception->reason = reason;
@@ -416,7 +422,7 @@ private:
 			else
 			{
 				Log(LOG_ADMIN, source, this) << "to set the session limit for " << mask << " to " << limit;
-				session_service->AddException(exception);
+				OperServ::session_service->AddException(exception);
 				source.Reply(_("Session limit for \002%s\002 set to \002%d\002."), mask.c_str(), limit);
 				if (Anope::ReadOnly)
 					source.Reply(READ_ONLY_MODE);
@@ -441,9 +447,9 @@ private:
 		}
 		else
 		{
-			unsigned i = 0, end = session_service->GetExceptions().size();
+			unsigned i = 0, end = OperServ::session_service->GetExceptions().size();
 			for (; i < end; ++i)
-				if (mask.equals_ci(session_service->GetExceptions()[i]->mask))
+				if (mask.equals_ci(OperServ::session_service->GetExceptions()[i]->mask))
 				{
 					Log(LOG_ADMIN, source, this) << "to remove the session limit exception for " << mask;
 					ExceptionDelCallback::DoDel(source, i);
@@ -462,7 +468,7 @@ private:
 	{
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
-		if (session_service->GetExceptions().empty())
+		if (OperServ::session_service->GetExceptions().empty())
 		{
 			source.Reply(_("The session exception list is empty."));
 			return;
@@ -482,10 +488,10 @@ private:
 
 				void HandleNumber(unsigned Number) override
 				{
-					if (!Number || Number > session_service->GetExceptions().size())
+					if (!Number || Number > OperServ::session_service->GetExceptions().size())
 						return;
 
-					Exception *e = session_service->GetExceptions()[Number - 1];
+					auto *e = OperServ::session_service->GetExceptions()[Number - 1];
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(Number);
@@ -503,9 +509,9 @@ private:
 		}
 		else
 		{
-			for (unsigned i = 0, end = session_service->GetExceptions().size(); i < end; ++i)
+			for (unsigned i = 0, end = OperServ::session_service->GetExceptions().size(); i < end; ++i)
 			{
-				Exception *e = session_service->GetExceptions()[i];
+				auto *e = OperServ::session_service->GetExceptions()[i];
 				if (mask.empty() || Anope::Match(e->mask, mask))
 				{
 					ListFormatter::ListEntry entry;
@@ -675,7 +681,7 @@ public:
 		if (!u_ip.valid())
 			return;
 
-		Session *&session = this->ss.FindOrCreateSession(u_ip);
+		auto *&session = this->ss.FindOrCreateSession(u_ip);
 
 		if (session)
 		{
@@ -683,7 +689,7 @@ public:
 			if (session->count >= session_limit)
 			{
 				kill = true;
-				Exception *exception = this->ss.FindException(u);
+				auto *exception = this->ss.FindException(u);
 				if (exception)
 				{
 					kill = false;
@@ -735,7 +741,7 @@ public:
 		}
 		else
 		{
-			session = new Session(u->ip, u->ip.ipv6() ? ipv6_cidr : ipv4_cidr);
+			session = new OperServ::Session(u->ip, u->ip.ipv6() ? ipv6_cidr : ipv4_cidr);
 		}
 	}
 
@@ -744,13 +750,13 @@ public:
 		if (!session_limit || !u->server || u->server->IsULined())
 			return;
 
-		SessionService::SessionMap &sessions = this->ss.GetSessions();
-		SessionService::SessionMap::iterator sit = this->ss.FindSessionIterator(u->ip);
+		auto &sessions = this->ss.GetSessions();
+		auto sit = this->ss.FindSessionIterator(u->ip);
 
 		if (sit == sessions.end())
 			return;
 
-		Session *session = sit->second;
+		auto *session = sit->second;
 
 		if (session->count > 1)
 		{
@@ -768,7 +774,7 @@ public:
 			return;
 		for (unsigned i = this->ss.GetExceptions().size(); i > 0; --i)
 		{
-			Exception *e = this->ss.GetExceptions()[i - 1];
+			auto *e = this->ss.GetExceptions()[i - 1];
 
 			if (!e->expires || e->expires > Anope::CurTime)
 				continue;

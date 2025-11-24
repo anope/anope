@@ -14,7 +14,14 @@
 
 #pragma once
 
-class HostRequest
+#define HOSTSERV_HOST_REQUEST_EXT "hostrequest"
+
+namespace HostServ
+{
+	class HostRequest;
+}
+
+class HostServ::HostRequest
 {
 protected:
 	HostRequest() = default;

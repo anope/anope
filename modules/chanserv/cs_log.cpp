@@ -14,12 +14,14 @@
 
 #include "module.h"
 #include "modules/chanserv/log.h"
+#include "modules/memoserv/service.h"
 
 struct LogSettingImpl final
-	: LogSetting
+	: ChanServ::LogSetting
 	, Serializable
 {
-	LogSettingImpl() : Serializable("LogSetting")
+	LogSettingImpl()
+		: Serializable(CHANSERV_LOG_SETTING_TYPE)
 	{
 	}
 
@@ -28,10 +30,10 @@ struct LogSettingImpl final
 		ChannelInfo *ci = ChannelInfo::Find(chan);
 		if (ci)
 		{
-			LogSettings *ls = ci->GetExt<LogSettings>("logsettings");
+			auto *ls = ci->GetExt<ChanServ::LogSettings>(CHANSERV_LOG_SETTING_EXT);
 			if (ls)
 			{
-				LogSettings::iterator it = std::find((*ls)->begin(), (*ls)->end(), this);
+				auto it = std::find((*ls)->begin(), (*ls)->end(), this);
 				if (it != (*ls)->end())
 					(*ls)->erase(it);
 			}
@@ -43,7 +45,7 @@ struct LogSettingTypeImpl final
 	: Serialize::Type
 {
 	LogSettingTypeImpl()
-		: Serialize::Type("LogSetting")
+		: Serialize::Type(CHANSERV_LOG_SETTING_TYPE)
 	{
 	}
 
@@ -74,7 +76,7 @@ struct LogSettingTypeImpl final
 			ls = anope_dynamic_static_cast<LogSettingImpl *>(obj);
 		else
 		{
-			LogSettings *lsettings = ci->Require<LogSettings>("logsettings");
+			auto *lsettings = ci->Require<ChanServ::LogSettings>(CHANSERV_LOG_SETTING_EXT);
 			ls = new LogSettingImpl();
 			(*lsettings)->push_back(ls);
 		}
@@ -93,21 +95,21 @@ struct LogSettingTypeImpl final
 };
 
 struct LogSettingsImpl final
-	: LogSettings
+	: ChanServ::LogSettings
 {
 	LogSettingsImpl(Extensible *) { }
 
 	~LogSettingsImpl() override
 	{
-		for (iterator it = (*this)->begin(); it != (*this)->end();)
+		for (auto it = (*this)->begin(); it != (*this)->end();)
 		{
-			LogSetting *ls = *it;
+			auto *ls = *it;
 			++it;
 			delete ls;
 		}
 	}
 
-	LogSetting *Create() override
+	ChanServ::LogSetting *Create() override
 	{
 		return new LogSettingImpl();
 	}
@@ -135,7 +137,7 @@ public:
 			source.Reply(ACCESS_DENIED);
 		else if (params.size() == 1)
 		{
-			LogSettings *ls = ci->Require<LogSettings>("logsettings");
+			auto *ls = ci->Require<ChanServ::LogSettings>(CHANSERV_LOG_SETTING_EXT);
 			if (!ls || (*ls)->empty())
 				source.Reply(_("There currently are no logging configurations for %s."), ci->name.c_str());
 			else
@@ -146,7 +148,7 @@ public:
 
 				for (unsigned i = 0; i < (*ls)->size(); ++i)
 				{
-					const LogSetting *log = (*ls)->at(i);
+					const auto *log = (*ls)->at(i);
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = Anope::ToString(i + 1);
@@ -168,7 +170,7 @@ public:
 				return;
 			}
 
-			LogSettings *ls = ci->Require<LogSettings>("logsettings");
+			auto *ls = ci->Require<ChanServ::LogSettings>(CHANSERV_LOG_SETTING_EXT);
 			const Anope::string &command = params[1];
 			const Anope::string &method = params[2];
 			const Anope::string &extra = params.size() > 3 ? params[3] : "";
@@ -224,7 +226,7 @@ public:
 
 			for (unsigned i = (*ls)->size(); i > 0; --i)
 			{
-				LogSetting *log = (*ls)->at(i - 1);
+				auto *log = (*ls)->at(i - 1);
 
 				if (log->service_name == service_name && log->method.equals_ci(method) && command_name.equals_ci(log->command_name))
 				{
@@ -300,7 +302,6 @@ public:
 class CSLog final
 	: public Module
 {
-	ServiceReference<MemoServService> MSService;
 	CommandCSLog commandcslog;
 	ExtensibleItem<LogSettingsImpl> logsettings;
 	LogSettingTypeImpl logsetting_type;
@@ -315,9 +316,8 @@ class CSLog final
 public:
 	CSLog(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, VENDOR)
-		, MSService("MemoServService", "MemoServ")
 		, commandcslog(this)
-		, logsettings(this, "logsettings")
+		, logsettings(this, CHANSERV_LOG_SETTING_EXT)
 	{
 	}
 
@@ -345,7 +345,7 @@ public:
 		if (defaults.empty())
 			return;
 
-		LogSettings *ls = logsettings.Require(ci);
+		auto *ls = logsettings.Require(ci);
 		for (auto &d : defaults)
 		{
 			auto *log = new LogSettingImpl();
@@ -376,7 +376,7 @@ public:
 		if (l->type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;
 
-		LogSettings *ls = logsettings.Get(l->ci);
+		auto *ls = logsettings.Get(l->ci);
 		if (ls)
 		{
 			for (auto *log : *(*ls))
@@ -398,8 +398,8 @@ public:
 
 				Anope::string buffer = l->u->nick + " used " + l->source->command.upper() + " " + l->buf.str();
 
-				if (log->method.equals_ci("MEMO") && MSService && l->ci->WhoSends() != NULL)
-					MSService->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
+				if (log->method.equals_ci("MEMO") && MemoServ::service && l->ci->WhoSends() != NULL)
+					MemoServ::service->Send(l->ci->WhoSends()->nick, l->ci->name, buffer, true);
 				else if (l->source->c)
 					/* Sending a channel message or notice in response to a fantasy command */;
 				else if (log->method.equals_ci("MESSAGE") && l->ci->c)

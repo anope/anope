@@ -1755,7 +1755,6 @@ class IRCDMessageMetadata final
 	: IRCDMessage
 {
 private:
-	ServiceReference<CertService> certs;
 	PrimitiveExtensibleItem<ListLimits> &maxlist;
 	ExtensibleItem<bool> ssl;
 
@@ -1827,7 +1826,7 @@ private:
 			return; // Not registered.
 
 		Anope::string modes;
-		const auto *modelocks = c->ci->GetExt<ModeLocks>("modelocks");
+		const auto *modelocks = c->ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 		if (modelocks)
 			modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
 
@@ -1920,8 +1919,8 @@ private:
 		FOREACH_MOD(OnFingerprint, (u));
 
 		// Any extra fingerprints are using backup algorithms.
-		while (certs && fingerprints.GetToken(data))
-			certs->ReplaceCert(data, u->fingerprint);
+		while (NickServ::cert_service && fingerprints.GetToken(data))
+			NickServ::cert_service->ReplaceCert(data, u->fingerprint);
 	}
 
 	static void HandleTopicLock(Channel *c, const Anope::string &value)
@@ -1939,7 +1938,6 @@ private:
 public:
 	IRCDMessageMetadata(Module *creator, PrimitiveExtensibleItem<ListLimits> &listlimits)
 		: IRCDMessage(creator, "METADATA", 2)
-		, certs("CertService", "certs")
 		, maxlist(listlimits)
 		, ssl(creator, "ssl")
 	{
@@ -2523,7 +2521,7 @@ public:
 
 	void OnChanRegistered(ChannelInfo *ci) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+		auto *modelocks = ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 		if (ci->c && modelocks && !modelocks->GetMLockAsString(false).empty())
 		{
 			Anope::string modes = modelocks->GetMLockAsString(false).replace_all_cs("+", "").replace_all_cs("-", "");
@@ -2543,9 +2541,9 @@ public:
 		SendChannelMetadata(ci->c, "topiclock", "");
 	}
 
-	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnMLock(ChannelInfo *ci, ChanServ::ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+		auto *modelocks = ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
 		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{
@@ -2556,9 +2554,9 @@ public:
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) override
+	EventReturn OnUnMLock(ChannelInfo *ci, ChanServ::ModeLock *lock) override
 	{
-		ModeLocks *modelocks = ci->GetExt<ModeLocks>("modelocks");
+		auto *modelocks = ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
 		if (cm && ci->c && modelocks && (cm->type == MODE_REGULAR || cm->type == MODE_PARAM))
 		{

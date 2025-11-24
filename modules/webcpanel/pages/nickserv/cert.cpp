@@ -38,7 +38,7 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTP::Provider *server, const Anope::s
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);
 	}
 
-	NSCertList *cl = na->nc->GetExt<NSCertList>("certificates");
+	auto *cl = na->nc->GetExt<::NickServ::CertList>(NICKSERV_CERT_EXT);
 	if (cl)
 		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
 			replacements["CERTS"] = cl->GetCert(i);

@@ -15,8 +15,9 @@
 #pragma once
 
 class AccessGroup;
-namespace ChanServ { class AutoKick; }
 class BotInfo;
+namespace BotServ { class BadWord; }
+namespace ChanServ { class AutoKick; class ModeLock; }
 class CallBack;
 class ChanAccess;
 class Channel;
@@ -41,6 +42,7 @@ class MessageSource;
 class Module;
 class NickAlias;
 class NickCore;
+namespace OperServ { struct Exception; }
 class OperType;
 class ReferenceBase;
 class Regex;
@@ -51,9 +53,6 @@ class Thread;
 class User;
 class XLine;
 class XLineManager;
-struct BadWord;
-struct Exception;
 struct MemoInfo;
-struct ModeLock;
 struct Oper;
 namespace SASL { struct Message; }

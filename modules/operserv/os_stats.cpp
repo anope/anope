@@ -183,9 +183,9 @@ private:
 		GetHashStats(*NickCoreList, entries, buckets, max_chain);
 		source.Reply(_("Registered accounts: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
 
-		if (session_service)
+		if (OperServ::session_service)
 		{
-			GetHashStats(session_service->GetSessions(), entries, buckets, max_chain);
+			GetHashStats(OperServ::session_service->GetSessions(), entries, buckets, max_chain);
 			source.Reply(_("Sessions: %zu entries, %zu buckets, longest chain is %zu"), entries, buckets, max_chain);
 		}
 	}

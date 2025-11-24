@@ -14,8 +14,7 @@
 
 #include "module.h"
 #include "modules/nickserv/cert.h"
-
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+#include "modules/nickserv/service.h"
 
 class NSGroupRequest final
 	: public IdentifyRequest
@@ -168,7 +167,7 @@ public:
 			source.Reply(NICK_IDENTIFY_REQUIRED);
 		else if (maxaliases && target->nc->aliases->size() >= maxaliases && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in your account."));
-		else if (nickserv && nickserv->IsGuestNick(source.GetNick()))
+		else if (NickServ::service && NickServ::service->IsGuestNick(source.GetNick()))
 			source.Reply(NICK_CANNOT_BE_REGISTERED, source.GetNick().c_str());
 		else
 		{
@@ -176,7 +175,7 @@ public:
 			if (!na && source.GetAccount() == target->nc)
 				ok = true;
 
-			NSCertList *cl = target->nc->GetExt<NSCertList>("certificates");
+			auto *cl = target->nc->GetExt<NickServ::CertList>(NICKSERV_CERT_EXT);
 			if (user != NULL && !user->fingerprint.empty() && cl && cl->FindCert(user->fingerprint))
 				ok = true;
 

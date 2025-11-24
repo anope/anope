@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/global/service.h"
 
 #define QUEUE_EMPTY _("You have no messages queued.")
 
@@ -21,13 +22,11 @@ class QueueDelCallback final
 {
 private:
 	unsigned deleted = 0;
-	ServiceReference<GlobalService> &global;
 	CommandSource &source;
 
 public:
-	QueueDelCallback(CommandSource &src, ServiceReference<GlobalService>& gl, const Anope::string &list)
+	QueueDelCallback(CommandSource &src, const Anope::string &list)
 		: NumberList(list, true)
-		, global(gl)
 		, source(src)
 	{
 	}
@@ -42,10 +41,10 @@ public:
 
 	void HandleNumber(unsigned number) override
 	{
-		if (!number || number > global->CountQueue(source.nc))
+		if (!number || number > Global::service->CountQueue(source.nc))
 			return;
 
-		if (global->Unqueue(source.nc, number - 1))
+		if (Global::service->Unqueue(source.nc, number - 1))
 			deleted++;
 	}
 };
@@ -54,8 +53,6 @@ class CommandGLQueue final
 	: public Command
 {
 private:
-	ServiceReference<GlobalService> global;
-
 	void DoAdd(CommandSource &source, const Anope::string &message)
 	{
 		if (message.empty())
@@ -65,26 +62,26 @@ private:
 		}
 
 		auto maxqueue = Config->GetModule(this->module).Get<size_t>("maxqueue", "10");
-		if (global->CountQueue(source.nc) >= maxqueue)
+		if (Global::service->CountQueue(source.nc) >= maxqueue)
 		{
 			source.Reply(_("You can not queue any more messages."));
 			return;
 		}
 
-		global->Queue(source.nc, message);
+		Global::service->Queue(source.nc, message);
 		source.Reply(_("Your message has been queued."));
 		Log(LOG_ADMIN, source, this) << "to queue: " << message;
 	}
 
 	void DoClear(CommandSource &source)
 	{
-		if (!global->CountQueue(source.nc))
+		if (!Global::service->CountQueue(source.nc))
 		{
 			source.Reply(_("You do not have any queued messages."));
 			return;
 		}
 
-		global->ClearQueue(source.nc);
+		Global::service->ClearQueue(source.nc);
 		source.Reply(_("Your message queue has been cleared."));
 		Log(LOG_ADMIN, source, this) << "to clear their queue.";
 	}
@@ -97,18 +94,18 @@ private:
 			return;
 		}
 
-		if (!global->CountQueue(source.nc))
+		if (!Global::service->CountQueue(source.nc))
 		{
 			source.Reply(QUEUE_EMPTY);
 			return;
 		}
 
-		QueueDelCallback(source, global, what).Process();
+		QueueDelCallback(source, what).Process();
 	}
 
 	void DoList(CommandSource &source)
 	{
-		const auto *q = global->GetQueue(source.nc);
+		const auto *q = Global::service->GetQueue(source.nc);
 		if (!q || q->empty())
 		{
 			source.Reply(QUEUE_EMPTY);
@@ -132,7 +129,6 @@ private:
 public:
 	CommandGLQueue(Module *creator)
 		: Command(creator, "global/queue", 1, 2)
-		, global("GlobalService", "Global")
 	{
 		this->SetDesc(_("Manages your pending message queue."));
 		this->SetSyntax(_("ADD \037message\037"));
@@ -143,7 +139,7 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (!global)
+		if (!Global::service)
 		{
 			source.Reply(SERVICE_UNAVAILABLE, source.service->nick.c_str());
 			return;

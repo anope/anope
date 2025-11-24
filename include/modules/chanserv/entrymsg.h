@@ -14,30 +14,44 @@
 
 #pragma once
 
-struct EntryMsg
+#define CHANSERV_ENTRY_MESSAGE_EXT "entrymsg"
+#define CHANSERV_ENTRY_MESSAGE_TYPE "EntryMsg"
+
+namespace ChanServ
 {
+	class EntryMessage;
+	class EntryMessageList;
+}
+
+class ChanServ::EntryMessage
+{
+protected:
+	EntryMessage() = default;
+
+public:
 	Anope::string chan;
 	Anope::string creator;
 	Anope::string message;
-	time_t when;
+	time_t when = 0;
 
-	virtual ~EntryMsg() = default;
-protected:
-	EntryMsg() = default;
+	virtual ~EntryMessage() = default;
 };
 
-struct EntryMessageList
-	: Serialize::Checker<std::vector<EntryMsg *> >
+class ChanServ::EntryMessageList
+	: public Serialize::Checker<std::vector<ChanServ::EntryMessage *>>
 {
 protected:
-	EntryMessageList() : Serialize::Checker<std::vector<EntryMsg *> >("EntryMsg") { }
+	EntryMessageList()
+		: Serialize::Checker<std::vector<ChanServ::EntryMessage *>>(CHANSERV_ENTRY_MESSAGE_TYPE)
+	{
+	}
 
 public:
 	virtual ~EntryMessageList()
 	{
-		for (unsigned i = (*this)->size(); i > 0; --i)
-			delete (*this)->at(i - 1);
+		while (!(*this)->empty())
+			delete (*this)->back();
 	}
 
-	virtual EntryMsg *Create() = 0;
+	virtual ChanServ::EntryMessage *Create() = 0;
 };

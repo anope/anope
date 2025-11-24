@@ -123,7 +123,7 @@ struct AutoKickType final
 	: public Serialize::Type
 {
 	AutoKickType()
-		: Serialize::Type(AUTOKICK_TYPE)
+		: Serialize::Type(CHANSERV_AUTO_KICK_TYPE)
 	{
 	}
 

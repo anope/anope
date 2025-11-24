@@ -13,8 +13,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
-
-static ServiceReference<NickServService> NickServService("NickServService", "NickServ");
+#include "modules/nickserv/service.h"
 
 class CommandNSLogout final
 	: public Command
@@ -41,8 +40,8 @@ public:
 			source.Reply(_("You can't logout %s, they are a Services Operator."), nick.c_str());
 		else
 		{
-			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServService)
-				NickServService->Validate(u2);
+			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && NickServ::service)
+				NickServ::service->Validate(u2);
 
 			u2->super_admin = false; /* Don't let people logout and remain a SuperAdmin */
 			Log(LOG_COMMAND, source, this) << "to logout " << u2->nick;

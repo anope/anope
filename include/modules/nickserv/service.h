@@ -14,11 +14,22 @@
 
 #pragma once
 
-class NickServService
-	: public Service
+
+#define NICKSERV_SERVICE "NickServ::Service"
+
+namespace NickServ
+{
+	class Service;
+
+	ServiceReference<Service> service(NICKSERV_SERVICE, NICKSERV_SERVICE);
+}
+
+class NickServ::Service
+	: public ::Service
 {
 public:
-	NickServService(Module *m) : Service(m, "NickServService", "NickServ")
+	Service(Module *m)
+		: ::Service(m, NICKSERV_SERVICE, NICKSERV_SERVICE)
 	{
 	}
 

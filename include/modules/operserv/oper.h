@@ -14,9 +14,20 @@
 
 #pragma once
 
-struct MyOper final
-	: Oper
+#define OPERSERV_OPER_TYPE "Oper"
+
+namespace OperServ
+{
+	struct Oper;
+}
+
+struct OperServ::Oper final
+	: ::Oper
 	, Serializable
 {
-	MyOper(const Anope::string &n, OperType *o) : Oper(n, o), Serializable("Oper") { }
+	Oper(const Anope::string &n, OperType *o)
+		: ::Oper(n, o)
+		, Serializable(OPERSERV_OPER_TYPE)
+	{
+	}
 };

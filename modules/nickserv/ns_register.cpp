@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/nickserv/service.h"
 
 namespace
 {
@@ -29,8 +30,6 @@ namespace
 }
 
 static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
-
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 class CommandNSRegister final
 	: public Command
@@ -76,7 +75,7 @@ public:
 			return;
 		}
 
-		if (nickserv && nickserv->IsGuestNick(u_nick))
+		if (NickServ::service && NickServ::service->IsGuestNick(u_nick))
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, u_nick.c_str());
 			return;

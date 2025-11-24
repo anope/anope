@@ -48,8 +48,3 @@
 #include "uplink.h"
 #include "users.h"
 #include "xline.h"
-
-#include "modules/chanserv/service.h"
-#include "modules/global/service.h"
-#include "modules/memoserv/service.h"
-#include "modules/nickserv/service.h"

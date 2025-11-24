@@ -13,9 +13,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/nickserv/service.h"
 #include "modules/suspend.h"
-
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
 
 struct NSSuspendInfo final
 	: SuspendInfo
@@ -144,8 +143,8 @@ public:
 					IRCD->SendLogout(u2);
 					u2->RemoveMode(source.service, "REGISTERED");
 					u2->Logout();
-					if (nickserv)
-						nickserv->Collide(u2, na2);
+					if (NickServ::service)
+						NickServ::service->Collide(u2, na2);
 				}
 			}
 		}

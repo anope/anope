@@ -32,26 +32,22 @@ enum
 class MessageNetworkRPCEvent final
 	: public RPC::Event
 {
-private:
-	ServiceReference<GlobalService> &global;
-
 public:
-	MessageNetworkRPCEvent(Module *o, ServiceReference<GlobalService> &g)
+	MessageNetworkRPCEvent(Module *o)
 		: RPC::Event(o, "anope.messageNetwork", 1)
-		, global(g)
 	{
 	}
 
 	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
-		if (!global)
+		if (!Global::service)
 		{
 			request.Error(ERR_NO_GLOBAL_SERVICE, "No global service");
 			return true;
 		}
 
 		for (const auto &message : request.data)
-			global->SendSingle(message);
+			Global::service->SendSingle(message);
 		return true;
 	}
 };
@@ -59,19 +55,15 @@ public:
 class MessageServerRPCEvent final
 	: public RPC::Event
 {
-private:
-	ServiceReference<GlobalService> &global;
-
 public:
-	MessageServerRPCEvent(Module *o, ServiceReference<GlobalService> &g)
+	MessageServerRPCEvent(Module *o)
 		: RPC::Event(o, "anope.messageServer", 2)
-		, global(g)
 	{
 	}
 
 	bool Run(RPC::ServiceInterface *iface, HTTP::Client *client, RPC::Request &request) override
 	{
-		if (!global)
+		if (!Global::service)
 		{
 			request.Error(ERR_NO_GLOBAL_SERVICE, "No global service");
 			return true;
@@ -86,7 +78,7 @@ public:
 
 		std::vector<Anope::string> messages(request.data.begin() + 1, request.data.end());
 		for (const auto &message : messages)
-			global->SendSingle(message, nullptr, nullptr, s);
+			Global::service->SendSingle(message, nullptr, nullptr, s);
 		return true;
 	}
 };
@@ -125,7 +117,6 @@ class ModuleRPCSystem final
 	: public Module
 {
 private:
-	ServiceReference<GlobalService> global;
 	ServiceReference<RPC::ServiceInterface> rpc;
 	MessageNetworkRPCEvent messagenetworkrpcevent;
 	MessageServerRPCEvent messageserverrpcevent;
@@ -134,9 +125,8 @@ private:
 public:
 	ModuleRPCSystem(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
-		, global("GlobalService", "Global")
-		, messagenetworkrpcevent(this, global)
-		, messageserverrpcevent(this, global)
+		, messagenetworkrpcevent(this)
+		, messageserverrpcevent(this)
 		, messageuserrpcevent(this)
 	{
 	}

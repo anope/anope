@@ -14,11 +14,21 @@
 
 #pragma once
 
-class ChanServService
-	: public Service
+#define CHANSERV_SERVICE "ChanServ::Service"
+
+namespace ChanServ
+{
+	class Service;
+
+	ServiceReference<Service> service(CHANSERV_SERVICE, CHANSERV_SERVICE);
+}
+
+class ChanServ::Service
+	: public ::Service
 {
 public:
-	ChanServService(Module *m) : Service(m, "ChanServService", "ChanServ")
+	Service(Module *m)
+		: ::Service(m, CHANSERV_SERVICE, CHANSERV_SERVICE)
 	{
 	}
 

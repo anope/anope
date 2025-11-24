@@ -20,8 +20,6 @@ class External final
 	: public SASL::Mechanism
 {
 private:
-	ServiceReference<CertService> certs;
-
 	struct Session final
 		: SASL::Session
 	{
@@ -36,7 +34,6 @@ private:
 public:
 	External(Module *o)
 		: SASL::Mechanism(o, "EXTERNAL")
-		, certs("CertService", "certs")
 	{
 	}
 
@@ -59,18 +56,18 @@ public:
 		}
 		else if (m.type == "C")
 		{
-			if (!certs || mysess->certs.empty())
+			if (!NickServ::cert_service || mysess->certs.empty())
 				return false;
 
 			for (auto it = mysess->certs.begin(); it != mysess->certs.end(); ++it)
 			{
-				auto *nc = certs->FindAccountFromCert(*it);
+				auto *nc = NickServ::cert_service->FindAccountFromCert(*it);
 				if (nc && !nc->HasExt("NS_SUSPENDED") && !nc->HasExt("UNCONFIRMED"))
 				{
 					// If we are using a fallback cert then upgrade it.
 					if (it != mysess->certs.begin())
 					{
-						auto *cl = nc->GetExt<NSCertList>("certificates");
+						auto *cl = nc->GetExt<NickServ::CertList>(NICKSERV_CERT_EXT);
 						if (cl)
 							cl->ReplaceCert(*it, mysess->certs[0]);
 					}

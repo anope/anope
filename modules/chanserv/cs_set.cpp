@@ -536,7 +536,7 @@ public:
 				if (cm)
 				{
 					/* Add it to the channels mlock */
-					ModeLocks *ml = ci->Require<ModeLocks>("modelocks");
+					auto *ml = ci->Require<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 					if (ml)
 						ml->SetMLock(cm, true, "", source.GetNick());
 
@@ -580,7 +580,7 @@ public:
 				if (cm)
 				{
 					/* Remove from mlock */
-					ModeLocks *ml = ci->GetExt<ModeLocks>("modelocks");
+					auto *ml = ci->GetExt<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 					if (ml)
 						ml->RemoveMLock(cm, true);
 

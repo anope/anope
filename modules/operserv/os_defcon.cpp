@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/global/service.h"
 #include "modules/operserv/session.h"
 
 enum DefconLevel
@@ -104,8 +105,6 @@ static DefconConfig DConfig;
 static void runDefCon();
 static Anope::string defconReverseModes(const Anope::string &modes);
 
-static ServiceReference<GlobalService> GlobalService("GlobalService", "Global");
-
 static Timer *timeout;
 
 class DefConTimeout final
@@ -134,15 +133,15 @@ public:
 			FOREACH_MOD(OnDefconLevel, (level));
 			Log(Config->GetClient("OperServ"), "operserv/defcon") << "Defcon level timeout, returning to level " << level;
 
-			if (DConfig.globalondefcon)
+			if (DConfig.globalondefcon && Global::service)
 			{
 				if (!DConfig.offmessage.empty())
-					GlobalService->SendSingle(DConfig.offmessage);
+					Global::service->SendSingle(DConfig.offmessage);
 				else
-					GlobalService->SendSingle(Anope::Format(Language::Translate(_("The Defcon level is now at: \002%d\002")), DConfig.defaultlevel));
+					Global::service->SendSingle(Anope::Format(Language::Translate(_("The Defcon level is now at: \002%d\002")), DConfig.defaultlevel));
 
 				if (!DConfig.message.empty())
-					GlobalService->SendSingle(DConfig.message);
+					Global::service->SendSingle(DConfig.message);
 			}
 
 			runDefCon();
@@ -217,15 +216,15 @@ public:
 
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
-		if (DConfig.globalondefcon)
+		if (DConfig.globalondefcon && Global::service)
 		{
 			if (DConfig.defaultlevel == 5 && !DConfig.offmessage.empty())
-				GlobalService->SendSingle(DConfig.offmessage);
+				Global::service->SendSingle(DConfig.offmessage);
 			else if (DConfig.defaultlevel != 5)
 			{
-				GlobalService->SendSingle(Anope::Format(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
+				Global::service->SendSingle(Anope::Format(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
 				if (!DConfig.message.empty())
-					GlobalService->SendSingle(DConfig.message);
+					Global::service->SendSingle(DConfig.message);
 			}
 		}
 
@@ -249,7 +248,6 @@ public:
 class OSDefcon final
 	: public Module
 {
-	ServiceReference<SessionService> session_service;
 	ServiceReference<XLineManager> akills;
 	CommandOSDefcon commandosdefcon;
 
@@ -330,7 +328,10 @@ class OSDefcon final
 	}
 
 public:
-	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR), session_service("SessionService", "session"), akills("XLineManager", "xlinemanager/sgline"), commandosdefcon(this)
+	OSDefcon(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, akills("XLineManager", "xlinemanager/sgline")
+		, commandosdefcon(this)
 	{
 
 	}
@@ -505,11 +506,11 @@ public:
 			return;
 		}
 
-		if (DConfig.sessionlimit <= 0 || !session_service)
+		if (DConfig.sessionlimit <= 0 || !OperServ::session_service)
 			return;
 
-		Session *session = session_service->FindSession(u->ip.addr());
-		Exception *exception = session_service->FindException(u);
+		auto *session = OperServ::session_service->FindSession(u->ip.addr());
+		auto *exception = OperServ::session_service->FindException(u);
 
 		if (DConfig.Check(DEFCON_REDUCE_SESSION) && !exception)
 		{

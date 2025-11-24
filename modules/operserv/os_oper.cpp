@@ -19,13 +19,13 @@ struct OSOperType
 	: Serialize::Type
 {
 	OSOperType()
-		: Serialize::Type("Oper")
+		: Serialize::Type(OPERSERV_OPER_TYPE)
 	{
 	}
 
 	void Serialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		const auto *myo = static_cast<const MyOper *>(obj);
+		const auto *myo = static_cast<const OperServ::Oper *>(obj);
 		data.Store("name", myo->name);
 		data.Store("type", myo->ot->GetName());
 	}
@@ -44,11 +44,11 @@ struct OSOperType
 		if (nc == NULL)
 			return NULL;
 
-		MyOper *myo;
+		OperServ::Oper *myo;
 		if (obj)
-			myo = anope_dynamic_static_cast<MyOper *>(obj);
+			myo = anope_dynamic_static_cast<OperServ::Oper *>(obj);
 		else
-			myo = new MyOper(nc->display, ot);
+			myo = new OperServ::Oper(nc->display, ot);
 		nc->o = myo;
 		Log(LOG_NORMAL, "operserv/oper") << "Tied oper " << nc->display << " to type " << ot->GetName();
 		return myo;
@@ -121,7 +121,7 @@ public:
 					return;
 				}
 
-				na->nc->o = new MyOper(na->nc->display, ot);
+				na->nc->o = new OperServ::Oper(na->nc->display, ot);
 
 				if (Anope::ReadOnly)
 					source.Reply(READ_ONLY_MODE);
@@ -280,7 +280,7 @@ public:
 	{
 		for (const auto &[_, nc] : *NickCoreList)
 		{
-			if (nc->o && dynamic_cast<MyOper *>(nc->o))
+			if (nc->o && dynamic_cast<OperServ::Oper *>(nc->o))
 			{
 				delete nc->o;
 				nc->o = NULL;
@@ -290,7 +290,7 @@ public:
 
 	void OnDelCore(NickCore *nc) override
 	{
-		if (nc->o && dynamic_cast<MyOper *>(nc->o))
+		if (nc->o && dynamic_cast<OperServ::Oper *>(nc->o))
 		{
 			delete nc->o;
 			nc->o = NULL;

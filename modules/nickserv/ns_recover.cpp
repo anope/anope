@@ -14,8 +14,7 @@
 
 #include "module.h"
 #include "modules/nickserv/cert.h"
-
-static ServiceReference<NickServService> nickserv("NickServService", "NickServ");
+#include "modules/nickserv/service.h"
 
 typedef std::map<Anope::string, ChannelStatus> NSRecoverInfo;
 
@@ -53,7 +52,7 @@ public:
 		/* Nick is being held by us, release it */
 		if (na->HasExt("HELD"))
 		{
-			nickserv->Release(na);
+			NickServ::service->Release(na);
 			source.Reply(_("Services' hold on \002%s\002 has been released."), na->nick.c_str());
 		}
 		else if (!u)
@@ -114,14 +113,14 @@ public:
 				svs->to = u->nick;
 			}
 
-			if (nickserv)
-				nickserv->Collide(u, na);
+			if (NickServ::service)
+				NickServ::service->Collide(u, na);
 
 			if (IRCD->CanSVSNick)
 			{
 				/* If we can svsnick then release our hold and svsnick the user using the command */
-				if (nickserv)
-					nickserv->Release(na);
+				if (NickServ::service)
+					NickServ::service->Release(na);
 
 				source.Reply(_("You have regained control of \002%s\002."), u->nick.c_str());
 			}
@@ -189,7 +188,7 @@ public:
 		if (source.GetAccount() == na->nc)
 			ok = true;
 
-		NSCertList *cl = na->nc->GetExt<NSCertList>("certificates");
+		auto *cl = na->nc->GetExt<NickServ::CertList>(NICKSERV_CERT_EXT);
 		if (source.GetUser() && !source.GetUser()->fingerprint.empty() && cl && cl->FindCert(source.GetUser()->fingerprint))
 			ok = true;
 

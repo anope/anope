@@ -14,8 +14,23 @@
 
 #pragma once
 
-struct ModeLock
+#define CHANSERV_MODE_LOCK_EXT "modelocks"
+#define CHANSERV_MODE_LOCK_TYPE "ModeLock"
+
+namespace ChanServ
 {
+	class ModeLock;
+	class ModeLocks;
+
+	using ModeLockList = std::vector<ModeLock *>;
+}
+
+class ChanServ::ModeLock
+{
+protected:
+	ModeLock() = default;
+
+public:
 	Anope::string ci;
 	bool set;
 	Anope::string name;
@@ -24,14 +39,14 @@ struct ModeLock
 	time_t created;
 
 	virtual ~ModeLock() = default;
-protected:
-	ModeLock() = default;
 };
 
-struct ModeLocks
+class ChanServ::ModeLocks
 {
-	typedef std::vector<ModeLock *> ModeList;
+protected:
+	ModeLocks() = default;
 
+public:
 	virtual ~ModeLocks() = default;
 
 	/** Check if a mode is mlocked
@@ -69,7 +84,7 @@ struct ModeLocks
 	/** Get all of the mlocks for this channel
 	 * @return The mlocks
 	 */
-	virtual const ModeList &GetMLock() const = 0;
+	virtual const ChanServ::ModeLockList &GetMLock() const = 0;
 
 	/** Get a list of mode locks on a channel
 	 * @param name The mode name to get a list of

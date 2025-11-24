@@ -14,8 +14,21 @@
 
 #pragma once
 
-struct LogSetting
+#define CHANSERV_LOG_SETTING_EXT "logsettings"
+#define CHANSERV_LOG_SETTING_TYPE "LogSetting"
+
+namespace ChanServ
 {
+	class LogSetting;
+	class LogSettings;
+}
+
+class ChanServ::LogSetting
+{
+protected:
+	LogSetting() = default;
+
+public:
 	Anope::string chan;
 	/* Our service name of the command */
 	Anope::string service_name;
@@ -28,21 +41,18 @@ struct LogSetting
 	time_t created;
 
 	virtual ~LogSetting() = default;
-protected:
-	LogSetting() = default;
 };
 
-struct LogSettings
-	: Serialize::Checker<std::vector<LogSetting *> >
+class ChanServ::LogSettings
+	: public Serialize::Checker<std::vector<ChanServ::LogSetting *>>
 {
-	typedef std::vector<LogSetting *>::iterator iterator;
-
 protected:
-	LogSettings() : Serialize::Checker<std::vector<LogSetting *> >("LogSetting")
+	LogSettings()
+		: Serialize::Checker<std::vector<ChanServ::LogSetting *>>(CHANSERV_LOG_SETTING_TYPE)
 	{
 	}
 
 public:
 	virtual ~LogSettings() = default;
-	virtual LogSetting *Create() = 0;
+	virtual ChanServ::LogSetting *Create() = 0;
 };

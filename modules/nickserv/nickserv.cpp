@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/nickserv/service.h"
 
 #define MORE_OBSCURE_PASSWORD _("Please try again with a more obscure password. " \
 	"Passwords should not be something that could be easily guessed (e.g. your " \
@@ -31,15 +32,13 @@ static std::set<NickServCollide *> collides;
 class NickServCollide final
 	: public Timer
 {
-	NickServService *service;
 	Reference<User> u;
 	time_t ts;
 	Reference<NickAlias> na;
 
 public:
-	NickServCollide(Module *me, NickServService *nss, User *user, NickAlias *nick, time_t delay)
+	NickServCollide(Module *me, User *user, NickAlias *nick, time_t delay)
 		: Timer(me, delay)
-		, service(nss)
 		, u(user)
 		, ts(user->timestamp)
 		, na(nick)
@@ -64,13 +63,14 @@ public:
 
 	void Tick() override
 	{
-		if (!u || !na)
+		if (!u || !na || !NickServ::service)
 			return;
+
 		/* If they identified or don't exist anymore, don't kill them. */
 		if (u->Account() == na->nc || u->timestamp > ts)
 			return;
 
-		service->Collide(u, na);
+		NickServ::service->Collide(u, na);
 	}
 };
 
@@ -140,7 +140,7 @@ public:
 
 class NickServCore final
 	: public Module
-	, public NickServService
+	, public NickServ::Service
 {
 	Reference<BotInfo> NickServ;
 	std::vector<Anope::string> defaults;
@@ -162,8 +162,11 @@ class NickServCore final
 	}
 
 public:
-	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		NickServService(this), held(this, "HELD"), collided(this, "COLLIDED")
+	NickServCore(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, NickServ::Service(this)
+		, held(this, "HELD")
+		, collided(this, "COLLIDED")
 	{
 	}
 
@@ -242,7 +245,7 @@ public:
 			{
 				u->SendMessage(NickServ, _("Your nickname will be changed in %s if you do not identify."),
 					Anope::Duration(protect, u->Account()).c_str());
-				new NickServCollide(this, this, u, na, protect);
+				new NickServCollide(this, u, na, protect);
 			}
 			else
 			{

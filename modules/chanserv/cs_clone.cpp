@@ -82,8 +82,8 @@ class CommandCSClone final
 
 	static void CopyBadwords(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
-		BadWords *target_badwords = target_ci->Require<BadWords>("badwords"),
-			*badwords = ci->Require<BadWords>("badwords");
+		auto *target_badwords = target_ci->Require<BotServ::BadWords>(BOTSERV_BAD_WORDS_EXT);
+		auto *badwords = ci->Require<BotServ::BadWords>(BOTSERV_BAD_WORDS_EXT);
 
 		if (!target_badwords || !badwords)
 		{
@@ -95,7 +95,7 @@ class CommandCSClone final
 
 		for (unsigned i = 0; i < badwords->GetBadWordCount(); ++i)
 		{
-			const BadWord *bw = badwords->GetBadWord(i);
+			const auto *bw = badwords->GetBadWord(i);
 			target_badwords->AddBadWord(bw->word, bw->type);
 		}
 

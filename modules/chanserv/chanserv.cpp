@@ -14,6 +14,7 @@
 
 #include "module.h"
 #include "modules/chanserv/mode.h"
+#include "modules/chanserv/service.h"
 
 inline static Anope::string BotModes()
 {
@@ -24,7 +25,7 @@ inline static Anope::string BotModes()
 
 class ChanServCore final
 	: public Module
-	, public ChanServService
+	, public ChanServ::Service
 {
 	Reference<BotInfo> ChanServ;
 	std::vector<Anope::string> defaults;
@@ -33,8 +34,11 @@ class ChanServCore final
 	bool always_lower = false;
 
 public:
-	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		ChanServService(this), inhabit(this, "inhabit"), persist("PERSIST")
+	ChanServCore(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, ChanServ::Service(this)
+		, inhabit(this, "inhabit")
+		, persist("PERSIST")
 	{
 	}
 

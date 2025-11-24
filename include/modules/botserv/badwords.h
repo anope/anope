@@ -14,33 +14,43 @@
 
 #pragma once
 
-/** Flags for badwords
- */
-enum BadWordType
+#define BOTSERV_BAD_WORDS_EXT "badwords"
+#define BOTSERV_BAD_WORDS_TYPE "BadWord"
+
+namespace BotServ
 {
-	/* Always kicks if the word is said */
-	BW_ANY,
-	/* User must way the entire word */
-	BW_SINGLE,
-	/* The word has to start with the badword */
-	BW_START,
-	/* The word has to end with the badword */
-	BW_END
-};
+	class BadWord;
+	struct BadWords;
+
+	/** Flags for badwords. */
+	enum BadWordType
+	{
+		/* Always kicks if the word is said */
+		BW_ANY,
+		/* User must way the entire word */
+		BW_SINGLE,
+		/* The word has to start with the badword */
+		BW_START,
+		/* The word has to end with the badword */
+		BW_END
+	};
+}
 
 /* Structure used to contain bad words. */
-struct BadWord
+class BotServ::BadWord
 {
-	Anope::string chan;
-	Anope::string word;
-	BadWordType type;
-
-	virtual ~BadWord() = default;
 protected:
 	BadWord() = default;
+
+public:
+	Anope::string chan;
+	Anope::string word;
+	BotServ::BadWordType type;
+
+	virtual ~BadWord() = default;
 };
 
-struct BadWords
+struct BotServ::BadWords
 {
 	virtual ~BadWords() = default;
 
@@ -49,13 +59,13 @@ struct BadWords
 	 * @param type The type (SINGLE START END)
 	 * @return The badword
 	 */
-	virtual BadWord *AddBadWord(const Anope::string &word, BadWordType type) = 0;
+	virtual BotServ::BadWord *AddBadWord(const Anope::string &word, BotServ::BadWordType type) = 0;
 
 	/** Get a badword structure by index
 	 * @param index The index
 	 * @return The badword
 	 */
-	virtual BadWord *GetBadWord(unsigned index) const = 0;
+	virtual BotServ::BadWord *GetBadWord(unsigned index) const = 0;
 
 	/** Get how many badwords are on this channel
 	 * @return The number of badwords in the vector

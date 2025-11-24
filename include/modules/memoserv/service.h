@@ -14,10 +14,13 @@
 
 #pragma once
 
-class MemoServService
-	: public Service
+#define MEMOSERV_SERVICE "MemoServ::Service"
+
+namespace MemoServ
 {
-public:
+	class Service;
+
+	/** Possible results when sending a memo. */
 	enum MemoResult
 	{
 		MEMO_SUCCESS,
@@ -26,7 +29,15 @@ public:
 		MEMO_TARGET_FULL
 	};
 
-	MemoServService(Module *m) : Service(m, "MemoServService", "MemoServ")
+	ServiceReference<Service> service(MEMOSERV_SERVICE, MEMOSERV_SERVICE);
+}
+
+class MemoServ::Service
+	: public ::Service
+{
+public:
+	Service(Module *m)
+		: ::Service(m, MEMOSERV_SERVICE, MEMOSERV_SERVICE)
 	{
 	}
 
@@ -36,7 +47,7 @@ public:
 	 * @param message Memo text
 	 * @param force true to force the memo, restrictions/delays etc are not checked
 	 */
-	virtual MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force = false) = 0;
+	virtual MemoServ::MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force = false) = 0;
 
 	/** Check for new memos and notify the user if there are any
 	 * @param u The user

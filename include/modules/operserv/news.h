@@ -14,37 +14,52 @@
 
 #pragma once
 
-enum NewsType
-{
-	NEWS_LOGON,
-	NEWS_RANDOM,
-	NEWS_OPER
-};
+#define OPERSERV_NEWS_ITEM_TYPE "NewsItem"
+#define OPERSERV_NEWS_SERVICE "OperServ::NewsService"
 
-struct NewsItem
+namespace OperServ
+{
+	struct NewsItem;
+	class NewsService;
+
+	enum NewsType
+	{
+		NEWS_LOGON,
+		NEWS_RANDOM,
+		NEWS_OPER,
+	};
+
+	ServiceReference<NewsService> news_service(OPERSERV_NEWS_SERVICE, OPERSERV_NEWS_SERVICE);
+}
+
+struct OperServ::NewsItem
 	: Serializable
 {
-	NewsType type;
+	OperServ::NewsType type;
 	Anope::string text;
 	Anope::string who;
 	time_t time;
 
-	NewsItem() : Serializable("NewsItem") { }
+	NewsItem()
+		: Serializable(OPERSERV_NEWS_ITEM_TYPE)
+	{
+	}
 };
 
-class NewsService
+class OperServ::NewsService
 	: public Service
 {
 public:
-	NewsService(Module *m) : Service(m, "NewsService", "news") { }
+	NewsService(Module *m)
+		: Service(m, OPERSERV_NEWS_SERVICE, OPERSERV_NEWS_SERVICE)
+	{
+	}
 
-	virtual NewsItem *CreateNewsItem() = 0;
+	virtual OperServ::NewsItem *CreateNewsItem() = 0;
 
-	virtual void AddNewsItem(NewsItem *n) = 0;
+	virtual void AddNewsItem(OperServ::NewsItem *n) = 0;
 
-	virtual void DelNewsItem(NewsItem *n) = 0;
+	virtual void DelNewsItem(OperServ::NewsItem *n) = 0;
 
-	virtual std::vector<NewsItem *> &GetNewsList(NewsType t) = 0;
+	virtual std::vector<OperServ::NewsItem *> &GetNewsList(OperServ::NewsType t) = 0;
 };
-
-static ServiceReference<NewsService> news_service("NewsService", "news");

@@ -14,12 +14,24 @@
 
 #pragma once
 
-struct NSCertList
+#define NICKSERV_CERT_EXT "certificates"
+#define NICKSERV_CERT_SERVICE "NickServ::CertService"
+
+namespace NickServ
+{
+	class CertList;
+	class CertService;
+
+	ServiceReference<CertService> cert_service(NICKSERV_CERT_SERVICE, NICKSERV_CERT_SERVICE);
+}
+
+class NickServ::CertList
 {
 protected:
-	NSCertList() = default;
+	CertList() = default;
+
 public:
-	virtual ~NSCertList() = default;
+	virtual ~CertList() = default;
 
 	/** Add an entry to the nick's certificate list
 	 *
@@ -75,11 +87,14 @@ public:
 	virtual void Check() = 0;
 };
 
-class CertService
-	: public Service
+class NickServ::CertService
+	: public ::Service
 {
 public:
-	CertService(Module *c) : Service(c, "CertService", "certs") { }
+	CertService(Module *m)
+		: ::Service(m, NICKSERV_CERT_SERVICE, NICKSERV_CERT_SERVICE)
+	{
+	}
 
 	virtual NickCore *FindAccountFromCert(const Anope::string &cert) = 0;
 	virtual void ReplaceCert(const Anope::string &oldcert, const Anope::string &newcert) = 0;

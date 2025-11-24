@@ -14,15 +14,15 @@
 
 #pragma once
 
-#define AUTOKICK_TYPE    "AutoKick"
-#define AUTOKICK_SERVICE "ChanServ::AutoKickService"
+#define CHANSERV_AUTO_KICK_TYPE "AutoKick"
+#define CHANSERV_AUTO_KICK_SERVICE "ChanServ::AutoKickService"
 
 namespace ChanServ
 {
 	class AutoKick;
 	class AutoKickService;
 
-	ServiceReference<AutoKickService> akick_service(AUTOKICK_SERVICE, AUTOKICK_TYPE);
+	ServiceReference<AutoKickService> akick_service(CHANSERV_AUTO_KICK_SERVICE, CHANSERV_AUTO_KICK_SERVICE);
 }
 
 class ChanServ::AutoKickService
@@ -30,7 +30,7 @@ class ChanServ::AutoKickService
 {
 public:
 	AutoKickService(Module *m)
-		: Service(m, AUTOKICK_SERVICE, AUTOKICK_TYPE)
+		: Service(m, CHANSERV_AUTO_KICK_SERVICE, CHANSERV_AUTO_KICK_SERVICE)
 	{
 	}
 
@@ -90,7 +90,7 @@ public:
 	time_t last_used;
 
 	AutoKick()
-		: Serializable(AUTOKICK_TYPE)
+		: Serializable(CHANSERV_AUTO_KICK_TYPE)
 	{
 	}
 

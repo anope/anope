@@ -13,13 +13,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
-
-static ServiceReference<MemoServService> MemoServService("MemoServService", "MemoServ");
+#include "modules/memoserv/service.h"
 
 static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Anope::string &targ)
 {
 	/* Only send receipt if memos are allowed */
-	if (MemoServService && !Anope::ReadOnly)
+	if (MemoServ::service && !Anope::ReadOnly)
 	{
 		/* Get nick alias for sender */
 		const NickAlias *na = NickAlias::Find(m->sender);
@@ -38,7 +37,7 @@ static void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Ano
 		Anope::string text = Anope::Format(Language::Translate(na->nc, _("\002[auto-memo]\002 The memo you sent to %s has been viewed.")), targ.c_str());
 
 		/* Send notification */
-		MemoServService->Send(source.GetNick(), m->sender, text, true);
+		MemoServ::service->Send(source.GetNick(), m->sender, text, true);
 
 		/* Notify recipient of the memo that a notification has
 		   been sent to the sender */

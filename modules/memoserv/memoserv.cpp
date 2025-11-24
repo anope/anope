@@ -13,10 +13,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/memoserv/service.h"
 
 class MemoServCore final
 	: public Module
-	, public MemoServService
+	, public MemoServ::Service
 {
 	Reference<BotInfo> MemoServ;
 
@@ -37,18 +38,19 @@ class MemoServCore final
 	}
 
 public:
-	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR),
-		MemoServService(this)
+	MemoServCore(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, MemoServ::Service(this)
 	{
 	}
 
-	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) override
+	MemoServ::MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) override
 	{
 		bool ischan;
 		MemoInfo *mi = MemoInfo::GetMemoInfo(target, ischan);
 
 		if (mi == NULL)
-			return MEMO_INVALID_TARGET;
+			return MemoServ::MEMO_INVALID_TARGET;
 
 		Anope::string sender_display = source;
 
@@ -59,13 +61,13 @@ public:
 			{
 				time_t send_delay = Config->GetModule("memoserv").Get<time_t>("senddelay");
 				if (send_delay > 0 && sender->lastmemosend + send_delay > Anope::CurTime)
-					return MEMO_TOO_FAST;
+					return MemoServ::MEMO_TOO_FAST;
 				else if (!mi->memomax)
-					return MEMO_TARGET_FULL;
+					return MemoServ::MEMO_TARGET_FULL;
 				else if (mi->memomax > 0 && mi->memos->size() >= static_cast<unsigned>(mi->memomax))
-					return MEMO_TARGET_FULL;
+					return MemoServ::MEMO_TARGET_FULL;
 				else if (mi->HasIgnore(sender))
-					return MEMO_SUCCESS;
+					return MemoServ::MEMO_SUCCESS;
 			}
 
 			NickCore *acc = sender->Account();
@@ -127,7 +129,7 @@ public:
 				SendMemoMail(nc, mi, m);
 		}
 
-		return MEMO_SUCCESS;
+		return MemoServ::MEMO_SUCCESS;
 	}
 
 	void Check(User *u) override

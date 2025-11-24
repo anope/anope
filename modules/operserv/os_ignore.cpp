@@ -16,24 +16,27 @@
 #include "modules/operserv/ignore.h"
 
 struct IgnoreDataImpl final
-	: IgnoreData
+	: OperServ::IgnoreData
 	, Serializable
 {
-	IgnoreDataImpl() : Serializable("IgnoreData") { }
+	IgnoreDataImpl()
+		: Serializable(OPERSERV_IGNORE_DATA_TYPE)
+	{
+	}
 	~IgnoreDataImpl() override;
 };
 
 IgnoreDataImpl::~IgnoreDataImpl()
 {
-	if (ignore_service)
-		ignore_service->DelIgnore(this);
+	if (OperServ::ignore_service)
+		OperServ::ignore_service->DelIgnore(this);
 }
 
 struct IgnoreDataTypeImpl final
 	: public Serialize::Type
 {
 	IgnoreDataTypeImpl()
-		: Serialize::Type("IgnoreData")
+		: Serialize::Type(OPERSERV_IGNORE_DATA_TYPE)
 	{
 	}
 	void Serialize(Serializable *obj, Serialize::Data &data) const override;
@@ -51,7 +54,7 @@ void IgnoreDataTypeImpl::Serialize(Serializable *obj, Serialize::Data &data) con
 
 Serializable *IgnoreDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	if (!ignore_service)
+	if (!OperServ::ignore_service)
 		return NULL;
 
 	IgnoreDataImpl *ign;
@@ -60,7 +63,7 @@ Serializable *IgnoreDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data
 	else
 	{
 		ign = new IgnoreDataImpl();
-		ignore_service->AddIgnore(ign);
+		OperServ::ignore_service->AddIgnore(ign);
 	}
 
 	data["mask"] >> ign->mask;
@@ -73,21 +76,25 @@ Serializable *IgnoreDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data
 
 
 class OSIgnoreService final
-	: public IgnoreService
+	: public OperServ::IgnoreService
 {
-	Serialize::Checker<std::vector<IgnoreData *> > ignores;
+	Serialize::Checker<std::vector<OperServ::IgnoreData *>> ignores;
 
 public:
-	OSIgnoreService(Module *o) : IgnoreService(o), ignores("IgnoreData") { }
+	OSIgnoreService(Module *o)
+		: OperServ::IgnoreService(o)
+		, ignores(OPERSERV_IGNORE_DATA_TYPE)
+	{
+	}
 
-	void AddIgnore(IgnoreData *ign) override
+	void AddIgnore(OperServ::IgnoreData *ign) override
 	{
 		ignores->push_back(ign);
 	}
 
-	void DelIgnore(IgnoreData *ign) override
+	void DelIgnore(OperServ::IgnoreData *ign) override
 	{
-		std::vector<IgnoreData *>::iterator it = std::find(ignores->begin(), ignores->end(), ign);
+		auto it = std::find(ignores->begin(), ignores->end(), ign);
 		if (it != ignores->end())
 			ignores->erase(it);
 	}
@@ -96,20 +103,20 @@ public:
 	{
 		for (unsigned i = ignores->size(); i > 0; --i)
 		{
-			IgnoreData *ign = ignores->at(i - 1);
+			auto *ign = ignores->at(i - 1);
 			delete ign;
 		}
 	}
 
-	IgnoreData *Create() override
+	OperServ::IgnoreData *Create() override
 	{
 		return new IgnoreDataImpl();
 	}
 
-	IgnoreData *Find(const Anope::string &mask) override
+	OperServ::IgnoreData *Find(const Anope::string &mask) override
 	{
 		User *u = User::Find(mask, true);
-		std::vector<IgnoreData *>::iterator ign = this->ignores->begin(), ign_end = this->ignores->end();
+		auto ign = this->ignores->begin(), ign_end = this->ignores->end();
 
 		if (u)
 		{
@@ -150,7 +157,7 @@ public:
 		/* Check whether the entry has timed out */
 		if (ign != ign_end)
 		{
-			IgnoreData *id = *ign;
+			auto *id = *ign;
 
 			if (id->time && !Anope::NoExpire && id->time <= Anope::CurTime)
 			{
@@ -164,7 +171,7 @@ public:
 		return NULL;
 	}
 
-	std::vector<IgnoreData *> &GetIgnores() override
+	std::vector<OperServ::IgnoreData *> &GetIgnores() override
 	{
 		return *ignores;
 	}
@@ -206,7 +213,7 @@ private:
 
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (!ignore_service)
+		if (!OperServ::ignore_service)
 			return;
 
 		const Anope::string &time = params.size() > 1 ? params[1] : "";
@@ -244,7 +251,7 @@ private:
 			ign->reason = reason;
 			ign->time = t ? Anope::CurTime + t : 0;
 
-			ignore_service->AddIgnore(ign);
+			OperServ::ignore_service->AddIgnore(ign);
 			if (!t)
 			{
 				source.Reply(_("\002%s\002 will now permanently be ignored."), mask.c_str());
@@ -260,13 +267,13 @@ private:
 
 	static void DoList(CommandSource &source)
 	{
-		if (!ignore_service)
+		if (!OperServ::ignore_service)
 			return;
 
-		std::vector<IgnoreData *> &ignores = ignore_service->GetIgnores();
+		auto &ignores = OperServ::ignore_service->GetIgnores();
 		for (unsigned i = ignores.size(); i > 0; --i)
 		{
-			IgnoreData *id = ignores[i - 1];
+			auto *id = ignores[i - 1];
 
 			if (id->time && !Anope::NoExpire && id->time <= Anope::CurTime)
 			{
@@ -290,7 +297,7 @@ private:
 
 			for (unsigned i = ignores.size(); i > 0; --i)
 			{
-				const IgnoreData *ignore = ignores[i - 1];
+				const auto *ignore = ignores[i - 1];
 
 				ListFormatter::ListEntry entry;
 				entry["Mask"] = ignore->mask;
@@ -307,7 +314,7 @@ private:
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (!ignore_service)
+		if (!OperServ::ignore_service)
 			return;
 
 		const Anope::string nick = params.size() > 1 ? params[1] : "";
@@ -324,7 +331,7 @@ private:
 			return;
 		}
 
-		IgnoreData *ign = ignore_service->Find(mask);
+		auto *ign = OperServ::ignore_service->Find(mask);
 		if (ign)
 		{
 			if (Anope::ReadOnly)
@@ -340,13 +347,13 @@ private:
 
 	void DoClear(CommandSource &source)
 	{
-		if (!ignore_service)
+		if (!OperServ::ignore_service)
 			return;
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 
-		ignore_service->ClearIgnores();
+		OperServ::ignore_service->ClearIgnores();
 		Log(LOG_ADMIN, source, this) << "to CLEAR the list";
 		source.Reply(_("Ignore list has been cleared."));
 	}

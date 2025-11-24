@@ -509,19 +509,19 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		if (!forbid_service)
+		if (!OperServ::forbid_service)
 		{
 			Log(this) << "Unable to convert forbidden email address " << email << " as os_forbid is not loaded";
 			return true;
 		}
 
-		auto *forbid = forbid_service->CreateForbid();
+		auto *forbid = OperServ::forbid_service->CreateForbid();
 		forbid->created = created;
 		forbid->creator = creator;
 		forbid->mask = email;
 		forbid->reason = reason;
-		forbid->type = FT_EMAIL;
-		forbid_service->AddForbid(forbid);
+		forbid->type = OperServ::FT_EMAIL;
+		OperServ::forbid_service->AddForbid(forbid);
 		return true;
 	}
 
@@ -570,21 +570,21 @@ private:
 			return false;
 		}
 
-		auto *bw = ci->Require<BadWords>("badwords");
+		auto *bw = ci->Require<BotServ::BadWords>(BOTSERV_BAD_WORDS_EXT);
 		if (!bw)
 		{
 			Log(this) << "Unable to import badwords for " << ci->name << " as bs_kick is not loaded";
 			return true;
 		}
 
-		auto *kd = ci->Require<KickerData>("kickerdata");
+		auto *kd = ci->Require<BotServ::KickerData>(BOTSERV_KICKER_DATA_EXT);
 		if (kd)
 		{
 			kd->badwords = true;
-			kd->ttb[TTB_BADWORDS] = 0;
+			kd->ttb[BotServ::TTB_BADWORDS] = 0;
 		}
 
-		bw->AddBadWord(badword, BW_ANY);
+		bw->AddBadWord(badword, BotServ::BW_ANY);
 		return true;
 	}
 
@@ -693,20 +693,20 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		if (!session_service)
+		if (!OperServ::session_service)
 		{
 			Log(this) << "Unable to import session limit for " << ip << " as os_session is not loaded";
 			return true;
 		}
 
-		auto *exception = session_service->CreateException();
+		auto *exception = OperServ::session_service->CreateException();
 		exception->mask = ip;
 		exception->limit = allowed;
 		exception->who = "Unknown";
 		exception->time = Anope::CurTime;
 		exception->expires = expires;
 		exception->reason = reason;
-		session_service->AddException(exception);
+		OperServ::session_service->AddException(exception);
 		return true;
 	}
 
@@ -752,7 +752,7 @@ private:
 			return false;
 		}
 
-		auto *hr = na->Require<HostRequest>("hostrequest");
+		auto *hr = na->Require<HostServ::HostRequest>(HOSTSERV_HOST_REQUEST_EXT);
 		if (!hr)
 		{
 			Log(this) << "Unable to convert host request for " << na->nick << " as hs_request is not loaded";
@@ -803,18 +803,18 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		if (!news_service)
+		if (!OperServ::news_service)
 		{
 			Log(this) << "Unable to convert logon news as os_news is not loaded";
 			return true;
 		}
 
-		auto *ni = news_service->CreateNewsItem();
-		ni->type = NEWS_LOGON;
+		auto *ni = OperServ::news_service->CreateNewsItem();
+		ni->type = OperServ::NEWS_LOGON;
 		ni->text = Anope::Format("[%s] %s", subject.c_str(), body.c_str());
 		ni->who = setter;
 		ni->time = ts;
-		news_service->AddNewsItem(ni);
+		OperServ::news_service->AddNewsItem(ni);
 		return true;
 	}
 
@@ -829,18 +829,18 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		if (!news_service)
+		if (!OperServ::news_service)
 		{
 			Log(this) << "Unable to convert oper news as os_news is not loaded";
 			return true;
 		}
 
-		auto *ni = news_service->CreateNewsItem();
-		ni->type = NEWS_OPER;
+		auto *ni = OperServ::news_service->CreateNewsItem();
+		ni->type = OperServ::NEWS_OPER;
 		ni->text = Anope::Format("[%s] %s", subject.c_str(), body.c_str());
 		ni->who = setter;
 		ni->time = ts;
-		news_service->AddNewsItem(ni);
+		OperServ::news_service->AddNewsItem(ni);
 		return true;
 	}
 
@@ -895,13 +895,13 @@ private:
 		pos = flags.find('f');
 		if (pos != Anope::string::npos)
 		{
-			auto *kd = ci->Require<KickerData>("kickerdata");
+			auto *kd = ci->Require<BotServ::KickerData>(BOTSERV_KICKER_DATA_EXT);
 			if (kd)
 			{
 				kd->flood = true;
 				kd->floodlines = 10;
 				kd->floodsecs = 60;
-				kd->ttb[TTB_FLOOD] = 0;
+				kd->ttb[BotServ::TTB_FLOOD] = 0;
 				flags.erase(pos, 1);
 			}
 			else
@@ -947,7 +947,7 @@ private:
 			return false;
 		}
 
-		auto *cl = nc->Require<NSCertList>("certificates");
+		auto *cl = nc->Require<NickServ::CertList>(NICKSERV_CERT_EXT);
 		if (!cl)
 		{
 			Log(this) << "Unable to convert certificate for " << nc->display << " as ns_cert is not loaded";
@@ -1023,7 +1023,7 @@ private:
 			data->suspend_ts = Anope::Convert<time_t>(value, 0);
 		else if (key == "private:entrymsg")
 		{
-			auto *eml = ci->Require<EntryMessageList>("entrymsg");
+			auto *eml = ci->Require<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
 			if (!eml)
 			{
 				Log(this) << "Unable to convert entry message for " << ci->name << " as cs_mode is not loaded";
@@ -1095,13 +1095,13 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		if (!forbid_service)
+		if (!OperServ::forbid_service)
 		{
 			Log(this) << "Unable to convert forbidden nick " << nick << " metadata as os_forbid is not loaded";
 			return true;
 		}
 
-		auto *forbid = forbid_service->FindForbidExact(nick, FT_NICK);
+		auto *forbid = OperServ::forbid_service->FindForbidExact(nick, OperServ::FT_NICK);
 		if (!forbid)
 		{
 			Log(this) << "Missing forbid for MDN: " << nick;
@@ -1425,18 +1425,18 @@ private:
 		if (!row)
 			return row.LogError(this);
 
-		if (!forbid_service)
+		if (!OperServ::forbid_service)
 		{
 			Log(this) << "Unable to convert forbidden nick " << nick << " as os_forbid is not loaded";
 			return true;
 		}
 
-		auto *forbid = forbid_service->CreateForbid();
+		auto *forbid = OperServ::forbid_service->CreateForbid();
 		forbid->creator = "Unknown";
 		forbid->mask = nick;
 		forbid->reason = "Unknown";
-		forbid->type = FT_NICK;
-		forbid_service->AddForbid(forbid);
+		forbid->type = OperServ::FT_NICK;
+		OperServ::forbid_service->AddForbid(forbid);
 		return true;
 	}
 
@@ -1498,7 +1498,7 @@ private:
 			return true;
 		}
 
-		nc->o = new MyOper(nc->display, ot);
+		nc->o = new OperServ::Oper(nc->display, ot);
 		return true;
 	}
 
@@ -1678,7 +1678,7 @@ public:
 			if (!data)
 				continue;
 
-			auto *ml = ci->Require<ModeLocks>("modelocks");
+			auto *ml = ci->Require<ChanServ::ModeLocks>(CHANSERV_MODE_LOCK_EXT);
 			if (!ml)
 			{
 				Log(this) << "Unable to convert mode locks for " << ci->name << " as cs_mode is not loaded";

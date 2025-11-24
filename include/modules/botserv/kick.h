@@ -14,36 +14,44 @@
 
 #pragma once
 
-/* Indices for TTB (Times To Ban) */
-enum
-{
-	TTB_BOLDS,
-	TTB_COLORS,
-	TTB_REVERSES,
-	TTB_UNDERLINES,
-	TTB_BADWORDS,
-	TTB_CAPS,
-	TTB_FLOOD,
-	TTB_REPEAT,
-	TTB_ITALICS,
-	TTB_AMSGS,
-	TTB_SIZE
-};
+#define BOTSERV_KICKER_DATA_EXT "kickerdata"
 
-struct KickerData
+namespace BotServ
 {
+	class KickerData;
+
+	/* Indices for TTB (Times To Ban) */
+	enum
+	{
+		TTB_BOLDS,
+		TTB_COLORS,
+		TTB_REVERSES,
+		TTB_UNDERLINES,
+		TTB_BADWORDS,
+		TTB_CAPS,
+		TTB_FLOOD,
+		TTB_REPEAT,
+		TTB_ITALICS,
+		TTB_AMSGS,
+		TTB_SIZE
+	};
+}
+
+
+class BotServ::KickerData
+{
+protected:
+	KickerData() = default;
+
+public:
 	bool amsgs, badwords, bolds, caps, colors, flood, italics, repeat, reverses, underlines;
-	int16_t ttb[TTB_SIZE];                    /* Times to ban for each kicker */
+	int16_t ttb[BotServ::TTB_SIZE];                    /* Times to ban for each kicker */
 	int16_t capsmin, capspercent;	          /* For CAPS kicker */
 	int16_t floodlines, floodsecs;            /* For FLOOD kicker */
 	int16_t repeattimes;                      /* For REPEAT kicker */
 
 	bool dontkickops, dontkickvoices;
 
-protected:
-	KickerData() = default;
-
-public:
 	virtual ~KickerData() = default;
 	virtual void Check(ChannelInfo *ci) = 0;
 };

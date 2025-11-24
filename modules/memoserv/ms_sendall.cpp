@@ -13,11 +13,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
-
-namespace
-{
-	ServiceReference<MemoServService> memoserv("MemoServService", "MemoServ");
-}
+#include "modules/memoserv/service.h"
 
 class CommandMSSendAll final
 	: public Command
@@ -31,7 +27,7 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		if (!memoserv)
+		if (!MemoServ::service)
 			return;
 
 		const Anope::string &text = params[0];
@@ -41,7 +37,7 @@ public:
 		for (const auto &[_, nc] : *NickCoreList)
 		{
 			if (nc != source.nc)
-				memoserv->Send(source.GetNick(), nc->display, text);
+				MemoServ::service->Send(source.GetNick(), nc->display, text);
 		}
 
 		source.Reply(_("A massmemo has been sent to all registered users."));
@@ -65,7 +61,7 @@ public:
 	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
 		commandmssendall(this)
 	{
-		if (!memoserv)
+		if (!MemoServ::service)
 			throw ModuleException("No MemoServ!");
 	}
 };

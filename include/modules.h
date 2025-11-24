@@ -672,14 +672,14 @@ public:
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickAdd(CommandSource &source, ChannelInfo *ci, const AutoKick *ak) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
+	virtual void OnAKickAdd(CommandSource &source, ChannelInfo *ci, const ChanServ::AutoKick *ak) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called before removing an akick from a channel
 	 * @param source The source of the command
 	 * @param ci The channel
 	 * @param ak The akick
 	 */
-	virtual void OnAkickDel(CommandSource &source, ChannelInfo *ci, const AutoKick *ak) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
+	virtual void OnAKickDel(CommandSource &source, ChannelInfo *ci, const ChanServ::AutoKick *ak) ATTR_NOT_NULL(3, 4) { throw NotImplementedException(); }
 
 	/** Called after a user join a channel when we decide whether to kick them or not
 	 * @param u The user
@@ -1087,8 +1087,8 @@ enum Implementation
 	I_OnAccessClear,
 	I_OnAccessDel,
 	I_OnAddXLine,
-	I_OnAkickAdd,
-	I_OnAkickDel,
+	I_OnAKickAdd,
+	I_OnAKickDel,
 	I_OnBadWordAdd,
 	I_OnBadWordDel,
 	I_OnBotAssign,

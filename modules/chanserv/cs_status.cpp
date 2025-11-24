@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/chanserv/akick.h"
 
 class CommandCSStatus final
 	: public Command
@@ -82,20 +83,23 @@ public:
 				}
 			}
 
-			for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
+			if (ChanServ::akick_service)
 			{
-				AutoKick *autokick = ci->GetAkick(j);
+				for (unsigned j = 0, end = ChanServ::akick_service->GetAKickCount(ci); j < end; ++j)
+				{
+					const auto *autokick = ChanServ::akick_service->GetAKick(ci, j);
 
-				if (autokick->nc)
-				{
-					if (na && *autokick->nc == na->nc)
-						source.Reply(_("\002%s\002 is on the auto kick list of \002%s\002 (%s)."), na->nc->display.c_str(), ci->name.c_str(), autokick->reason.c_str());
-				}
-				else if (u != NULL)
-				{
-					Entry akick_mask("", autokick->mask);
-					if (akick_mask.Matches(u))
-						source.Reply(_("\002%s\002 matches auto kick entry %s on \002%s\002 (%s)."), u->nick.c_str(), autokick->mask.c_str(), ci->name.c_str(), autokick->reason.c_str());
+					if (autokick->nc)
+					{
+						if (na && *autokick->nc == na->nc)
+							source.Reply(_("\002%s\002 is on the auto kick list of \002%s\002 (%s)."), na->nc->display.c_str(), ci->name.c_str(), autokick->reason.c_str());
+					}
+					else if (u != NULL)
+					{
+						Entry akick_mask("", autokick->mask);
+						if (akick_mask.Matches(u))
+							source.Reply(_("\002%s\002 matches auto kick entry %s on \002%s\002 (%s)."), u->nick.c_str(), autokick->mask.c_str(), ci->name.c_str(), autokick->reason.c_str());
+					}
 				}
 			}
 		}

@@ -211,16 +211,6 @@ public:
 					break;
 				}
 			}
-
-			for (unsigned j = 0; j < ci->GetAkickCount(); ++j)
-			{
-				const AutoKick *akick = ci->GetAkick(j);
-				if (akick->nc == nc)
-				{
-					ci->EraseAkick(j);
-					break;
-				}
-			}
 		}
 	}
 

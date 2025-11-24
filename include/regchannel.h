@@ -26,34 +26,6 @@ typedef Anope::unordered_map<ChannelInfo *> registered_channel_map;
 
 extern CoreExport Serialize::Checker<registered_channel_map> RegisteredChannelList;
 
-/* AutoKick data. */
-class CoreExport AutoKick final
-	: public Serializable
-{
-public:
-	struct Type final
-		: public Serialize::Type
-	{
-		Type();
-		void Serialize(Serializable *obj, Serialize::Data &data) const override;
-		Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override;
-	};
-
-	/* Channel this autokick is on */
-	Serialize::Reference<ChannelInfo> ci;
-
-	Anope::string mask;
-	Serialize::Reference<NickCore> nc;
-
-	Anope::string reason;
-	Anope::string creator;
-	time_t addtime;
-	time_t last_used;
-
-	AutoKick();
-	~AutoKick();
-};
-
 /* It matters that Base is here before Extensible (it is inherited by Serializable)
  */
 class CoreExport ChannelInfo final
@@ -75,7 +47,6 @@ private:
 	Serialize::Reference<NickCore> founder;					/* Channel founder */
 	Serialize::Reference<NickCore> successor;                               /* Who gets the channel if the founder nick is dropped or expires */
 	Serialize::Checker<std::vector<ChanAccess *> > access;			/* List of authorized users */
-	Serialize::Checker<std::vector<AutoKick *> > akick;			/* List of users to kickban */
 	Anope::map<int16_t> levels;
 
 public:
@@ -179,44 +150,6 @@ public:
 	 * Clears the entire access list by deleting every item and then clearing the vector.
 	 */
 	void ClearAccess();
-
-	/** Add an akick entry to the channel by NickCore
-	 * @param user The user who added the akick
-	 * @param akicknc The nickcore being akicked
-	 * @param reason The reason for the akick
-	 * @param t The time the akick was added, defaults to now
-	 * @param lu The time the akick was last used, defaults to never
-	 */
-	AutoKick *AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
-
-	/** Add an akick entry to the channel by reason
-	 * @param user The user who added the akick
-	 * @param mask The mask of the akick
-	 * @param reason The reason for the akick
-	 * @param t The time the akick was added, defaults to now
-	 * @param lu The time the akick was last used, defaults to never
-	 */
-	AutoKick *AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
-
-	/** Get an entry from the channel akick list
-	 * @param index The index in the akick vector
-	 * @return The akick structure, or NULL if not found
-	 */
-	AutoKick *GetAkick(unsigned index) const;
-
-	/** Get the size of the akick vector for this channel
-	 * @return The akick vector size
-	 */
-	unsigned GetAkickCount() const;
-
-	/** Erase an entry from the channel akick list
-	 * @param index The index of the akick
-	 */
-	void EraseAkick(unsigned index);
-
-	/** Clear the whole akick list
-	 */
-	void ClearAkick();
 
 	/** Get the level entries for the channel.
 	 * @return The levels for the channel.

@@ -14,6 +14,7 @@
 
 #include "module.h"
 #include "modules/botserv/badwords.h"
+#include "modules/chanserv/akick.h"
 
 class CommandCSClone final
 	: public Command
@@ -63,14 +64,17 @@ class CommandCSClone final
 
 	static void CopyAkick(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
-		target_ci->ClearAkick();
-		for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
+		if (!ChanServ::akick_service)
+			return;
+
+		ChanServ::akick_service->ClearAKick(target_ci);
+		for (unsigned i = 0; i < ChanServ::akick_service->GetAKickCount(ci); ++i)
 		{
-			const AutoKick *akick = ci->GetAkick(i);
+			const auto *akick = ChanServ::akick_service->GetAKick(ci, i);
 			if (akick->nc)
-				target_ci->AddAkick(akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
+				ChanServ::akick_service->AddAKick(ci, akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
 			else
-				target_ci->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
+				ChanServ::akick_service->AddAKick(ci, akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
 		}
 
 		source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002."), ci->name.c_str(), target_ci->name.c_str());

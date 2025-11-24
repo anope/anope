@@ -13,6 +13,180 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/chanserv/akick.h"
+
+#define AKICK_EXT "akicks"
+
+class AKickService final
+	: public ChanServ::AutoKickService
+{
+private:
+	struct AKickList final
+		: Serialize::Checker<std::vector<ChanServ::AutoKick *>>
+	{
+		AKickList(Extensible *)
+			: Serialize::Checker<std::vector<ChanServ::AutoKick *>>(AKICK_EXT)
+		{
+		}
+	};
+	ExtensibleItem<AKickList> akickext;
+
+public:
+	AKickService(Module *m)
+		: ChanServ::AutoKickService(m)
+		, akickext(m, AKICK_EXT)
+	{
+	}
+
+	ChanServ::AutoKick *AddAKick(ChannelInfo *ci, const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0) override
+	{
+		auto *akick = new ChanServ::AutoKick();
+		akick->ci = ci;
+		akick->nc = akicknc;
+		akick->reason = reason;
+		akick->creator = user;
+		akick->addtime = t;
+		akick->last_used = lu;
+
+		auto *akicks = akickext.Require(ci);
+		(*akicks)->push_back(akick);
+
+		akicknc->AddChannelReference(ci);
+
+		return akick;
+	}
+
+	ChanServ::AutoKick *AddAKick(ChannelInfo *ci, const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0)  override
+	{
+		auto *akick = new ChanServ::AutoKick();
+		akick->ci = ci;
+		akick->mask = mask;
+		akick->nc = nullptr;
+		akick->reason = reason;
+		akick->creator = user;
+		akick->addtime = t;
+		akick->last_used = lu;
+
+		auto *akicks = akickext.Require(ci);
+		(*akicks)->push_back(akick);
+
+		return akick;
+	}
+
+	ChanServ::AutoKick *GetAKick(ChannelInfo *ci, unsigned index) override
+	{
+		auto *akicks = akickext.Get(ci);
+		if (!akicks || index >= (*akicks)->size())
+			return nullptr;
+
+		auto *akick = (*akicks)->at(index);
+		akick->QueueUpdate();
+		return akick;
+	}
+
+	unsigned GetAKickCount(ChannelInfo *ci) override
+	{
+		auto *akicks = akickext.Get(ci);
+		return akicks ? (*akicks)->size() : 0;
+	}
+
+	void EraseAKick(ChannelInfo *ci, unsigned index) override
+	{
+		auto *akicks = akickext.Get(ci);
+		if (akicks && index < (*akicks)->size())
+			delete (*akicks)->at(index);
+	}
+
+	void EraseAKick(ChannelInfo *ci, ChanServ::AutoKick *akick) override
+	{
+		auto *akicks = akickext.Get(ci);
+		if (!akicks)
+			return;
+
+		auto it = std::find((*akicks)->begin(), (*akicks)->end(), akick);
+		if (it != (*akicks)->end())
+			(*akicks)->erase(it);
+	}
+
+	void ClearAKick(ChannelInfo *ci) override
+	{
+		auto *akicks = akickext.Get(ci);
+		if (!akicks)
+			return; // No akick list.
+
+		while (!(*akicks)->empty())
+			delete (*akicks)->back();
+	}
+};
+
+struct AutoKickType final
+	: public Serialize::Type
+{
+	AutoKickType()
+		: Serialize::Type(AUTOKICK_TYPE)
+	{
+	}
+
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *ak = static_cast<const ChanServ::AutoKick *>(obj);
+		data.Store("ci", ak->ci->name);
+		if (ak->nc)
+			data.Store("ncid", ak->nc->GetId());
+		else
+			data.Store("mask", ak->mask);
+		data.Store("reason", ak->reason);
+		data.Store("creator", ak->creator);
+		data.Store("addtime", ak->addtime);
+		data.Store("last_used", ak->last_used);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
+	{
+		Anope::string sci, snc;
+		uint64_t sncid = 0;
+
+		data["ci"] >> sci;
+		data["nc"] >> snc; // Deprecated 2.0 field
+		data["ncid"] >> sncid;
+
+		ChannelInfo *ci = ChannelInfo::Find(sci);
+		if (!ci)
+			return NULL;
+
+		ChanServ::AutoKick *ak;
+		auto *nc = sncid ? NickCore::FindId(sncid) : NickCore::Find(snc);
+		if (obj)
+		{
+			ak = anope_dynamic_static_cast<ChanServ::AutoKick *>(obj);
+			data["creator"] >> ak->creator;
+			data["reason"] >> ak->reason;
+			ak->nc = nc;
+			data["mask"] >> ak->mask;
+			data["addtime"] >> ak->addtime;
+			data["last_used"] >> ak->last_used;
+		}
+		else
+		{
+			time_t addtime, lastused;
+			data["addtime"] >> addtime;
+			data["last_used"] >> lastused;
+
+			Anope::string screator, sreason, smask;
+
+			data["creator"] >> screator;
+			data["reason"] >> sreason;
+			data["mask"] >> smask;
+
+			if (nc)
+				ak = ChanServ::akick_service->AddAKick(ci, screator, nc, sreason, addtime, lastused);
+			else
+				ak = ChanServ::akick_service->AddAKick(ci, screator, smask, sreason, addtime, lastused);
+		}
+
+		return ak;
+	}
+};
 
 class CommandCSAKick final
 	: public Command
@@ -48,7 +222,7 @@ class CommandCSAKick final
 		Anope::string reason = params.size() > 3 ? params[3] : "";
 		const NickAlias *na = NickAlias::Find(mask);
 		NickCore *nc = NULL;
-		const AutoKick *akick;
+		const ChanServ::AutoKick *akick;
 		unsigned reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
 
 		if (reason.length() > reasonmax)
@@ -163,9 +337,9 @@ class CommandCSAKick final
 			 }
 		}
 
-		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
+		for (unsigned j = 0, end = ChanServ::akick_service->GetAKickCount(ci); j < end; ++j)
 		{
-			akick = ci->GetAkick(j);
+			akick = ChanServ::akick_service->GetAKick(ci, j);
 			if (akick->nc ? akick->nc == nc : mask.equals_ci(akick->mask))
 			{
 				source.Reply(_("\002%s\002 already exists on %s autokick list."), akick->nc ? akick->nc->display.c_str() : akick->mask.c_str(), ci->name.c_str());
@@ -173,20 +347,20 @@ class CommandCSAKick final
 			}
 		}
 
-		if (ci->GetAkickCount() >= Config->GetModule(this->owner).Get<unsigned>("autokickmax"))
+		if (ChanServ::akick_service->GetAKickCount(ci) >= Config->GetModule(this->owner).Get<unsigned>("autokickmax"))
 		{
 			source.Reply(_("Sorry, you can only have %d autokick masks on a channel."), Config->GetModule(this->owner).Get<unsigned>("autokickmax"));
 			return;
 		}
 
 		if (nc)
-			akick = ci->AddAkick(source.GetNick(), nc, reason);
+			akick = ChanServ::akick_service->AddAKick(ci, source.GetNick(), nc, reason);
 		else
-			akick = ci->AddAkick(source.GetNick(), mask, reason);
+			akick = ChanServ::akick_service->AddAKick(ci, source.GetNick(), mask, reason);
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << (reason == "" ? "" : ": ") << reason;
 
-		FOREACH_MOD(OnAkickAdd, (source, ci, akick));
+		FOREACH_MOD(OnAKickAdd, (source, ci, akick));
 
 		source.Reply(_("\002%s\002 added to %s autokick list."), mask.c_str(), ci->name.c_str());
 
@@ -198,7 +372,7 @@ class CommandCSAKick final
 		const Anope::string &mask = params[2];
 		unsigned i, end;
 
-		if (!ci->GetAkickCount())
+		if (!ChanServ::akick_service->GetAKickCount(ci))
 		{
 			source.Reply(_("%s autokick list is empty."), ci->name.c_str());
 			return;
@@ -241,19 +415,19 @@ class CommandCSAKick final
 
 				void HandleNumber(unsigned number) override
 				{
-					if (!number || number > ci->GetAkickCount())
+					if (!number || number > ChanServ::akick_service->GetAKickCount(ci))
 						return;
 
-					const AutoKick *akick = ci->GetAkick(number - 1);
+					const auto *akick = ChanServ::akick_service->GetAKick(ci, number - 1);
 
-					FOREACH_MOD(OnAkickDel, (source, ci, akick));
+					FOREACH_MOD(OnAKickDel, (source, ci, akick));
 
 					bool override = !ag.HasPriv("AKICK");
 					lastdeleted = (akick->nc ? akick->nc->display : akick->mask);
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, c, ci) << "to delete " << lastdeleted;
 
 					++deleted;
-					ci->EraseAkick(number - 1);
+					ChanServ::akick_service->EraseAKick(ci, number - 1);
 				}
 			}
 			delcallback(source, ci, this, mask);
@@ -264,15 +438,15 @@ class CommandCSAKick final
 			const NickAlias *na = NickAlias::Find(mask);
 			const NickCore *nc = na ? *na->nc : NULL;
 
-			for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
+			for (i = 0, end = ChanServ::akick_service->GetAKickCount(ci); i < end; ++i)
 			{
-				const AutoKick *akick = ci->GetAkick(i);
+				const auto *akick = ChanServ::akick_service->GetAKick(ci, i);
 
 				if (akick->nc ? akick->nc == nc : mask.equals_ci(akick->mask))
 					break;
 			}
 
-			if (i == ci->GetAkickCount())
+			if (i == ChanServ::akick_service->GetAKickCount(ci))
 			{
 				source.Reply(_("\002%s\002 not found on %s autokick list."), mask.c_str(), ci->name.c_str());
 				return;
@@ -281,9 +455,9 @@ class CommandCSAKick final
 			bool override = !source.AccessFor(ci).HasPriv("AKICK");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 
-			FOREACH_MOD(OnAkickDel, (source, ci, ci->GetAkick(i)));
+			FOREACH_MOD(OnAKickDel, (source, ci, ChanServ::akick_service->GetAKick(ci, i)));
 
-			ci->EraseAkick(i);
+			ChanServ::akick_service->EraseAKick(ci, i);
 
 			source.Reply(_("\002%s\002 deleted from %s autokick list."), mask.c_str(), ci->name.c_str());
 		}
@@ -308,10 +482,10 @@ class CommandCSAKick final
 
 				void HandleNumber(unsigned number) override
 				{
-					if (!number || number > ci->GetAkickCount())
+					if (!number || number > ChanServ::akick_service->GetAKickCount(ci))
 						return;
 
-					const AutoKick *akick = ci->GetAkick(number - 1);
+					const auto *akick = ChanServ::akick_service->GetAKick(ci, number - 1);
 
 					Anope::string timebuf, lastused;
 					if (akick->addtime)
@@ -341,9 +515,9 @@ class CommandCSAKick final
 		}
 		else
 		{
-			for (unsigned i = 0, end = ci->GetAkickCount(); i < end; ++i)
+			for (unsigned i = 0, end = ChanServ::akick_service->GetAKickCount(ci); i < end; ++i)
 			{
-				const AutoKick *akick = ci->GetAkick(i);
+				const auto *akick = ChanServ::akick_service->GetAKick(ci, i);
 
 				if (!mask.empty())
 				{
@@ -389,7 +563,7 @@ class CommandCSAKick final
 
 	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		if (!ci->GetAkickCount())
+		if (!ChanServ::akick_service->GetAKickCount(ci))
 		{
 			source.Reply(_("%s autokick list is empty."), ci->name.c_str());
 			return;
@@ -409,7 +583,7 @@ class CommandCSAKick final
 
 	void DoView(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		if (!ci->GetAkickCount())
+		if (!ChanServ::akick_service->GetAKickCount(ci))
 		{
 			source.Reply(_("%s autokick list is empty."), ci->name.c_str());
 			return;
@@ -445,7 +619,7 @@ class CommandCSAKick final
 		bool override = !source.AccessFor(ci).HasPriv("AKICK");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to clear the akick list";
 
-		ci->ClearAkick();
+		ChanServ::akick_service->ClearAKick(ci);
 		source.Reply(_("Channel %s akick list has been cleared."), ci->name.c_str());
 	}
 
@@ -561,12 +735,46 @@ public:
 class CSAKick final
 	: public Module
 {
+private:
+	AKickService akick_service;
+	AutoKickType autokick_type;
 	CommandCSAKick commandcsakick;
 
 public:
-	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsakick(this)
+	CSAKick(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, akick_service(this)
+		, commandcsakick(this)
 	{
+	}
+
+	void OnCreateChan(ChannelInfo *ci) override
+	{
+		OnDelChan(ci); // copy ctor might have been called
+	}
+
+	void OnDelChan(ChannelInfo *ci) override
+	{
+		akick_service.ClearAKick(ci);
+	}
+
+	void OnDelCore(NickCore *nc) override
+	{
+		std::deque<ChannelInfo *> chans;
+		nc->GetChannelReferences(chans);
+
+		for (auto *ci : chans)
+		{
+			for (unsigned j = 0; j < akick_service.GetAKickCount(ci); ++j)
+			{
+				const auto *akick = akick_service.GetAKick(ci, j);
+				if (akick->nc == nc)
+				{
+					akick_service.EraseAKick(ci, j);
+					break;
+				}
+			}
+		}
 	}
 
 	EventReturn OnCheckKick(User *u, Channel *c, Anope::string &mask, Anope::string &reason) override
@@ -574,9 +782,10 @@ public:
 		if (!c->ci || c->MatchesList(u, "EXCEPT"))
 			return EVENT_CONTINUE;
 
-		for (unsigned j = 0, end = c->ci->GetAkickCount(); j < end; ++j)
+
+		for (unsigned j = 0, end = ChanServ::akick_service->GetAKickCount(c->ci); j < end; ++j)
 		{
-			AutoKick *autokick = c->ci->GetAkick(j);
+			auto *autokick = ChanServ::akick_service->GetAKick(c->ci, j);
 			bool kick = false;
 
 			if (autokick->nc)

@@ -16,6 +16,7 @@
 #include "module.h"
 #include "modules/botserv/badwords.h"
 #include "modules/botserv/kick.h"
+#include "modules/chanserv/akick.h"
 #include "modules/chanserv/entrymsg.h"
 #include "modules/chanserv/mode.h"
 #include "modules/hostserv/request.h"
@@ -121,7 +122,7 @@ struct ModeLockData final
 
 struct ChannelData final
 {
-	Anope::unordered_map<AutoKick *> akicks;
+	Anope::unordered_map<ChanServ::AutoKick *> akicks;
 	Anope::string bot;
 	Anope::string info_adder;
 	Anope::string info_message;
@@ -609,11 +610,17 @@ private:
 		auto *nc = NickCore::Find(mask);
 		if (flags.find('b') != Anope::string::npos)
 		{
+			if (ChanServ::akick_service)
+			{
+				Log(this) << "Unable to import channel akick for " << ci->name << " as cs_akick is not loaded";
+				return true;
+			}
+
 			auto *data = chandata.Require(ci);
 			if (nc)
-				data->akicks[mask] = ci->AddAkick(setter, nc, "", modifiedtime, modifiedtime);
+				data->akicks[mask] = ChanServ::akick_service->AddAKick(ci, setter, nc, "", modifiedtime, modifiedtime);
 			else
-				data->akicks[mask] = ci->AddAkick(setter, mask, "", modifiedtime, modifiedtime);
+				data->akicks[mask] = ChanServ::akick_service->AddAKick(ci, setter, mask, "", modifiedtime, modifiedtime);
 			return true;
 		}
 

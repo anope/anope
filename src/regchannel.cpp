@@ -24,93 +24,9 @@
 
 Serialize::Checker<registered_channel_map> RegisteredChannelList(CHANNELINFO_TYPE);
 
-AutoKick::AutoKick()
-	: Serializable(AUTOKICK_TYPE)
-{
-}
-
-AutoKick::~AutoKick()
-{
-	if (this->ci)
-	{
-		std::vector<AutoKick *>::iterator it = std::find(this->ci->akick->begin(), this->ci->akick->end(), this);
-		if (it != this->ci->akick->end())
-			this->ci->akick->erase(it);
-
-		if (nc)
-			nc->RemoveChannelReference(this->ci);
-	}
-}
-
-AutoKick::Type::Type()
-	: Serialize::Type(AUTOKICK_TYPE)
-{
-}
-
-void AutoKick::Type::Serialize(Serializable *obj, Serialize::Data &data) const
-{
-	const auto *ak = static_cast<const AutoKick *>(obj);
-	data.Store("ci", ak->ci->name);
-	if (ak->nc)
-		data.Store("ncid", ak->nc->GetId());
-	else
-		data.Store("mask", ak->mask);
-	data.Store("reason", ak->reason);
-	data.Store("creator", ak->creator);
-	data.Store("addtime", ak->addtime);
-	data.Store("last_used", ak->last_used);
-}
-
-Serializable *AutoKick::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
-{
-	Anope::string sci, snc;
-	uint64_t sncid = 0;
-
-	data["ci"] >> sci;
-	data["nc"] >> snc; // Deprecated 2.0 field
-	data["ncid"] >> sncid;
-
-	ChannelInfo *ci = ChannelInfo::Find(sci);
-	if (!ci)
-		return NULL;
-
-	AutoKick *ak;
-	auto *nc = sncid ? NickCore::FindId(sncid) : NickCore::Find(snc);
-	if (obj)
-	{
-		ak = anope_dynamic_static_cast<AutoKick *>(obj);
-		data["creator"] >> ak->creator;
-		data["reason"] >> ak->reason;
-		ak->nc = nc;
-		data["mask"] >> ak->mask;
-		data["addtime"] >> ak->addtime;
-		data["last_used"] >> ak->last_used;
-	}
-	else
-	{
-		time_t addtime, lastused;
-		data["addtime"] >> addtime;
-		data["last_used"] >> lastused;
-
-		Anope::string screator, sreason, smask;
-
-		data["creator"] >> screator;
-		data["reason"] >> sreason;
-		data["mask"] >> smask;
-
-		if (nc)
-			ak = ci->AddAkick(screator, nc, sreason, addtime, lastused);
-		else
-			ak = ci->AddAkick(screator, smask, sreason, addtime, lastused);
-	}
-
-	return ak;
-}
-
 ChannelInfo::ChannelInfo(const Anope::string &chname)
 	: Serializable(CHANNELINFO_TYPE)
 	, access(CHANACCESS_TYPE)
-	, akick(AUTOKICK_TYPE)
 	, name(chname)
 	, registered(Anope::CurTime)
 	, last_used(Anope::CurTime)
@@ -131,7 +47,6 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 ChannelInfo::ChannelInfo(const ChannelInfo &ci)
 	: Serializable(CHANNELINFO_TYPE)
 	, access(CHANACCESS_TYPE)
-	, akick(AUTOKICK_TYPE)
 {
 	*this = ci;
 
@@ -139,7 +54,6 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci)
 		++this->founder->channelcount;
 
 	this->access->clear();
-	this->akick->clear();
 
 	FOREACH_MOD(OnCreateChan, (this));
 }
@@ -174,7 +88,6 @@ ChannelInfo::~ChannelInfo()
 	this->SetSuccessor(NULL);
 
 	this->ClearAccess();
-	this->ClearAkick();
 
 	if (!this->memos.memos->empty())
 	{
@@ -538,68 +451,6 @@ void ChannelInfo::ClearAccess()
 {
 	for (unsigned i = this->access->size(); i > 0; --i)
 		delete this->GetAccess(i - 1);
-}
-
-AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t, time_t lu)
-{
-	auto *autokick = new AutoKick();
-	autokick->ci = this;
-	autokick->nc = akicknc;
-	autokick->reason = reason;
-	autokick->creator = user;
-	autokick->addtime = t;
-	autokick->last_used = lu;
-
-	this->akick->push_back(autokick);
-
-	akicknc->AddChannelReference(this);
-
-	return autokick;
-}
-
-AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t, time_t lu)
-{
-	auto *autokick = new AutoKick();
-	autokick->ci = this;
-	autokick->mask = mask;
-	autokick->nc = NULL;
-	autokick->reason = reason;
-	autokick->creator = user;
-	autokick->addtime = t;
-	autokick->last_used = lu;
-
-	this->akick->push_back(autokick);
-
-	return autokick;
-}
-
-AutoKick *ChannelInfo::GetAkick(unsigned index) const
-{
-	if (this->akick->empty() || index >= this->akick->size())
-		return NULL;
-
-	AutoKick *ak = (*this->akick)[index];
-	ak->QueueUpdate();
-	return ak;
-}
-
-unsigned ChannelInfo::GetAkickCount() const
-{
-	return this->akick->size();
-}
-
-void ChannelInfo::EraseAkick(unsigned index)
-{
-	if (this->akick->empty() || index >= this->akick->size())
-		return;
-
-	delete this->GetAkick(index);
-}
-
-void ChannelInfo::ClearAkick()
-{
-	while (!this->akick->empty())
-		delete this->akick->back();
 }
 
 const Anope::map<int16_t> &ChannelInfo::GetLevelEntries()

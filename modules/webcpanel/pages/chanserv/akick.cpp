@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "../../webcpanel.h"
+#include "modules/chanserv/akick.h"
 
 WebCPanel::ChanServ::Akick::Akick(const Anope::string &cat, const Anope::string &u) : WebPanelProtectedPage(cat, u)
 {
@@ -75,16 +76,19 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTP::Provider *server, const Anope::
 
 	replacements["ESCAPED_CHANNEL"] = HTTP::URLEncode(chname);
 
-	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
+	if (::ChanServ::akick_service)
 	{
-		AutoKick *akick = ci->GetAkick(i);
+		for (unsigned i = 0; i < ::ChanServ::akick_service->GetAKickCount(ci); ++i)
+		{
+			const auto *akick = ::ChanServ::akick_service->GetAKick(ci, i);
 
-		if (akick->nc)
-			replacements["MASKS"] = akick->nc->display;
-		else
-			replacements["MASKS"] = akick->mask;
-		replacements["CREATORS"] = akick->creator;
-		replacements["REASONS"] = akick->reason;
+			if (akick->nc)
+				replacements["MASKS"] = akick->nc->display;
+			else
+				replacements["MASKS"] = akick->mask;
+			replacements["CREATORS"] = akick->creator;
+			replacements["REASONS"] = akick->reason;
+		}
 	}
 
 	Page.Serve(server, page_name, client, message, reply, replacements);

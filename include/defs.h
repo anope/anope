@@ -15,7 +15,7 @@
 #pragma once
 
 class AccessGroup;
-class AutoKick;
+namespace ChanServ { class AutoKick; }
 class BotInfo;
 class CallBack;
 class ChanAccess;

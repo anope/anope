@@ -35,7 +35,6 @@ void Serialize::RegisterTypes()
 	static BotInfo::Type bi;
 	static ChannelInfo::Type ci;
 	static ChanAccess::Type access;
-	static AutoKick::Type akick;
 	static Memo::Type memo;
 	static XLine::Type xline;
 	CreateTypes();

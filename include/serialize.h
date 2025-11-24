@@ -20,7 +20,6 @@
 #include "base.h"
 
 /** Names of serialization types implemented in the core. */
-#define AUTOKICK_TYPE    "AutoKick"
 #define BOTINFO_TYPE     "BotInfo"
 #define CHANACCESS_TYPE  "ChanAccess"
 #define CHANNELINFO_TYPE "ChannelInfo"

@@ -144,7 +144,7 @@ public:
 
 		if (!Anope::Encrypt(param, nc->pass))
 		{
-			source.Reply(_("Passwords can not be changed right now. Please try again later."));
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
 		}
 
@@ -203,7 +203,7 @@ public:
 
 		if (!Anope::Encrypt(param, nc->pass))
 		{
-			source.Reply(_("Passwords can not be changed right now. Please try again later."));
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
 		}
 

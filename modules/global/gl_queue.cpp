@@ -141,7 +141,7 @@ public:
 	{
 		if (!Global::service)
 		{
-			source.Reply(SERVICE_UNAVAILABLE, source.service->nick.c_str());
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
 		}
 

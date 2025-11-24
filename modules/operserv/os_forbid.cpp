@@ -245,7 +245,10 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!OperServ::forbid_service)
+		{
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
+		}
 
 		const Anope::string &command = params[0];
 		const Anope::string &subcommand = params.size() > 1 ? params[1] : "";

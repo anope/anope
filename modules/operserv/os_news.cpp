@@ -290,7 +290,10 @@ protected:
 	void DoNews(CommandSource &source, const std::vector<Anope::string> &params, OperServ::NewsType ntype)
 	{
 		if (!OperServ::news_service)
+		{
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
+		}
 
 		const Anope::string &cmd = params[0];
 

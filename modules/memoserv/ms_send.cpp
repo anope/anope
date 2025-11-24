@@ -28,7 +28,10 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		if (!MemoServ::service)
+		{
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
+		}
 
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];

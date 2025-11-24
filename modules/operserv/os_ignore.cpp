@@ -214,7 +214,10 @@ private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!OperServ::ignore_service)
+		{
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
+		}
 
 		const Anope::string &time = params.size() > 1 ? params[1] : "";
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
@@ -268,7 +271,10 @@ private:
 	static void DoList(CommandSource &source)
 	{
 		if (!OperServ::ignore_service)
+		{
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
+		}
 
 		auto &ignores = OperServ::ignore_service->GetIgnores();
 		for (unsigned i = ignores.size(); i > 0; --i)
@@ -315,7 +321,10 @@ private:
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!OperServ::ignore_service)
+		{
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
+		}
 
 		const Anope::string nick = params.size() > 1 ? params[1] : "";
 		if (nick.empty())
@@ -348,7 +357,10 @@ private:
 	void DoClear(CommandSource &source)
 	{
 		if (!OperServ::ignore_service)
+		{
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
+		}
 
 		if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);

@@ -127,10 +127,10 @@ namespace Language
 #define NO_EXPIRE                    _("does not expire")
 #define PASSWORD_INCORRECT           _("Password incorrect.")
 #define READ_ONLY_MODE               _("Services are temporarily in read-only mode.")
-#define SERVICE_UNAVAILABLE          _("Sorry, %s is temporarily unavailable.")
 #define TIME_NEVER                   _("Never")
 #define TIME_NOW                     _("Now")
 #define TIME_UNKNOWN                 _("Unknown")
+#define TRY_AGAIN_LATER              _("The \002%s\002 command is temporarily unavailable. Please try again later.")
 #define USERHOST_MASK_TOO_WIDE       _("%s coverage is too wide; Please use a more specific mask.")
 
 #define BOT_DOES_NOT_EXIST           _("Bot \002%s\002 does not exist.")

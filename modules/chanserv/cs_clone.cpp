@@ -65,7 +65,10 @@ class CommandCSClone final
 	static void CopyAkick(CommandSource &source, ChannelInfo *ci, ChannelInfo *target_ci)
 	{
 		if (!ChanServ::akick_service)
+		{
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
+		}
 
 		ChanServ::akick_service->ClearAKick(target_ci);
 		for (unsigned i = 0; i < ChanServ::akick_service->GetAKickCount(ci); ++i)
@@ -87,7 +90,7 @@ class CommandCSClone final
 
 		if (!target_badwords || !badwords)
 		{
-			source.Reply(ACCESS_DENIED); // BotServ doesn't exist/badwords isn't loaded
+			source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 			return;
 		}
 

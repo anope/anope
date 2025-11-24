@@ -127,7 +127,7 @@ public:
 			Anope::string encpass;
 			if (!Anope::Encrypt(pass, encpass))
 			{
-				source.Reply(_("Accounts can not be registered right now. Please try again later."));
+				source.Reply(TRY_AGAIN_LATER, source.command.nobreak().c_str());
 				return;
 			}
 

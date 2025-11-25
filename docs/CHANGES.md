@@ -1,5 +1,45 @@
 # Anope Change Log
 
+## Anope 2.1.20 (unreleased)
+
+### Breaking Changes
+
+* Changed the registration database types added by modules to be delayed until after the module constructor has been called.
+
+* Moved akicks out of the core into cs_akick. Modules which depend on akicks now require the cs_akick module to be loaded.
+
+### Changes
+
+* Added `{db_json}:preserve_unknown_data` to configure whether unknown database types are kept in the JSON database. By default unknown database types from unloaded modules will be preserved in the database to allow reloading later. This setting can be used to disable this and prune the database.
+
+* Added support for forbidding passwords. This is intended to be used with file forbids (see below).
+
+* Added support for loading forbids from a file.
+
+* Added support for the UnrealIRCd `+F` flood profile mode.
+
+* Added the DISPLAY flag to `nickserv/list` to only show account display nicknames.
+
+* Added the hs_offer module which allows offering templated vhosts to users (based on a modsite module by @genius3000 on GitHub).
+
+* Changed chanserv/mode lock messages to stack the responses into one message per type instead of sending one message per mode.
+
+* Changed database objects to rehook to their type when it becomes available again.
+
+* Changed the `nickserv/set/language` and `nickserv/set/timezone` commands to allow setting back to the default value by omitting the last parameter.
+
+* Changed the default install directory from `~/anope` to `~/anope-2.1`.
+
+* Changed the enc_sha1 module to use a vendored SHA-1 implementation.
+
+* Expanded password obscurity checks and added an event hook to allow modules to reject passwords.
+
+* Fixed the rpc_user module sending the "invalid account" and "invalid password" error codes inverted.
+
+* Fixed unintentionally reloading the core database when reloading a module that provides a database type.
+
+* Removed a bunch of obsolete build system cruft.
+
 ## Anope 2.1.19 (2025-11-01)
 
 ### Breaking Changes

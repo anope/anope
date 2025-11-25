@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+#
+# Anope IRC Services <https://www.anope.org/>
+#
+# Copyright (C) 2003-2025 Anope Contributors
+#
+# Anope is free software. You can use, modify, and/or distribute it under the
+# terms of version 2 of the GNU General Public License. See docs/LICENSE.txt
+# for the complete terms of this license and docs/AUTHORS.txt for a list of
+# contributors.
+#
+# Based on the original code of Epona by Lara
+# Based on the original code of Services by Andy Church
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+import argon2 # pip3 install argon2-cffi
+import bcrypt # pip3 install bcrypt
+import getpass
+import hashlib
+import hmac
+import secrets
+import sys
+import textwrap
+
+algorithm = sys.argv[1] if len(sys.argv) >= 2 else "hmac-sha512"
+password  = sys.argv[2] if len(sys.argv) >= 3 else getpass.getpass()
+
+def do_argon2(variant, password):
+    ph = argon2.PasswordHasher(type=variant)
+    return ph.hash(password)
+
+def do_bcrypt(password):
+    salt = bcrypt.gensalt(16)
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+
+def do_hmac(digest, password):
+    key = secrets.token_bytes(digest().digest_size)
+    mac = hmac.HMAC(key, password.encode('utf-8'), digestmod=digest)
+    return f"{mac.hexdigest()}:{key.hex()}"
+
+config = False
+function = None
+module = None
+match algorithm:
+    case "argon2d":
+        config = True
+        function = lambda pw: do_argon2(argon2.Type.D, password)
+        module = "enc_argon2"
+    case "argon2i":
+        config = True
+        function = lambda pw: do_argon2(argon2.Type.I, password)
+        module = "enc_argon2"
+    case "argon2id":
+        config = True
+        function = lambda pw: do_argon2(argon2.Type.ID, password)
+        module = "enc_argon2"
+    case "bcrypt":
+        config = True
+        function = lambda pw: do_bcrypt(password)
+        module = "enc_bcrypt"
+    case "hmac-sha224":
+        function = lambda pw: do_hmac(hashlib.sha224, password)
+        module = "enc_sha2"
+    case "hmac-sha256":
+        function = lambda pw: do_hmac(hashlib.sha256, password)
+        module = "enc_sha2"
+    case "hmac-sha384":
+        function = lambda pw: do_hmac(hashlib.sha384, password)
+        module = "enc_sha2"
+    case "hmac-sha512":
+        function = lambda pw: do_hmac(hashlib.sha512, password)
+        module = "enc_sha2"
+
+if not function:
+    print(f"Error: unknown algorithm: {algorithm}", file=sys.stderr)
+    sys.exit(1)
+
+password_hash = function(password)
+print(textwrap.dedent(f"""
+    For use in the database:
+        {algorithm}:{password_hash}
+    """).lstrip())
+
+if config:
+    print(textwrap.dedent(f"""
+        For use in an oper:
+            password = "{password_hash}"
+            password_hash = "{algorithm}"
+
+        For use in an jsonrpc/xmlrpc token:
+            token = "{password_hash}"
+            token_hash = "{algorithm}"
+        """).lstrip())
+
+print(f"Make sure you have the {module} module loaded!");

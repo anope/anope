@@ -19,6 +19,12 @@ foreach(SRC ${TOOLS_SRCS})
   endif()
 endforeach()
 
+# Install the mkpasswd script
+install(
+  PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/anope-mkpasswd
+  DESTINATION ${BIN_DIR}
+)
+
 # If not on Windows, generate anope.service and anoperc
 if(NOT WIN32)
   if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

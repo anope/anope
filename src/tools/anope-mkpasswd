@@ -19,11 +19,31 @@ import bcrypt # pip3 install bcrypt
 import getpass
 import hashlib
 import hmac
+import os
 import secrets
 import sys
 import textwrap
 
-algorithm = sys.argv[1] if len(sys.argv) >= 2 else "hmac-sha512"
+program = os.path.basename(__file__)
+if len(sys.argv) < 2:
+    print(textwrap.dedent(f"""
+        Usage: {program} <algorithm> [password]
+
+        The algorithm can be one of:
+            * argon2d
+            * argon2i
+            * argon2id
+            * bcrypt
+            * hmac-sha224
+            * hmac-sha256
+            * hmac-sha384
+            * hmac-sha512
+
+        If a password is not entered it will be read from stdin.
+    """).strip(), file=sys.stderr)
+    sys.exit(1)
+
+algorithm = sys.argv[1]
 password  = sys.argv[2] if len(sys.argv) >= 3 else getpass.getpass()
 
 def do_argon2(variant, password):

@@ -340,7 +340,7 @@ private:
 		unsigned badwordsmax = Config->GetModule(this->module).Get<unsigned>("badwordsmax");
 		if (badwords->GetBadWordCount() >= badwordsmax)
 		{
-			source.Reply(_("Sorry, you can only have %d bad words entries on a channel."), badwordsmax);
+			source.Reply(_("You can only have %d bad words entries on a channel."), badwordsmax);
 			return;
 		}
 

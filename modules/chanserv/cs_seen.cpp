@@ -276,7 +276,7 @@ public:
 		SeenInfo *info = FindInfo(target);
 		if (!info)
 		{
-			source.Reply(_("Sorry, I have not seen %s."), target.c_str());
+			source.Reply(_("I have not seen %s."), target.c_str());
 			return;
 		}
 

@@ -158,7 +158,7 @@ class CommandNSAJoin final
 
 			if ((*channels)->size() >= Config->GetModule(this->owner).Get<unsigned>("ajoinmax"))
 			{
-				source.Reply(_("Sorry, the maximum of %d auto join entries has been reached."), Config->GetModule(this->owner).Get<unsigned>("ajoinmax"));
+				source.Reply(_("The maximum of %d auto join entries has been reached."), Config->GetModule(this->owner).Get<unsigned>("ajoinmax"));
 				return;
 			}
 			else if (i != (*channels)->size())

@@ -349,7 +349,7 @@ class CommandCSAKick final
 
 		if (ChanServ::akick_service->GetAKickCount(ci) >= Config->GetModule(this->owner).Get<unsigned>("autokickmax"))
 		{
-			source.Reply(_("Sorry, you can only have %d autokick masks on a channel."), Config->GetModule(this->owner).Get<unsigned>("autokickmax"));
+			source.Reply(_("You can only have %d autokick masks on a channel."), Config->GetModule(this->owner).Get<unsigned>("autokickmax"));
 			return;
 		}
 

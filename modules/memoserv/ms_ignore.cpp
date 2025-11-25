@@ -56,7 +56,7 @@ public:
 		{
 			if (mi->ignores.size() >= Config->GetModule(this->owner).Get<unsigned>("max", "50"))
 			{
-				source.Reply(_("Sorry, the memo ignore list for \002%s\002 is full."), channel.c_str());
+				source.Reply(_("The memo ignore list for \002%s\002 is full."), channel.c_str());
 				return;
 			}
 

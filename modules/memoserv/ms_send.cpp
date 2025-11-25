@@ -63,7 +63,7 @@ public:
 			source.Reply(_("Please wait %s before using the %s command again."), Anope::Duration(waitperiod, source.GetAccount()).c_str(), source.command.nobreak().c_str());
 		}
 		else if (result == MemoServ::MEMO_TARGET_FULL)
-			source.Reply(_("Sorry, %s currently has too many memos and cannot receive more."), nick.c_str());
+			source.Reply(_("%s currently has too many memos and cannot receive more."), nick.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override

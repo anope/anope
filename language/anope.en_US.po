@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-25 00:00+0000\n"
-"PO-Revision-Date: 2025-11-25 00:00+0000\n"
+"POT-Creation-Date: 2025-11-25 00:05+0000\n"
+"PO-Revision-Date: 2025-11-25 00:05+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -984,6 +984,10 @@ msgstr ""
 
 #, c-format
 msgid "%s currently has no memos."
+msgstr ""
+
+#, c-format
+msgid "%s currently has too many memos and cannot receive more."
 msgstr ""
 
 #, c-format
@@ -3163,6 +3167,10 @@ msgstr ""
 msgid "Hosts with at least %d sessions:"
 msgstr ""
 
+#, c-format
+msgid "I have not seen %s."
+msgstr ""
+
 msgid "ID"
 msgstr ""
 
@@ -5082,46 +5090,6 @@ msgstr ""
 msgid "Signed kicks"
 msgstr ""
 
-#, c-format
-msgid "Sorry, %s currently has too many memos and cannot receive more."
-msgstr ""
-
-#, c-format
-msgid "Sorry, I have not seen %s."
-msgstr ""
-
-#, c-format
-msgid "Sorry, the maximum of %d auto join entries has been reached."
-msgstr ""
-
-#, c-format
-msgid "Sorry, the maximum of %d certificate entries has been reached."
-msgstr ""
-
-#, c-format
-msgid "Sorry, the memo ignore list for %s is full."
-msgstr ""
-
-#, c-format
-msgid "Sorry, you can only have %d access entries on a channel, including access entries from other channels."
-msgstr ""
-
-#, c-format
-msgid "Sorry, you can only have %d autokick masks on a channel."
-msgstr ""
-
-#, c-format
-msgid "Sorry, you can only have %d bad words entries on a channel."
-msgstr ""
-
-#, c-format
-msgid "Sorry, you have already exceeded your limit of %d channels."
-msgstr ""
-
-#, c-format
-msgid "Sorry, you have already reached your limit of %d channels."
-msgstr ""
-
 msgid "State"
 msgstr ""
 
@@ -5497,6 +5465,18 @@ msgid "The limit on %s is not valid."
 msgstr ""
 
 msgid "The mask must contain at least one non wildcard character."
+msgstr ""
+
+#, c-format
+msgid "The maximum of %d auto join entries has been reached."
+msgstr ""
+
+#, c-format
+msgid "The maximum of %d certificate entries has been reached."
+msgstr ""
+
+#, c-format
+msgid "The memo ignore list for %s is full."
 msgstr ""
 
 #, c-format
@@ -6209,6 +6189,18 @@ msgid "You can not send a single message while you have messages queued."
 msgstr ""
 
 #, c-format
+msgid "You can only have %d access entries on a channel, including access entries from other channels."
+msgstr ""
+
+#, c-format
+msgid "You can only have %d autokick masks on a channel."
+msgstr ""
+
+#, c-format
+msgid "You can only have %d bad words entries on a channel."
+msgstr ""
+
+#, c-format
 msgid "You can't %s yourself!"
 msgstr ""
 
@@ -6287,6 +6279,14 @@ msgstr[1] ""
 
 #, c-format
 msgid "You have a new memo from %s. Type %s%zu to read it."
+msgstr ""
+
+#, c-format
+msgid "You have already exceeded your limit of %d channels."
+msgstr ""
+
+#, c-format
+msgid "You have already reached your limit of %d channels."
 msgstr ""
 
 #, c-format

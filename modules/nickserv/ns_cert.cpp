@@ -214,7 +214,7 @@ private:
 
 		if (cl->GetCertCount() >= max)
 		{
-			source.Reply(_("Sorry, the maximum of %d certificate entries has been reached."), max);
+			source.Reply(_("The maximum of %d certificate entries has been reached."), max);
 			return;
 		}
 

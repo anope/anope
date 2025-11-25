@@ -140,6 +140,7 @@ class CommandNSAJoin final
 
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &chans, const Anope::string &keys)
 	{
+		const auto ajoinmax = Config->GetModule(this->owner).Get<unsigned>("ajoinmax");
 		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
 
 		Anope::string addedchans;
@@ -156,9 +157,10 @@ class CommandNSAJoin final
 				if ((*channels)->at(i)->channel.equals_ci(chan))
 					break;
 
-			if ((*channels)->size() >= Config->GetModule(this->owner).Get<unsigned>("ajoinmax"))
+			if ((*channels)->size() >= ajoinmax)
 			{
-				source.Reply(_("The maximum of %d auto join entries has been reached."), Config->GetModule(this->owner).Get<unsigned>("ajoinmax"));
+				source.Reply(ajoinmax, N_("The maximum of %u auto join entry has been reached.", "The maximum of %u auto join entries has been reached."),
+					ajoinmax);
 				return;
 			}
 			else if (i != (*channels)->size())

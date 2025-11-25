@@ -210,11 +210,12 @@ private:
 	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
 	{
 		auto *cl = nc->Require<NickServ::CertList>(NICKSERV_CERT_EXT);
-		unsigned max = Config->GetModule(this->owner).Get<unsigned>("max", "5");
 
+		const auto max = Config->GetModule(this->owner).Get<unsigned>("max", "5");
 		if (cl->GetCertCount() >= max)
 		{
-			source.Reply(_("The maximum of %d certificate entries has been reached."), max);
+			source.Reply(max, N_("The maximum of %u certificate entry has been reached.", "The maximum of %u certificate entries has been reached."),
+				max);
 			return;
 		}
 

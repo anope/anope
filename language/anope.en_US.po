@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-25 00:05+0000\n"
-"PO-Revision-Date: 2025-11-25 00:05+0000\n"
+"POT-Creation-Date: 2025-11-25 00:31+0000\n"
+"PO-Revision-Date: 2025-11-25 00:32+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -5468,12 +5468,16 @@ msgid "The mask must contain at least one non wildcard character."
 msgstr ""
 
 #, c-format
-msgid "The maximum of %d auto join entries has been reached."
-msgstr ""
+msgid "The maximum of %u auto join entry has been reached."
+msgid_plural "The maximum of %u auto join entries has been reached."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
-msgid "The maximum of %d certificate entries has been reached."
-msgstr ""
+msgid "The maximum of %u certificate entry has been reached."
+msgid_plural "The maximum of %u certificate entries has been reached."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
 msgid "The memo ignore list for %s is full."

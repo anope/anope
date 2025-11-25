@@ -573,7 +573,7 @@ public:
 	{
 		this->SetDesc(_("Manipulate the host offer list"));
 		this->SetSyntax(_("ADD [+\037expiry\037] \037vhost\037 [\037reason\037]"));
-		this->SetSyntax(_("CLEAR"));
+		this->SetSyntax("CLEAR");
 		this->SetSyntax(_("DEL {\037vhost\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("LIST [\037vhost-mask\037 | \037entry-num\037 | \037list\037]"));
 		this->SetSyntax(_("VIEW [\037vhost-mask\037 | \037entry-num\037 | \037list\037]"));

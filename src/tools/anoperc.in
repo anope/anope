@@ -17,7 +17,7 @@
 ANOPEPID="@INSTDIR@/data/anope.pid"
 ANOPROG="@INSTDIR@/bin/anope"
 LOG="@INSTDIR@/logs/"
-ARCVERSION="2"
+ARCVERSION="@VERSION_FULL@"
 
 isAnopeRunning () {
 	if [ ! -f $ANOPEPID ] ; then

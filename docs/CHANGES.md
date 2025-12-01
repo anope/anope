@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
-* Changed the registration database types added by modules to be delayed until after the module constructor has been called.
+* Changed the registration of database types added by modules to be delayed until after the module constructor has been called. This might affect any custom modules you are using.
 
 * Moved akicks out of the core into cs_akick. Modules which depend on akicks now require the cs_akick module to be loaded.
 
@@ -14,19 +14,89 @@
 
 * Added support for forbidding passwords. This is intended to be used with file forbids (see below).
 
+  ```
+  /OPERSERV FORBID ADD PASSWORD +30d hunter2 This password is insecure
+  -OperServ- Added a forbid on hunter2 of type password to expire on Mon 29 Dec 2025 11:51:13 AM UTC (30 days from now).
+  ```
+
 * Added support for loading forbids from a file.
+
+  ```cpp
+  file
+  {
+    type = "email"
+    file = "temp-emails.txt"
+    reason = "Temporary email"
+  }
+  ```
 
 * Added support for the UnrealIRCd `+F` flood profile mode.
 
+* Added the `anope-mkpasswd` script to help generate passwords for use in the config.
+
+  ```
+  $ ./anope-mkpasswd argon2id hunter2
+  For use in the database:
+      argon2id:$argon2id$v=19$m=65536,t=3,p=4$AmGWdtn1OUT9WSKSqESsPw$iguvHs6oIi/hF7e3t/bGNwgqP41vl/J4qP3a/yH9SLo
+
+  For use in an oper:
+      password = "$argon2id$v=19$m=65536,t=3,p=4$AmGWdtn1OUT9WSKSqESsPw$iguvHs6oIi/hF7e3t/bGNwgqP41vl/J4qP3a/yH9SLo"
+      password_hash = "argon2id"
+
+  For use in an jsonrpc/xmlrpc token:
+      token = "$argon2id$v=19$m=65536,t=3,p=4$AmGWdtn1OUT9WSKSqESsPw$iguvHs6oIi/hF7e3t/bGNwgqP41vl/J4qP3a/yH9SLo"
+      token_hash = "argon2id"
+
+  Make sure you have the enc_argon2 module loaded!
+  ```
+
 * Added the DISPLAY flag to `nickserv/list` to only show account display nicknames.
 
-* Added the hs_offer module which allows offering templated vhosts to users (based on a modsite module by @genius3000 on GitHub).
+  ```
+  /NICKSERV LIST *
+  -NickServ- List of entries matching *:
+  -NickServ- nick1 (last mask: foo@example.com)
+  -NickServ- nick1|afk (last mask: bar@example.com)
+  -NickServ- nick2 (last mask: baz@example.com)
+  -NickServ- End of list - 3/3 matches shown.
+
+  /NICKSERV LIST * DISPLAY
+  -NickServ- List of entries matching *:
+  -NickServ- nick1 (last mask: foo@example.com)
+  -NickServ- nick2 (last mask: baz@example.com)
+  -NickServ- End of list - 2/2 matches shown.
+  ```
+
+* Added the hs_offer module which allows offering templated vhosts to users (based on a
+modsite module by @genius3000 on GitHub).
+
+  ```
+  /HOSTSERV OFFER ADD {account}.users.example.com
+
+  /HOSTSERV OFFERLIST
+  -HostServ- Current host offer list:
+  -HostServ- 2: {account}.users.example.com / FooBar.users.example.com -- does not expire
+  -HostServ- End of host offer list.
+  ```
 
 * Changed chanserv/mode lock messages to stack the responses into one message per type instead of sending one message per mode.
+
+  ```
+  /CHANSERV MODE #stest LOCK ADD +bb foo!foo@foo bar!bar@bar
+  -ChanServ- +bb foo!foo@foo bar!bar@bar has been locked on #stest.
+  ```
 
 * Changed database objects to rehook to their type when it becomes available again.
 
 * Changed the `nickserv/set/language` and `nickserv/set/timezone` commands to allow setting back to the default value by omitting the last parameter.
+
+  ```
+  /NICKSERV SET LANGUAGE
+  12:23 -NickServ- Language changed to English.
+
+  /NICKSERV SET TIMEZONE
+  12:24 -NickServ- Timezone changed to UTC.
+  ```
 
 * Changed the default install directory from `~/anope` to `~/anope-2.1`.
 

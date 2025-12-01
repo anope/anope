@@ -20,9 +20,9 @@ contributions they have made, are:
   * Adam Kramer <ribosome@anope.org>
   * Attila Molnar <attilamolnar@hush.com>
   * Michael Wobst <wobst.michael@web.de>
+  * Matt Schatz <genius3000@g3k.solutions>
   * PeGaSuS <droider.pc@gmail.com>
   * Mark Summers <mark@goopler.net>
-  * Matt Schatz <genius3000@g3k.solutions>
   * Daniel Vassdal <shutter@canternet.org>
   * MatthewM <mcm@they-got.us>
   * Sebastian V. <hal9000@denorastats.org>

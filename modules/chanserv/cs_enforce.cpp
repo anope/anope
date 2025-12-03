@@ -56,7 +56,8 @@ private:
 			if (user->IsProtected())
 				continue;
 
-			if (ci->AccessFor(user).empty())
+			AccessGroup access = ci->AccessFor(user);
+			if (!access.founder && access.empty())
 				users.push_back(user);
 		}
 
@@ -184,7 +185,8 @@ private:
 			if (user->IsProtected())
 				continue;
 
-			if (!ci->AccessFor(user).empty())
+			AccessGroup access = ci->AccessFor(user);
+			if (access.founder || !access.empty())
 				continue;
 
 			if (ci->c->users.size() - users.size() <= static_cast<unsigned>(l))

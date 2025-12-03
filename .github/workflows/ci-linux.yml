@@ -2,6 +2,7 @@ name: Ubuntu CI
 on:
   - pull_request
   - push
+  - workflow_dispatch
 jobs:
   build:
     if: "!contains(github.event.head_commit.message, '[skip ubuntu ci]')"
@@ -10,7 +11,7 @@ jobs:
       CXX: ${{ matrix.compiler }}
       CXXFLAGS: -std=${{ matrix.standard }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install dependencies
         run: |

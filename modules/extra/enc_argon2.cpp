@@ -23,6 +23,7 @@
 
 #include <climits>
 #include <random>
+#include <regex>
 
 #include <argon2.h>
 
@@ -143,6 +144,44 @@ private:
 		return nullptr;
 	}
 
+	bool ShouldRehash(Encryption::Provider *provider, const Anope::string &password)
+	{
+		if (provider != defaultprovider)
+			return true;
+
+		static std::regex pattern("^\\$argon2(?:i|d|id)(?:\\$v=(\\d+))?\\$m=(\\d+),t=(\\d+),p=(\\d+)\\$([A-Za-z0-9+\\/=]+)\\$([A-Za-z0-9+\\/=]+)$", std::regex::optimize);
+
+		std::smatch matches;
+		if (!std::regex_match(password.str(), matches, pattern))
+			return true; // Unable to determine, assume yes.
+
+		const auto version = Anope::TryConvert<uint32_t>(matches[1].str());
+		if (!version || *version != ARGON2_VERSION_NUMBER)
+			return true;
+
+		const auto memory_cost = Anope::TryConvert<uint32_t>(matches[2].str());
+		if (!memory_cost || *memory_cost != Argon2Context::memory_cost)
+			return true;
+
+		const auto time_cost = Anope::TryConvert<uint32_t>(matches[3].str());
+		if (!time_cost || *time_cost != Argon2Context::time_cost)
+			return true;
+
+		const auto parallelism = Anope::TryConvert<uint32_t>(matches[4].str());
+		if (!parallelism || *parallelism != Argon2Context::parallelism)
+			return true;
+
+		const auto salt = Anope::B64Decode(matches[5].str());
+		if (salt.length() != Argon2Context::salt_length)
+			return true;
+
+		const auto hash = Anope::B64Decode(matches[6].str());
+		if (hash.length() != Argon2Context::hash_length)
+			return true;
+
+		return false;
+	}
+
 public:
 	EArgon2(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, ENCRYPTION | VENDOR)
@@ -210,7 +249,7 @@ public:
 			// If we are NOT the first encryption module or the algorithm is
 			// different we want to re-encrypt the password with the primary
 			// encryption method.
-			if (ModuleManager::FindFirstOf(ENCRYPTION) != this || provider != defaultprovider)
+			if (ModuleManager::FindFirstOf(ENCRYPTION) != this || ShouldRehash(provider, hash_value))
 				Anope::Encrypt(req->GetPassword(), nc->pass);
 			req->Success(this, na);
 		}

@@ -156,7 +156,7 @@ public:
 			}
 
 		}
-		if (!CheckLimitReached(source, nse->email, true))
+		if (CheckLimitReached(source, nse->email, true))
 		{
 			ns_set_email.Unset(nc);
 			return;

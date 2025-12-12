@@ -342,7 +342,7 @@ public:
 				: _("\002{nick}\002: registered on {registered}; expires in {expires}");
 		});
 
-		time_t nickserv_expire = Config->GetModule("nickserv").Get<time_t>("expire", "90d"),
+		time_t nickserv_expire = Config->GetModule("nickserv").Get<time_t>("expire", "1y"),
 		       unconfirmed_expire = Config->GetModule("ns_register").Get<time_t>("unconfirmedexpire", "1d");
 		for (auto *na2 : *nc->aliases)
 		{

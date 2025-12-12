@@ -608,7 +608,7 @@ public:
 		if (Anope::NoExpire || Anope::ReadOnly)
 			return;
 
-		time_t nickserv_expire = Config->GetModule(this).Get<time_t>("expire", "90d");
+		time_t nickserv_expire = Config->GetModule(this).Get<time_t>("expire", "1y");
 
 		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; )
 		{

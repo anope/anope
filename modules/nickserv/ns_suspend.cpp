@@ -70,7 +70,8 @@ class CommandNSSuspend final
 	: public Command
 {
 public:
-	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 3)
+	CommandNSSuspend(Module *creator)
+		: Command(creator, "nickserv/suspend", 1, 3)
 	{
 		this->SetDesc(_("Suspend a given nick"));
 		this->SetSyntax(_("\037nickname\037 [+\037expiry\037] [\037reason\037]"));
@@ -78,24 +79,40 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-
-		const Anope::string &nick = params[0];
-		Anope::string expiry = params[1];
-		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->GetModule(this->owner).Get<time_t>("suspendexpire");
-
 		if (Anope::ReadOnly)
+		{
 			source.Reply(READ_ONLY_MODE);
-
-		if (expiry[0] != '+')
-		{
-			reason = expiry + " " + reason;
-			reason.trim();
-			expiry.clear();
+			return;
 		}
-		else
+
+		const auto &nick = params[0];
+		auto *na = NickAlias::Find(nick);
+		if (!na)
 		{
-			expiry_secs = Anope::DoTime(expiry);
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			return;
+		}
+
+		NickCore *nc = na->nc;
+		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && nc->IsServicesOper())
+		{
+			source.Reply(_("You may not suspend other Services Operators' nicknames."));
+			return;
+		}
+
+		if (nc->HasExt("NS_SUSPENDED"))
+		{
+			source.Reply(_("\002%s\002 is already suspended."), na->nc->display.c_str());
+			return;
+		}
+
+		const size_t expiry_idx = params.size() >= 1 && params[1][0] == '+' ? 1 : 0;
+		const size_t reason_idx = expiry_idx ? 2 : 1;
+
+		time_t expiry_secs = Config->GetModule(this->owner).Get<time_t>("suspendexpire");
+		if (expiry_idx != 0)
+		{
+			expiry_secs = Anope::DoTime(params[expiry_idx].substr(1));
 			if (expiry_secs < 0)
 			{
 				source.Reply(BAD_EXPIRY_TIME);
@@ -103,26 +120,9 @@ public:
 			}
 		}
 
-		NickAlias *na = NickAlias::Find(nick);
-		if (!na)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-			return;
-		}
-
-		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && na->nc->IsServicesOper())
-		{
-			source.Reply(_("You may not suspend other Services Operators' nicknames."));
-			return;
-		}
-
-		if (na->nc->HasExt("NS_SUSPENDED"))
-		{
-			source.Reply(_("\002%s\002 is already suspended."), na->nc->display.c_str());
-			return;
-		}
-
-		NickCore *nc = na->nc;
+		Anope::string reason;
+		for (auto idx = reason_idx; idx < params.size(); ++idx)
+			reason.append(reason.empty() ? "" : " ").append(params[idx]);
 
 		NSSuspendInfo *si = nc->Extend<NSSuspendInfo>("NS_SUSPENDED");
 		si->what = nc->display;

@@ -69,7 +69,8 @@ class CommandCSSuspend final
 	: public Command
 {
 public:
-	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 2, 3)
+	CommandCSSuspend(Module *creator)
+		: Command(creator, "chanserv/suspend", 1, 3)
 	{
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] [\037reason\037]"));
@@ -77,31 +78,14 @@ public:
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
-		const Anope::string &chan = params[0];
-		Anope::string expiry = params[1];
-		Anope::string reason = params.size() > 2 ? params[2] : "";
-		time_t expiry_secs = Config->GetModule(this->owner).Get<time_t>("suspendexpire");
-
-		if (!expiry.empty() && expiry[0] != '+')
-		{
-			reason = expiry + " " + reason;
-			reason.trim();
-			expiry.clear();
-		}
-		else
-		{
-			expiry_secs = Anope::DoTime(expiry);
-			if (expiry_secs < 0)
-			{
-				source.Reply(BAD_EXPIRY_TIME);
-				return;
-			}
-		}
-
 		if (Anope::ReadOnly)
+		{
 			source.Reply(READ_ONLY_MODE);
+			return;
+		}
 
-		ChannelInfo *ci = ChannelInfo::Find(chan);
+		const auto &chan = params[0];
+		auto *ci = ChannelInfo::Find(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
@@ -113,6 +97,24 @@ public:
 			source.Reply(_("\002%s\002 is already suspended."), ci->name.c_str());
 			return;
 		}
+
+		const size_t expiry_idx = params.size() >= 1 && params[1][0] == '+' ? 1 : 0;
+		const size_t reason_idx = expiry_idx ? 2 : 1;
+
+		time_t expiry_secs = Config->GetModule(this->owner).Get<time_t>("suspendexpire");
+		if (expiry_idx != 0)
+		{
+			expiry_secs = Anope::DoTime(params[expiry_idx].substr(1));
+			if (expiry_secs < 0)
+			{
+				source.Reply(BAD_EXPIRY_TIME);
+				return;
+			}
+		}
+
+		Anope::string reason;
+		for (auto idx = reason_idx; idx < params.size(); ++idx)
+			reason.append(reason.empty() ? "" : " ").append(params[idx]);
 
 		CSSuspendInfo *si = ci->Extend<CSSuspendInfo>("CS_SUSPENDED");
 		si->what = ci->name;

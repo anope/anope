@@ -126,7 +126,7 @@ class CommandOSModUnLoad final
 public:
 	CommandOSModUnLoad(Module *creator) : Command(creator, "operserv/modunload", 1, 1)
 	{
-		this->SetDesc(_("Un-Load a module"));
+		this->SetDesc(_("Unload a module"));
 		this->SetSyntax(_("\037modname\037"));
 	}
 

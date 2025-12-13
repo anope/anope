@@ -43,7 +43,7 @@ Anope Modules
 
        MODLOAD     Load a module
        MODRELOAD   Reload a module
-       MODUNLOAD   Un-Load a module
+       MODUNLOAD   Unload a module
        MODLIST     List loaded modules
        MODINFO     Info about a loaded module
 

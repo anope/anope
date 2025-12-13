@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-25 00:37+0000\n"
-"PO-Revision-Date: 2025-11-25 00:37+0000\n"
+"POT-Creation-Date: 2025-12-13 15:06+0000\n"
+"PO-Revision-Date: 2025-12-13 15:06+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -5855,9 +5855,6 @@ msgstr ""
 msgid "Type %sregion to list timezones for a region."
 msgstr ""
 
-msgid "Un-Load a module"
-msgstr ""
-
 #, c-format
 msgid "Unable to find regex engine %s."
 msgstr ""
@@ -5919,6 +5916,9 @@ msgstr ""
 
 #, c-format
 msgid "Unknown passwords: %zu"
+msgstr ""
+
+msgid "Unload a module"
 msgstr ""
 
 msgid "Unpooled"

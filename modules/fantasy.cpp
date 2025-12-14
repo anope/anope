@@ -75,13 +75,13 @@ public:
 				"Enables or disables \002fantasy\002 mode on a channel. "
 				"When it is enabled, users will be able to use "
 				"fantasy commands on a channel when prefixed "
-				"with one of the following fantasy characters: \002%s\002"
+				"with one of the following fantasy prefixes: \002%s\002"
 				"\n\n"
 				"Note that users wanting to use fantasy commands "
 				"MUST have enough access for both the FANTASY "
 				"privilege and the command they are executing."
 			),
-			Config->GetModule(this->owner).Get<const Anope::string>("fantasycharacter", "!").c_str());
+			Config->GetModule(this->owner).Get<const Anope::string>("prefix", "!").c_str());
 		return true;
 	}
 };
@@ -89,14 +89,24 @@ public:
 class Fantasy final
 	: public Module
 {
+private:
 	SerializableExtensibleItem<bool> fantasy;
-
 	CommandBSSetFantasy commandbssetfantasy;
+	std::vector<Anope::string> prefixes;
 
 public:
-	Fantasy(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		fantasy(this, "BS_FANTASY"), commandbssetfantasy(this)
+	Fantasy(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, fantasy(this, "BS_FANTASY")
+		, commandbssetfantasy(this)
 	{
+	}
+
+	void OnReload(Configuration::Conf &conf) override
+	{
+		const auto &modconf = conf.GetModule(this);
+		const auto &prefix = modconf.Get<const Anope::string>("prefix", "!");
+		spacesepstream(prefix).GetTokens(prefixes);
 	}
 
 	void OnPrivmsg(User *u, Channel *c, Anope::string &msg, const Anope::map<Anope::string> &tags) override
@@ -114,23 +124,24 @@ public:
 			return;
 
 		Anope::string normalized_param0 = Anope::RemoveFormatting(params[0]);
-		Anope::string fantasy_chars = Config->GetModule(this).Get<Anope::string>("fantasycharacter", "!");
-
-		if (!normalized_param0.find(c->ci->bi->nick))
+		if (normalized_param0.find_ci(c->ci->bi->nick) == 0)
 		{
 			params.erase(params.begin());
 		}
-		else if (!normalized_param0.find_first_of(fantasy_chars))
+		else
 		{
-			size_t sz = params[0].find_first_of(fantasy_chars);
+			auto fn = [&normalized_param0](const auto &prefix) { return normalized_param0.find(prefix) == 0; };
+			auto it = std::find_if(prefixes.begin(), prefixes.end(), fn);
+			if (it == prefixes.end())
+				return;
+
+			auto sz = params[0].find(*it);
 			if (sz == Anope::string::npos)
 				return; /* normalized_param0 is a subset of params[0] so this can't happen */
 
-			params[0].erase(0, sz + 1);
-		}
-		else
-		{
-			return;
+			params[0].erase(0, sz + it->length());
+			if (params[0].equals_ci(c->ci->bi->alias))
+				params.erase(params.begin());
 		}
 
 		if (params.empty())

@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-13 15:06+0000\n"
-"PO-Revision-Date: 2025-12-13 15:06+0000\n"
+"POT-Creation-Date: 2025-12-14 01:24+0000\n"
+"PO-Revision-Date: 2025-12-14 01:24+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1436,7 +1436,7 @@ msgid "Additionally, Services Operators with the nickserv/resend permission ca
 msgstr ""
 
 #, c-format
-msgid "Additionally, if fantasy is enabled fantasy commands can be executed by prefixing the command name with one of the following characters: %s"
+msgid "Additionally, if fantasy is enabled fantasy commands can be executed by prefixing the command name with one of the following fantasy prefixes: %s"
 msgstr ""
 
 #, c-format
@@ -2830,7 +2830,7 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Enables or disables fantasy mode on a channel. When it is enabled, users will be able to use fantasy commands on a channel when prefixed with one of the following fantasy characters: %s\n"
+"Enables or disables fantasy mode on a channel. When it is enabled, users will be able to use fantasy commands on a channel when prefixed with one of the following fantasy prefixes: %s\n"
 "\n"
 "Note that users wanting to use fantasy commands MUST have enough access for both the FANTASY privilege and the command they are executing."
 msgstr ""
@@ -3015,7 +3015,7 @@ msgid "Fantasy"
 msgstr ""
 
 #, c-format
-msgid "Fantasy commands may be prefixed with one of the following characters: %s"
+msgid "Fantasy commands may be prefixed with one of the following fantasy prefixes: %s"
 msgstr ""
 
 #, c-format

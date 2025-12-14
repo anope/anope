@@ -147,11 +147,11 @@ public:
 				),
 				source.service->nick.c_str());
 
-			const Anope::string &fantasycharacters = Config->GetModule("fantasy").Get<const Anope::string>("fantasycharacter", "!");
+			const Anope::string &fantasycharacters = Config->GetModule("fantasy").Get<const Anope::string>("prefix", "!");
 			if (!fantasycharacters.empty())
 			{
 				source.Reply(" ");
-				source.Reply(_("Fantasy commands may be prefixed with one of the following characters: %s"),
+				source.Reply(_("Fantasy commands may be prefixed with one of the following fantasy prefixes: %s"),
 					fantasycharacters.c_str());
 			}
 			source.Reply(" ");
@@ -187,13 +187,13 @@ public:
 		source.Reply(_("Bot will join a channel whenever there is at least \002%d\002 user(s) on it."),
 			Config->GetModule(this).Get<unsigned>("minusers"));
 
-		const Anope::string &fantasycharacters = Config->GetModule("fantasy").Get<const Anope::string>("fantasycharacter", "!");
+		const Anope::string &fantasycharacters = Config->GetModule("fantasy").Get<const Anope::string>("prefix", "!");
 		if (!fantasycharacters.empty())
 		{
 			source.Reply(_(
 					"Additionally, if fantasy is enabled fantasy commands "
 					"can be executed by prefixing the command name with "
-					"one of the following characters: %s"
+					"one of the following fantasy prefixes: %s"
 				),
 				fantasycharacters.c_str());
 		}

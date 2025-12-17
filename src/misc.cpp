@@ -916,9 +916,9 @@ Anope::string Anope::VersionBuildString()
 	return s;
 }
 
-int Anope::VersionMajor() { return VERSION_MAJOR; }
-int Anope::VersionMinor() { return VERSION_MINOR; }
-int Anope::VersionPatch() { return VERSION_PATCH; }
+unsigned Anope::VersionMajor() { return VERSION_MAJOR; }
+unsigned Anope::VersionMinor() { return VERSION_MINOR; }
+unsigned Anope::VersionPatch() { return VERSION_PATCH; }
 
 Anope::string Anope::RemoveFormatting(const Anope::string &buf)
 {

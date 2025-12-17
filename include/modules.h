@@ -169,7 +169,7 @@ typedef unsigned short ModType;
 
 struct ModuleVersionC final
 {
-	int version_major, version_minor, version_patch;
+	unsigned version_major, version_minor, version_patch;
 };
 
 /** Returned by Module::GetVersion, used to see what version of Anope
@@ -178,9 +178,9 @@ struct ModuleVersionC final
 class ModuleVersion final
 {
 private:
-	int version_major;
-	int version_minor;
-	int version_patch;
+	unsigned version_major;
+	unsigned version_minor;
+	unsigned version_patch;
 
 public:
 	ModuleVersion(const ModuleVersionC &);
@@ -188,17 +188,17 @@ public:
 	/** Get the major version of Anope this was built against
 	 * @return The major version
 	 */
-	int GetMajor() const;
+	unsigned GetMajor() const;
 
 	/** Get the minor version of Anope this was built against
 	 * @return The minor version
 	 */
-	int GetMinor() const;
+	unsigned GetMinor() const;
 
 	/** Get the patch version this was built against
 	 * @return The patch version
 	 */
-	int GetPatch() const;
+	unsigned GetPatch() const;
 };
 
 class CoreExport NotImplementedException final

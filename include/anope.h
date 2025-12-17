@@ -418,9 +418,9 @@ namespace Anope
 	extern CoreExport string Version();
 	extern CoreExport string VersionShort();
 	extern CoreExport string VersionBuildString();
-	extern CoreExport int VersionMajor();
-	extern CoreExport int VersionMinor();
-	extern CoreExport int VersionPatch();
+	extern CoreExport unsigned VersionMajor();
+	extern CoreExport unsigned VersionMinor();
+	extern CoreExport unsigned VersionPatch();
 
 	/** Determines if we are still attached to the terminal, and can print
 	 * messages to the user via stderr/stdout.

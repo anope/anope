@@ -117,23 +117,23 @@ void Module::Prioritize()
 }
 
 ModuleVersion::ModuleVersion(const ModuleVersionC &ver)
+	: version_major(ver.version_major)
+	, version_minor(ver.version_minor)
+	, version_patch(ver.version_patch)
 {
-	version_major = ver.version_major;
-	version_minor = ver.version_minor;
-	version_patch = ver.version_patch;
 }
 
-int ModuleVersion::GetMajor() const
+unsigned ModuleVersion::GetMajor() const
 {
 	return this->version_major;
 }
 
-int ModuleVersion::GetMinor() const
+unsigned ModuleVersion::GetMinor() const
 {
 	return this->version_minor;
 }
 
-int ModuleVersion::GetPatch() const
+unsigned ModuleVersion::GetPatch() const
 {
 	return this->version_patch;
 }

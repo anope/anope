@@ -115,7 +115,7 @@ public:
 		return !(!BinarySocket::ProcessWrite() || this->write_buffer.empty());
 	}
 
-	const Anope::string GetIP() override
+	Anope::string GetIP() const override
 	{
 		return this->ip;
 	}

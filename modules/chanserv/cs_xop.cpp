@@ -514,7 +514,7 @@ public:
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const override
+	Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::Format(Language::Translate(source.GetAccount(), _("Modify the list of %s users")), source.command.nobreak().c_str());
 	}

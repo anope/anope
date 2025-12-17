@@ -245,7 +245,7 @@ public:
 	{
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const override
+	Anope::string GetDesc(CommandSource &source) const override
 	{
 		return Anope::Format(Language::Translate(source.GetAccount(), _("Manipulate the %s list")), source.command.nobreak().c_str());
 	}

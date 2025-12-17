@@ -152,7 +152,7 @@ public:
 	{
 	}
 
-	virtual const Anope::string GetIP()
+	virtual Anope::string GetIP() const
 	{
 		return this->clientaddr.addr();
 	}

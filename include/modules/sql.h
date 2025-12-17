@@ -157,7 +157,7 @@ namespace SQL
 			}
 		}
 
-		const Anope::string Get(size_t index, const Anope::string &col) const
+		Anope::string Get(size_t index, const Anope::string &col) const
 		{
 			const std::map<Anope::string, Anope::string> rows = this->Row(index);
 

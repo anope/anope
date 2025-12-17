@@ -199,7 +199,7 @@ void Command::RequireUser(bool b)
 	this->require_user = b;
 }
 
-const Anope::string Command::GetDesc(CommandSource &) const
+Anope::string Command::GetDesc(CommandSource &) const
 {
 	return this->desc;
 }

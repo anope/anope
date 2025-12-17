@@ -148,7 +148,7 @@ public:
 	 * @param source The source wanting the command description
 	 * @return The commands description
 	 */
-	virtual const Anope::string GetDesc(CommandSource &source) const;
+	virtual Anope::string GetDesc(CommandSource &source) const;
 
 	/** Execute this command.
 	 * @param source The source

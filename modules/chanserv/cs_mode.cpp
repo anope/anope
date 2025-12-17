@@ -943,7 +943,7 @@ public:
 		}
 	}
 
-	const Anope::string GetDesc(CommandSource &source) const override
+	Anope::string GetDesc(CommandSource &source) const override
 	{
 		const std::pair<bool, Anope::string> &m = modes[source.command];
 		if (!m.second.empty())

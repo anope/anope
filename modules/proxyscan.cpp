@@ -85,7 +85,7 @@ public:
 	}
 
 	void OnConnect() override = 0;
-	virtual const Anope::string GetType() const = 0;
+	virtual const char *GetType() const = 0;
 
 protected:
 	void Ban()
@@ -134,7 +134,7 @@ public:
 		this->Write("");
 	}
 
-	const Anope::string GetType() const override
+	const char *GetType() const override
 	{
 		return "HTTP";
 	}
@@ -187,7 +187,7 @@ public:
 		this->Write(buf, ptr);
 	}
 
-	const Anope::string GetType() const override
+	const char *GetType() const override
 	{
 		return "SOCKS5";
 	}

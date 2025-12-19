@@ -118,12 +118,12 @@ public:
 				for (const auto &query : create)
 					this->RunQuery(query);
 
-				auto res = this->RunQuery(this->SQL->BuildInsert(GetTableName(s_type), obj->id, data));
-				if (res.GetID() && obj->id != res.GetID())
+				auto res = this->RunQuery(this->SQL->BuildInsert(GetTableName(s_type), obj->object_id, data));
+				if (res.GetID() && obj->object_id != res.GetID())
 				{
 					/* In this case obj is new, so place it into the object map */
-					obj->id = res.GetID();
-					s_type->objects[obj->id] = obj;
+					obj->object_id = res.GetID();
+					s_type->objects[obj->object_id] = obj;
 				}
 			}
 		}
@@ -168,9 +168,9 @@ public:
 		Serialize::Type *s_type = obj->GetSerializableType();
 		if (s_type)
 		{
-			if (obj->id > 0)
-				this->RunQuery("DELETE FROM `" + GetTableName(s_type) + "` WHERE `id` = " + Anope::ToString(obj->id));
-			s_type->objects.erase(obj->id);
+			if (obj->object_id > 0)
+				this->RunQuery("DELETE FROM `" + GetTableName(s_type) + "` WHERE `id` = " + Anope::ToString(obj->object_id));
+			s_type->objects.erase(obj->object_id);
 		}
 		this->updated_items.erase(obj);
 	}
@@ -227,10 +227,10 @@ public:
 				Serializable *new_s = obj->Unserialize(s, data);
 				if (new_s)
 				{
-					// If s == new_s then s->id == new_s->id
+					// If s == new_s then s->object_id == new_s->object_id
 					if (s != new_s)
 					{
-						new_s->id = id;
+						new_s->object_id = id;
 						obj->objects[id] = new_s;
 
 						/* The Unserialize operation is destructive so rebuild the data for UpdateCache.

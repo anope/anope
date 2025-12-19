@@ -118,7 +118,7 @@ public:
 	virtual ~Serializable();
 
 	/* Unique ID (per type, not globally) for this object */
-	Id id = 0;
+	Id object_id = 0;
 
 	/* Only used by redis, to ignore updates */
 	unsigned short redis_ignore = 0;

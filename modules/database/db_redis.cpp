@@ -146,7 +146,7 @@ public:
 		Serialize::Type *t = obj->GetSerializableType();
 
 		/* If there is no id yet for this object, get one */
-		if (!obj->id)
+		if (!obj->object_id)
 			redis->SendCommand(new IDInterface(this, obj), "INCR id:" + t->GetName());
 		else
 		{
@@ -160,10 +160,10 @@ public:
 
 			std::vector<Anope::string> args;
 			args.emplace_back("HGETALL");
-			args.push_back("hash:" + t->GetName() + ":" + Anope::ToString(obj->id));
+			args.push_back("hash:" + t->GetName() + ":" + Anope::ToString(obj->object_id));
 
 			/* Get object attrs to clear before updating */
-			redis->SendCommand(new Updater(this, t->GetName(), obj->id), args);
+			redis->SendCommand(new Updater(this, t->GetName(), obj->object_id), args);
 		}
 	}
 
@@ -246,13 +246,13 @@ public:
 
 		std::vector<Anope::string> args;
 		args.emplace_back("HGETALL");
-		args.push_back("hash:" + t->GetName() + ":" + Anope::ToString(obj->id));
+		args.push_back("hash:" + t->GetName() + ":" + Anope::ToString(obj->object_id));
 
 		/* Get all of the attributes for this object */
-		redis->SendCommand(new Deleter(this, t->GetName(), obj->id), args);
+		redis->SendCommand(new Deleter(this, t->GetName(), obj->object_id), args);
 
 		this->updated_items.erase(obj);
-		t->objects.erase(obj->id);
+		t->objects.erase(obj->object_id);
 		this->Notify();
 	}
 
@@ -315,7 +315,7 @@ void ObjectLoader::OnResult(const Reply &r)
 	obj = st->Unserialize(obj, data);
 	if (obj)
 	{
-		obj->id = this->id;
+		obj->object_id = this->id;
 		obj->UpdateCache(data);
 	}
 
@@ -333,9 +333,9 @@ void IDInterface::OnResult(const Reply &r)
 	Serializable *&obj = o->GetSerializableType()->objects[r.i];
 	if (obj)
 		/* This shouldn't be possible */
-		obj->id = 0;
+		obj->object_id = 0;
 
-	o->id = r.i;
+	o->object_id = r.i;
 	obj = o;
 
 	/* Now that we have the id, insert this object for real */
@@ -431,12 +431,12 @@ void Updater::OnResult(const Reply &r)
 	std::vector<Anope::string> args;
 	args.emplace_back("SADD");
 	args.push_back("ids:" + this->type);
-	args.push_back(Anope::ToString(obj->id));
+	args.push_back(Anope::ToString(obj->object_id));
 	me->redis->SendCommand(NULL, args);
 
 	args.clear();
 	args.emplace_back("HMSET");
-	args.push_back("hash:" + this->type + ":" + Anope::ToString(obj->id));
+	args.push_back("hash:" + this->type + ":" + Anope::ToString(obj->object_id));
 
 	for (const auto &[key, value] : data.data)
 	{
@@ -447,7 +447,7 @@ void Updater::OnResult(const Reply &r)
 
 		args2.emplace_back("SADD");
 		args2.push_back("value:" + this->type + ":" + key + ":" + value->str());
-		args2.push_back(Anope::ToString(obj->id));
+		args2.push_back(Anope::ToString(obj->object_id));
 
 		/* Add to value -> object id set */
 		me->redis->SendCommand(NULL, args2);
@@ -551,7 +551,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 		std::vector<Anope::string> args;
 		args.emplace_back("SREM");
 		args.push_back("ids:" + type);
-		args.push_back(Anope::ToString(s->id));
+		args.push_back(Anope::ToString(s->object_id));
 
 		/* Delete object from id set */
 		me->redis->SendCommand(NULL, args);
@@ -610,7 +610,7 @@ void ModifiedObject::OnResult(const Reply &r)
 	obj = st->Unserialize(obj, data);
 	if (obj)
 	{
-		obj->id = this->id;
+		obj->object_id = this->id;
 		obj->UpdateCache(data);
 
 		/* Insert new object values */
@@ -619,7 +619,7 @@ void ModifiedObject::OnResult(const Reply &r)
 			std::vector<Anope::string> args;
 			args.emplace_back("SADD");
 			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
-			args.push_back(Anope::ToString(obj->id));
+			args.push_back(Anope::ToString(obj->object_id));
 
 			/* Add to value -> object id set */
 			me->redis->SendCommand(NULL, args);
@@ -628,7 +628,7 @@ void ModifiedObject::OnResult(const Reply &r)
 		std::vector<Anope::string> args;
 		args.emplace_back("SADD");
 		args.push_back("ids:" + st->GetName());
-		args.push_back(Anope::ToString(obj->id));
+		args.push_back(Anope::ToString(obj->object_id));
 
 		/* Add to type -> id set */
 		me->redis->SendCommand(NULL, args);

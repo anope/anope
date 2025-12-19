@@ -159,7 +159,7 @@ public:
 
 	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) override;
 
-	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) override;
+	Query BuildInsert(const Anope::string &table, Serializable::Id id, Data &data) override;
 
 	Query GetTables(const Anope::string &prefix) override;
 
@@ -568,7 +568,7 @@ std::vector<Query> MySQLService::CreateTable(const Anope::string &table, const D
 	return queries;
 }
 
-Query MySQLService::BuildInsert(const Anope::string &table, unsigned int id, Data &data)
+Query MySQLService::BuildInsert(const Anope::string &table, Serializable::Id id, Data &data)
 {
 	/* Empty columns not present in the data set */
 	for (const auto &known_col : this->active_schema[table])

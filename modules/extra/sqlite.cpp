@@ -69,7 +69,7 @@ public:
 
 	std::vector<Query> CreateTable(const Anope::string &table, const Data &data) override;
 
-	Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) override;
+	Query BuildInsert(const Anope::string &table, Serializable::Id id, Data &data) override;
 
 	Query GetTables(const Anope::string &prefix) override;
 
@@ -305,7 +305,7 @@ std::vector<Query> SQLiteService::CreateTable(const Anope::string &table, const 
 	return queries;
 }
 
-Query SQLiteService::BuildInsert(const Anope::string &table, unsigned int id, Data &data)
+Query SQLiteService::BuildInsert(const Anope::string &table, Serializable::Id id, Data &data)
 {
 	/* Empty columns not present in the data set */
 	for (const auto &known_col : this->active_schema[table])

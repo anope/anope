@@ -43,8 +43,8 @@ public:
 	// Used when writing data.
 	Data(Serialize::Type *s_type, Serializable *obj)
 	{
-		if (obj->id)
-			this->id = obj->id;
+		if (obj->object_id)
+			this->id = obj->object_id;
 		s_type->Serialize(obj, *this);
 	}
 

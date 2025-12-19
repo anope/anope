@@ -197,7 +197,7 @@ namespace SQL
 
 		virtual std::vector<Query> CreateTable(const Anope::string &table, const Data &data) = 0;
 
-		virtual Query BuildInsert(const Anope::string &table, unsigned int id, Data &data) = 0;
+		virtual Query BuildInsert(const Anope::string &table, Serializable::Id id, Data &data) = 0;
 
 		virtual Query GetTables(const Anope::string &prefix) = 0;
 

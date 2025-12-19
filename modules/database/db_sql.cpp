@@ -49,7 +49,7 @@ public:
 	{
 		SQLSQLInterface::OnResult(r);
 		if (r.GetID() > 0 && this->obj)
-			this->obj->id = r.GetID();
+			this->obj->object_id = r.GetID();
 		delete this;
 	}
 
@@ -136,7 +136,7 @@ public:
 					continue;
 
 				auto create = this->sql->CreateTable(GetTableName(s_type), data);
-				auto insert = this->sql->BuildInsert(GetTableName(s_type), obj->id, data);
+				auto insert = this->sql->BuildInsert(GetTableName(s_type), obj->object_id, data);
 
 				if (this->imported)
 				{
@@ -155,7 +155,7 @@ public:
 					 */
 					Result r = this->sql->RunQuery(insert);
 					if (r.GetID() > 0)
-						obj->id = r.GetID();
+						obj->object_id = r.GetID();
 				}
 			}
 		}
@@ -226,8 +226,8 @@ public:
 		if (this->shutting_down)
 			return;
 		Serialize::Type *s_type = obj->GetSerializableType();
-		if (s_type && obj->id > 0)
-			this->RunBackground("DELETE FROM `" + GetTableName(s_type) + "` WHERE `id` = " + Anope::ToString(obj->id));
+		if (s_type && obj->object_id > 0)
+			this->RunBackground("DELETE FROM `" + GetTableName(s_type) + "` WHERE `id` = " + Anope::ToString(obj->object_id));
 		this->updated_items.erase(obj);
 	}
 
@@ -235,7 +235,7 @@ public:
 	{
 		if (this->shutting_down || obj->IsTSCached())
 			return;
-		if (obj->id == 0)
+		if (obj->object_id == 0)
 			return; /* object is pending creation */
 		obj->UpdateTS();
 		this->updated_items.insert(obj);
@@ -262,7 +262,7 @@ public:
 			{
 				auto oid = Anope::TryConvert<Serializable::Id>(res.Get(j, "id"));
 				if (oid.has_value())
-					obj->id = oid.value();
+					obj->object_id = oid.value();
 				else
 					Log(this) << "Unable to convert id for object #" << j << " of type " << sb->GetName();
 

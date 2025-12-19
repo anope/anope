@@ -118,7 +118,7 @@ public:
 
 				Serializable *obj = stype->Unserialize(NULL, ld);
 				if (obj != NULL)
-					obj->id = ld.id;
+					obj->object_id = ld.id;
 				ld.Reset();
 			}
 		}

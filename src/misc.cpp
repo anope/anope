@@ -862,15 +862,17 @@ int Anope::LastErrorCode()
 
 Anope::string Anope::LastError()
 {
-#ifndef _WIN32
-	return strerror(errno);
-#else
-	char errbuf[513];
-	DWORD err = GetLastError();
-	if (!err)
+	const auto errcode = LastErrorCode();
+	if (!errcode)
 		return "";
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, 0, errbuf, 512, NULL);
-	return errbuf;
+
+#ifndef _WIN32
+	return strerror(errcode);
+#else
+	char errmsg[1024];
+	if (FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, errcode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)errmsg, _countof(errmsg), nullptr) == 0)
+		sprintf_s(errmsg, _countof(errmsg), "Error code: %d", errcode);
+	return errmsg;
 #endif
 }
 

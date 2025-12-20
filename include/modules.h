@@ -1271,7 +1271,7 @@ public:
 	 * @param minor The minor version
 	 * @param patch The patch version
 	 */
-	static void RequireVersion(int major, int minor, int patch);
+	static void RequireVersion(unsigned major, unsigned minor, unsigned patch);
 
 	/** Change the priority of one event in a module.
 	 * Each module event has a list of modules which are attached to that event type. If you wish to be called before or after other specific modules, you may use this

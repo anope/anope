@@ -283,21 +283,17 @@ Module *ModuleManager::FindFirstOf(ModType type, bool ignoredeprecated)
 	return NULL;
 }
 
-void ModuleManager::RequireVersion(int major, int minor, int patch)
+void ModuleManager::RequireVersion(unsigned major, unsigned minor, unsigned patch)
 {
 	if (Anope::VersionMajor() > major)
 		return;
 	else if (Anope::VersionMajor() == major)
 	{
-		if (minor == -1)
-			return;
-		else if (Anope::VersionMinor() > minor)
+		if (Anope::VersionMinor() > minor)
 			return;
 		else if (Anope::VersionMinor() == minor)
 		{
-			if (patch == -1)
-				return;
-			else if (Anope::VersionPatch() > patch)
+			if (Anope::VersionPatch() > patch)
 				return;
 			else if (Anope::VersionPatch() == patch)
 				return;

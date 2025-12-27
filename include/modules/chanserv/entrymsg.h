@@ -49,8 +49,8 @@ protected:
 public:
 	virtual ~EntryMessageList()
 	{
-		while (!(*this)->empty())
-			delete (*this)->back();
+		for (auto i = (*this)->size(); i > 0; --i)
+			delete (*this)->at(i - 1);
 	}
 
 	virtual ChanServ::EntryMessage *Create() = 0;

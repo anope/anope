@@ -32,7 +32,7 @@ jobs:
           version: 1.66.0
 
       - name: Try to restore libraries from the cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         id: library-cache
         with:
           key: conan-${{ hashFiles('src/win32/conanfile.txt') }}
@@ -44,7 +44,7 @@ jobs:
 
       - name: Save libraries to the cache
         if: ${{ steps.library-cache.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           key:  ${{ steps.library-cache.outputs.cache-primary-key }}
           path: ${{ env.CONAN_USER_HOME }}/.conan

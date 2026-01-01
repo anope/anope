@@ -1,6 +1,6 @@
 // Anope IRC Services <https://www.anope.org/>
 //
-// Copyright (C) 2003-2025 Anope Contributors
+// Copyright (C) 2003-2026 Anope Contributors
 // Copyright (C) 2012-2022 ircd-hybrid development team
 //
 // Anope is free software. You can use, modify, and/or distribute it under the

@@ -1,6 +1,6 @@
 // Anope IRC Services <https://www.anope.org/>
 //
-// Copyright (C) 2003-2025 Anope Contributors
+// Copyright (C) 2003-2026 Anope Contributors
 // Copyright (C) 2011-2012, 2014 Alex Barton <alex@barton.de>
 //
 // Anope is free software. You can use, modify, and/or distribute it under the

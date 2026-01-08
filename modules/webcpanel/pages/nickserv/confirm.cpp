@@ -20,11 +20,16 @@ WebCPanel::NickServ::Confirm::Confirm(const Anope::string &cat, const Anope::str
 
 bool WebCPanel::NickServ::Confirm::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
+	const auto code = message.post_data["code"].trim();
+	if (code.empty())
+		replacements["MESSAGES"] = "You must specify a confirmation code";
+	else
+	{
+		std::vector<Anope::string> params;
+		params.push_back(code);
 
-	std::vector<Anope::string> params;
-	params.push_back(message.post_data["code"]);
-
-	WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/confirm", params, replacements);
+		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/confirm/register", params, replacements);
+	}
 
 	TemplateFileServer page("nickserv/confirm.html");
 

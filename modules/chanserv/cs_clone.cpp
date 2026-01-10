@@ -75,9 +75,9 @@ class CommandCSClone final
 		{
 			const auto *akick = ChanServ::akick_service->GetAKick(ci, i);
 			if (akick->nc)
-				ChanServ::akick_service->AddAKick(ci, akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
+				ChanServ::akick_service->AddAKick(target_ci, akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
 			else
-				ChanServ::akick_service->AddAKick(ci, akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
+				ChanServ::akick_service->AddAKick(target_ci, akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
 		}
 
 		source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002."), ci->name.c_str(), target_ci->name.c_str());

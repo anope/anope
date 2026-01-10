@@ -291,6 +291,7 @@ private:
 public:
 	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
+		, httpref(HTTP_PROVIDER)
 		, xmlrpcinterface(this)
 	{
 		xmlrpc_env env;
@@ -325,7 +326,7 @@ public:
 		XMLRPCServiceInterface::enable_i8 = modconf.Get<bool>("enable_i8", "yes");
 		XMLRPCServiceInterface::enable_nil = modconf.Get<bool>("enable_nil", "yes");
 
-		this->httpref = ServiceReference<HTTP::Provider>(HTTP_PROVIDER, modconf.Get<const Anope::string>("server", "httpd/main"));
+		this->httpref.SetServiceName(modconf.Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
 

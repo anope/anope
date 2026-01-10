@@ -15,7 +15,7 @@
 #include "webcpanel.h"
 
 Module *me;
-Anope::string provider_name, template_base, page_title;
+Anope::string template_base, page_title;
 
 class ModuleWebCPanel final
 	: public Module
@@ -53,6 +53,7 @@ class ModuleWebCPanel final
 
 public:
 	ModuleWebCPanel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR),
+		provider(HTTP_PROVIDER),
 		panel(this, "webcpanel"),
 		id(this, "webcpanel_id"), ip(this, "webcpanel_ip"), last_login(this, "webcpanel_last_login"),
 		style_css("style.css", "/static/style.css", "text/css"), logo_png("logo.png", "/static/logo.png", "image/png"), cubes_png("cubes.png", "/static/cubes.png", "image/png"), favicon_ico("favicon.ico", "/favicon.ico", "image/x-icon"),
@@ -70,7 +71,7 @@ public:
 		template_base = Anope::ExpandData(block.Get<const Anope::string>("template_dir", "webcpanel/templates/default"));
 		page_title = block.Get<const Anope::string>("title", "Anope IRC Services");
 
-		provider = ServiceReference<HTTP::Provider>(HTTP_PROVIDER, provider_name);
+		provider.SetServiceName(block.Get<const Anope::string>("server", "httpd/main"));
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is httpd loaded?");
 

@@ -289,6 +289,7 @@ private:
 public:
 	ModuleJSONRPC(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, EXTRA | VENDOR)
+		, httpref(HTTP_PROVIDER)
 		, jsonrpcinterface(this)
 	{
 	}
@@ -307,7 +308,7 @@ public:
 		const auto &modconf = conf.GetModule(this);
 		JSONRPCServiceInterface::integer_bits = modconf.Get<unsigned>("integer_bits", "64");
 
-		this->httpref = ServiceReference<HTTP::Provider>(HTTP_PROVIDER, modconf.Get<const Anope::string>("server", "httpd/main"));
+		this->httpref.SetServiceName(modconf.Get<const Anope::string>("server", "httpd/main"));
 		if (!httpref)
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
 

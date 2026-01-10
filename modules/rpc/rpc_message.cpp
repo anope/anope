@@ -117,7 +117,6 @@ class ModuleRPCSystem final
 	: public Module
 {
 private:
-	ServiceReference<RPC::ServiceInterface> rpc;
 	MessageNetworkRPCEvent messagenetworkrpcevent;
 	MessageServerRPCEvent messageserverrpcevent;
 	MessageUserRPCEvent messageuserrpcevent;

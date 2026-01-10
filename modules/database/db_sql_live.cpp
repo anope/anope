@@ -79,7 +79,9 @@ private:
 	}
 
 public:
-	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), SQL("", "")
+	DBMySQL(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, DATABASE | VENDOR)
+		, SQL("SQL::Provider")
 	{
 		this->lastwarn = 0;
 		this->ro = false;
@@ -148,7 +150,8 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		const auto &block = conf.GetModule(this);
-		this->SQL = ServiceReference<Provider>("SQL::Provider", block.Get<const Anope::string>("engine"));
+
+		this->SQL.SetServiceName(block.Get<const Anope::string>("engine"));
 		this->prefix = block.Get<const Anope::string>("prefix", "anope_db_");
 	}
 

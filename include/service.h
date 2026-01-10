@@ -138,20 +138,30 @@ class ServiceReference
 	Anope::string name;
 
 public:
-	ServiceReference() = default;
-
-	ServiceReference(const Anope::string &t, const Anope::string &n) : type(t), name(n)
+	ServiceReference(const Anope::string &t, const Anope::string &n = "")
+		: type(t)
+		, name(n)
 	{
 	}
 
-	const Anope::string &GetServiceName() const { return name; }
+	/** Retrieves the name of the service (e.g. mysql/main). */
+	const auto &GetServiceName() const { return name; }
 
-	const Anope::string &GetServiceType() const { return type; }
+	/** Retrieves the type of the service (e.g. SQL::Provider). */
+	const auto &GetServiceType() const { return type; }
 
-	inline void operator=(const Anope::string &n)
+	/** Invalidates the reference and changes the name of the referenced service. */
+	void SetServiceName(const Anope::string& newname)
 	{
-		this->name = n;
 		this->invalid = true;
+		this->name = newname;
+	}
+
+	/** Invalidates the reference and changes the type of the referenced service. */
+	void SetServiceType(const Anope::string& newtype)
+	{
+		this->invalid = true;
+		this->type = newtype;
 	}
 
 	operator bool() override

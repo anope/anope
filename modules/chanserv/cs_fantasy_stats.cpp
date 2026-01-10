@@ -73,17 +73,21 @@ class CSStats final
 	MySQLInterface sqlinterface;
 	Anope::string prefix;
 public:
-	CSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcsstats(this), commandcsgstats(this), sql("", ""), sqlinterface(this)
+	CSStats(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandcsstats(this)
+		, commandcsgstats(this)
+		, sql("SQL::Provider")
+		, sqlinterface(this)
 	{
 		me = this;
-
 	}
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		prefix = conf.GetModule("chanstats").Get<const Anope::string>("prefix", "anope_");
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf.GetModule("chanstats").Get<const Anope::string>("engine"));
+		const auto &block = conf.GetModule("chanstats");
+		prefix = block.Get<const Anope::string>("prefix", "anope_");
+		this->sql.SetServiceName(block.Get<const Anope::string>("engine"));
 	}
 
 	SQL::Result RunQuery(const SQL::Query &query)

@@ -494,11 +494,15 @@ class MChanstats final
 
 
 public:
-	MChanstats(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, EXTRA | VENDOR),
-		cs_stats(this, "CS_STATS"), ns_stats(this, "NS_STATS"),
-		commandcssetchanstats(this), commandnssetchanstats(this), commandnssasetchanstats(this),
-		sqlinterface(this)
+	MChanstats(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, EXTRA | VENDOR)
+		, cs_stats(this, "CS_STATS")
+		, ns_stats(this, "NS_STATS")
+		, commandcssetchanstats(this)
+		, commandnssetchanstats(this)
+		, commandnssasetchanstats(this)
+		, sql("SQL::Provider")
+		, sqlinterface(this)
 	{
 	}
 
@@ -509,12 +513,11 @@ public:
 		SmileysHappy = block.Get<const Anope::string>("SmileysHappy");
 		SmileysSad = block.Get<const Anope::string>("SmileysSad");
 		SmileysOther = block.Get<const Anope::string>("SmileysOther");
-		Anope::string engine = block.Get<const Anope::string>("engine");
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", engine);
+		this->sql.SetServiceName(block.Get<const Anope::string>("engine"));
 		if (sql)
 			this->CheckTables();
 		else
-			Log(this) << "no database connection to " << engine;
+			Log(this) << "no database connection to " << this->sql.GetServiceName();
 	}
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool show_all) override

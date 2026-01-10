@@ -134,13 +134,14 @@ public:
 class ModuleSQLOper final
 	: public Module
 {
-	Anope::string engine;
 	Anope::string query;
 
 	ServiceReference<SQL::Provider> SQL;
 
 public:
-	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+	ModuleSQLOper(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, EXTRA | VENDOR)
+		, SQL("SQL::Provider")
 	{
 	}
 
@@ -159,11 +160,8 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		const auto &config = conf.GetModule(this);
-
-		this->engine = config.Get<const Anope::string>("engine");
 		this->query = config.Get<const Anope::string>("query");
-
-		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
+		this->SQL.SetServiceName(config.Get<const Anope::string>("engine"));
 	}
 
 	void OnNickIdentify(User *u) override

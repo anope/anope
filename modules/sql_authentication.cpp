@@ -20,7 +20,7 @@ namespace
 {
 	Module *me;
 
-	ServiceReference<Encryption::Provider> encryption;
+	ServiceReference<Encryption::Provider> encryption("Encryption::Provider");
 	Anope::string password_hash, password_field;
 }
 class SQLAuthenticationResult final
@@ -110,34 +110,32 @@ public:
 class ModuleSQLAuthentication final
 	: public Module
 {
-	Anope::string engine;
 	Anope::string query;
 	Anope::string disable_reason, disable_email_reason;
 
 	ServiceReference<SQL::Provider> SQL;
 
 public:
-	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, EXTRA | VENDOR)
+	ModuleSQLAuthentication(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, EXTRA | VENDOR)
+		, SQL("SQL::Provider")
 	{
 		me = this;
-
 	}
 
 	void OnReload(Configuration::Conf &conf) override
 	{
 		const auto &config = conf.GetModule(this);
-		this->engine = config.Get<const Anope::string>("engine");
 		this->query =  config.Get<const Anope::string>("query");
 		this->disable_reason = config.Get<const Anope::string>("disable_reason");
 		this->disable_email_reason = config.Get<Anope::string>("disable_email_reason");
-
-		this->SQL = ServiceReference<SQL::Provider>("SQL::Provider", this->engine);
+		this->SQL.SetServiceName(config.Get<const Anope::string>("engine"));
 
 		password_hash = config.Get<const Anope::string>("password_hash");
 		if (!password_hash.empty())
 		{
 			password_field = config.Get<const Anope::string>("password_field", "password");
-			encryption = ServiceReference<Encryption::Provider>("Encryption::Provider", password_hash);
+			encryption.SetServiceName(password_hash);
 		}
 	}
 

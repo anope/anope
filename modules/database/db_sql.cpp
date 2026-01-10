@@ -102,10 +102,11 @@ class DBSQL final
 	}
 
 public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sql("", ""), sqlinterface(this)
+	DBSQL(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, DATABASE | VENDOR)
+		, sql("SQL::Provider")
+		, sqlinterface(this)
 	{
-
-
 		if (ModuleManager::FindModule("db_sql_live") != NULL)
 			throw ModuleException("db_sql can not be loaded after db_sql_live");
 	}
@@ -166,7 +167,7 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		const auto &block = conf.GetModule(this);
-		this->sql = ServiceReference<Provider>("SQL::Provider", block.Get<const Anope::string>("engine"));
+		this->sql.SetServiceName(block.Get<const Anope::string>("engine"));
 		this->prefix = block.Get<const Anope::string>("prefix", "anope_db_");
 		this->import = block.Get<bool>("import");
 	}

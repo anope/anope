@@ -134,7 +134,10 @@ class DatabaseRedis final
 public:
 	ServiceReference<Provider> redis;
 
-	DatabaseRedis(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE | VENDOR), sl(this)
+	DatabaseRedis(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, DATABASE | VENDOR)
+		, sl(this)
+		, redis("Redis::Provider")
 	{
 		me = this;
 
@@ -180,7 +183,7 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		const auto &block = conf.GetModule(this);
-		this->redis = ServiceReference<Provider>("Redis::Provider", block.Get<const Anope::string>("engine", "redis/main"));
+		this->redis.SetServiceName(block.Get<const Anope::string>("engine", "redis/main"));
 	}
 
 	EventReturn OnLoadDatabase() override

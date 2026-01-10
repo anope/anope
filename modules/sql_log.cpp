@@ -35,7 +35,7 @@ public:
 	void OnLogMessage(LogInfo *li, const Log *l, const Anope::string &msg) override
 	{
 		Anope::string ref_name;
-		ServiceReference<SQL::Provider> SQL;
+		ServiceReference<SQL::Provider> SQL("SQL::Provider");
 
 		for (const auto &target : li->targets)
 		{
@@ -43,7 +43,7 @@ public:
 			if (!sz)
 			{
 				ref_name = target.substr(8);
-				SQL = ServiceReference<SQL::Provider>("SQL::Provider", ref_name);
+				SQL.SetServiceName(ref_name);
 				break;
 			}
 		}

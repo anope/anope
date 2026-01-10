@@ -99,18 +99,23 @@ class CSTop final
 	Anope::string prefix;
 
 public:
-	CSTop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, VENDOR),
-		commandcstop(this), commandcsgtop(this), commandcstop10(this), commandcsgtop10(this), sql("", ""),
-		sqlinterface(this)
+	CSTop(const Anope::string &modname, const Anope::string &creator)
+		: Module(modname, creator, VENDOR)
+		, commandcstop(this)
+		, commandcsgtop(this)
+		, commandcstop10(this)
+		, commandcsgtop10(this)
+		, sql("SQL::Provider")
+		, sqlinterface(this)
 	{
 		me = this;
-
 	}
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		prefix = conf.GetModule("chanstats").Get<const Anope::string>("prefix", "anope_");
-		this->sql = ServiceReference<SQL::Provider>("SQL::Provider", conf.GetModule("chanstats").Get<const Anope::string>("engine"));
+		const auto &block = conf.GetModule("chanstats");
+		prefix = block.Get<const Anope::string>("prefix", "anope_");
+		this->sql.SetServiceName(block.Get<const Anope::string>("engine"));
 	}
 
 	SQL::Result RunQuery(const SQL::Query &query)

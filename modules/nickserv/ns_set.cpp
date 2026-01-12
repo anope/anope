@@ -186,7 +186,7 @@ public:
 			return;
 		}
 
-		const Anope::string &param = params[0];
+		const Anope::string &param = params[1];
 		NickCore *nc = setter_na->nc;
 
 		if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.nc != nc && nc->IsServicesOper())

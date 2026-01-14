@@ -23,8 +23,8 @@ typedef Anope::unordered_map<Channel *> channel_map;
 
 extern CoreExport channel_map ChannelList;
 
-/* A user container, there is one of these per user per channel. */
-struct ChanUserContainer final
+/* A user's membership to a channel, there is one of these per user per channel. */
+struct Membership final
 	: public Extensible
 {
 	User *user;
@@ -32,7 +32,11 @@ struct ChanUserContainer final
 	/* Status the user has in the channel */
 	ChannelStatus status;
 
-	ChanUserContainer(User *u, Channel *c) : user(u), chan(c) { }
+	Membership(User *u, Channel *c)
+		: user(u)
+		, chan(c)
+	{
+	}
 };
 
 class CoreExport Channel final
@@ -61,7 +65,7 @@ public:
 	bool botchannel = false;
 
 	/* Users in the channel */
-	typedef std::map<User *, ChanUserContainer *> ChanUserList;
+	typedef std::map<User *, Membership *> ChanUserList;
 	ChanUserList users;
 
 	/* Current topic of the channel */
@@ -114,9 +118,9 @@ public:
 	/** Join a user internally to the channel
 	 * @param u The user
 	 * @param status The status to give the user, if any
-	 * @return The UserContainer for the user
+	 * @return The membership for the user
 	 */
-	ChanUserContainer *JoinUser(User *u, const ChannelStatus *status);
+	Membership *JoinUser(User *u, const ChannelStatus *status);
 
 	/** Remove a user internally from the channel
 	 * @param u The user
@@ -125,9 +129,9 @@ public:
 
 	/** Check if the user is on the channel
 	 * @param u The user
-	 * @return A user container if found, else NULL
+	 * @return A membership if found, else NULL
 	 */
-	ChanUserContainer *FindUser(User *u) const;
+	Membership *FindUser(User *u) const;
 
 	/** Check if a user has a status on a channel
 	 * @param u The user

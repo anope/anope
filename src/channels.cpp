@@ -135,18 +135,18 @@ bool Channel::CheckDelete()
 	return MOD_RESULT != EVENT_STOP && this->users.empty();
 }
 
-ChanUserContainer *Channel::JoinUser(User *user, const ChannelStatus *status)
+Membership *Channel::JoinUser(User *user, const ChannelStatus *status)
 {
 	if (user->server && user->server->IsSynced())
 		Log(user, this, "join");
 
-	auto *cuc = new ChanUserContainer(user, this);
-	user->chans[this] = cuc;
-	this->users[user] = cuc;
+	auto *memb = new Membership(user, this);
+	user->chans[this] = memb;
+	this->users[user] = memb;
 	if (status)
-		cuc->status = *status;
+		memb->status = *status;
 
-	return cuc;
+	return memb;
 }
 
 void Channel::DeleteUser(User *user)
@@ -156,18 +156,18 @@ void Channel::DeleteUser(User *user)
 
 	FOREACH_MOD(OnLeaveChannel, (user, this));
 
-	ChanUserContainer *cu = user->FindChannel(this);
+	auto *memb = user->FindChannel(this);
 	if (!this->users.erase(user))
 		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistent user " << user->nick << " from channel " << this->name;
 
 	if (!user->chans.erase(this))
 		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistent channel " << this->name << " from " << user->nick << "'s channel list";
-	delete cu;
+	delete memb;
 
 	QueueForDeletion();
 }
 
-ChanUserContainer *Channel::FindUser(User *u) const
+Membership *Channel::FindUser(User *u) const
 {
 	ChanUserList::const_iterator it = this->users.find(u);
 	if (it != this->users.end())
@@ -178,13 +178,13 @@ ChanUserContainer *Channel::FindUser(User *u) const
 bool Channel::HasUserStatus(User *u, ChannelModeStatus *cms)
 {
 	/* Usually its more efficient to search the users channels than the channels users */
-	ChanUserContainer *cc = u->FindChannel(this);
-	if (cc)
+	auto *memb = u->FindChannel(this);
+	if (memb)
 	{
 		if (cms)
-			return cc->status.HasMode(cms->mchar);
+			return memb->status.HasMode(cms->mchar);
 		else
-			return cc->status.Empty();
+			return memb->status.Empty();
 	}
 
 	return false;
@@ -281,9 +281,9 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Mod
 		Log(LOG_DEBUG) << "Setting +" << cm->mchar << " on " << this->name << " for " << u->nick;
 
 		/* Set the status on the user */
-		ChanUserContainer *cc = u->FindChannel(this);
-		if (cc)
-			cc->status.AddMode(cm->mchar);
+		auto *memb = u->FindChannel(this);
+		if (memb)
+			memb->status.AddMode(cm->mchar);
 
 		FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm, data));
 
@@ -352,9 +352,9 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 		Log(LOG_DEBUG) << "Setting -" << cm->mchar << " on " << this->name << " for " << u->nick;
 
 		/* Remove the status on the user */
-		ChanUserContainer *cc = u->FindChannel(this);
-		if (cc)
-			cc->status.DelMode(cm->mchar);
+		auto *memb = u->FindChannel(this);
+		if (memb)
+			memb->status.DelMode(cm->mchar);
 
 		FOREACH_RESULT(OnChannelModeUnset, MOD_RESULT, (this, setter, cm, param));
 
@@ -762,16 +762,16 @@ void Channel::KickInternal(const MessageSource &source, const Anope::string &nic
 
 	Anope::string chname = this->name;
 
-	ChanUserContainer *cu = target->FindChannel(this);
-	if (cu == NULL)
+	auto *memb = target->FindChannel(this);
+	if (memb == NULL)
 	{
 		Log(LOG_DEBUG) << "Channel::KickInternal got kick for user " << target->nick << " from " << source.GetSource() << " who isn't on channel " << this->name;
 		return;
 	}
 
-	ChannelStatus status = cu->status;
+	ChannelStatus status = memb->status;
 
-	FOREACH_MOD(OnPreUserKicked, (source, cu, reason));
+	FOREACH_MOD(OnPreUserKicked, (source, memb, reason));
 	this->DeleteUser(target);
 	FOREACH_MOD(OnUserKicked, (source, target, this->name, status, reason));
 }

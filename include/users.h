@@ -89,7 +89,7 @@ public: // XXX: exposing a tiny bit too much
 	time_t awaytime = 0;
 
 	/* Channels the user is in */
-	typedef std::map<Channel *, ChanUserContainer *> ChanUserList;
+	typedef std::map<Channel *, Membership *> ChanUserList;
 	ChanUserList chans;
 
 	/* Last time this user sent a memo command used */
@@ -338,9 +338,9 @@ public:
 	 * This is preferred over using FindUser in Channel, as there are usually more users in a channel
 	 * than channels a user is in
 	 * @param c The channel
-	 * @return The channel container, or NULL
+	 * @return The channel membership, or NULL
 	 */
-	ChanUserContainer *FindChannel(Channel *c) const;
+	Membership *FindChannel(Channel *c) const;
 
 	/** Check if the user is protected from kicks and negative mode changes
 	 * @return true or false

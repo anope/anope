@@ -603,14 +603,14 @@ class CommandCSMode final
 
 								for (Channel::ChanUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end;)
 								{
-									ChanUserContainer *uc = it->second;
+									auto *memb = it->second;
 									++it;
 
-									AccessGroup targ_access = ci->AccessFor(uc->user);
+									AccessGroup targ_access = ci->AccessFor(memb->user);
 
-									if (uc->user->IsProtected())
+									if (memb->user->IsProtected())
 									{
-										source.Reply(_("You do not have the access to change %s's modes."), uc->user->nick.c_str());
+										source.Reply(_("You do not have the access to change %s's modes."), memb->user->nick.c_str());
 										continue;
 									}
 
@@ -622,17 +622,17 @@ class CommandCSMode final
 										}
 										else
 										{
-											source.Reply(_("You do not have the access to change %s's modes."), uc->user->nick.c_str());
+											source.Reply(_("You do not have the access to change %s's modes."), memb->user->nick.c_str());
 											continue;
 										}
 									}
 
-									if (Anope::Match(uc->user->GetMask(), param))
+									if (Anope::Match(memb->user->GetMask(), param))
 									{
 										if (adding)
-											ci->c->SetMode(NULL, cm, uc->user->GetUID());
+											ci->c->SetMode(NULL, cm, memb->user->GetUID());
 										else
-											ci->c->RemoveMode(NULL, cm, uc->user->GetUID());
+											ci->c->RemoveMode(NULL, cm, memb->user->GetUID());
 									}
 								}
 							}

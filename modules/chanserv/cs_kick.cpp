@@ -92,18 +92,18 @@ public:
 			int matched = 0, kicked = 0;
 			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)
 			{
-				ChanUserContainer *uc = it->second;
+				auto *memb = it->second;
 				++it;
 
 				Entry e("",  mask);
-				if (e.Matches(uc->user))
+				if (e.Matches(memb->user))
 				{
 					++matched;
 
-					AccessGroup u2_access = ci->AccessFor(uc->user);
-					if (u != uc->user && ci->HasExt("PEACE") && u2_access >= u_access)
+					AccessGroup u2_access = ci->AccessFor(memb->user);
+					if (u != memb->user && ci->HasExt("PEACE") && u2_access >= u_access)
 						continue;
-					else if (uc->user->IsProtected())
+					else if (memb->user->IsProtected())
 						continue;
 
 					++kicked;
@@ -114,10 +114,10 @@ public:
 							{ "message", reason           },
 							{ "nick",    source.GetNick() },
 						});
-						c->Kick(ci->WhoSends(), uc->user, signkickformat);
+						c->Kick(ci->WhoSends(), memb->user, signkickformat);
 					}
 					else
-						c->Kick(ci->WhoSends(), uc->user, "%s (Matches %s)", reason.c_str(), mask.c_str());
+						c->Kick(ci->WhoSends(), memb->user, "%s (Matches %s)", reason.c_str(), mask.c_str());
 				}
 			}
 

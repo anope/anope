@@ -420,9 +420,9 @@ public:
 		UpdateUser(u, PART, u->nick, "", channel, msg);
 	}
 
-	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &msg) override
+	void OnPreUserKicked(const MessageSource &source, Membership *memb, const Anope::string &msg) override
 	{
-		UpdateUser(cu->user, KICK, cu->user->nick, source.GetSource(), cu->chan->name, msg);
+		UpdateUser(memb->user, KICK, memb->user->nick, source.GetSource(), memb->chan->name, msg);
 	}
 
 private:

@@ -738,7 +738,7 @@ const User::ModeList &User::GetModeList() const
 	return modes;
 }
 
-ChanUserContainer *User::FindChannel(Channel *c) const
+Membership *User::FindChannel(Channel *c) const
 {
 	User::ChanUserList::const_iterator it = this->chans.find(c);
 	if (it != this->chans.end())

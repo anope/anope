@@ -571,18 +571,18 @@ private:
 	}
 
 public:
-	void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) override
+	void OnPreUserKicked(const MessageSource &source, Membership *memb, const Anope::string &kickmsg) override
 	{
-		if (!cu->chan->ci || !cs_stats.HasExt(cu->chan->ci))
+		if (!memb->chan->ci || !cs_stats.HasExt(memb->chan->ci))
 			return;
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0);";
-		query.SetValue("channel", cu->chan->name);
-		query.SetValue("nick", GetDisplay(cu->user));
+		query.SetValue("channel", memb->chan->name);
+		query.SetValue("nick", GetDisplay(memb->user));
 		this->RunQuery(query);
 
 		query = "CALL " + prefix + "chanstats_proc_update(@channel@, @nick@, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);";
-		query.SetValue("channel", cu->chan->name);
+		query.SetValue("channel", memb->chan->name);
 		query.SetValue("nick", GetDisplay(source.GetUser()));
 		this->RunQuery(query);
 	}

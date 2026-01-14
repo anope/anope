@@ -1081,11 +1081,11 @@ class BSKick final
 
 	UserData *GetUserData(User *u, Channel *c)
 	{
-		ChanUserContainer *uc = c->FindUser(u);
-		if (uc == NULL)
+		auto *memb = c->FindUser(u);
+		if (memb == NULL)
 			return NULL;
 
-		UserData *ud = userdata.Require(uc);
+		UserData *ud = userdata.Require(memb);
 		return ud;
 	}
 

@@ -100,16 +100,16 @@ public:
 			/* If the user is internally on the channel with flags, kill them so that
 			 * the stacker will allow this.
 			 */
-			ChanUserContainer *uc = c->FindUser(user);
-			if (uc != NULL)
-				uc->status.Clear();
+			auto *memb = c->FindUser(user);
+			if (memb != NULL)
+				memb->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->GetUID());
 			for (auto mode : cs.Modes())
 				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), user->GetUID(), false);
 
-			if (uc != NULL)
-				uc->status = cs;
+			if (memb != NULL)
+				memb->status = cs;
 		}
 	}
 

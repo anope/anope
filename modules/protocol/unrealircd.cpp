@@ -194,16 +194,16 @@ private:
 			/* If the user is internally on the channel with flags, kill them so that
 			 * the stacker will allow this.
 			 */
-			ChanUserContainer *uc = c->FindUser(user);
-			if (uc != NULL)
-				uc->status.Clear();
+			auto *memb = c->FindUser(user);
+			if (memb != NULL)
+				memb->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->GetUID());
 			for (auto mode : cs.Modes())
 				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), user->GetUID(), false);
 
-			if (uc != NULL)
-				uc->status = cs;
+			if (memb != NULL)
+				memb->status = cs;
 		}
 	}
 
@@ -543,9 +543,9 @@ namespace UnrealExtBan
 			Channel *c = Channel::Find(channel);
 			if (c != NULL)
 			{
-				ChanUserContainer *uc = c->FindUser(u);
-				if (uc != NULL)
-					if (cm == NULL || uc->status.HasMode(cm->mchar))
+				auto *memb = c->FindUser(u);
+				if (memb != NULL)
+					if (cm == NULL || memb->status.HasMode(cm->mchar))
 						return true;
 			}
 

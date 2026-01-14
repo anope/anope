@@ -292,10 +292,10 @@ public:
 
 	/** Called before a user has been kicked from a channel.
 	 * @param source The kicker
-	 * @param cu The user, channel, and status of the user being kicked
+	 * @param memb The membership for the user who is being kicked
 	 * @param kickmsg The reason for the kick.
 	 */
-	virtual void OnPreUserKicked(const MessageSource &source, ChanUserContainer *cu, const Anope::string &kickmsg) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
+	virtual void OnPreUserKicked(const MessageSource &source, Membership *memb, const Anope::string &kickmsg) ATTR_NOT_NULL(3) { throw NotImplementedException(); }
 
 	/** Called when a user has been kicked from a channel.
 	 * @param source The kicker

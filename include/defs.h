@@ -22,7 +22,6 @@ class Channel;
 class ChannelInfo;
 class ChannelStatus;
 namespace ChanServ { class AutoKick; class ModeLock; }
-struct ChanUserContainer;
 class ClientSocket;
 class Command;
 class CommandSource;
@@ -35,6 +34,7 @@ class InfoFormatter;
 class IRCDProto;
 class ListenSocket;
 class Log;
+struct Membership;
 class Memo;
 struct MemoInfo;
 class MessageSource;

@@ -179,8 +179,8 @@ private:
 		/* The newer users are at the end of the list, so kick users starting from the end */
 		for (Channel::ChanUserList::reverse_iterator it = ci->c->users.rbegin(), it_end = ci->c->users.rend(); it != it_end; ++it)
 		{
-			ChanUserContainer *uc = it->second;
-			User *user = uc->user;
+			auto *memb = it->second;
+			User *user = memb->user;
 
 			if (user->IsProtected())
 				continue;

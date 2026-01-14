@@ -203,10 +203,10 @@ class CommandCSAKick final
 
 		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
-			ChanUserContainer *uc = it->second;
+			auto *memb = it->second;
 			++it;
 
-			if (c->CheckKick(uc->user))
+			if (c->CheckKick(memb->user))
 				++count;
 		}
 

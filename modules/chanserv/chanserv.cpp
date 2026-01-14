@@ -462,9 +462,9 @@ public:
 	{
 		if (!always_lower && Anope::CurTime == c->created && c->ci && setter.GetUser() && !setter.GetUser()->server->IsULined())
 		{
-			ChanUserContainer *cu = c->FindUser(setter.GetUser());
+			auto *memb = c->FindUser(setter.GetUser());
 			ChannelMode *cm = ModeManager::FindChannelModeByName("OP");
-			if (cu && cm && !cu->status.HasMode(cm->mchar))
+			if (memb && cm && !memb->status.HasMode(cm->mchar))
 			{
 				/* Our -o and their mode change crossing, bounce their mode */
 				c->RemoveMode(c->ci->WhoSends(), mode, data.value);

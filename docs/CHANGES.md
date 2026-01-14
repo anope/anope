@@ -1,5 +1,31 @@
 # Anope Change Log
 
+## Anope 2.1.21 (unreleased)
+
+### Breaking Changes
+
+* `{fantasy}:fantasycharacter` has been replaced with `{fantasy}:prefix` which allows multiple-character fantasy prefixes. If you have multiple custom fantasy characters set you should separate them with a space when upgrading your config.
+
+### Changes
+
+* Fixed a crash when clearing channel entry messages.
+
+* Fixed a memory leak when cloning akicks.
+
+* Fixed confirming accounts using the webcpanel.
+
+* Fixed limiting the number of accounts per email address.
+
+* Fixed the `chanserv/enforce` command erroneously enforcing against channel founders.
+
+* Fixed the syntax of the `chanserv/suspend` command.
+
+* Fixed the syntax of the `nickserv/suspend` command.
+
+* Improved password rehash detection in the enc_argon2 module.
+
+* Various minor improvements to how services work internally.
+
 ## Anope 2.1.20 (2025-12-01)
 
 ### Breaking Changes

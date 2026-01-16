@@ -1289,7 +1289,7 @@ private:
 
 	bool HandleMN(AthemeRow &row)
 	{
-		// MU <display> <nick> <regtime> <lastseen>
+		// MN <display> <nick> <regtime> <lastseen>
 		auto display = row.Get();
 		auto nick = row.Get();
 		auto regtime = row.GetNum<time_t>();
@@ -1314,7 +1314,7 @@ private:
 
 		na = new NickAlias(nick, nc);
 		na->registered = regtime;
-		na->last_seen = lastseen ? regtime : na->registered;
+		na->last_seen = lastseen ? lastseen : regtime;
 
 		auto *data = userdata.Get(nc);
 		if (data)

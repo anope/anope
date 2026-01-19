@@ -145,6 +145,8 @@ class CommandCSFlags final
 					return;
 				}
 			}
+			else if (!na && mask.find_first_of("!*@") != Anope::string::npos)
+				mask = Entry("", mask).GetNUHMask();
 
 			if (na)
 				mask = na->nick;

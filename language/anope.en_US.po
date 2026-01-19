@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-14 01:24+0000\n"
-"PO-Revision-Date: 2025-12-14 01:24+0000\n"
+"POT-Creation-Date: 2026-01-19 11:28+0000\n"
+"PO-Revision-Date: 2026-01-19 11:28+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -6190,16 +6190,24 @@ msgid "You can not send a single message while you have messages queued."
 msgstr ""
 
 #, c-format
-msgid "You can only have %d access entries on a channel, including access entries from other channels."
-msgstr ""
-
-#, c-format
 msgid "You can only have %d autokick masks on a channel."
 msgstr ""
 
 #, c-format
 msgid "You can only have %d bad words entries on a channel."
 msgstr ""
+
+#, c-format
+msgid "You can only have %u access entry on a channel, including access entries from other channels."
+msgid_plural "You can only have %u access entries on a channel, including access entries from other channels."
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
+msgid "You can only have %u access entry on a channel."
+msgid_plural "You can only have %u access entries on a channel."
+msgstr[0] ""
+msgstr[1] ""
 
 #, c-format
 msgid "You can't %s yourself!"

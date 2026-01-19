@@ -137,6 +137,8 @@ namespace Language
 #define BOT_NOT_ASSIGNED             _("You must assign a bot to the channel before using this command.")
 #define BOT_NOT_ON_CHANNEL           _("Bot is not on channel \002%s\002.")
 
+#define CHAN_ACCESS_LIMIT           N_("You can only have %u access entry on a channel.", "You can only have %u access entries on a channel.")
+#define CHAN_ACCESS_LIMIT_DEEP      N_("You can only have %u access entry on a channel, including access entries from other channels.", "You can only have %u access entries on a channel, including access entries from other channels.")
 #define CHAN_ACCESS_LEVEL_RANGE      _("Access level must be between %d and %d inclusive.")
 #define CHAN_EXCEPTED                _("\002%s\002 matches an except on %s and cannot be banned until the except has been removed.")
 #define CHAN_INFO_HEADER             _("Information about channel \002%s\002:")

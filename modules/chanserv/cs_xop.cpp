@@ -167,37 +167,43 @@ private:
 		else
 		{
 			na = NickAlias::Find(mask);
-			if (!na && Config->GetModule("chanserv").Get<bool>("disallow_hostmask_access"))
+			if (na)
 			{
-				source.Reply(_("Masks and unregistered users may not be on access lists."));
-				return;
-			}
-			else if (na && na->nc->HasExt("NEVEROP"))
-			{
-				source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
-					na->nc->display.c_str());
-				return;
-			}
-			else if (mask.find_first_of("!*@") == Anope::string::npos && !na)
-			{
-				User *targ = User::Find(mask, true);
-				if (targ != NULL)
+				if (na->nc->HasExt("NEVEROP"))
 				{
+					source.Reply(_("\002%s\002 does not wish to be added to channel access lists."),
+						na->nc->display.c_str());
+					return;
+				}
+				mask = na->nick;
+			}
+			else
+			{
+				if (Config->GetModule("chanserv").Get<bool>("disallow_hostmask_access"))
+				{
+					source.Reply(_("Masks and unregistered users may not be on access lists."));
+					return;
+				}
+
+				if (mask.find_first_of("!*@") == Anope::string::npos)
+				{
+					auto *targ = User::Find(mask, true);
+					if (!targ)
+					{
+						source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+						return;
+					}
+
 					mask = "*!*@" + targ->GetDisplayedHost();
 					if (description.empty())
 						description = targ->nick;
 				}
 				else
 				{
-					source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
-					return;
+					// Normalize the entry mask.
+					mask = Entry("", mask).GetNUHMask();
 				}
 			}
-			else if (!na && mask.find_first_of("!*@") != Anope::string::npos)
-				mask = Entry("", mask).GetNUHMask();
-
-			if (na)
-				mask = na->nick;
 		}
 
 		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)

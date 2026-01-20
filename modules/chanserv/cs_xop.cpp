@@ -201,7 +201,7 @@ private:
 				else
 				{
 					// Normalize the entry mask.
-					mask = Entry("", mask).GetNUHMask();
+					mask = Entry("", mask).GetCleanMask();
 				}
 			}
 		}

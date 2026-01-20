@@ -442,16 +442,17 @@ public:
 
 	/** Constructor
 	 * @param mode What mode this host is for, can be empty for unknown/no mode
-	 * @param host A full or partial nick!ident@host/cidr#real name mask
+	 * @param mask A full or partial nick!ident@host/cidr#real name mask
+	 * @Param real Whether to allow a real name in the mask.
 	 */
-	Entry(const Anope::string &mode, const Anope::string &host);
+	Entry(const Anope::string &mode, const Anope::string &mask, bool real = true);
 
 	/** Get the banned mask for this entry
 	 * @return The mask
 	 */
 	Anope::string GetMask() const;
 
-	Anope::string GetNUHMask() const;
+	Anope::string GetCleanMask() const;
 
 	/** Check if this entry matches a user
 	 * @param u The user

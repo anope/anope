@@ -389,7 +389,7 @@ Anope::string IRCDProto::NormalizeMask(const Anope::string &mask)
 {
 	if (IsExtbanValid(mask))
 		return mask;
-	return Entry("", mask).GetNUHMask();
+	return Entry("", mask).GetCleanMask();
 }
 
 void IRCDProto::SendContextNotice(BotInfo *bi, User *target, Channel *context, const Anope::string &msg, const Anope::map<Anope::string> &tags)

@@ -788,7 +788,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			return Entry(this->name, e->GetMask()).Matches(u);
+			return Entry(this->name, e->GetMask(), false).Matches(u);
 		}
 	};
 
@@ -898,7 +898,7 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			return !u->Account() && Entry(this->base, e->GetMask()).Matches(u);
+			return !u->Account() && Entry(this->base, e->GetMask(), false).Matches(u);
 		}
 	};
 

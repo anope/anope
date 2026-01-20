@@ -564,7 +564,7 @@ namespace UnrealExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			return Entry(this->base, e->GetMask()).Matches(u);
+			return Entry(this->base, e->GetMask(), false).Matches(u);
 		}
 	};
 
@@ -646,7 +646,7 @@ namespace UnrealExtBan
 			/* strip down the time (~t:1234:) and call other matchers */
 			auto real_mask = e->GetMask();
 			real_mask = real_mask.substr(real_mask.find(":") + 1);
-			return Entry("BAN", real_mask).Matches(u);
+			return Entry("BAN", real_mask, false).Matches(u);
 		}
 	};
 

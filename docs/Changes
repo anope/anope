@@ -1,5 +1,5 @@
-Anope Version 2.0.19-git
-------------------------
+Anope Version 2.0.19
+--------------------
 Added a Doxygen config file.
 Backported various minor config changes from 2.1.
 Fixed chanserv/enforce enforcing against founders.

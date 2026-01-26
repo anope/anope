@@ -1,5 +1,6 @@
 build/
 config.cache
+docs/doxygen
 include/sysconf.h
 modules/m_ldap.cpp
 modules/m_ldap_authentication.cpp

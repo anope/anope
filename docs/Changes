@@ -1,6 +1,15 @@
 Anope Version 2.0.19-git
 ------------------------
-No significant changes.
+Added a Doxygen config file.
+Backported various minor config changes from 2.1.
+Fixed chanserv/enforce enforcing against founders.
+Fixed creating channel entries in irc2sql.
+Fixed not respecting the mode state when removing a mode lock.
+Fixed reading the settings in m_dns.
+Fixed resetpass confirming accounts when not using email confirmation.
+Fixed trying to write to a buffered socket when there's no data.
+Fixed various minor spelling issues.
+Updated some messages for the language used by modern BIND versions.
 
 Anope Version 2.0.18
 --------------------

@@ -1,5 +1,6 @@
 build/
 config.cache
+docs/doxygen
 include/sysconf.h
 modules/enc_argon2.cpp
 modules/enc_posix.cpp

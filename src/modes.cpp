@@ -673,7 +673,7 @@ void ModeManager::StackerDel(Mode *m)
 	}
 }
 
-Entry::Entry(const Anope::string &n, const Anope::string &m, bool r)
+Entry::Entry(const Anope::string &m, const Anope::string &n, bool r)
 	: name(n)
 	, mask(m)
 {

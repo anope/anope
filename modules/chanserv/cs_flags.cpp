@@ -153,7 +153,7 @@ class CommandCSFlags final
 				else
 				{
 					// Normalize the entry mask.
-					mask = Entry("", mask).GetCleanMask();
+					mask = Entry(mask).GetCleanMask();
 				}
 			}
 		}

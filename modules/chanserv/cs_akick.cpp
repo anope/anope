@@ -796,7 +796,7 @@ public:
 				kick = chan != NULL && chan->FindUser(u);
 			}
 			else
-				kick = Entry("BAN", autokick->mask).Matches(u);
+				kick = Entry(autokick->mask, "BAN").Matches(u);
 
 			if (kick)
 			{

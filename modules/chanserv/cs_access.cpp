@@ -167,9 +167,10 @@ private:
 			}
 		}
 
+		const auto &csconf = Config->GetModule("chanserv");
 		if (IRCD->IsChannelValid(mask))
 		{
-			if (Config->GetModule("chanserv").Get<bool>("disallow_channel_access"))
+			if (csconf.Get<bool>("disallow_channel_access"))
 			{
 				source.Reply(_("Channels may not be on access lists."));
 				return;
@@ -204,7 +205,7 @@ private:
 			}
 			else
 			{
-				if (Config->GetModule("chanserv").Get<bool>("disallow_hostmask_access"))
+				if (csconf.Get<bool>("disallow_hostmask_access"))
 				{
 					source.Reply(_("Masks and unregistered users may not be on access lists."));
 					return;
@@ -215,18 +216,32 @@ private:
 					auto *targ = User::Find(mask, true);
 					if (!targ)
 					{
-						source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+						source.Reply(NICK_X_NOT_IN_USE, mask.c_str());
 						return;
 					}
 
-					mask = "*!*@" + targ->GetDisplayedHost();
+					auto *targnc = targ->Account();
+					if (!targnc)
+					{
+						source.Reply(NICK_X_NOT_REGISTERED, targ->nick.c_str());
+						return;
+					}
+
+					mask = targnc->display;
 					if (description.empty())
 						description = targ->nick;
 				}
 				else
 				{
 					// Normalize the entry mask.
-					mask = Entry(mask).GetCleanMask();
+					const auto cleanmask = Entry(mask).GetCleanMask();
+					if (csconf.Get<bool>("disallow_malformed_hostmask") && cleanmask != mask)
+					{
+						source.Reply(CHAN_ACCESS_MALFORMED, cleanmask.c_str());
+						return;
+					}
+
+					mask = cleanmask;
 				}
 			}
 		}

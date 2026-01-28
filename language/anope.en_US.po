@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:28+0000\n"
-"PO-Revision-Date: 2026-01-19 11:28+0000\n"
+"POT-Creation-Date: 2026-01-28 19:44+0000\n"
+"PO-Revision-Date: 2026-01-28 19:44+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -6218,6 +6218,10 @@ msgstr ""
 
 #, c-format
 msgid "You can't logout %s, they are a Services Operator."
+msgstr ""
+
+#, c-format
+msgid "You cannot add a malformed mask to an access list. Did you mean to add %s instead?"
 msgstr ""
 
 #, c-format

@@ -6,13 +6,23 @@
 
 * `{fantasy}:fantasycharacter` has been replaced with `{fantasy}:prefix` which allows multiple-character fantasy prefixes. If you have multiple custom fantasy characters set you should separate them with a space when upgrading your config.
 
+* When adding an unregistered user to an access list you must now explicitly specify their hostmask. This prevents accidentally adding a hostmask which is too wide.
+
 ### Changes
+
+* Added cleaning up of hostmasks when adding them to an access list and `{chanserv}:disallow_malformed_hostmask` to allow rejecting them instead.
+
+* Changed access commands to add the account of a user who is logged in to an account but not using a nickname belonging to that account.
 
 * Fixed a crash when clearing channel entry messages.
 
 * Fixed a memory leak when cloning akicks.
 
+* Fixed cleaning up ban masks.
+
 * Fixed confirming accounts using the webcpanel.
+
+* Fixed importing the time a nickname was used from Atheme.
 
 * Fixed limiting the number of accounts per email address.
 

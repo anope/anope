@@ -216,7 +216,7 @@ public:
 				auto *memb = it->second;
 				++it;
 
-				Entry e(mode, mask);
+				Entry e(mask, mode);
 				if (e.Matches(memb->user))
 				{
 					++matched;

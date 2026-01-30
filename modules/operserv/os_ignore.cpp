@@ -122,7 +122,7 @@ public:
 		{
 			for (; ign != ign_end; ++ign)
 			{
-				Entry ignore_mask("", (*ign)->mask);
+				Entry ignore_mask((*ign)->mask);
 				if (ignore_mask.Matches(u, true))
 					break;
 			}

@@ -70,7 +70,7 @@ public:
 				// We have to check for bans.
 				for (const auto &entry : c->GetModeList("BAN"))
 				{
-					Entry ban("BAN", entry);
+					Entry ban(entry, "BAN");
 					if (ban.Matches(user))
 						c->RemoveMode(NULL, "BAN", ban.GetMask());
 				}
@@ -205,7 +205,7 @@ public:
 		{
 			BotInfo *bi = c->ci->bi;
 
-			Entry ban("BAN", data.value);
+			Entry ban(data.value, "BAN");
 			if (ban.Matches(bi))
 				c->RemoveMode(bi, "BAN", data.value);
 		}

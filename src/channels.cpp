@@ -737,7 +737,7 @@ bool Channel::MatchesList(User *u, const Anope::string &mode)
 
 	for (const auto &entry : this->GetModeList(mode))
 	{
-		Entry e(mode, entry);
+		Entry e(entry, mode);
 		if (e.Matches(u))
 			return true;
 	}
@@ -888,7 +888,7 @@ bool Channel::Unban(User *u, const Anope::string &mode, bool full)
 
 	for (const auto &entry : this->GetModeList(mode))
 	{
-		Entry ban(mode, entry);
+		Entry ban(entry, mode);
 		if (ban.Matches(u, full))
 		{
 			this->RemoveMode(NULL, mode, ban.GetMask());

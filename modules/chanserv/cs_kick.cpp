@@ -95,7 +95,7 @@ public:
 				auto *memb = it->second;
 				++it;
 
-				Entry e("",  mask);
+				Entry e(mask);
 				if (e.Matches(memb->user))
 				{
 					++matched;

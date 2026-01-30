@@ -260,13 +260,7 @@ class CommandCSAKick final
 				}
 			}
 
-			Entry e("", mask);
-
-			mask = (e.nick.empty() ? "*" : e.nick) + "!"
-				+ (e.user.empty() ? "*" : e.user) + "@"
-				+ (e.host.empty() ? "*" : e.host);
-			if (!e.real.empty())
-				mask += "#" + e.real;
+			mask = Entry(mask).GetCleanMask();
 		}
 		else
 			nc = na->nc;
@@ -309,7 +303,7 @@ class CommandCSAKick final
 			for (const auto &[_, u2] : UserListByNick)
 			{
 				AccessGroup nc_access = ci->AccessFor(nc), u_access = source.AccessFor(ci);
-				Entry entry_mask("", mask);
+				Entry entry_mask(mask);
 
 				if ((ci->AccessFor(u2).HasPriv("FOUNDER") || nc_access >= u_access) && entry_mask.Matches(u2))
 				{

@@ -96,7 +96,7 @@ public:
 					}
 					else if (u != NULL)
 					{
-						Entry akick_mask("", autokick->mask);
+						Entry akick_mask(autokick->mask);
 						if (akick_mask.Matches(u))
 							source.Reply(_("\002%s\002 matches auto kick entry %s on \002%s\002 (%s)."), u->nick.c_str(), autokick->mask.c_str(), ci->name.c_str(), autokick->reason.c_str());
 					}

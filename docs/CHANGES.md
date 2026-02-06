@@ -6,6 +6,8 @@
 
 * `{fantasy}:fantasycharacter` has been replaced with `{fantasy}:prefix` which allows multiple-character fantasy prefixes. If you have multiple custom fantasy characters set you should separate them with a space when upgrading your config.
 
+* The db_json module will now terminate the process if it fails to write the database. This replicates the behaviour previously used by the db_flatfile module.
+
 * When adding an unregistered user to an access list you must now explicitly specify their hostmask. This prevents accidentally adding a hostmask which is too wide.
 
 ### Changes
@@ -25,6 +27,8 @@
 * Fixed importing the time a nickname was used from Atheme.
 
 * Fixed limiting the number of accounts per email address.
+
+* Fixed locking modes that take a parameter when they are added.
 
 * Fixed the `chanserv/enforce` command erroneously enforcing against channel founders.
 

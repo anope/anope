@@ -433,8 +433,9 @@ public:
 			const auto flags = YYJSON_WRITE_ALLOW_INVALID_UNICODE | YYJSON_WRITE_NEWLINE_AT_END | YYJSON_WRITE_PRETTY;
 			if (!yyjson_mut_write_file(dbname.c_str(), doc, flags, nullptr, &errmsg))
 			{
-				Log(this) << "Unable to write " << dbname << ": error #" << errmsg.code << ": " << errmsg.msg;
-				// TODO: exit??? retry???
+				Anope::Quitting = true;
+				Anope::QuitReason = "Unable to write " + dbname + ": error #" + Anope::ToString(errmsg.code) + ": " + errmsg.msg;
+				Log(this) << Anope::QuitReason;
 			}
 
 			yyjson_mut_doc_free(doc);

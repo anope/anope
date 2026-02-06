@@ -322,7 +322,7 @@ class CommandCSMode final
 				return true;
 
 			case MODE_PARAM:
-				return !anope_dynamic_static_cast<ChannelModeParam *>(cm)->minus_no_arg;
+				return adding || !anope_dynamic_static_cast<ChannelModeParam *>(cm)->minus_no_arg;
 		}
 		return false;
 	}

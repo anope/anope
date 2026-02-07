@@ -1,5 +1,17 @@
 # Anope Change Log
 
+## Anope 2.1.22 (unreleased)
+
+### Breaking Changes
+
+* Conan 2 is now used for packaging dependencies on Windows. If you are building from source you will need to upgrade Conan.
+
+* Non-breaking spaces in translatable messages now use 0x1B instead of 0x1A due to recent msgfmt releases treating 0x1A as an EOF character. If you have an out of tree translation you will need to update it.
+
+## Changes
+
+* The Windows dependencies have been updated.
+
 ## Anope 2.1.21 (2026-02-07)
 
 ### Breaking Changes

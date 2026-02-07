@@ -279,7 +279,7 @@ public:
 				"Otherwise, \037command\037 must be a command name, and \037method\037 "
 				"is one of the following logging methods:"
 				"\n\n"
-				" MESSAGE\032[status], NOTICE\032[status], MEMO"
+				" MESSAGE\033[status], NOTICE\033[status], MEMO"
 				"\n\n"
 				"Which are used to message, notice, and memo the channel respectively. "
 				"With MESSAGE or NOTICE you must have a service bot assigned to and joined "
@@ -288,7 +288,7 @@ public:
 				"To remove a logging method use the same syntax as you would to add it."
 				"\n\n"
 				"Example:\n"
-				" %s\032#anope\032chanserv/access\032MESSAGE\032@\n"
+				" %s\033#anope\033chanserv/access\033MESSAGE\033@\n"
 				" Would message any channel operators whenever someone used the "
 				"ACCESS command on ChanServ on the channel."
 			),

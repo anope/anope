@@ -212,7 +212,7 @@ public:
 			source.Reply(" ");
 			source.Reply(_(
 				"The \037email\037 parameter is optional and will set the email address for your "
-				"nick immediately. You may also wish to \002SET\032HIDE\002 it after registering "
+				"nick immediately. You may also wish to \002SET\033HIDE\002 it after registering "
 				"if it isn't the default setting already."
 			));
 		}

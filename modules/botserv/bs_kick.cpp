@@ -159,7 +159,7 @@ public:
 		help.SendTo(source);
 
 		source.Reply(_(
-				"Type \002%s\032\037option\037\002 for more information "
+				"Type \002%s\033\037option\037\002 for more information "
 				"on a specific option."
 				"\n\n"
 				"Note: access to this command is controlled by the "
@@ -322,7 +322,7 @@ public:
 				"on the channels."
 				"\n\n"
 				"You can define bad words for your channel using the "
-				"\002BADWORDS\002 command. Type \002%s\032BADWORDS\002 for "
+				"\002BADWORDS\002 command. Type \002%s\033BADWORDS\002 for "
 				"more information."
 				"\n\n"
 				"\037ttb\037 is the number of times a user can be kicked "

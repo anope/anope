@@ -479,7 +479,7 @@ bool LineWrapper::GetLine(Anope::string &out)
 				break;
 			}
 
-			case '\x1A': // Non-breaking space
+			case '\x1B': // Non-breaking space
 			{
 				// There aren't any single byte non-breaking spaces so we use
 				// a substitute for that purpose.

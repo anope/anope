@@ -238,7 +238,7 @@ public:
 			return;
 
 		source.Reply(" ");
-		source.Reply(_("Type \002%s\032\037command\037\002 for help on any of the above commands."),
+		source.Reply(_("Type \002%s\033\037command\037\002 for help on any of the above commands."),
 			MemoServ->GetQueryCommand("generic/help").c_str());
 	}
 };

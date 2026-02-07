@@ -456,7 +456,7 @@ public:
 			"connect, services will not allow them to pursue their IRC "
 			"session."
 			"\n\n"
-			"\002SNLINE\032ADD\002 adds the given realname mask to the SNLINE "
+			"\002SNLINE\033ADD\002 adds the given realname mask to the SNLINE "
 			"list for the given reason (which \002must\002 be given). "
 			"\037expiry\037 is specified as an integer followed by one of \037d\037 "
 			"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as "
@@ -466,7 +466,7 @@ public:
 			"realname mask to be added starts with a \037+\037, an expiry time must "
 			"be given, even if it is the same as the default. The "
 			"current SNLINE default expiry time can be found with the "
-			"\002STATS\032AKILL\002 command. "
+			"\002STATS\033AKILL\002 command. "
 			"\n\n"
 			"\002Note\002: because the realname mask may contain spaces, the "
 			"separator between it and the reason is a colon."
@@ -485,24 +485,24 @@ public:
 
 		source.Reply(" ");
 		source.Reply(_(
-			"The \002SNLINE\032DEL\002 command removes the given mask from the "
+			"The \002SNLINE\033DEL\002 command removes the given mask from the "
 			"SNLINE list if it is present. If a list of entry numbers is "
 			"given, those entries are deleted.  (See the example for LIST "
 			"below.)"
 			"\n\n"
-			"The \002SNLINE\032LIST\002 command displays the SNLINE list. "
+			"The \002SNLINE\033LIST\002 command displays the SNLINE list. "
 			"If a wildcard mask is given, only those entries matching the "
 			"mask are displayed. If a list of entry numbers is given, "
 			"only those entries are shown; for example:\n"
-			"   \002SNLINE\032LIST\0322-5,7-9\002\n"
+			"   \002SNLINE\033LIST\0332-5,7-9\002\n"
 			"      Lists SNLINE entries numbered 2 through 5 and 7\n"
 			"      through 9."
 			"\n\n"
-			"\002SNLINE\032VIEW\002 is a more verbose version of \002SNLINE\032LIST\002, and "
+			"\002SNLINE\033VIEW\002 is a more verbose version of \002SNLINE\033LIST\002, and "
 			"will show who added an SNLINE, the date it was added, and when "
 			"it expires, as well as the realname mask and reason."
 			"\n\n"
-			"\002SNLINE\032CLEAR\002 clears all entries of the SNLINE list."
+			"\002SNLINE\033CLEAR\002 clears all entries of the SNLINE list."
 		));
 		return true;
 	}
@@ -699,7 +699,7 @@ public:
 			"regular expression, the expression will be matched against "
 			"channels too."
 			"\n\n"
-			"\002SQLINE\032ADD\002 adds the given (nick/channel) mask to the SQLINE "
+			"\002SQLINE\033ADD\002 adds the given (nick/channel) mask to the SQLINE "
 			"list for the given reason (which \002must\002 be given). "
 			"\037expiry\037 is specified as an integer followed by one of \037d\037 "
 			"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as "
@@ -709,7 +709,7 @@ public:
 			"If the mask to be added starts with a \037+\037, an expiry time "
 			"must be given, even if it is the same as the default. The "
 			"current SQLINE default expiry time can be found with the "
-			"\002STATS\032AKILL\002 command."
+			"\002STATS\033AKILL\002 command."
 		));
 
 		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
@@ -725,24 +725,24 @@ public:
 
 		source.Reply(" ");
 		source.Reply(_(
-			"The \002SQLINE\032DEL\002 command removes the given mask from the "
+			"The \002SQLINE\033DEL\002 command removes the given mask from the "
 			"SQLINE list if it is present. If a list of entry numbers is "
 			"given, those entries are deleted. (See the example for LIST "
 			"below.)"
 			"\n\n"
-			"The \002SQLINE\032LIST\002 command displays the SQLINE list. "
+			"The \002SQLINE\033LIST\002 command displays the SQLINE list. "
 			"If a wildcard mask is given, only those entries matching the "
 			"mask are displayed. If a list of entry numbers is given, "
 			"only those entries are shown; for example:\n"
-			"   \002SQLINE\032LIST\0322-5,7-9\002\n"
+			"   \002SQLINE\033LIST\0332-5,7-9\002\n"
 			"      Lists SQLINE entries numbered 2 through 5 and 7\n"
 			"      through 9."
 			"\n\n"
-			"\002SQLINE\032VIEW\002 is a more verbose version of \002SQLINE\032LIST\002, and "
+			"\002SQLINE\033VIEW\002 is a more verbose version of \002SQLINE\033LIST\002, and "
 			"will show who added an SQLINE, the date it was added, and when "
 			"it expires, as well as the mask and reason."
 			"\n\n"
-			"\002SQLINE\032CLEAR\002 clears all entries of the SQLINE list."
+			"\002SQLINE\033CLEAR\002 clears all entries of the SQLINE list."
 		));
 		return true;
 	}

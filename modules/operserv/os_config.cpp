@@ -121,7 +121,7 @@ public:
 			"restarted, or the configuration is reloaded."
 			"\n\n"
 			"Example:\n"
-			"     \002MODIFY\032nickserv\032regdelay\03215m\002"
+			"     \002MODIFY\033nickserv\033regdelay\03315m\002"
 		));
 		return true;
 	}

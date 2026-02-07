@@ -67,7 +67,7 @@ public:
 		}
 		help.SendTo(source);
 
-		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a particular option."),
+		source.Reply(_("Type \002%s\033\037option\037\002 for more information on a particular option."),
 			source.service->GetQueryCommand("generic/help", this_name).c_str());
 		return true;
 	}

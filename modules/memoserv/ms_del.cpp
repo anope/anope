@@ -141,10 +141,10 @@ public:
 			"\n\n"
 			"Examples:"
 			"\n\n"
-			"   \002DEL\0321\002\n"
+			"   \002DEL\0331\002\n"
 			"      Deletes your first memo."
 			"\n\n"
-			"   \002DEL\0322-5,7-9\002\n"
+			"   \002DEL\0332-5,7-9\002\n"
 			"      Deletes memos numbered 2 through 5 and 7 through 9."
 		));
 		return true;

@@ -263,8 +263,8 @@ public:
 				"malicious users from \"taking over\" channels by limiting "
 				"who is allowed channel operator privileges. Available "
 				"commands are listed below; to use them, type "
-				"\002%s\032\037command\037\002. For more information on a "
-				"specific command, type \002%s\032\037command\037\002."
+				"\002%s\033\037command\037\002. For more information on a "
+				"specific command, type \002%s\033\037command\037\002."
 			),
 			ChanServ->nick.c_str(),
 			ChanServ->nick.c_str(),

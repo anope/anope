@@ -135,7 +135,7 @@ public:
 			"Allows Services Operators to change modes for any channel. "
 			"Parameters are the same as for the standard /MODE command. "
 			"Alternatively, CLEAR may be given to clear all modes on the channel. "
-			"If CLEAR\032ALL is given then all modes, including user status, is removed."
+			"If CLEAR\033ALL is given then all modes, including user status, is removed."
 		));
 		return true;
 	}

@@ -109,7 +109,7 @@ public:
 		{
 			source.Reply(" ");
 			source.Reply(_(
-					"See the \002%s\002 command (\002%s\032ACCESS\002) for "
+					"See the \002%s\002 command (\002%s\033ACCESS\002) for "
 					"information on giving a subset of these privileges to "
 					"other channel users."
 				),

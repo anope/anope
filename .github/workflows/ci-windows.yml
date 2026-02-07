@@ -55,8 +55,10 @@ jobs:
           path: ${{ env.CONAN_HOME }}\p
 
       - name: Run CMake
+        shell: cmd # work around a conan-io/conan-center-index bug #21823
         working-directory: ${{ github.workspace }}\build
         run: |
+          call ${{ github.workspace }}\conanbuild.bat
           cmake -A x64 -D "CMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}" -D CMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -G "Visual Studio 17 2022" ..
 
       - name: Build Anope

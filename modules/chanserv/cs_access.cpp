@@ -605,7 +605,7 @@ public:
 				"a user level of 0, and any unregistered user has a user level "
 				"of -1."
 				"\n\n"
-				"The \002%s\032ADD\002 command adds the given mask to the "
+				"The \002%s\033ADD\002 command adds the given mask to the "
 				"access list with the given user level; if the mask is "
 				"already present on the list, its access level is changed to "
 				"the level specified in the command. The \037level\037 specified "
@@ -626,24 +626,24 @@ public:
 
 		source.Reply(" ");
 		source.Reply(_(
-				"The \002%s\032DEL\002 command removes the given nick from the "
+				"The \002%s\033DEL\002 command removes the given nick from the "
 				"access list. If a list of entry numbers is given, those "
 				"entries are deleted.  (See the example for LIST below.) "
 				"You may remove yourself from an access list, even if you "
 				"do not have access to modify that list otherwise."
 				"\n\n"
-				"The \002%s\032LIST\002 command displays the access list. If "
+				"The \002%s\033LIST\002 command displays the access list. If "
 				"a wildcard mask is given, only those entries matching the "
 				"mask are displayed. If a list of entry numbers is given, "
 				"only those entries are shown; for example:\n"
-				"   \002%s\032#channel\032LIST\0322-5,7-9\002\n"
+				"   \002%s\033#channel\033LIST\0332-5,7-9\002\n"
 				"      Lists access entries numbered 2 through 5 and\n"
 				"      7 through 9."
 				"\n\n"
-				"The \002%s\032VIEW\002 command displays the access list similar "
-				"to \002%s\032LIST\002 but shows the creator and last used time."
+				"The \002%s\033VIEW\002 command displays the access list similar "
+				"to \002%s\033LIST\002 but shows the creator and last used time."
 				"\n\n"
-				"The \002%s\032CLEAR\002 command clears all entries of the "
+				"The \002%s\033CLEAR\002 command clears all entries of the "
 				"access list."
 			),
 			source.command.nobreak().c_str(),
@@ -660,7 +660,7 @@ public:
 			source.Reply(" ");
 			source.Reply(_(
 					"\002User access levels\002 can be seen by using the "
-					"\002%s\002 command; type \002%s\032LEVELS\002 for "
+					"\002%s\002 command; type \002%s\033LEVELS\002 for "
 					"information."
 				),
 				cmd.c_str(),
@@ -700,7 +700,7 @@ class CommandCSLevels final
 			Privilege *p = PrivilegeManager::FindPrivilege(what);
 			if (p == NULL)
 			{
-				source.Reply(_("Setting \002%s\002 not known. Type \002%s\032LEVELS\002 for a list of valid settings."),
+				source.Reply(_("Setting \002%s\002 not known. Type \002%s\033LEVELS\002 for a list of valid settings."),
 					what.c_str(), source.service->GetQueryCommand("generic/help").c_str());
 			}
 			else
@@ -743,7 +743,7 @@ class CommandCSLevels final
 			return;
 		}
 
-		source.Reply(_("Setting \002%s\002 not known. Type \002%s\032LEVELS\002 for a list of valid settings."),
+		source.Reply(_("Setting \002%s\002 not known. Type \002%s\033LEVELS\002 for a list of valid settings."),
 			what.c_str(), source.service->GetQueryCommand("generic/help").c_str());
 	}
 
@@ -868,22 +868,22 @@ public:
 					"The \002%s\002 command allows fine control over the meaning of "
 					"the numeric access levels used for channels. With this "
 					"command, you can define the access level required for most "
-					"of %s's functions. (The \002SET\032FOUNDER\002 and this command "
+					"of %s's functions. (The \002SET\033FOUNDER\002 and this command "
 					"are always restricted to the channel founder)."
 					"\n\n"
-					"\002%s\032SET\002 allows the access level for a function or group of "
-					"functions to be changed. \002%s\032DISABLE\002 (or \002DIS\002 for short) "
+					"\002%s\033SET\002 allows the access level for a function or group of "
+					"functions to be changed. \002%s\033DISABLE\002 (or \002DIS\002 for short) "
 					"disables an automatic feature or disallows access to a "
 					"function by anyone, INCLUDING the founder (although, the founder "
-					"can always re-enable it). Use \002%s\032SET founder\002 to make a level "
+					"can always re-enable it). Use \002%s\033SET founder\002 to make a level "
 					"founder only."
 					"\n\n"
-					"\002%s\032LIST\002 shows the current levels for each function or "
-					"group of functions. \002%s\032RESET\002 resets the levels to the "
+					"\002%s\033LIST\002 shows the current levels for each function or "
+					"group of functions. \002%s\033RESET\002 resets the levels to the "
 					"default levels of a newly-created channel."
 					"\n\n"
 					"For a list of the features and functions whose levels can be "
-					"set, see \002HELP\032%s\032DESC\002."
+					"set, see \002HELP\033%s\033DESC\002."
 				),
 				source.service->nick.c_str(),
 				source.command.nobreak().c_str(),

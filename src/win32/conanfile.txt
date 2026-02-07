@@ -1,11 +1,13 @@
 [requires]
 argon2/20190702
-gettext/0.26
 libgettext/0.26
 libmysqlclient/8.1.0
 openssl/3.6.1
 pcre2/10.44
 sqlite3/3.51.0
+
+[tool_requires]
+gettext/0.26
 
 [options]
 */*:shared=True

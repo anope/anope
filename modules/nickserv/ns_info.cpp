@@ -243,8 +243,8 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 				"Allows you to prevent certain pieces of information from "
-				"being displayed when someone does a %s\032\002INFO\002 on your "
-				"nick. You can hide your email address\032(\002EMAIL\002), last seen "
+				"being displayed when someone does a %s\033\002INFO\002 on your "
+				"nick. You can hide your email address\033(\002EMAIL\002), last seen "
 				"user@host mask (\002MASK\002), your services access status "
 				"(\002STATUS\002) and last quit message (\002QUIT\002). "
 				"The second parameter specifies whether the information should "
@@ -276,7 +276,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 				"Allows you to prevent certain pieces of information from "
-				"being displayed when someone does a %s\032\002INFO\002 on the "
+				"being displayed when someone does a %s\033\002INFO\002 on the "
 				"nick. You can hide the email address (\002EMAIL\002), last seen "
 				"user@host mask (\002MASK\002), the services access status "
 				"(\002STATUS\002) and last quit message (\002QUIT\002). "

@@ -158,7 +158,7 @@ public:
 			for (const auto &[timeregion, timezone] : timeregions)
 				source.Reply("    %s (%zu timezones)", timeregion.c_str(), timezone.size());
 
-			source.Reply(_("Type \002%s\032\037region\037\002 to list timezones for a region."),
+			source.Reply(_("Type \002%s\033\037region\037\002 to list timezones for a region."),
 				source.service->GetQueryCommand("generic/help", source.command).c_str());
 		}
 		else if (!SendZones(source, subcommand))
@@ -201,7 +201,7 @@ public:
 			for (const auto &[timeregion, timezone] : timeregions)
 				source.Reply("    %s (%zu timezones)", timeregion.c_str(), timezone.size());
 
-			source.Reply(_("Type \002%s\032\037region\037\002 to list timezones for a region."),
+			source.Reply(_("Type \002%s\033\037region\037\002 to list timezones for a region."),
 				source.service->GetQueryCommand("generic/help", source.command).c_str());
 		}
 		else if (!SendZones(source, subcommand))

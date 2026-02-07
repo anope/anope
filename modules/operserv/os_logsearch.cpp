@@ -159,7 +159,7 @@ public:
 			"to 50."
 			"\n\n"
 			"For example:\n"
-			"    \002LOGSEARCH\032+21d\032+500l\032Anope\002\n"
+			"    \002LOGSEARCH\033+21d\033+500l\033Anope\002\n"
 			"      Searches the last 21 days worth of logs for messages\n"
 			"      containing Anope and lists the most recent 500 of them."
 		));

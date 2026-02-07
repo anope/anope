@@ -236,7 +236,7 @@ public:
 
 			u->SendMessage(NickServ, _(
 					"This nickname is registered and has protection enabled. If it belongs to you, "
-					"type \002%s\032\037password\037\002 to identify to your account."
+					"type \002%s\033\037password\037\002 to identify to your account."
 				),
 				NickServ->GetQueryCommand("nickserv/identify", u->nick).c_str()
 			);
@@ -418,7 +418,7 @@ public:
 			u->SendMessage(NickServ, _(
 					"You must now supply an email address for your nick. This email address will "
 					"allow you to recover your account in case you forget your password. Type "
-					"\002%s\032\037email\037\002 in order to set your email address."
+					"\002%s\033\037email\037\002 in order to set your email address."
 				),
 				NickServ->GetQueryCommand("nickserv/set/email").c_str());
 		}
@@ -530,9 +530,9 @@ public:
 					"\002%s\002 allows you to register a nickname and "
 					"prevent others from using it. The following "
 					"commands allow for registration and maintenance of "
-					"nicknames; to use them, type \002%s\032\037command\037\002. "
+					"nicknames; to use them, type \002%s\033\037command\037\002. "
 					"For more information on a specific command, type "
-					"\002%s\032\037command\037\002."
+					"\002%s\033\037command\037\002."
 				),
 				NickServ->nick.c_str(),
 				NickServ->GetQueryCommand().c_str(),
@@ -543,9 +543,9 @@ public:
 			source.Reply(_(
 					"\002%s\002 allows you to register an account. "
 					"The following commands allow for registration and maintenance of "
-					"accounts; to use them, type \002%s\032\037command\037\002. "
+					"accounts; to use them, type \002%s\033\037command\037\002. "
 					"For more information on a specific command, type "
-					"\002%s\032\037command\037\002."
+					"\002%s\033\037command\037\002."
 				),
 				NickServ->nick.c_str(),
 				NickServ->GetQueryCommand().c_str(),

@@ -232,7 +232,7 @@ public:
 				"database that were added within \037time\037."
 				"\n\n"
 				"Example:\n"
-				" %s\032CLEAR\03230m\n"
+				" %s\033CLEAR\03330m\n"
 				" Will remove all entries that were added within the last 30 minutes."
 			),
 			source.command.nobreak().c_str());

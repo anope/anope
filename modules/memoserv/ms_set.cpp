@@ -235,7 +235,7 @@ public:
 			help.SendTo(source);
 
 			source.Reply(" ");
-			source.Reply(_("Type \002%s\032\037option\037\002 for more information on a specific option."),
+			source.Reply(_("Type \002%s\033\037option\037\002 for more information on a specific option."),
 				source.service->GetQueryCommand("generic/help", source.command).c_str());
 		}
 		else if (subcommand.equals_ci("NOTIFY"))
@@ -280,7 +280,7 @@ public:
 						"change the limit (even if a previous limit was set with "
 						"\002HARD\002)."
 						"\n\n"
-						"This use of the \002SET\032LIMIT\002 command is limited to \002Services "
+						"This use of the \002SET\033LIMIT\002 command is limited to \002Services "
 						"Operators\002. Other users may only enter a limit for themselves "
 						"or a channel on which they have such privileges, may not "
 						"remove their limit, may not set a limit above %d, and may "

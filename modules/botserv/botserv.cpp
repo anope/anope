@@ -164,9 +164,9 @@ public:
 					"It has been created for users that can't host or "
 					"configure a bot, or for use on networks that don't "
 					"allow user bots. Available commands are listed "
-					"below; to use them, type \002%s\032\037command\037\002. For "
+					"below; to use them, type \002%s\033\037command\037\002. For "
 					"more information on a specific command, type "
-					"\002%s\032\037command\037\002."
+					"\002%s\033\037command\037\002."
 				),
 				BotServ->nick.c_str(),
 				BotServ->GetQueryCommand().c_str(),

@@ -117,7 +117,7 @@ namespace Language
 #define ACCESS_DENIED                _("Access denied.")
 #define BAD_EXPIRY_TIME              _("Invalid expiry time.")
 #define BAD_USERHOST_MASK            _("Mask must be in the form \037user\037@\037host\037.")
-#define CONFIRM_DROP                 _("Please confirm that you want to drop \002%s\002 with \002%s\032%s\032%s\002")
+#define CONFIRM_DROP                 _("Please confirm that you want to drop \002%s\002 with \002%s\033%s\033%s\002")
 #define CONFIRM_REGISTER_ADMIN       _("All new accounts must be confirmed by an administrator. Please wait for your registration to be confirmed.")
 #define CONFIRM_REGISTER_CODE        _("All new accounts must be confirmed. To confirm your account, type \002%s\002.")
 #define CONFIRM_REGISTER_MAIL        _("All new accounts must be confirmed. To confirm your account, follow the instructions that were emailed to you.")
@@ -163,8 +163,8 @@ namespace Language
 
 #define MEMO_HAVE_NO_MEMOS           _("You have no memos.")
 #define MEMO_HAVE_NO_NEW_MEMOS       _("You have no new memos.")
-#define MEMO_NEW_MEMO_ARRIVED        _("You have a new memo from %s. Type \002%s\032%zu\002 to read it.")
-#define MEMO_NEW_X_MEMO_ARRIVED      _("There is a new memo on channel %s. Type \002%s\032%s\032%zu\002 to read it.")
+#define MEMO_NEW_MEMO_ARRIVED        _("You have a new memo from %s. Type \002%s\033%zu\002 to read it.")
+#define MEMO_NEW_X_MEMO_ARRIVED      _("There is a new memo on channel %s. Type \002%s\033%s\033%zu\002 to read it.")
 #define MEMO_X_HAS_NO_MEMOS          _("%s has no memos.")
 #define MEMO_X_HAS_NO_NEW_MEMOS      _("%s has no new memos.")
 

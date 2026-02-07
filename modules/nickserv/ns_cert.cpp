@@ -370,15 +370,15 @@ public:
 				"\n\n"
 				"Examples:"
 				"\n\n"
-				"    \002%s\032ADD\002\n"
+				"    \002%s\033ADD\002\n"
 				"        Adds your current fingerprint to the certificate list and\n"
 				"        automatically identifies you when you connect to IRC\n"
 				"        using this fingerprint."
 				"\n\n"
-				"    \002%s\032DEL\032<fingerprint>\002\n"
+				"    \002%s\033DEL\033<fingerprint>\002\n"
 				"        Removes the fingerprint <fingerprint> from your certificate list."
 				"\n\n"
-				"    \002%s\032LIST\002\n"
+				"    \002%s\033LIST\002\n"
 				"        Displays the current certificate list."
 			),
 			source.command.nobreak().c_str(),

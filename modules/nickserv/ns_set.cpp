@@ -62,7 +62,7 @@ public:
 		}
 		help.SendTo(source);
 
-		source.Reply(_("Type \002%s\032\037option\037\002 for more information on a specific option."),
+		source.Reply(_("Type \002%s\033\037option\037\002 for more information on a specific option."),
 			source.service->GetQueryCommand("generic/help", this_name).c_str());
 
 		return true;
@@ -107,7 +107,7 @@ public:
 		help.SendTo(source);
 
 		source.Reply(_(
-				"Type \002%s\032\037option\037\002 for more information "
+				"Type \002%s\033\037option\037\002 for more information "
 				"on a specific option. The options will be set on the given "
 				"\037nickname\037."
 			),

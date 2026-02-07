@@ -25,7 +25,10 @@ include(CheckFunctionExists)
 include(CheckTypeSize)
 include(CheckLibraryExists)
 include(CheckCXXCompilerFlag)
-include(FindPkgConfig)
+
+if(NOT WIN32)
+  include(FindPkgConfig)
+endif()
 
 # If extra include directories were specified, tell cmake about them.
 if(EXTRA_INCLUDE)
@@ -35,12 +38,6 @@ endif()
 # If extra library directories were specified, tell cmake about them.
 if(EXTRA_LIBS)
   link_directories(${EXTRA_LIBS})
-endif()
-
-# setup conan
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/conanbuildinfo.cmake")
-  include("${CMAKE_CURRENT_SOURCE_DIR}/conanbuildinfo.cmake")
-  conan_basic_setup(TARGETS)
 endif()
 
 # Find gettext

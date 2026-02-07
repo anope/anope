@@ -14,7 +14,8 @@
 
 /// BEGIN CMAKE
 /// if(WIN32)
-///   target_link_libraries(${SO} PRIVATE CONAN_PKG::libmysqlclient)
+///   find_package("libmysqlclient" REQUIRED)
+///   target_link_libraries(${SO} PRIVATE "libmysqlclient::libmysqlclient")
 /// else()
 ///   pkg_search_module("MYSQL" IMPORTED_TARGET REQUIRED "mysqlclient" "mariadb")
 ///   target_link_libraries(${SO} PRIVATE PkgConfig::MYSQL)

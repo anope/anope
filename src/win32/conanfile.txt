@@ -1,23 +1,22 @@
 [requires]
 argon2/20190702
+gettext/0.26
+libgettext/0.26
 libmysqlclient/8.1.0
-openssl/3.2.1
-pcre2/10.42
-sqlite3/3.45.1
-gettext/0.21
-libgettext/0.22
+openssl/3.6.1
+pcre2/10.44
+sqlite3/3.51.0
 
 [options]
-argon2/*:shared=True
-libmysqlclient/*:shared=True
-openssl/*:shared=True
-pcre2/*:shared=True
-sqlite3/*:shared=True
-libgettext/*:shared=True
-
-[imports]
-., *.dll -> extradll
-., *.lib -> extralib
+*/*:shared=True
+libiconv/*:shared=False # Shared libiconv causes linker errors
+openssl/*:no_apps=True
+openssl/*:no_legacy=True
+pcre2/*:build_pcre2_16=False
+pcre2/*:build_pcre2_32=False
+pcre2/*:build_pcre2grep=False
+sqlite3/*:build_executable=False
 
 [generators]
-cmake
+CMakeDeps
+CMakeToolchain

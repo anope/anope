@@ -14,7 +14,8 @@
 
 /// BEGIN CMAKE
 /// if(WIN32)
-///   target_link_libraries(${SO} PRIVATE CONAN_PKG::pcre2)
+///   find_package("PCRE2" REQUIRED)
+///   target_link_libraries(${SO} PRIVATE "pcre2::pcre2")
 /// else()
 ///   pkg_check_modules("PCRE2" IMPORTED_TARGET REQUIRED "libpcre2-8")
 ///   target_link_libraries(${SO} PRIVATE PkgConfig::PCRE2)

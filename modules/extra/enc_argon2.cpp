@@ -14,7 +14,8 @@
 
 /// BEGIN CMAKE
 /// if(WIN32)
-///   target_link_libraries(${SO} PRIVATE CONAN_PKG::argon2)
+///   find_package("argon2" REQUIRED)
+///   target_link_libraries(${SO} PRIVATE "argon2::argon2")
 /// else()
 ///   pkg_check_modules("ARGON2" IMPORTED_TARGET REQUIRED "libargon2")
 ///   target_link_libraries(${SO} PRIVATE PkgConfig::ARGON2)

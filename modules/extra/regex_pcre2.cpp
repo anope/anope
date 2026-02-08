@@ -15,7 +15,7 @@
 /// BEGIN CMAKE
 /// if(WIN32)
 ///   find_package("PCRE2" REQUIRED)
-///   target_link_libraries(${SO} PRIVATE "pcre2::pcre2")
+///   target_link_libraries(${SO} PRIVATE "PCRE2::8BIT")
 /// else()
 ///   pkg_check_modules("PCRE2" IMPORTED_TARGET REQUIRED "libpcre2-8")
 ///   target_link_libraries(${SO} PRIVATE PkgConfig::PCRE2)

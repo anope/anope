@@ -12,9 +12,21 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only
 
+/// BEGIN CMAKE
+/// if(WIN32)
+///   find_package("PCRE2" REQUIRED)
+///   target_link_libraries(${SO} PRIVATE "PCRE2::POSIX")
+/// endif()
+/// END CMAKE
+
 #include "module.h"
-#include <sys/types.h>
-#include <regex.h>
+
+#ifdef _WIN32
+# include "pcre2posix.h"
+#else
+# include <sys/types.h>
+# include <regex.h>
+#endif
 
 class POSIXRegex final
 	: public Regex

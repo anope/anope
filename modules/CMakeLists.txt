@@ -5,19 +5,19 @@ endif()
 
 # enable extra modules if conan is used
 if(WIN32 AND DEFINED CMAKE_TOOLCHAIN_FILE)
+  function(copy_extra NAME)
+    # copy the modules out of extra so it gets picked up by build_modules
+    message("Enabling the ${NAME} module")
+    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/extra/${NAME}.cpp" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}")
+  endfunction()
+
   function(enable_extra NAME PACKAGE)
     find_package(${PACKAGE})
     if(${PACKAGE}_FOUND)
-      message("Enabling the ${NAME} module")
-      # copy the modules out of extra so it gets picked up by build_modules
-      file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/extra/${NAME}.cpp" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}")
+      copy_extra(${NAME})
     else()
-      message("Unable to enable the ${NAME} module (missing library)")
+      message("Unable to enable the ${NAME} module (missing ${PACKAGE} library)")
     endif()
-  endfunction()
-
-  function(copy_extra NAME)
-    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/extra/${NAME}.cpp" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}")
   endfunction()
 
   enable_extra("enc_argon2" "argon2")

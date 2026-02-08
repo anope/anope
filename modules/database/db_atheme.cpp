@@ -653,7 +653,7 @@ private:
 			auto *access = accessprov->Create();
 			access->SetMask(mask, ci);
 			access->creator = setter;
-			access->description = "Imported from Atheme: " + flags;
+			access->description = "Imported from Atheme: " + originalflags;
 			access->last_seen = modifiedtime;
 			access->created = modifiedtime;
 			access->AccessUnserialize(accessflags);

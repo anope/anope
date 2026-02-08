@@ -10,6 +10,10 @@
 
 ## Changes
 
+* The regex_posix module is now available on Windows (using the PCRE2 POSIX compatibility layer).
+
+* The regex_tre module is now available on Windows.
+
 * The Windows dependencies have been updated.
 
 ## Anope 2.1.21 (2026-02-07)

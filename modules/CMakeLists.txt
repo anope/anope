@@ -24,6 +24,7 @@ if(WIN32 AND DEFINED CMAKE_TOOLCHAIN_FILE)
   enable_extra("mysql" "libmysqlclient")
   enable_extra("regex_pcre2" "PCRE2")
   enable_extra("regex_posix" "PCRE2")
+  enable_extra("regex_tre" "tre")
   enable_extra("sqlite" "SQLite3")
   enable_extra("ssl_openssl" "OpenSSL")
   # this uses Wldap so should always be available

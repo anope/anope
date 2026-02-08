@@ -13,9 +13,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 /// BEGIN CMAKE
-/// pkg_check_modules("TRE" IMPORTED_TARGET REQUIRED "tre")
-/// target_link_libraries(${SO} PRIVATE PkgConfig::TRE)
-/// target_compile_options(${SO} PRIVATE "-Wno-error=date-time") # Workaround for TRE bug 117
+/// if(WIN32)
+///   find_package("tre" REQUIRED)
+///   target_link_libraries(${SO} PRIVATE "tre::tre")
+/// else()
+///   pkg_check_modules("TRE" IMPORTED_TARGET REQUIRED "tre")
+///   target_link_libraries(${SO} PRIVATE PkgConfig::TRE)
+///   target_compile_options(${SO} PRIVATE "-Wno-error=date-time") # Workaround for TRE bug 117
+/// endif()
 /// END CMAKE
 
 #include "module.h"

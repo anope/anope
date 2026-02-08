@@ -5,6 +5,7 @@ libmysqlclient/8.1.0
 openssl/3.6.1
 pcre2/10.44
 sqlite3/3.51.0
+tre/cci.20230717
 
 [tool_requires]
 gettext/0.26

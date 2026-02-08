@@ -434,7 +434,7 @@ class CommandCSMode final
 						break;
 					}
 					Anope::string mode_param;
-					if (NeedsParam(cm, adding) && !sep.GetToken(mode_param))
+					if (NeedsParam(cm, adding && setting) && !sep.GetToken(mode_param))
 					{
 						missingparam.Push(cm, mode_param, adding);
 						break;

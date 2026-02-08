@@ -18,9 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup NSIS
-        run: |-
-          choco install nsis
+      - name: Install NSIS
+        uses: negrutiu/nsis-install@v2
+        with:
+          distro: official
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2

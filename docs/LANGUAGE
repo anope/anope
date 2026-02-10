@@ -29,7 +29,7 @@ Anope Multi Language Support
     po files (especially on Windows).
 
     There are several control characters within the messages. These are mostly IRC formatting codes (https://modern.ircdocs.horse/formatting)
-    but 0x1A is special to Anope and is used to prevent the automatic linewrapper from breaking messages in the middle of
+    but 0x1B is special to Anope and is used to prevent the automatic linewrapper from breaking messages in the middle of
     text that should not be split (e.g. commands). Your editor may not show these so be careful you don't delete them!
 
     If you have finished a language file translation and you want others to use it, please file a pull request on GitHub

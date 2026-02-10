@@ -55,6 +55,7 @@ public:
 		CanSVSNick = true;
 		CanSVSJoin = true;
 		CanSVSNOOP = true;
+		CanSendMultipleSWhois = true;
 		CanSetVHost = true;
 		CanSetVIdent = true;
 		CanSNLine = true;
@@ -246,13 +247,14 @@ private:
 
 		// BIGLINES: enable sending lines up to 16384 characters in length.
 		// EAUTH: communicates information about the local server.
+		// EXTSWHOIS: enable receiving extended SWHOIS messages.
 		// MLOCK: enable receiving the MLOCK message when a mode lock changes.
 		// MTAGS: enable receiving IRCv3 message tags.
 		// NEXTBANS: enables receiving named extended bans.
 		// SJSBY: enables receiving list mode setters and set timestamps.
 		// SID: communicates the unique identifier of the local server.
 		// VHP: enable receiving the vhost in UID.
-		Uplink::Send("PROTOCTL", "BIGLINES", "MLOCK", "MTAGS", "NEXTBANS", "SJSBY", "VHP");
+		Uplink::Send("PROTOCTL", "BIGLINES", "EXTSWHOIS", "MLOCK", "MTAGS", "NEXTBANS", "SJSBY", "VHP");
 		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
 
@@ -342,9 +344,16 @@ private:
 		Uplink::Send("SENDUMODE", 'o', "From " + source.GetName() + ": " + buf);
 	}
 
-	void SendSWhois(const MessageSource &source, const Anope::string &who, const Anope::string &mask) override
+	void SendSWhois(const MessageSource &source, User *target, const Anope::string &tag, const Anope::string &message) override
 	{
-		Uplink::Send("SWHOIS", who, mask);
+		const auto utag = tag.empty() ? source.GetName() : tag;
+		Uplink::Send(source, "SWHOIS", target->GetUID(), "+", utag, 0, message);
+	}
+
+	void SendSWhoisDel(const MessageSource &source, User *target, const Anope::string &tag, const Anope::string &message) override
+	{
+		const auto utag = tag.empty() ? source.GetName() : tag;
+		Uplink::Send(source, "SWHOIS", target->GetUID(), "-", utag, 0, message.empty() ? "*" : message);
 	}
 
 	void SendEOB() override

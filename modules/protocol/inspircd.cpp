@@ -587,10 +587,36 @@ public:
 			Uplink::Send(source, "SVSPART", u->GetUID(), chan);
 	}
 
-	void SendSWhois(const MessageSource &bi, const Anope::string &who, const Anope::string &mask) override
+	void SendSWhois(const MessageSource &source, User *target, const Anope::string &tag, const Anope::string &message) override
 	{
-		User *u = User::Find(who);
-		Uplink::Send("METADATA", u->GetUID(), "swhois", mask);
+		if (!IRCD->CanSendMultipleSWhois)
+		{
+			// Old style SWHOIS.
+			Uplink::Send("METADATA", target->GetUID(), "swhois", message);
+		}
+		else
+		{
+			// New style SWHOIS.
+			Uplink::Send("METADATA", target->GetUID(), "specialwhois", Anope::Format("+ @%s s %ld :%s",
+				tag.c_str(), Anope::CurTime, message.c_str()));
+		}
+	}
+
+	void SendSWhoisDel(const MessageSource &source, User *target, const Anope::string &tag, const Anope::string &message) override
+	{
+		if (!IRCD->CanSendMultipleSWhois)
+		{
+			// Old style SWHOIS.
+			Uplink::Send("METADATA", target->GetUID(), "swhois", "");
+		}
+		else
+		{
+			// New style SWHOIS.
+			if (tag.empty())
+				Uplink::Send("METADATA", target->GetUID(), "specialwhois", Anope::Format("- :%s", message.c_str()));
+			else
+				Uplink::Send("METADATA", target->GetUID(), "specialwhois", Anope::Format("- @%s", tag.c_str()));
+		}
 	}
 
 	void SendBOB() override
@@ -1492,6 +1518,9 @@ struct IRCDMessageCapab final
 
 				else if (modname.equals_cs("services"))
 					Servers::Capab.insert("SERVICES");
+
+				else if (modname.equals_cs("swhois_ext"))
+					IRCD->CanSendMultipleSWhois = true;
 			}
 
 			const auto &anoperegex = Config->GetBlock("options").Get<const Anope::string>("regexengine");
@@ -1878,6 +1907,9 @@ private:
 
 		else if (modname.equals_cs("services"))
 			required = true;
+
+		else if (modname.equals_cs("swhois_ext"))
+			IRCD->CanSendMultipleSWhois = plus;
 
 		else
 			return;

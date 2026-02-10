@@ -80,6 +80,9 @@ public:
 	/** Can we force servers to remove opers? */
 	bool CanSVSNOOP = false;
 
+	/** Can we send multiple swhois messages? */
+	bool CanSendMultipleSWhois = false;
+
 	/* Can we set vhosts on users? */
 	bool CanSetVHost = false;
 
@@ -276,7 +279,8 @@ public:
 	virtual void SendSVSHold(const Anope::string &, time_t) { }
 	virtual void SendSVSHoldDel(const Anope::string &) { }
 
-	virtual void SendSWhois(const MessageSource &, const Anope::string &, const Anope::string &) { }
+	virtual void SendSWhois(const MessageSource &source, User *target, const Anope::string &tag, const Anope::string &message) { };
+	virtual void SendSWhoisDel(const MessageSource &source, User *target, const Anope::string &tag, const Anope::string &message) { }
 
 	/** Introduces a server to the uplink
 	 */

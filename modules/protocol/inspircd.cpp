@@ -1228,6 +1228,7 @@ struct IRCDMessageCapab final
 
 			Servers::Capab.clear();
 			IRCD->CanClearModes.clear();
+			IRCD->CanSendMultipleSWhois = false;
 			IRCD->CanSQLineChannel = false;
 			IRCD->CanTagMessage = false;
 			IRCD->DefaultPseudoclientModes = "+oI";

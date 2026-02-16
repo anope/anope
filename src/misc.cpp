@@ -783,6 +783,9 @@ Anope::string Anope::Format(const char *fmt, ...)
 
 Anope::string Anope::Format(va_list &valist, const char *fmt)
 {
+	if (!fmt || !fmt[0])
+		return "";
+
 	static std::vector<char> buffer(512);
 	while (true)
 	{

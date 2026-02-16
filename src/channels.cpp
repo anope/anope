@@ -77,8 +77,8 @@ void Channel::Reset()
 		/* reset modes for my clients */
 		if (uc->user->server == Me)
 		{
-			for (auto mode : f.Modes())
-				this->SetMode(NULL, ModeManager::FindChannelModeByChar(mode), uc->user->GetUID(), false);
+			for (auto *mode : f.Modes())
+				this->SetMode(NULL, mode, uc->user->GetUID(), false);
 			/* Modes might not exist yet, so be sure the status is really reset */
 			uc->status = f;
 		}
@@ -182,7 +182,7 @@ bool Channel::HasUserStatus(User *u, ChannelModeStatus *cms)
 	if (memb)
 	{
 		if (cms)
-			return memb->status.HasMode(cms->mchar);
+			return memb->status.HasMode(cms);
 		else
 			return memb->status.Empty();
 	}
@@ -283,7 +283,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Mod
 		/* Set the status on the user */
 		auto *memb = u->FindChannel(this);
 		if (memb)
-			memb->status.AddMode(cm->mchar);
+			memb->status.AddMode(cm);
 
 		FOREACH_RESULT(OnChannelModeSet, MOD_RESULT, (this, setter, cm, data));
 
@@ -354,7 +354,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 		/* Remove the status on the user */
 		auto *memb = u->FindChannel(this);
 		if (memb)
-			memb->status.DelMode(cm->mchar);
+			memb->status.DelMode(cm);
 
 		FOREACH_RESULT(OnChannelModeUnset, MOD_RESULT, (this, setter, cm, param));
 

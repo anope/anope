@@ -386,7 +386,7 @@ Conf::Conf() : Block("")
 			if (memb != NULL)
 			{
 				for (auto mode : memb->status.Modes())
-					c->RemoveMode(bi, ModeManager::FindChannelModeByChar(mode), bi->GetUID());
+					c->RemoveMode(bi, mode, bi->GetUID());
 			}
 			/* Set the new modes */
 			for (char want_mode : want_modes)

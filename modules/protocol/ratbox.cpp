@@ -134,7 +134,7 @@ public:
 		{
 			ChannelStatus status;
 
-			status.AddMode('o');
+			status.AddMode(ModeManager::FindChannelModeByName("OP"));
 			bi->Join(c, &status);
 		}
 

@@ -64,24 +64,41 @@ struct StackerInfo final
 	void AddMode(Mode *mode, bool set, const ModeData &data);
 };
 
-ChannelStatus::ChannelStatus(const Anope::string &m) : modes(m)
+ChannelStatus::ChannelStatus(const Anope::string &m)
 {
+	for (const auto mc : m)
+	{
+		auto *cm = ModeManager::FindChannelModeByChar(mc);
+		if (IsValidMode(cm))
+			AddMode(cm);
+	}
+}
+
+bool ChannelStatus::IsValidMode(ChannelMode *cm)
+{
+	return cm && cm->type == MODE_STATUS;
 }
 
 void ChannelStatus::AddMode(char c)
 {
-	if (modes.find(c) == Anope::string::npos)
-		modes.append(c);
+	AddMode(ModeManager::FindChannelModeByChar(c));
 }
 
-void ChannelStatus::DelMode(char c)
+void ChannelStatus::AddMode(ChannelMode *cm)
 {
-	modes = modes.replace_all_cs(c, "");
+	if (IsValidMode(cm))
+		modes.insert(cm);
 }
 
-bool ChannelStatus::HasMode(char c) const
+void ChannelStatus::DelMode(ChannelMode *cm)
 {
-	return modes.find(c) != Anope::string::npos;
+	if (IsValidMode(cm))
+		modes.erase(cm);
+}
+
+bool ChannelStatus::HasMode(ChannelMode *cm) const
+{
+	return IsValidMode(cm) && modes.find(cm) != modes.end();
 }
 
 bool ChannelStatus::Empty() const
@@ -94,23 +111,14 @@ void ChannelStatus::Clear()
 	modes.clear();
 }
 
-const Anope::string &ChannelStatus::Modes() const
-{
-	return modes;
-}
-
 Anope::string ChannelStatus::BuildModePrefixList() const
 {
 	Anope::string ret;
 
-	for (auto mode : modes)
+	for (const auto *cm : modes)
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByChar(mode);
-		if (cm != NULL && cm->type == MODE_STATUS)
-		{
-			ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
-			ret += cms->symbol;
-		}
+		const auto *cms = anope_dynamic_static_cast<const ChannelModeStatus *>(cm);
+		ret += cms->symbol;
 	}
 
 	return ret;

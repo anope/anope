@@ -55,8 +55,8 @@ public:
 					if (uc->user->HasMode("OPER"))
 						continue;
 
-					for (size_t i = uc->status.Modes().length(); i > 0; --i)
-						c->RemoveMode(c->WhoSends(), ModeManager::FindChannelModeByChar(uc->status.Modes()[i - 1]), uc->user->GetUID(), false);
+					for (auto *mode : uc->status.Modes())
+						c->RemoveMode(c->WhoSends(), mode, uc->user->GetUID(), false);
 				}
 
 				source.Reply(_("All modes cleared on %s."), c->name.c_str());

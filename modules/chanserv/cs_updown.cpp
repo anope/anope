@@ -143,8 +143,8 @@ class CommandCSDown final
 		auto *memb = c->FindUser(u);
 		if (memb != NULL)
 		{
-			for (size_t i = memb->status.Modes().length(); i > 0;)
-				c->RemoveMode(NULL, ModeManager::FindChannelModeByChar(memb->status.Modes()[--i]), u->GetUID());
+			for (auto *mode : memb->status.Modes())
+				c->RemoveMode(NULL, mode, u->GetUID());
 		}
 	}
 

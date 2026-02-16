@@ -516,8 +516,8 @@ public:
 				memb->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(user->GetUID());
-			for (auto mode : cs.Modes())
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), user->GetUID(), false);
+			for (auto *mode : cs.Modes())
+				c->SetMode(setter, mode, user->GetUID(), false);
 
 			if (memb != NULL)
 				memb->status = cs;
@@ -845,7 +845,7 @@ namespace InspIRCdExtBan
 			{
 				auto *memb = c->FindUser(u);
 				if (memb != NULL)
-					if (cm == NULL || memb->status.HasMode(cm->mchar))
+					if (cm == NULL || memb->status.HasMode(cm))
 						return true;
 			}
 

@@ -122,8 +122,8 @@ public:
 				memb->status.Clear();
 
 			BotInfo *setter = BotInfo::Find(u->GetUID());
-			for (auto mode : cs.Modes())
-				c->SetMode(setter, ModeManager::FindChannelModeByChar(mode), u->GetUID(), false);
+			for (auto *mode : cs.Modes())
+				c->SetMode(setter, mode, u->GetUID(), false);
 
 			if (memb)
 				memb->status = cs;

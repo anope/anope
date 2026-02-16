@@ -464,7 +464,7 @@ public:
 		{
 			auto *memb = c->FindUser(setter.GetUser());
 			ChannelMode *cm = ModeManager::FindChannelModeByName("OP");
-			if (memb && cm && !memb->status.HasMode(cm->mchar))
+			if (memb && cm && !memb->status.HasMode(cm))
 			{
 				/* Our -o and their mode change crossing, bounce their mode */
 				c->RemoveMode(c->ci->WhoSends(), mode, data.value);

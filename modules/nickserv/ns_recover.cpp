@@ -292,7 +292,7 @@ public:
 				if (it != ei->end())
 				{
 					for (auto mode : it->second.Modes())
-						c->SetMode(c->WhoSends(), ModeManager::FindChannelModeByChar(mode), u->GetUID());
+						c->SetMode(c->WhoSends(), mode, u->GetUID());
 
 					ei->erase(it);
 					if (ei->empty())

@@ -263,16 +263,20 @@ public:
 /* The status a user has on a channel (+v, +h, +o) etc */
 class CoreExport ChannelStatus final
 {
-	Anope::string modes;
+private:
+	std::set<ChannelMode *> modes;
+	static bool IsValidMode(ChannelMode *cm);
+
 public:
 	ChannelStatus() = default;
 	ChannelStatus(const Anope::string &modes);
 	void AddMode(char c);
-	void DelMode(char c);
-	bool HasMode(char c) const;
+	void AddMode(ChannelMode *cm);
+	void DelMode(ChannelMode *cm);
+	bool HasMode(ChannelMode *cm) const;
 	bool Empty() const;
 	void Clear();
-	const Anope::string &Modes() const;
+	const auto &Modes() const { return modes; }
 	Anope::string BuildModePrefixList() const;
 };
 

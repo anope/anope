@@ -803,7 +803,7 @@ namespace InspIRCdExtBan
 		}
 	};
 
-	class EntryMatcher final
+	class EntryMatcher
 		: public Base
 	{
 	public:
@@ -814,7 +814,9 @@ namespace InspIRCdExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			return Entry(e->GetMask(), this->name, false).Matches(u);
+			auto mask = e->GetMask();
+			auto *cm = basech->Unwrap(mask);
+			return Entry(mask, cm->name, false).Matches(u);
 		}
 	};
 
@@ -914,17 +916,17 @@ namespace InspIRCdExtBan
 	};
 
 	class UnidentifiedMatcher final
-		: public Base
+		: public EntryMatcher
 	{
 	public:
 		UnidentifiedMatcher(const Anope::string &mname, const Anope::string &xname, char xchar)
-			: Base(mname, xname, xchar)
+			: EntryMatcher(mname, xname, xchar)
 		{
 		}
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			return !u->Account() && Entry(e->GetMask(), this->base, false).Matches(u);
+			return !u->Account() && EntryMatcher::Matches(u, e);
 		}
 	};
 

@@ -796,6 +796,8 @@ Anope::string Entry::GetCleanMask() const
 
 bool Entry::Matches(User *u, bool full) const
 {
+	Log(LOG_DEBUG) << "Checking whether " << u->GetMask() << " matches " << this->GetMask();
+
 	/* First check if this mode has defined any matches (usually for extbans). */
 	if (IRCD->IsExtbanValid(this->mask))
 	{

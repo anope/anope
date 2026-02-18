@@ -242,11 +242,9 @@ template<typename T>
 class CoreExport ChannelModeVirtual
 	: public T
 {
-private:
-	ChannelMode *basech;
-
 protected:
 	Anope::string base;
+	ChannelMode *basech;
 
 public:
 	ChannelModeVirtual(const Anope::string &mname, const Anope::string &basename);

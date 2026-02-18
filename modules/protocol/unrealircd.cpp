@@ -573,7 +573,9 @@ namespace UnrealExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			return Entry(e->GetMask(), this->base, false).Matches(u);
+			auto mask = e->GetMask();
+			auto *cm = basech->Unwrap(mask);
+			return Entry(mask, cm->name, false).Matches(u);
 		}
 	};
 

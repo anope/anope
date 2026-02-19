@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-28 19:44+0000\n"
-"PO-Revision-Date: 2026-01-28 19:44+0000\n"
+"POT-Creation-Date: 2026-02-14 15:15+0000\n"
+"PO-Revision-Date: 2026-02-14 15:15+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -543,6 +543,10 @@ msgstr ""
 msgid "channel VIEW [mask | list]"
 msgstr ""
 
+#, c-format
+msgid "channel [%s]"
+msgstr ""
+
 msgid "channel [code]"
 msgstr ""
 
@@ -550,9 +554,6 @@ msgid "channel [description]"
 msgstr ""
 
 msgid "channel [nick]"
-msgstr ""
-
-msgid "channel [parameters]"
 msgstr ""
 
 msgid "channel [user]"
@@ -660,13 +661,14 @@ msgstr ""
 msgid "nickname new-password"
 msgstr ""
 
+#, c-format
+msgid "nickname [%s]"
+msgstr ""
+
 msgid "nickname [code]"
 msgstr ""
 
 msgid "nickname [language]"
-msgstr ""
-
-msgid "nickname [parameter]"
 msgstr ""
 
 msgid "nickname [password]"
@@ -1121,6 +1123,10 @@ msgstr ""
 
 #, c-format
 msgid "%s settings:"
+msgstr ""
+
+#, c-format
+msgid "%s syntax is invalid."
 msgstr ""
 
 #, c-format
@@ -6742,6 +6748,9 @@ msgid "letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
 msgstr ""
 
 msgid "not assigned yet"
+msgstr ""
+
+msgid "value"
 msgstr ""
 
 msgid "vhost"

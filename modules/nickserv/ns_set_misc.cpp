@@ -17,7 +17,20 @@
 
 static Module *me;
 
-static Anope::map<Anope::string> descriptions;
+#define MISC_PREFIX "ns_set_misc:"
+
+struct CommandData final
+{
+	Anope::string saset_description;
+	Anope::string set_description;
+	Anope::string pattern;
+	Anope::string syntax;
+	Anope::string title;
+	bool swhois = false;
+};
+
+static Anope::map<CommandData> command_data;
+
 
 struct NSMiscData;
 static Anope::map<ExtensibleItem<NSMiscData> *> items;
@@ -99,13 +112,65 @@ static Anope::string GetAttribute(const Anope::string &command)
 {
 	size_t sp = command.rfind(' ');
 	if (sp != Anope::string::npos)
-		return command.substr(sp + 1);
-	return command;
+		return MISC_PREFIX + command.substr(sp + 1);
+	return MISC_PREFIX + command;
+}
+
+static const char* GetTitle(ExtensibleItem<NSMiscData> *ext)
+{
+	auto it = command_data.find(ext->name);
+	if (it == command_data.end() || it->second.title.empty())
+		return ext->name.c_str() + 12;
+	return it->second.title.c_str();
+}
+
+static void CheckSWhois(User* u, const Anope::string &name, ExtensibleItem<NSMiscData> *ext)
+{
+	auto it = command_data.find(name);
+	if (it == command_data.end() || !it->second.swhois)
+		return; // No swhois.
+
+	auto *nickserv = Config->GetClient("NickServ");
+
+	auto *nc = u->Account();
+	auto *data = nc ? ext->Get(nc) : nullptr;
+	if (data)
+		IRCD->SendSWhois(nickserv, u, name, Anope::Format("%s: %s", GetTitle(ext), data->data.c_str()));
+	else
+		IRCD->SendSWhoisDel(nickserv, u, name, "");
 }
 
 class CommandNSSetMisc
 	: public Command
 {
+protected:
+	bool saset = false;
+
+private:
+	bool CheckSyntax(CommandSource &source, ExtensibleItem<NSMiscData> *ext, const Anope::string &value) const
+	{
+		auto it = command_data.find(ext->name);
+		if (it == command_data.end() || it->second.pattern.empty())
+			return true; // No syntax validation.
+
+		ServiceReference<RegexProvider> regex("Regex", Config->GetBlock("options").Get<const Anope::string>("regexengine"));
+		if (!regex)
+			return true; // No regex engine.
+
+		auto ret = true;
+		try
+		{
+			auto *pattern = regex->Compile(it->second.pattern);
+			ret = pattern->Matches(value);
+			delete pattern;
+		}
+		catch (const RegexException &ex)
+		{
+			Log(LOG_DEBUG) << ex.GetReason();
+		}
+		return ret;
+	}
+
 public:
 	CommandNSSetMisc(Module *creator, const Anope::string &cname = "nickserv/set/misc", size_t min = 0) : Command(creator, cname, min, min + 1)
 	{
@@ -133,22 +198,31 @@ public:
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Anope::string scommand = GetAttribute(source.command);
-		Anope::string key = "ns_set_misc:" + scommand;
+		const auto key = GetAttribute(source.command);
 		ExtensibleItem<NSMiscData> *item = GetItem(key);
 		if (item == NULL)
 			return;
 
 		if (!param.empty())
 		{
+			if (!CheckSyntax(source, item, param))
+			{
+				source.Reply(CHAN_SETTING_INVALID, GetTitle(item));
+				this->SendSyntax(source);
+				return;
+			}
+
 			item->Set(nc, NSMiscData(nc, key, param));
-			source.Reply(CHAN_SETTING_CHANGED, scommand.c_str(), nc->display.c_str(), param.c_str());
+			source.Reply(CHAN_SETTING_CHANGED, GetTitle(item), nc->display.c_str(), param.c_str());
 		}
 		else
 		{
 			item->Unset(nc);
-			source.Reply(CHAN_SETTING_UNSET, scommand.c_str(), nc->display.c_str());
+			source.Reply(CHAN_SETTING_UNSET, GetTitle(item), nc->display.c_str());
 		}
+
+		for (auto *u : nc->users)
+			CheckSWhois(u, key, item);
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -158,23 +232,45 @@ public:
 
 	void OnServHelp(CommandSource &source, HelpWrapper &help) override
 	{
-		if (descriptions.count(source.command))
-		{
-			this->SetDesc(descriptions[source.command]);
-			Command::OnServHelp(source, help);
-		}
+		auto it = command_data.find(GetAttribute(source.command));
+		if (it == command_data.end())
+			return;
+
+		const auto &desc = saset ? it->second.saset_description : it->second.set_description;
+		if (desc.empty())
+			return;
+
+		this->SetDesc(desc);
+		Command::OnServHelp(source, help);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		if (descriptions.count(source.command))
-		{
-			this->SendSyntax(source);
-			source.Reply(" ");
-			source.Reply("%s", Language::Translate(source.nc, descriptions[source.command].c_str()));
-			return true;
-		}
-		return false;
+		auto it = command_data.find(GetAttribute(source.command));
+		if (it == command_data.end())
+			return false;
+
+		const auto &desc = saset ? it->second.saset_description : it->second.set_description;
+		if (desc.empty())
+			return false;
+
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply("%s", Language::Translate(source.nc, desc.c_str()));
+		return true;
+	}
+
+	void SendSyntax(CommandSource &source) override
+	{
+		auto *value = _("value");
+		auto it = command_data.find(GetAttribute(source.command));
+		if (it != command_data.end() && !it->second.syntax.empty())
+			value = it->second.syntax.c_str();
+
+		this->ClearSyntax();
+		this->SetSyntax(Anope::Format("[\037%s\037]", Language::Translate(source.nc, value)));
+
+		Command::SendSyntax(source);
 	}
 };
 
@@ -184,13 +280,28 @@ class CommandNSSASetMisc final
 public:
 	CommandNSSASetMisc(Module *creator) : CommandNSSetMisc(creator, "nickserv/saset/misc", 1)
 	{
-		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 [\037parameter\037]"));
+		this->saset = true;
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
+	}
+
+	void SendSyntax(CommandSource &source) override
+	{
+		auto *value = _("value");
+		auto it = command_data.find(GetAttribute(source.command));
+		if (it != command_data.end() && !it->second.syntax.empty())
+			value = it->second.syntax.c_str();
+
+		this->ClearSyntax();
+		this->SetSyntax(Anope::Format(
+			Language::Translate(source.nc, _("\037nickname\037 [\037%s\037]")),
+			Language::Translate(source.nc, value)
+		));
+
+		Command::SendSyntax(source);
 	}
 };
 
@@ -218,28 +329,50 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		descriptions.clear();
-
+		command_data.clear();
 		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
 			const auto &block = conf.GetBlock("command", i);
-
 			const Anope::string &cmd = block.Get<const Anope::string>("command");
-
 			if (cmd != "nickserv/set/misc" && cmd != "nickserv/saset/misc")
 				continue;
 
 			Anope::string cname = block.Get<const Anope::string>("name");
 			Anope::string desc = block.Get<const Anope::string>("misc_description");
-
 			if (cname.empty() || desc.empty())
 				continue;
 
-			descriptions[cname] = desc;
-
 			// Force creation of the extension item.
-			GetItem("ns_set_misc:" + GetAttribute(cname));
+			const auto extname = GetAttribute(cname);
+			GetItem(extname);
+
+			auto &data = command_data[extname];
+			if (cmd == "nickserv/saset/misc")
+			{
+				data.saset_description = desc;
+				continue;
+			}
+
+			data.set_description = desc;
+			data.pattern = block.Get<const Anope::string>("misc_pattern");
+			data.syntax = block.Get<const Anope::string>("misc_syntax");
+			data.title = block.Get<const Anope::string>("misc_title");
+			data.swhois = block.Get<bool>("misc_swhois");
 		}
+	}
+
+	void OnUserLogin(User *u) override
+	{
+		if (u->server == Me || command_data.empty() || !IRCD->CanSendMultipleSWhois)
+			return;
+
+		for (const auto &[name, ext] : items)
+			CheckSWhois(u, name, ext);
+	}
+
+	void OnNickLogout(User *u) override
+	{
+		OnUserLogin(u);
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool) override
@@ -249,7 +382,7 @@ public:
 			NSMiscData *data = e->Get(na->nc);
 
 			if (data != NULL)
-				info[e->name.substr(12).replace_all_cs("_", " ")] = data->data;
+				info[GetTitle(e)] = data->data;
 		}
 	}
 };

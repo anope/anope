@@ -17,8 +17,18 @@
 
 static Module *me;
 
-static Anope::map<Anope::string> descriptions;
-static Anope::map<unsigned> numerics;
+#define MISC_PREFIX "cs_set_misc:"
+
+struct CommandData final
+{
+	Anope::string description;
+	Anope::string pattern;
+	Anope::string syntax;
+	Anope::string title;
+	unsigned numeric = 0;
+};
+
+static Anope::map<CommandData> command_data;
 
 struct CSMiscData;
 static Anope::map<ExtensibleItem<CSMiscData> *> items;
@@ -100,17 +110,49 @@ static Anope::string GetAttribute(const Anope::string &command)
 {
 	size_t sp = command.rfind(' ');
 	if (sp != Anope::string::npos)
-		return command.substr(sp + 1);
-	return command;
+		return MISC_PREFIX + command.substr(sp + 1);
+	return MISC_PREFIX + command;
+}
+
+static const char* GetTitle(ExtensibleItem<CSMiscData> *ext)
+{
+	auto it = command_data.find(ext->name);
+	if (it == command_data.end() || it->second.title.empty())
+		return ext->name.c_str() + 12;
+	return it->second.title.c_str();
 }
 
 class CommandCSSetMisc final
 	: public Command
 {
+private:
+	bool CheckSyntax(CommandSource &source, ExtensibleItem<CSMiscData> *ext, const Anope::string &value) const
+	{
+		auto it = command_data.find(ext->name);
+		if (it == command_data.end() || it->second.pattern.empty())
+			return true; // No syntax validation.
+
+		ServiceReference<RegexProvider> regex("Regex", Config->GetBlock("options").Get<const Anope::string>("regexengine"));
+		if (!regex)
+			return true; // No regex engine.
+
+		auto ret = true;
+		try
+		{
+			auto *pattern = regex->Compile(it->second.pattern);
+			ret = pattern->Matches(value);
+			delete pattern;
+		}
+		catch (const RegexException &ex)
+		{
+			Log(LOG_DEBUG) << ex.GetReason();
+		}
+		return ret;
+	}
+
 public:
 	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 2)
 	{
-		this->SetSyntax(_("\037channel\037 [\037parameters\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -140,45 +182,69 @@ public:
 			return;
 		}
 
-		Anope::string scommand = GetAttribute(source.command);
-		Anope::string key = "cs_set_misc:" + scommand;
+		const auto key = GetAttribute(source.command);
 		ExtensibleItem<CSMiscData> *item = GetItem(key);
 		if (item == NULL)
 			return;
 
 		if (!param.empty())
 		{
+			if (!CheckSyntax(source, item, param))
+			{
+				source.Reply(CHAN_SETTING_INVALID, GetTitle(item));
+				this->SendSyntax(source);
+				return;
+			}
+
 			item->Set(ci, CSMiscData(ci, key, param));
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to change it to " << param;
-			source.Reply(CHAN_SETTING_CHANGED, scommand.c_str(), ci->name.c_str(), params[1].c_str());
+			source.Reply(CHAN_SETTING_CHANGED, GetTitle(item), ci->name.c_str(), params[1].c_str());
 		}
 		else
 		{
 			item->Unset(ci);
 			Log(source.AccessFor(ci).HasPriv("SET") ? LOG_COMMAND : LOG_OVERRIDE, source, this, ci) << "to unset it";
-			source.Reply(CHAN_SETTING_UNSET, scommand.c_str(), ci->name.c_str());
+			source.Reply(CHAN_SETTING_UNSET, GetTitle(item), ci->name.c_str());
 		}
 	}
 
 	void OnServHelp(CommandSource &source, HelpWrapper &help) override
 	{
-		if (descriptions.count(source.command))
+		auto it = command_data.find(GetAttribute(source.command));
+		if (it != command_data.end() && !it->second.description.empty())
 		{
-			this->SetDesc(descriptions[source.command]);
+			this->SetDesc(it->second.description);
 			Command::OnServHelp(source, help);
 		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		if (descriptions.count(source.command))
+		auto it = command_data.find(GetAttribute(source.command));
+		if (it != command_data.end() && !it->second.description.empty())
 		{
 			this->SendSyntax(source);
 			source.Reply(" ");
-			source.Reply("%s", Language::Translate(source.nc, descriptions[source.command].c_str()));
+			source.Reply("%s", Language::Translate(source.nc, it->second.description.c_str()));
 			return true;
 		}
 		return false;
+	}
+
+	void SendSyntax(CommandSource &source) override
+	{
+		auto *value = _("value");
+		auto it = command_data.find(GetAttribute(source.command));
+		if (it != command_data.end() && !it->second.syntax.empty())
+			value = it->second.syntax.c_str();
+
+		this->ClearSyntax();
+		this->SetSyntax(Anope::Format(
+			Language::Translate(source.nc, _("\037channel\037 [\037%s\037]")),
+			Language::Translate(source.nc, value)
+		));
+
+		Command::SendSyntax(source);
 	}
 };
 
@@ -204,37 +270,37 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		descriptions.clear();
-		numerics.clear();
-
+		command_data.clear();
 		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
 			const auto &block = conf.GetBlock("command", i);
-
 			if (block.Get<const Anope::string>("command") != "chanserv/set/misc")
 				continue;
 
 			Anope::string cname = block.Get<const Anope::string>("name");
 			Anope::string desc = block.Get<const Anope::string>("misc_description");
-
 			if (cname.empty() || desc.empty())
 				continue;
 
-			descriptions[cname] = desc;
-
 			// Force creation of the extension item.
-			const auto extname = "cs_set_misc:" + GetAttribute(cname);
+			const auto extname = GetAttribute(cname);
 			GetItem(extname);
 
-			auto numeric = block.Get<unsigned>("misc_numeric");
+			auto &data = command_data[extname];
+			data.description = desc;
+			data.title = block.Get<const Anope::string>("misc_title");
+			data.pattern = block.Get<const Anope::string>("misc_pattern");
+			data.syntax = block.Get<const Anope::string>("misc_syntax");
+
+			const auto numeric = block.Get<unsigned>("misc_numeric");
 			if (numeric >= 1 && numeric <= 999)
-				numerics[extname] = numeric;
+				data.numeric =  numeric;
 		}
 	}
 
 	void OnJoinChannel(User *user, Channel *c) override
 	{
-		if (!c->ci || !user->server->IsSynced() || user->server == Me || numerics.empty())
+		if (!c->ci || !user->server->IsSynced() || user->server == Me || command_data.empty())
 			return;
 
 		for (const auto &[name, ext] : items)
@@ -243,9 +309,9 @@ public:
 			if (!data)
 				continue;
 
-			auto numeric = numerics.find(name);
-			if (numeric != numerics.end())
-				IRCD->SendNumeric(numeric->second, user->GetUID(), c->ci->name, data->data);
+			auto command = command_data.find(name);
+			if (command != command_data.end() && command->second.numeric)
+				IRCD->SendNumeric(command->second.numeric, user->GetUID(), c->ci->name, data->data);
 		}
 	}
 
@@ -257,7 +323,7 @@ public:
 			MiscData *data = e->Get(ci);
 
 			if (data != NULL)
-				info[e->name.substr(12).replace_all_cs("_", " ")] = data->data;
+				info[GetTitle(e)] = data->data;
 		}
 	}
 };

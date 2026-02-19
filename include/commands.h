@@ -135,7 +135,7 @@ protected:
 
 	void ClearSyntax();
 	void SetSyntax(const Anope::string &s, const std::function<bool(CommandSource&)> &p = nullptr);
-	void SendSyntax(CommandSource &);
+	virtual void SendSyntax(CommandSource &);
 
 	void AllowUnregistered(bool b);
 	void RequireUser(bool b);

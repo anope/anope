@@ -147,6 +147,7 @@ namespace Language
 #define CHAN_LIMIT_REACHED           _("You have already reached your limit of \002%d\002 channels.")
 #define CHAN_NOT_ALLOWED_TO_JOIN     _("You are not permitted to be on this channel.")
 #define CHAN_SETTING_CHANGED         _("%s for %s set to %s.")
+#define CHAN_SETTING_INVALID         _("%s syntax is invalid.")
 #define CHAN_SETTING_UNSET           _("%s for %s unset.")
 #define CHAN_SYMBOL_REQUIRED         _("Please use the symbol of \002#\002 when attempting to register.")
 #define CHAN_X_INVALID               _("Channel %s is not a valid channel.")

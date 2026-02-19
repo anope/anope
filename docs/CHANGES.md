@@ -10,7 +10,13 @@
 
 ## Changes
 
+* The cs_set_misc and ns_set_misc modules now can use a separate title from the command name.
+
+* The cs_set_misc and ns_set_misc modules now support validation of user-specified data.
+
 * The db_atheme module can now import arbitrary metadata to fields from the ns_set_misc module.
+
+* The ns_set_misc module can now add account data to the WHOIS output of authenticated users on InspIRCd (with the swhois_ext module) and UnrealIRCd.
 
 * The regex_posix module is now available on Windows (using the PCRE2 POSIX compatibility layer).
 

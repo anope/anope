@@ -170,6 +170,8 @@ private:
 	ServiceReference<XLineManager> sglinemgr;
 	ServiceReference<XLineManager> snlinemgr;
 	ServiceReference<XLineManager> sqlinemgr;
+	Anope::map<Anope::string> csmiscdata;
+	Anope::map<Anope::string> nsmiscdata;
 
 	Anope::map<std::function<bool(DBAtheme*,AthemeRow&)>> rowhandlers = {
 		{ "AC",         &DBAtheme::HandleIgnore    },
@@ -1080,7 +1082,26 @@ private:
 			data->data = value;
 		}
 		else
-			Log(this) << "Unknown channel metadata for " << ci->name << ": " << key << " = " << value;
+		{
+			auto it = csmiscdata.find(key);
+			if (it == csmiscdata.end())
+			{
+				Log(this) << "Unknown channel metadata for " << ci->name << ": " << key << " = " << value;
+				return true;
+			}
+
+			ExtensibleRef<MiscData> extref("cs_set_misc:" + it->second);
+			if (!extref)
+			{
+				Log(this) << "Unknown imported channel metadata for " << ci->name << ": " << it->second << " = " << value;
+				return true;
+			}
+
+			auto *data = extref->Set(ci);
+			data->object = ci->name;
+			data->name = it->second;
+			data->data = value;
+		}
 
 		return true;
 	}
@@ -1193,7 +1214,26 @@ private:
 			data->data = value;
 		}
 		else
-			Log(this) << "Unknown account metadata for " << nc->display << ": " << key << " = " << value;
+		{
+			auto it = nsmiscdata.find(key);
+			if (it == nsmiscdata.end())
+			{
+				Log(this) << "Unknown public account metadata for " << nc->display << ": " << key << " = " << value;
+				return true;
+			}
+
+			ExtensibleRef<MiscData> extref("ns_set_misc:" + it->second);
+			if (!extref)
+			{
+				Log(this) << "Unknown imported account metadata for " << nc->display << ": " << key << " = " << value;
+				return true;
+			}
+
+			auto *data = extref->Set(nc);
+			data->object = nc->display;
+			data->name = it->second;
+			data->data = value;
+		}
 
 		return true;
 	}
@@ -1541,6 +1581,28 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
+		const auto &modconf = conf.GetModule(this);
+
+		csmiscdata.clear();
+		for (auto idx = 0; idx < modconf.CountBlock("cs_set_misc"); ++idx)
+		{
+			const auto &data = modconf.GetBlock("cs_set_misc", idx);
+			const auto &anope = data.Get<const Anope::string>("anope");
+			const auto &atheme = data.Get<const Anope::string>("atheme");
+			if (!anope.empty() && !atheme.empty())
+				csmiscdata[atheme] = anope.upper();
+		}
+
+		nsmiscdata.clear();
+		for (auto idx = 0; idx < modconf.CountBlock("ns_set_misc"); ++idx)
+		{
+			const auto &data = modconf.GetBlock("ns_set_misc", idx);
+			const auto &anope = data.Get<const Anope::string>("anope");
+			const auto &atheme = data.Get<const Anope::string>("atheme");
+			if (!anope.empty() && !atheme.empty())
+				nsmiscdata[atheme] = anope.upper();
+		}
+
 		flags.clear();
 		for (int i = 0; i < Config->CountBlock("privilege"); ++i)
 		{

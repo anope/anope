@@ -10,6 +10,8 @@
 
 ## Changes
 
+* The db_atheme module can now import arbitrary metadata to fields from the ns_set_misc module.
+
 * The regex_posix module is now available on Windows (using the PCRE2 POSIX compatibility layer).
 
 * The regex_tre module is now available on Windows.

@@ -15,7 +15,20 @@
 #include "module.h"
 #include "modules/nickserv/cert.h"
 
-static Anope::unordered_map<NickCore *> certmap;
+#define NICKSERV_CERT_TYPE "NSCert"
+
+struct NSCertInfo final
+	: NickServ::Cert
+	, Serializable
+{
+	NSCertInfo(Extensible *ext)
+		: Serializable(NICKSERV_CERT_TYPE)
+	{
+		account = anope_dynamic_static_cast<NickCore *>(ext);
+	}
+};
+
+static Anope::unordered_map<NSCertInfo *> certmap;
 
 struct CertServiceImpl final
 	: NickServ::CertService
@@ -27,9 +40,9 @@ struct CertServiceImpl final
 
 	NickCore *FindAccountFromCert(const Anope::string &cert) override
 	{
-		Anope::unordered_map<NickCore *>::iterator it = certmap.find(cert);
+		auto it = certmap.find(cert);
 		if (it != certmap.end())
-			return it->second;
+			return it->second->account;
 		return NULL;
 	}
 
@@ -48,8 +61,10 @@ struct CertServiceImpl final
 struct NSCertListImpl final
 	: NickServ::CertList
 {
+	friend class NSCertInfoType;
+
 	Serialize::Reference<NickCore> nc;
-	std::vector<Anope::string> certs;
+	std::vector<NSCertInfo *> certs;
 
 public:
 	NSCertListImpl(Extensible *obj) : nc(anope_dynamic_static_cast<NickCore *>(obj)) { }
@@ -65,11 +80,15 @@ public:
 	 *
 	 * Adds a new entry into the cert list.
 	 */
-	void AddCert(const Anope::string &entry) override
+	NickServ::Cert *AddCert(const Anope::string &entry) override
 	{
-		this->certs.push_back(entry);
-		certmap[entry] = nc;
-		FOREACH_MOD(OnNickAddCert, (this->nc, entry));
+		auto *cert = new NSCertInfo(nc);
+		cert->fingerprint = entry;
+
+		this->certs.push_back(cert);
+		certmap[entry] = cert;
+		FOREACH_MOD(OnNickAddCert, (this->nc, cert));
+		return cert;
 	}
 
 	/** Get an entry from the nick's cert list by index
@@ -79,10 +98,11 @@ public:
 	 *
 	 * Retrieves an entry from the certificate list corresponding to the given index.
 	 */
-	Anope::string GetCert(unsigned entry) const override
+	NickServ::Cert *GetCert(unsigned entry) const override
 	{
 		if (entry >= this->certs.size())
-			return "";
+			return nullptr;
+
 		return this->certs[entry];
 	}
 
@@ -100,7 +120,10 @@ public:
 	 */
 	bool FindCert(const Anope::string &entry) const override
 	{
-		return std::find(this->certs.begin(), this->certs.end(), entry) != this->certs.end();
+		auto it = std::find_if(this->certs.begin(), this->certs.end(), [&entry](const NSCertInfo *cert) {
+			return cert->fingerprint == entry;
+		});
+		return it != this->certs.end();
 	}
 
 	/** Erase a fingerprint from the nick's certificate list
@@ -111,34 +134,45 @@ public:
 	 */
 	void EraseCert(const Anope::string &entry) override
 	{
-		std::vector<Anope::string>::iterator it = std::find(this->certs.begin(), this->certs.end(), entry);
+		auto it = std::find_if(this->certs.begin(), this->certs.end(), [&entry](const NSCertInfo *cert) {
+			return cert->fingerprint == entry;
+		});
 		if (it != this->certs.end())
 		{
-			FOREACH_MOD(OnNickEraseCert, (this->nc, entry));
+			FOREACH_MOD(OnNickEraseCert, (this->nc, *it));
 			certmap.erase(entry);
+
+			delete *it;
 			this->certs.erase(it);
 		}
 	}
 
 	void ReplaceCert(const Anope::string &oldentry, const Anope::string &newentry) override
 	{
-		auto it = std::find(this->certs.begin(), this->certs.end(), oldentry);
-		if (it == this->certs.end())
+		auto oldit = std::find_if(this->certs.begin(), this->certs.end(), [&oldentry](const NSCertInfo *cert) {
+			return cert->fingerprint == oldentry;
+		});
+		if (oldit == this->certs.end())
 			return; // We can't replace a non-existent cert.
 
-		FOREACH_MOD(OnNickEraseCert, (this->nc, oldentry));
+		FOREACH_MOD(OnNickEraseCert, (this->nc, *oldit));
 		certmap.erase(oldentry);
 
-		if (std::find(this->certs.begin(), this->certs.end(), newentry) != this->certs.end())
+		auto newit = std::find_if(this->certs.begin(), this->certs.end(), [&newentry](const NSCertInfo *cert) {
+			return cert->fingerprint == newentry;
+		});
+		if (newit != this->certs.end())
 		{
 			// The cert we're upgrading to already exists.
-			this->certs.erase(it);
+			delete *newit;
+			this->certs.erase(newit);
 			return;
 		}
 
-		*it = newentry;
-		certmap[newentry] = nc;
-		FOREACH_MOD(OnNickAddCert, (this->nc, newentry));
+		auto *cert = *newit;
+		cert->fingerprint = newentry;
+		certmap[newentry] = cert;
+		FOREACH_MOD(OnNickAddCert, (this->nc, cert));
 	}
 
 	/** Clears the entire nick's cert list
@@ -148,8 +182,11 @@ public:
 	void ClearCert() override
 	{
 		FOREACH_MOD(OnNickClearCert, (this->nc));
-		for (const auto &cert : certs)
-			certmap.erase(cert);
+		for (const auto *cert : certs)
+		{
+			delete cert;
+			certmap.erase(cert->fingerprint);
+		}
 		this->certs.clear();
 	}
 
@@ -164,43 +201,87 @@ public:
 	{
 		ExtensibleItem(Module *m, const Anope::string &ename) : ::ExtensibleItem<NSCertListImpl>(m, ename) { }
 
-		void ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data) const override
-		{
-			if (s->GetSerializableType()->GetName() != NICKCORE_TYPE)
-				return;
-
-			const NickCore *n = anope_dynamic_static_cast<const NickCore *>(e);
-			auto *c = this->Get(n);
-			if (c == NULL || !c->GetCertCount())
-				return;
-
-			std::ostringstream oss;
-			for (unsigned i = 0; i < c->GetCertCount(); ++i)
-				oss << c->GetCert(i) << " ";
-			data.Store("cert", oss.str());
-		}
-
 		void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 		{
+			// Begin 2.0 compatibility.
 			if (s->GetSerializableType()->GetName() != NICKCORE_TYPE)
 				return;
 
-			NickCore *n = anope_dynamic_static_cast<NickCore *>(e);
-			auto *c = this->Require(n);
+			auto *nc = anope_dynamic_static_cast<NickCore *>(e);
+			auto *cl = this->Require(nc);
 
+			// Delete the old cert list.
+			for (const auto *cert : cl->certs)
+			{
+				delete cert;
+				certmap.erase(cert->fingerprint);
+			}
+			cl->certs.clear();
+
+			// Add the new cert list
 			Anope::string buf;
 			data["cert"] >> buf;
-			spacesepstream sep(buf);
-			for (const auto &cert : c->certs)
-				certmap.erase(cert);
-			c->certs.clear();
-			while (sep.GetToken(buf))
+			for (spacesepstream sep(buf); sep.GetToken(buf); )
 			{
-				c->certs.push_back(buf);
-				certmap[buf] = n;
+				auto *cert = new NSCertInfo(e);
+				cert->fingerprint = buf;
+				cl->certs.push_back(cert);
+				certmap[buf] = cert;
 			}
+			// End 2.0 compatibility.
 		}
 	};
+};
+
+
+class NSCertInfoType final
+	: public Serialize::Type
+{
+public:
+	NSCertInfoType()
+		: Serialize::Type(NICKSERV_CERT_TYPE)
+	{
+	}
+
+	void Serialize(Serializable *obj, Serialize::Data &data) const override
+	{
+		const auto *cert = static_cast<const NSCertInfo *>(obj);
+		data.Store("account", cert->account->GetId());
+		data.Store("created", cert->created);
+		data.Store("creator", cert->creator);
+		data.Store("description", cert->description);
+		data.Store("fingerprint", cert->fingerprint);
+	}
+
+	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
+	{
+		uint64_t account = 0;
+		data["account"] >> account;
+
+		auto *nc = NickCore::FindId(account);
+		if (!nc)
+			return nullptr; // Missing user.
+
+		NSCertInfo *cert;
+		if (obj)
+			cert = anope_dynamic_static_cast<NSCertInfo *>(obj);
+		else
+			cert = new NSCertInfo(nc);
+
+		data["created"] >> cert->created;
+		data["creator"] >> cert->creator;
+		data["description"] >> cert->description;
+		data["fingerprint"] >> cert->fingerprint;
+
+		if (!obj)
+		{
+			auto *cl = nc->Require<NSCertListImpl>(NICKSERV_CERT_EXT);
+			cl->certs.push_back(cert);
+			certmap[cert->fingerprint] = cert;
+		}
+
+		return cert;
+	}
 };
 
 class CommandNSCert final
@@ -244,7 +325,10 @@ private:
 			return;
 		}
 
-		cl->AddCert(certfp);
+		auto *cert = cl->AddCert(certfp);
+		cert->created = Anope::CurTime;
+		cert->creator = source.GetNick();
+
 		Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to ADD certificate fingerprint " << certfp << " to " << nc->display;
 		source.Reply(_("\002%s\002 added to %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
@@ -278,7 +362,7 @@ private:
 		source.Reply(_("\002%s\002 deleted from %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
 
-	static void DoList(CommandSource &source, const NickCore *nc)
+	static void DoList(CommandSource &source, const NickCore *nc, bool full)
 	{
 		auto *cl = nc->GetExt<NickServ::CertList>(NICKSERV_CERT_EXT);
 
@@ -288,12 +372,51 @@ private:
 			return;
 		}
 
-		source.Reply(_("Certificate list for %s:"), nc->display.c_str());
+		ListFormatter list(source.GetAccount());
+		list.AddColumn(_("Fingerprint"));
+		if (full)
+		{
+			list.AddColumn(_("Creator")).AddColumn(_("Created"));
+			list.SetFlexible([](ListFormatter::ListEntry &row)
+			{
+				return row["Description"].empty()
+					? _("\002{fingerprint}\002 -- created by {creator} at {created}")
+					: _("\002{fingerprint}\002 -- created by {creator} at {created} ({description})");
+			});
+
+		}
+		else
+		{
+			list.SetFlexible([](ListFormatter::ListEntry &row)
+			{
+				return row["Description"].empty()
+					? _("\002{fingerprint}\002")
+					: _("\002{fingerprint}\002 ({description})");
+			});
+		}
+		list.AddColumn(_("Description"));
+
 		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
 		{
-			Anope::string fingerprint = cl->GetCert(i);
-			source.Reply("    %s", fingerprint.c_str());
+			auto *cert = cl->GetCert(i);
+			ListFormatter::ListEntry entry;
+			entry["Fingerprint"] = cert->fingerprint;
+			entry["Description"] = cert->description;
+			if (full)
+			{
+				entry["Created"] = cert->created
+					? Anope::strftime(cert->created, nullptr, true)
+					: TIME_UNKNOWN;
+
+				entry["Creator"] = cert->creator.empty()
+					? TIME_UNKNOWN
+					: cert->creator;
+			}
+			list.AddEntry(entry);
 		}
+
+		source.Reply(_("Certificate list for %s:"), nc->display.c_str());
+		list.SendTo(source);
 	}
 
 public:
@@ -303,6 +426,7 @@ public:
 		this->SetSyntax(_("ADD [\037nickname\037] [\037fingerprint\037]"));
 		this->SetSyntax(_("DEL [\037nickname\037] \037fingerprint\037"));
 		this->SetSyntax(_("LIST [\037nickname\037]"));
+		this->SetSyntax(_("VIEW [\037nickname\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -310,7 +434,7 @@ public:
 		const Anope::string &cmd = params[0];
 		Anope::string nick, certfp;
 
-		if (cmd.equals_ci("LIST"))
+		if (cmd.equals_ci("LIST") || cmd.equals_ci("VIEW"))
 			nick = params.size() > 1 ? params[1] : "";
 		else
 		{
@@ -344,7 +468,9 @@ public:
 			nc = source.nc;
 
 		if (cmd.equals_ci("LIST"))
-			return this->DoList(source, nc);
+			return this->DoList(source, nc, false);
+		if (cmd.equals_ci("VIEW"))
+			return this->DoList(source, nc, true);
 		else if (nc->HasExt("NS_SUSPENDED"))
 			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
 		else if (Anope::ReadOnly)
@@ -498,6 +624,7 @@ private:
 	CommandNSSASetAutologin commandnssasetautologin;
 	NSCertListImpl::ExtensibleItem certs;
 	CertServiceImpl cs;
+	NSCertInfoType cert_type;
 
 	bool CanLogin(User *u, NickCore *nc)
 	{
@@ -558,7 +685,9 @@ public:
 			return;
 
 		auto *cl = certs.Require(na->nc);
-		cl->AddCert(u->fingerprint);
+		auto *cert = cl->AddCert(u->fingerprint);
+		cert->created = Anope::CurTime;
+		cert->creator = u->nick;
 
 		auto *NickServ = Config->GetClient("NickServ");
 		u->SendMessage(NickServ, _("Your SSL certificate fingerprint \002%s\002 has been automatically added to your certificate list."), u->fingerprint.c_str());

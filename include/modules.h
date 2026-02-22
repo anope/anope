@@ -793,13 +793,13 @@ public:
 	 * @param nc The nick
 	 * @param entry The entry
 	 */
-	virtual void OnNickAddCert(NickCore *nc, const Anope::string &entry) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual void OnNickAddCert(NickCore *nc, const NickServ::Cert *entry) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called from NickCore::EraseCert()
 	 * @param nc pointer to the NickCore
 	 * @param entry The fingerprint
 	 */
-	virtual void OnNickEraseCert(NickCore *nc, const Anope::string &entry) ATTR_NOT_NULL(2) { throw NotImplementedException(); }
+	virtual void OnNickEraseCert(NickCore *nc, const NickServ::Cert *entry) ATTR_NOT_NULL(2, 3) { throw NotImplementedException(); }
 
 	/** Called when a user requests info for a nick
 	 * @param source The user requesting info

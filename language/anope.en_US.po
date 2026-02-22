@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-22 16:58+0000\n"
-"PO-Revision-Date: 2026-02-22 16:58+0000\n"
+"POT-Creation-Date: 2026-02-22 17:02+0000\n"
+"PO-Revision-Date: 2026-02-22 17:03+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -361,6 +361,18 @@ msgstr ""
 
 #, c-format
 msgid "[auto-memo] The memo you sent to %s has been viewed."
+msgstr ""
+
+msgid "{fingerprint}"
+msgstr ""
+
+msgid "{fingerprint} ({description})"
+msgstr ""
+
+msgid "{fingerprint} -- created by {creator} at {created}"
+msgstr ""
+
+msgid "{fingerprint} -- created by {creator} at {created} ({description})"
 msgstr ""
 
 msgid "{host}: {session} sessions"
@@ -3038,6 +3050,9 @@ msgid "Fantasy mode is now on on channel %s."
 msgstr ""
 
 msgid "Find a user's status on a channel"
+msgstr ""
+
+msgid "Fingerprint"
 msgstr ""
 
 #, c-format
@@ -6068,6 +6083,9 @@ msgid "VIEW [mask | list | id]"
 msgstr ""
 
 msgid "VIEW [mask | list]"
+msgstr ""
+
+msgid "VIEW [nickname]"
 msgstr ""
 
 msgid "VIEW [vhost-mask | entry-num | list]"

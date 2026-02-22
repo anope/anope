@@ -41,7 +41,7 @@ bool WebCPanel::NickServ::Cert::OnRequest(HTTP::Provider *server, const Anope::s
 	auto *cl = na->nc->GetExt<::NickServ::CertList>(NICKSERV_CERT_EXT);
 	if (cl)
 		for (unsigned i = 0; i < cl->GetCertCount(); ++i)
-			replacements["CERTS"] = cl->GetCert(i);
+			replacements["CERTS"] = cl->GetCert(i)->fingerprint;
 
 	TemplateFileServer page("nickserv/cert.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

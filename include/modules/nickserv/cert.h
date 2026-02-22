@@ -19,11 +19,30 @@
 
 namespace NickServ
 {
+	struct Cert;
 	class CertList;
 	class CertService;
 
 	ServiceReference<CertService> cert_service(NICKSERV_CERT_SERVICE, NICKSERV_CERT_SERVICE);
 }
+
+struct NickServ::Cert
+{
+	/** The account this cert is for. */
+	Serialize::Reference<NickCore> account;
+
+	/** The time at which this certificate was created. */
+	time_t created = 0;
+
+	/** The user who created this certificate. */
+	Anope::string creator;
+
+	/** If non-empty then a description of the certificate. */
+	Anope::string description;
+
+	/** The TLS fingerprint for the certificate. */
+	Anope::string fingerprint;
+};
 
 class NickServ::CertList
 {
@@ -39,7 +58,7 @@ public:
 	 *
 	 * Adds a new entry into the cert list.
 	 */
-	virtual void AddCert(const Anope::string &entry) = 0;
+	virtual NickServ::Cert *AddCert(const Anope::string &entry) = 0;
 
 	/** Get an entry from the nick's cert list by index
 	 *
@@ -48,7 +67,7 @@ public:
 	 *
 	 * Retrieves an entry from the certificate list corresponding to the given index.
 	 */
-	virtual Anope::string GetCert(unsigned entry) const = 0;
+	virtual NickServ::Cert *GetCert(unsigned entry) const = 0;
 
 	virtual unsigned GetCertCount() const = 0;
 

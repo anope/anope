@@ -42,6 +42,7 @@ struct ModeData;
 class Module;
 class NickAlias;
 class NickCore;
+namespace NickServ { struct Cert; }
 struct Oper;
 namespace OperServ { struct Exception; }
 class OperType;

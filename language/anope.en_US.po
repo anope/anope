@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-14 15:15+0000\n"
-"PO-Revision-Date: 2026-02-14 15:15+0000\n"
+"POT-Creation-Date: 2026-02-22 16:58+0000\n"
+"PO-Revision-Date: 2026-02-22 16:58+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1142,6 +1142,14 @@ msgid "%s will not send you any notification of memos."
 msgstr ""
 
 #, c-format
+msgid "%s will now be automatically logged in when they connect using a known SSL certificate."
+msgstr ""
+
+#, c-format
+msgid "%s will now not be automatically logged in when they connect using a known SSL certificate."
+msgstr ""
+
+#, c-format
 msgid "%s will now notify you of memos when they are sent to you."
 msgstr ""
 
@@ -1778,9 +1786,6 @@ msgid "Associate a URL with your account"
 msgstr ""
 
 msgid "Associate a greet message with your nickname"
-msgstr ""
-
-msgid "Associate an email address with the channel"
 msgstr ""
 
 msgid "Associate an email address with your nickname"
@@ -5036,6 +5041,10 @@ msgid "Sets whether the given nickname can be added to a channel access list."
 msgstr ""
 
 #, c-format
+msgid "Sets whether the given nickname should automatically be logged in when they connect using a known SSL certificate. You can configure their SSL certificate using the %s command."
+msgstr ""
+
+#, c-format
 msgid "Sets whether the given nickname will be given its status modes in channels automatically. Set to ON to allow %s to set status modes on the given nickname automatically when it is entering channels. Note that depending on channel settings some modes may not get set automatically."
 msgstr ""
 
@@ -5043,6 +5052,13 @@ msgid "Sets whether the given nickname will expire. Setting this to ON prevent
 msgstr ""
 
 msgid "Sets whether you can be added to a channel access list."
+msgstr ""
+
+msgid "Sets whether you should automatically be logged in when you connect using a known SSL certificate."
+msgstr ""
+
+#, c-format
+msgid "Sets whether you should automatically be logged in when you connect using a known SSL certificate. You can configure your SSL certificate using the %s command."
 msgstr ""
 
 #, c-format

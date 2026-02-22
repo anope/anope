@@ -4,6 +4,8 @@
 
 ### Breaking Changes
 
+* Automatic login using a known SSL fingerprint now requires the `AUTOLOGIN` option to be set on accounts. Users can enable it on existing accounts with `/NS SET AUTOLOGIN ON`.
+
 * Conan 2 is now used for packaging dependencies on Windows. If you are building from source you will need to upgrade Conan.
 
 * Non-breaking spaces in translatable messages now use 0x1B instead of 0x1A due to recent msgfmt releases treating 0x1A as an EOF character. If you have an out of tree translation you will need to update it.

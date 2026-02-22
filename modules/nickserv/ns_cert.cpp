@@ -388,10 +388,114 @@ public:
 	}
 };
 
+class CommandNSSetAutologin
+	: public Command
+{
+public:
+	CommandNSSetAutologin(Module *creator, const Anope::string &sname = "nickserv/set/autologin", size_t min = 1)
+		: Command(creator, sname, min, min + 1)
+	{
+		this->SetDesc(_("Sets whether you should automatically be logged in when you connect using a known SSL certificate."));
+		this->SetSyntax("{ON | OFF}");
+	}
+
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
+	{
+		if (Anope::ReadOnly)
+		{
+			source.Reply(READ_ONLY_MODE);
+			return;
+		}
+
+		const NickAlias *na = NickAlias::Find(user);
+		if (na == NULL)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
+		NickCore *nc = na->nc;
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(OnSetNickOption, MOD_RESULT, (source, this, nc, param));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
+
+		if (param.equals_ci("ON"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to enable autologin for " << na->nc->display;
+			nc->Extend<bool>("AUTOLOGIN");
+			source.Reply(_("%s will now be automatically logged in when they connect using a known SSL certificate."), nc->display.c_str());
+		}
+		else if (param.equals_ci("OFF"))
+		{
+			Log(nc == source.GetAccount() ? LOG_COMMAND : LOG_ADMIN, source, this) << "to disable autologin for " << na->nc->display;
+			nc->Shrink<bool>("AUTOLOGIN");
+			source.Reply(_("%s will now not be automatically logged in when they connect using a known SSL certificate."), nc->display.c_str());
+		}
+		else
+			this->OnSyntaxError(source, "AUTOLOGIN");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		this->Run(source, source.nc->display, params[0]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(
+			_(
+				"Sets whether you should automatically be logged in when you connect using a known "
+				"SSL certificate. You can configure your SSL certificate using the \002%s\002 "
+				"command."
+			),
+			source.service->GetQueryCommand("nickserv/cert").c_str()
+		);
+		return true;
+	}
+};
+
+class CommandNSSASetAutologin final
+	: public CommandNSSetAutologin
+{
+public:
+	CommandNSSASetAutologin(Module *creator)
+		: CommandNSSetAutologin(creator, "nickserv/saset/autologin", 2)
+	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
+	{
+		this->Run(source, params[0], params[1]);
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &) override
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(
+			_(
+				"Sets whether the given nickname should automatically be logged in when they "
+				"connect using a known SSL certificate. You can configure their SSL certificate "
+				"using the \002%s\002 command."
+			),
+			source.service->GetQueryCommand("nickserv/cert").c_str()
+		);
+		return true;
+	}
+};
+
 class NSCert final
 	: public Module
 {
+private:
 	CommandNSCert commandnscert;
+	CommandNSSetAutologin commandnssetautologin;
+	CommandNSSASetAutologin commandnssasetautologin;
 	NSCertListImpl::ExtensibleItem certs;
 	CertServiceImpl cs;
 
@@ -399,6 +503,9 @@ class NSCert final
 	{
 		if (!nc || nc->HasExt("NS_SUSPENDED"))
 			return false; // Account suspended.
+
+		if (!nc->HasExt("AUTOLOGIN"))
+			return false; // Autologin disabled.
 
 		const auto maxlogins = Config->GetModule("ns_identify").Get<unsigned int>("maxlogins");
 		if (maxlogins && nc->users.size() >= maxlogins)
@@ -416,6 +523,8 @@ public:
 	NSCert(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, VENDOR)
 		, commandnscert(this)
+		, commandnssetautologin(this)
+		, commandnssasetautologin(this)
 		, certs(this, NICKSERV_CERT_EXT)
 		, cs(this)
 	{

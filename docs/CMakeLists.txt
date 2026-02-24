@@ -3,7 +3,7 @@ if(WIN32)
   # Only install given files from this directory
   # NOTE: I would've had this just find all files in the directory, but that would include files not needed (like this file)
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/README.txt)
-  set(DOCS CHANGES.md DEFCON FAQ INSTALL LANGUAGE MODULES ${CMAKE_CURRENT_BINARY_DIR}/README.txt WIN32.txt)
+  set(DOCS CHANGES.md DEFCON FAQ INSTALL LANGUAGE MODULES ${CMAKE_CURRENT_BINARY_DIR}/README.txt WIN32.md)
   install(FILES ${DOCS}
     DESTINATION ${DOC_DIR}
   )

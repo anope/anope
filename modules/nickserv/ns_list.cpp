@@ -147,22 +147,32 @@ public:
 			"suspended, or are unconfirmed will be shown. If multiple options are "
 			"given, nicks must match every option to be shown. "
 			"Note that these options are limited to \037Services Operators\037."
-			"\n\n"
-			"Examples:"
-			"\n\n"
-			"    \002LIST *!joeuser@foo.com\002\n"
-			"        Lists all registered nicks owned by joeuser@foo.com."
-			"\n\n"
-			"    \002LIST *Bot*!*@*\002\n"
-			"        Lists all registered nicks with \002Bot\002 in their\n"
-			"        names (case insensitive)."
-			"\n\n"
-			"    \002LIST * NOEXPIRE\002\n"
-			"        Lists all registered nicks which have been set to not expire."
-			"\n\n"
-			"    \002LIST #51-100\002\n"
-			"        Lists all registered nicks within the given range (51-100)."
 		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("*!foobar@example.com", _(
+			"Lists all registered nicks owned by a user who last connected from the userhost "
+			"\037foobar@example.com\037 (case insensitive)."
+		));
+		examples.AddEntry("*Bot*!*@*", _(
+			"Lists all registered nicks with \037Bot\037 in their name (case insensitive)."
+		));
+		examples.AddEntry("#51-100", _(
+			"Lists all registered nicks within the given range (51-100)."
+		));
+		examples.AddEntry("* DISPLAY", _(
+			"Lists all registered nicks that are the display nickname for their account."
+		), "nickserv/list");
+		examples.AddEntry("* NOEXPIRE", _(
+			"Lists all registered nicks that have been set to not expire."
+		), "nickserv/list");
+		examples.AddEntry("* SUSPENDED", _(
+			"Lists all registered nicks that have been suspended."
+		), "nickserv/list");
+		examples.AddEntry("* UNCONFIRMED", _(
+			"Lists all registered nicks that have not been confirmed yet."
+		), "nickserv/list");
+		examples.SendTo(source);
 
 		const Anope::string &regexengine = Config->GetBlock("options").Get<const Anope::string>("regexengine");
 		if (!regexengine.empty())

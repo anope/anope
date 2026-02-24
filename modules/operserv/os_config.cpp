@@ -119,10 +119,17 @@ public:
 			"Settings changed by this command are temporary and will not be reflected "
 			"back into the configuration file, and will be lost if Anope is shut down, "
 			"restarted, or the configuration is reloaded."
-			"\n\n"
-			"Example:\n"
-			"     \002MODIFY\033nickserv\033regdelay\03315m\002"
 		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("MODIFY nickserv regdelay 15m", _(
+			"Changes the registration delay to 15 minutes."
+		));
+		examples.AddEntry("VIEW", _(
+			"Shows the current server configuration."
+		));
+		examples.SendTo(source);
+
 		return true;
 	}
 };

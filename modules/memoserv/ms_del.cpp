@@ -134,19 +134,23 @@ public:
 			"Deletes the specified memo or memos. You can supply "
 			"multiple memo numbers or ranges of numbers instead of a "
 			"single number, as in the second example below."
-			"\n\n"
-			"If \002LAST\002 is given, the last memo will be deleted."
-			"\n\n"
-			"If \002ALL\002 is given, deletes all of your memos."
-			"\n\n"
-			"Examples:"
-			"\n\n"
-			"   \002DEL\0331\002\n"
-			"      Deletes your first memo."
-			"\n\n"
-			"   \002DEL\0332-5,7-9\002\n"
-			"      Deletes memos numbered 2 through 5 and 7 through 9."
 		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("ALL", _(
+			"Deletes all of your memos."
+		));
+		examples.AddEntry("LAST", _(
+			"Deletes your last memo."
+		));
+		examples.AddEntry("1", _(
+			"Deletes your first memo."
+		));
+		examples.AddEntry("2-5,7-9", _(
+			"Deletes memos numbered 2 through 5 and 7 through 9."
+		));
+		examples.SendTo(source);
+
 		return true;
 	}
 };

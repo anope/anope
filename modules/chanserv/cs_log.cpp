@@ -286,14 +286,22 @@ public:
 				"to your channel. Status may be a channel status such as @ or +."
 				"\n\n"
 				"To remove a logging method use the same syntax as you would to add it."
-				"\n\n"
-				"Example:\n"
-				" %s\033#anope\033chanserv/access\033MESSAGE\033@\n"
-				" Would message any channel operators whenever someone used the "
-				"ACCESS command on ChanServ on the channel."
 			),
-			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str());
+
+		ExampleWrapper examples;
+		examples.AddEntry("#anope chanserv/access MESSAGE @", _(
+			"Sends a message to channel operators and above when someone uses the chanserv/access "
+			"command on #anope."
+		));
+		examples.AddEntry("#anope chanserv/flags NOTICE +", _(
+			"Sends a notice to channel voices and above when someone uses the chanserv/flags "
+			"command on #anope."
+		));
+		examples.AddEntry("#anope chanserv/xop MEMO", _(
+			"Sends a memo to the channel when someone uses the chanserv/xop command on #anope."
+		));
+		examples.SendTo(source);
 
 		return true;
 	}

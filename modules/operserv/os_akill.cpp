@@ -480,10 +480,7 @@ public:
 				"The \002%s\033LIST\002 command displays the AKILL list. "
 				"If a wildcard mask is given, only those entries matching the "
 				"mask are displayed. If a list of entry numbers is given, "
-				"only those entries are shown; for example:\n"
-				"   \002%s\033LIST\0332-5,7-9\002\n"
-				"      Lists AKILL entries numbered 2 through 5 and 7\n"
-				"      through 9."
+				"only those entries are shown."
 				"\n\n"
 				"\002%s\033VIEW\002 is a more verbose version of \002%s\033LIST\002, and "
 				"will show who added an AKILL, the date it was added, and when "
@@ -495,8 +492,14 @@ public:
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
-			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str());
+
+		ExampleWrapper examples;
+		examples.AddEntry("2-5,7-9", _(
+			"Lists AKILL entries numbered 2 through 5 and 7 through 9."
+		));
+		examples.SendTo(source);
+
 		return true;
 	}
 };

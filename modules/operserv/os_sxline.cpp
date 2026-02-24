@@ -493,10 +493,7 @@ public:
 			"The \002SNLINE\033LIST\002 command displays the SNLINE list. "
 			"If a wildcard mask is given, only those entries matching the "
 			"mask are displayed. If a list of entry numbers is given, "
-			"only those entries are shown; for example:\n"
-			"   \002SNLINE\033LIST\0332-5,7-9\002\n"
-			"      Lists SNLINE entries numbered 2 through 5 and 7\n"
-			"      through 9."
+			"only those entries are shown."
 			"\n\n"
 			"\002SNLINE\033VIEW\002 is a more verbose version of \002SNLINE\033LIST\002, and "
 			"will show who added an SNLINE, the date it was added, and when "
@@ -504,6 +501,13 @@ public:
 			"\n\n"
 			"\002SNLINE\033CLEAR\002 clears all entries of the SNLINE list."
 		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("LIST 2-5,7-9", _(
+			"Lists SNLINE entries numbered 2 through 5 and 7 through 9."
+		));
+		examples.SendTo(source);
+
 		return true;
 	}
 };
@@ -733,10 +737,7 @@ public:
 			"The \002SQLINE\033LIST\002 command displays the SQLINE list. "
 			"If a wildcard mask is given, only those entries matching the "
 			"mask are displayed. If a list of entry numbers is given, "
-			"only those entries are shown; for example:\n"
-			"   \002SQLINE\033LIST\0332-5,7-9\002\n"
-			"      Lists SQLINE entries numbered 2 through 5 and 7\n"
-			"      through 9."
+			"only those entries are shown."
 			"\n\n"
 			"\002SQLINE\033VIEW\002 is a more verbose version of \002SQLINE\033LIST\002, and "
 			"will show who added an SQLINE, the date it was added, and when "
@@ -744,6 +745,13 @@ public:
 			"\n\n"
 			"\002SQLINE\033CLEAR\002 clears all entries of the SQLINE list."
 		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("LIST 2-5,7-9", _(
+			"Lists SQLINE entries numbered 2 through 5 and 7 through 9."
+		));
+		examples.SendTo(source);
+
 		return true;
 	}
 };

@@ -204,12 +204,24 @@ public:
 			"given, sends you the memo you most recently received. If "
 			"NEW is given, sends you all of your new memos. If ALL is "
 			"given, sends you all of your memos. Otherwise, sends you "
-			"memo number \037num\037. You can also give a list of numbers, "
-			"as in this example:"
-			"\n\n"
-			"   \002READ 2-5,7-9\002\n"
-			"      Displays memos numbered 2 through 5 and 7 through 9."
+			"memo number \037num\037. You can also give a list of numbers."
 		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("ALL", _(
+			"Displays all of your memos."
+		));
+		examples.AddEntry("LAST", _(
+			"Displays your last memo."
+		));
+		examples.AddEntry("NEW", _(
+			"Displays any new memos."
+		));
+		examples.AddEntry("2-5,7-9", _(
+			"Displays memos numbered 2 through 5 and 7 through 9."
+		));
+		examples.SendTo(source);
+
 		return true;
 	}
 };

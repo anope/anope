@@ -154,19 +154,22 @@ public:
 			"flag set will be displayed. If multiple options are given, "
 			"all channels matching at least one option will be displayed. "
 			"Note that these options are limited to \037Services Operators\037."
-			"\n\n"
-			"Examples:"
-			"\n\n"
-			"    \002LIST\033*anope*\002\n"
-			"        Lists all registered channels with \002anope\002 in their\n"
-			"        names (case insensitive)."
-			"\n\n"
-			"    \002LIST\033*\033NOEXPIRE\002\n"
-			"        Lists all registered channels which have been set to not expire."
-			"\n\n"
-			"    \002LIST #51-100\002\n"
-			"        Lists all registered channels within the given range (51-100)."
 		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("*anope*", _(
+			"Lists all registered channels with \037anope\037 in their name (case insensitive). "
+		));
+		examples.AddEntry("#51-100", _(
+			"Lists all registered channels within the given range (51-100)."
+		));
+		examples.AddEntry("* NOEXPIRE", _(
+			"Lists all registered channels that have been set to not expire."
+		), "chanserv/list");
+		examples.AddEntry("* SUSPENDED", _(
+			"Lists all registered channels that have been suspended."
+		), "chanserv/list");
+		examples.SendTo(source);
 
 		if (!Config->GetBlock("options").Get<const Anope::string>("regexengine").empty())
 		{

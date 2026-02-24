@@ -143,10 +143,18 @@ public:
 			"Lists any memos you currently have. With \002NEW\002, lists only "
 			"new (unread) memos. Unread memos are marked with a \"*\" "
 			"to the left of the memo number. You can also specify a list "
-			"of numbers, as in the example below:\n"
-			"   \002LIST 2-5,7-9\002\n"
-			"      Lists memos numbered 2 through 5 and 7 through 9."
+			"of numbers."
 		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("NEW", _(
+			"Lists any new memos."
+		));
+		examples.AddEntry("2-5,7-9", _(
+			"Lists memos numbered 2 through 5 and 7 through 9."
+		));
+		examples.SendTo(source);
+
 		return true;
 	}
 };

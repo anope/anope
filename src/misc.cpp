@@ -310,6 +310,54 @@ void InfoFormatter::AddOption(const Anope::string &opt)
 	this->options.push_back(Language::Translate(nc, opt.c_str()));
 }
 
+void ExampleWrapper::AddEntry(const Anope::string &example, const Anope::string &desc, const Anope::string &priv)
+{
+	auto &entry = entries.emplace_back();
+	entry.example = example;
+	entry.description = desc;
+	entry.privilege = priv;
+}
+
+void ExampleWrapper::SendTo(CommandSource &source)
+{
+	const auto *sourcenc = source.GetAccount();
+	const auto flexible = sourcenc ? sourcenc->HasExt("NS_FLEXIBLE") : false;
+	const auto *monospace = !flexible && sourcenc && sourcenc->HasExt("NS_MONOSPACE") ? "\021" : "";
+
+	const auto max_length = Config->GetBlock("options").Get<size_t>("linelength", "100");
+
+	auto header = true;
+	for (const auto &entry : entries)
+	{
+		if (!entry.privilege.empty() && !source.HasPriv(entry.privilege))
+			continue;
+
+		if (header)
+		{
+			source.Reply(" ");
+			source.Reply(_("Examples:"));
+			header = false;
+		}
+
+		source.Reply(" ");
+		if (flexible)
+		{
+			source.Reply("\002%s %s\002: %s", source.command.c_str(),
+				entry.example.c_str(), entry.description.c_str());
+		}
+		else
+		{
+			const auto full_example = Anope::Format("%s %s", source.command.c_str(), entry.example.c_str());
+			LineWrapper elw(Language::Translate(source.nc, full_example.c_str()), max_length - 2);
+			for (Anope::string line; elw.GetLine(line); )
+				source.Reply("%s  \002%s\002", monospace, line.c_str());
+
+			LineWrapper dlw(Language::Translate(source.nc, entry.description.c_str()), max_length - 4);
+			for (Anope::string line; dlw.GetLine(line); )
+				source.Reply("%s    %s", monospace, line.c_str());
+		}
+	}
+}
 
 void HelpWrapper::AddEntry(const Anope::string &name, const Anope::string &desc)
 {

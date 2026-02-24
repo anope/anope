@@ -614,10 +614,7 @@ public:
 				"The \002%s\033LIST\002 command displays the %s list. If "
 				"a wildcard mask is given, only those entries matching the "
 				"mask are displayed. If a list of entry numbers is given, "
-				"only those entries are shown; for example:\n"
-				"   \002%s\033#channel\033LIST\0332-5,7-9\002\n"
-				"      Lists %s entries numbered 2 through 5 and\n"
-				"      7 through 9."
+				"only those entries are shown."
 				"\n\n"
 				"The \002%s\033CLEAR\002 command clears all entries of the "
 				"%s list."
@@ -629,9 +626,13 @@ public:
 			cmd.c_str(),
 			cmd.c_str(),
 			cmd.c_str(),
-			cmd.c_str(),
-			cmd.c_str(),
 			cmd.c_str());
+
+		ExampleWrapper examples;
+		examples.AddEntry("#channel LIST 2-5,7-9", _(
+			"Lists access entries numbered 2 through 5 and 7 through 9."
+		));
+		examples.SendTo(source);
 
 		BotInfo *access_bi, *flags_bi;
 		Anope::string access_cmd, flags_cmd;

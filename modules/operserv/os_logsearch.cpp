@@ -157,12 +157,15 @@ public:
 			"and the number of replies to limit to. By default this "
 			"command searches one week of logs, and limits replies "
 			"to 50."
-			"\n\n"
-			"For example:\n"
-			"    \002LOGSEARCH\033+21d\033+500l\033Anope\002\n"
-			"      Searches the last 21 days worth of logs for messages\n"
-			"      containing Anope and lists the most recent 500 of them."
 		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("+21d +500l Anope", _(
+			"Searches the last 21 days worth of logs for messages containing Anope and lists the "
+			"most recent 500 of them."
+		));
+		examples.SendTo(source);
+
 		return true;
 	}
 };

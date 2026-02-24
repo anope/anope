@@ -816,18 +816,8 @@ public:
 				"command will clear all existing mode locks and set the new one given, while \002ADD\002 and \002DEL\002 "
 				"modify the existing mode lock."
 				"\n\n"
-				"Example:\n"
-				"     \002%s\033#channel\033LOCK\033ADD\033+bmnt\033*!*@*.example.com\002\n"
-				"\n\n"
 				"The \002%s\033SET\002 command allows you to set modes through services. Wildcards * and ? may "
 				"be given as parameters for list and status modes."
-				"\n\n"
-				"Example:\n"
-				"     \002%s\033#channel\033SET\033+v\033*\002\n"
-				"       Sets voice status to all users in the channel."
-				"\n\n"
-				"     \002%s\033#channel\033SET\033-b\033~c:*\n"
-				"       Clears all extended bans that start with ~c:"
 				"\n\n"
 				"The \002%s\033CLEAR\002 command is an easy way to clear modes on a channel. \037what\037 may be "
 				"any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If \037what\037 "
@@ -835,10 +825,20 @@ public:
 			),
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
-			source.command.nobreak().c_str(),
-			source.command.nobreak().c_str(),
-			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str());
+
+		ExampleWrapper examples;
+		examples.AddEntry("#channel LOCK ADD +bmnt *!*@*.example.com", _(
+			"Adds a mode lock on the moderated, no external messages, topic lock flag modes as "
+			"well as a ban on \037*!*@*.example.com\037."
+		));
+		examples.AddEntry("#channel SET +v *", _(
+			"Sets voice status on all users in the channel."
+		));
+		examples.AddEntry("#channel SET -b channel:*", _(
+			"Clears all extended bans that start with \037channel:\037."
+		));
+
 		return true;
 	}
 };

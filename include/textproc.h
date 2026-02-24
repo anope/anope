@@ -101,6 +101,22 @@ namespace Anope
 	extern CoreExport Anope::string Template(const Anope::string &str, const Anope::map<Anope::string> &vars);
 }
 
+class CoreExport ExampleWrapper final
+{
+private:
+	struct Example final
+	{
+		Anope::string example;
+		Anope::string description;
+		Anope::string privilege;
+	};
+	std::vector<Example> entries;
+
+public:
+	void AddEntry(const Anope::string &example, const Anope::string &desc, const Anope::string &priv = "");
+	void SendTo(CommandSource &source);
+};
+
 class CoreExport HelpWrapper final
 {
 private:

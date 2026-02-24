@@ -635,10 +635,7 @@ public:
 				"The \002%s\033LIST\002 command displays the access list. If "
 				"a wildcard mask is given, only those entries matching the "
 				"mask are displayed. If a list of entry numbers is given, "
-				"only those entries are shown; for example:\n"
-				"   \002%s\033#channel\033LIST\0332-5,7-9\002\n"
-				"      Lists access entries numbered 2 through 5 and\n"
-				"      7 through 9."
+				"only those entries are shown."
 				"\n\n"
 				"The \002%s\033VIEW\002 command displays the access list similar "
 				"to \002%s\033LIST\002 but shows the creator and last used time."
@@ -650,8 +647,16 @@ public:
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
-			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str());
+
+		ExampleWrapper examples;
+		examples.AddEntry("#channel LIST 2-5,7-9", _(
+			"Lists access entries on \037#channel\037 numbered 2 through 5 and 7 through 9."
+		));
+		examples.AddEntry("#channel LIST *nick*", _(
+			"Lists access entries on \037#channel\037 that match \037*nick*\037."
+		));
+		examples.SendTo(source);
 
 		BotInfo *bi;
 		Anope::string cmd;

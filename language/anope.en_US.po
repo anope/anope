@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-24 15:34+0000\n"
-"PO-Revision-Date: 2026-02-24 15:34+0000\n"
+"POT-Creation-Date: 2026-02-24 18:12+0000\n"
+"PO-Revision-Date: 2026-02-24 18:12+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1294,6 +1294,9 @@ msgstr ""
 msgid "ADD message"
 msgstr ""
 
+msgid "ADD nickname fingerprint"
+msgstr ""
+
 msgid "ADD oper type"
 msgstr ""
 
@@ -1463,6 +1466,15 @@ msgstr ""
 
 #, c-format
 msgid "Additionally, if fantasy is enabled fantasy commands can be executed by prefixing the command name with one of the following fantasy prefixes: %s"
+msgstr ""
+
+msgid "Adds a mode lock on the moderated, no external messages, topic lock flag modes as well as a ban on *!*@*.example.com."
+msgstr ""
+
+msgid "Adds the specified fingerprint to the certificate list of nickname."
+msgstr ""
+
+msgid "Adds your current fingerprint to your certificate list."
 msgstr ""
 
 #, c-format
@@ -1737,11 +1749,7 @@ msgstr ""
 msgid "Allows you to change and view Services Operators. Note that operators removed by this command but are still set in the configuration file are not permanently affected by this."
 msgstr ""
 
-msgid ""
-"Allows you to change and view configuration settings. Settings changed by this command are temporary and will not be reflected back into the configuration file, and will be lost if Anope is shut down, restarted, or the configuration is reloaded.\n"
-"\n"
-"Example:\n"
-"     MODIFYnickservregdelay15m"
+msgid "Allows you to change and view configuration settings. Settings changed by this command are temporary and will not be reflected back into the configuration file, and will be lost if Anope is shut down, restarted, or the configuration is reloaded."
 msgstr ""
 
 msgid "Allows you to choose the way services are communicating with the given user. With MSG set, services will use messages, else they'll use notices."
@@ -2124,6 +2132,9 @@ msgstr ""
 msgid "Changes the password used to identify you as the nick's owner."
 msgstr ""
 
+msgid "Changes the registration delay to 15 minutes."
+msgstr ""
+
 msgid "Changes the successor of a channel. If the founder's nickname expires or is dropped while the channel is still registered, the successor will become the new founder of the channel. The successor's nickname must be a registered one. If there's no successor set, then the first nickname on the access list (with the highest access, if applicable) will become the new founder, but if the access list is empty, the channel will be dropped."
 msgstr ""
 
@@ -2283,6 +2294,9 @@ msgstr ""
 
 #, c-format
 msgid "Cleared info from %s."
+msgstr ""
+
+msgid "Clears all extended bans that start with channel:."
 msgstr ""
 
 msgid "Colors kicker"
@@ -2452,6 +2466,12 @@ msgid "Current users: %zu (%zu ops)"
 msgstr ""
 
 msgid "DEL entry-num"
+msgstr ""
+
+msgid "DEL fingerprint"
+msgstr ""
+
+msgid "DEL nickname fingerprint"
 msgstr ""
 
 msgid "DEL oper"
@@ -2686,20 +2706,13 @@ msgstr[1] ""
 msgid "Deleted info from %s."
 msgstr ""
 
-msgid ""
-"Deletes the specified memo or memos. You can supply multiple memo numbers or ranges of numbers instead of a single number, as in the second example below.\n"
-"\n"
-"If LAST is given, the last memo will be deleted.\n"
-"\n"
-"If ALL is given, deletes all of your memos.\n"
-"\n"
-"Examples:\n"
-"\n"
-"   DEL1\n"
-"      Deletes your first memo.\n"
-"\n"
-"   DEL2-5,7-9\n"
-"      Deletes memos numbered 2 through 5 and 7 through 9."
+msgid "Deletes all of your memos."
+msgstr ""
+
+msgid "Deletes memos numbered 2 through 5 and 7 through 9."
+msgstr ""
+
+msgid "Deletes the specified memo or memos. You can supply multiple memo numbers or ranges of numbers instead of a single number, as in the second example below."
 msgstr ""
 
 msgid "Deletes the vhost assigned to the given nick from the database."
@@ -2709,6 +2722,12 @@ msgid "Deletes the vhost for all nicks in an account"
 msgstr ""
 
 msgid "Deletes the vhost for all nicks in the same account as that of the given nick."
+msgstr ""
+
+msgid "Deletes your first memo."
+msgstr ""
+
+msgid "Deletes your last memo."
 msgstr ""
 
 #, c-format
@@ -2751,6 +2770,12 @@ msgstr ""
 msgid "Displayed records matching key %s (count: %d)."
 msgstr ""
 
+msgid "Displays all of your memos."
+msgstr ""
+
+msgid "Displays any new memos."
+msgstr ""
+
 msgid "Displays information about a given nickname"
 msgstr ""
 
@@ -2760,7 +2785,16 @@ msgstr ""
 msgid "Displays information about your memos"
 msgstr ""
 
+msgid "Displays memos numbered 2 through 5 and 7 through 9."
+msgstr ""
+
 msgid "Displays one or more vhost entries"
+msgstr ""
+
+msgid "Displays the current certificate list of nickname as well as the details about who added each entry and when they added it."
+msgstr ""
+
+msgid "Displays the current certificate list of nickname."
 msgstr ""
 
 msgid "Displays the top 10 users of a channel"
@@ -2782,6 +2816,15 @@ msgid "Displays your Channel Stats"
 msgstr ""
 
 msgid "Displays your Global Stats"
+msgstr ""
+
+msgid "Displays your current certificate list as well the details about who added each entry and when they added it."
+msgstr ""
+
+msgid "Displays your current certificate list."
+msgstr ""
+
+msgid "Displays your last memo."
 msgstr ""
 
 msgid "Don't use AMSGs!"
@@ -3017,6 +3060,9 @@ msgstr ""
 
 #, c-format
 msgid "Error! The vident is too long, please use an ident shorter than %zu characters."
+msgstr ""
+
+msgid "Examples:"
 msgstr ""
 
 #, c-format
@@ -3315,6 +3361,9 @@ msgstr ""
 msgid "LIMIT enforced on %s, %zu users removed."
 msgstr ""
 
+msgid "LIST nickname"
+msgstr ""
+
 msgid "LIST threshold"
 msgstr ""
 
@@ -3438,6 +3487,24 @@ msgstr ""
 msgid "List your memos"
 msgstr ""
 
+msgid "Lists AKILL entries numbered 2 through 5 and 7 through 9."
+msgstr ""
+
+msgid "Lists SNLINE entries numbered 2 through 5 and 7 through 9."
+msgstr ""
+
+msgid "Lists SQLINE entries numbered 2 through 5 and 7 through 9."
+msgstr ""
+
+msgid "Lists access entries numbered 2 through 5 and 7 through 9."
+msgstr ""
+
+msgid "Lists access entries on #channel numbered 2 through 5 and 7 through 9."
+msgstr ""
+
+msgid "Lists access entries on #channel that match *nick*."
+msgstr ""
+
 msgid ""
 "Lists all available bots on this network.\n"
 "\n"
@@ -3475,19 +3542,19 @@ msgid ""
 "\n"
 "Note that a preceding '#' specifies a range, channel names are to be written without '#'.\n"
 "\n"
-"If the SUSPENDED or NOEXPIRE options are given, only channels which, respectively, are SUSPENDED or have the NOEXPIRE flag set will be displayed. If multiple options are given, all channels matching at least one option will be displayed. Note that these options are limited to Services Operators.\n"
-"\n"
-"Examples:\n"
-"\n"
-"    LIST*anope*\n"
-"        Lists all registered channels with anope in their\n"
-"        names (case insensitive).\n"
-"\n"
-"    LIST*NOEXPIRE\n"
-"        Lists all registered channels which have been set to not expire.\n"
-"\n"
-"    LIST #51-100\n"
-"        Lists all registered channels within the given range (51-100)."
+"If the SUSPENDED or NOEXPIRE options are given, only channels which, respectively, are SUSPENDED or have the NOEXPIRE flag set will be displayed. If multiple options are given, all channels matching at least one option will be displayed. Note that these options are limited to Services Operators."
+msgstr ""
+
+msgid "Lists all registered channels that have been set to not expire."
+msgstr ""
+
+msgid "Lists all registered channels that have been suspended."
+msgstr ""
+
+msgid "Lists all registered channels with anope in their name (case insensitive). "
+msgstr ""
+
+msgid "Lists all registered channels within the given range (51-100)."
 msgstr ""
 
 msgid ""
@@ -3495,22 +3562,28 @@ msgid ""
 "\n"
 "Note that a preceding '#' specifies a range.\n"
 "\n"
-"If the DISPLAY, NOEXPIRE, SUSPENDED, or UNCONFIRMED options are given only nicks which, respectively, are display nicks, will not expire, are suspended, or are unconfirmed will be shown. If multiple options are given, nicks must match every option to be shown. Note that these options are limited to Services Operators.\n"
-"\n"
-"Examples:\n"
-"\n"
-"    LIST *!joeuser@foo.com\n"
-"        Lists all registered nicks owned by joeuser@foo.com.\n"
-"\n"
-"    LIST *Bot*!*@*\n"
-"        Lists all registered nicks with Bot in their\n"
-"        names (case insensitive).\n"
-"\n"
-"    LIST * NOEXPIRE\n"
-"        Lists all registered nicks which have been set to not expire.\n"
-"\n"
-"    LIST #51-100\n"
-"        Lists all registered nicks within the given range (51-100)."
+"If the DISPLAY, NOEXPIRE, SUSPENDED, or UNCONFIRMED options are given only nicks which, respectively, are display nicks, will not expire, are suspended, or are unconfirmed will be shown. If multiple options are given, nicks must match every option to be shown. Note that these options are limited to Services Operators."
+msgstr ""
+
+msgid "Lists all registered nicks owned by a user who last connected from the userhost foobar@example.com (case insensitive)."
+msgstr ""
+
+msgid "Lists all registered nicks that are the display nickname for their account."
+msgstr ""
+
+msgid "Lists all registered nicks that have been set to not expire."
+msgstr ""
+
+msgid "Lists all registered nicks that have been suspended."
+msgstr ""
+
+msgid "Lists all registered nicks that have not been confirmed yet."
+msgstr ""
+
+msgid "Lists all registered nicks with Bot in their name (case insensitive)."
+msgstr ""
+
+msgid "Lists all registered nicks within the given range (51-100)."
 msgstr ""
 
 msgid "Lists all user records"
@@ -3522,13 +3595,19 @@ msgid ""
 "If pattern is given, lists only users that match it (it must be in the format nick!user@host[#realname]). If channel is given, lists only users that are on the given channel. If INVISIBLE is specified, only users with the +i flag will be listed."
 msgstr ""
 
-msgid ""
-"Lists any memos you currently have. With NEW, lists only new (unread) memos. Unread memos are marked with a \"*\" to the left of the memo number. You can also specify a list of numbers, as in the example below:\n"
-"   LIST 2-5,7-9\n"
-"      Lists memos numbered 2 through 5 and 7 through 9."
+msgid "Lists any memos you currently have. With NEW, lists only new (unread) memos. Unread memos are marked with a \"*\" to the left of the memo number. You can also specify a list of numbers."
+msgstr ""
+
+msgid "Lists any new memos."
 msgstr ""
 
 msgid "Lists available bots"
+msgstr ""
+
+msgid "Lists bad word entries on #channel numbered 2 through 5 and 7 through 9."
+msgstr ""
+
+msgid "Lists bad word entries on #channel that match *UwU*."
 msgstr ""
 
 msgid "Lists currently loaded modules."
@@ -3538,6 +3617,9 @@ msgid "Lists information about the specified registered channel"
 msgstr ""
 
 msgid "Lists information about the specified registered channel, including its founder, time of registration, last time used, and description. If the user issuing the command has the appropriate access for it, then the successor, last topic set, settings and expiration time will also be displayed when applicable."
+msgstr ""
+
+msgid "Lists memos numbered 2 through 5 and 7 through 9."
 msgstr ""
 
 msgid "Load a module"
@@ -3595,18 +3677,7 @@ msgid ""
 "\n"
 "The %sLOCK command allows you to add, delete, and view mode locks on a channel. If a mode is locked on or off, services will not allow that mode to be changed. The SET command will clear all existing mode locks and set the new one given, while ADD and DEL modify the existing mode lock.\n"
 "\n"
-"Example:\n"
-"     %s#channelLOCKADD+bmnt*!*@*.example.com\n"
-"\n"
-"\n"
 "The %sSET command allows you to set modes through services. Wildcards * and ? may be given as parameters for list and status modes.\n"
-"\n"
-"Example:\n"
-"     %s#channelSET+v*\n"
-"       Sets voice status to all users in the channel.\n"
-"\n"
-"     %s#channelSET-b~c:*\n"
-"       Clears all extended bans that start with ~c:\n"
 "\n"
 "The %sCLEAR command is an easy way to clear modes on a channel. what may be any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If what is not given then all basic modes are removed."
 msgstr ""
@@ -3653,10 +3724,7 @@ msgid ""
 "\n"
 "The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
-"The LIST command displays the bad words list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   #channelLIST2-5,7-9\n"
-"      Lists bad words entries numbered 2 through 5 and\n"
-"      7 through 9.\n"
+"The LIST command displays the bad words list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "The CLEAR command clears all entries from the bad words list."
 msgstr ""
@@ -3813,22 +3881,7 @@ msgstr ""
 msgid "Modes cleared on %s and the channel destroyed."
 msgstr ""
 
-#, c-format
-msgid ""
-"Modifies or displays the certificate list for your nick. If you connect to IRC and provide a client certificate with a matching fingerprint in the cert list, you will be automatically identified to services. Services Operators may provide a nick to modify other users' certificate lists.\n"
-"\n"
-"Examples:\n"
-"\n"
-"    %sADD\n"
-"        Adds your current fingerprint to the certificate list and\n"
-"        automatically identifies you when you connect to IRC\n"
-"        using this fingerprint.\n"
-"\n"
-"    %sDEL<fingerprint>\n"
-"        Removes the fingerprint <fingerprint> from your certificate list.\n"
-"\n"
-"    %sLIST\n"
-"        Displays the current certificate list."
+msgid "Modifies or displays the certificate list for your nick. If you connect to IRC and provide a client certificate with a matching fingerprint in the cert list, you will be automatically identified to services. Services Operators may provide a nick to modify other users' certificate lists."
 msgstr ""
 
 #, c-format
@@ -4556,6 +4609,15 @@ msgstr ""
 msgid "Removes a selected nicks status modes on a channel. If nick is omitted then your status is removed. If channel is omitted then your channel status is removed on every channel you are in."
 msgstr ""
 
+msgid "Removes all entries that were added in the last 30 minutes."
+msgstr ""
+
+msgid "Removes the specified fingerprint from the certificate list of nickname."
+msgstr ""
+
+msgid "Removes the specified fingerprint from your certificate list."
+msgstr ""
+
 #, c-format
 msgid "Removing %s because %s covers it."
 msgstr ""
@@ -4643,6 +4705,9 @@ msgstr ""
 msgid "Searches logs for a matching pattern"
 msgstr ""
 
+msgid "Searches the last 21 days worth of logs for messages containing Anope and lists the most recent 500 of them."
+msgstr ""
+
 msgid "Secure founder"
 msgstr ""
 
@@ -4705,6 +4770,15 @@ msgstr ""
 msgid "Sends a memo and requests a read receipt"
 msgstr ""
 
+msgid "Sends a memo to the channel when someone uses the chanserv/xop command on #anope."
+msgstr ""
+
+msgid "Sends a message to channel operators and above when someone uses the chanserv/access command on #anope."
+msgstr ""
+
+msgid "Sends a notice to channel voices and above when someone uses the chanserv/flags command on #anope."
+msgstr ""
+
 msgid "Sends all registered users a memo containing memo-text."
 msgstr ""
 
@@ -4717,11 +4791,7 @@ msgstr ""
 msgid "Sends the named nick or channel a memo containing memo-text. When sending to a nickname, the recipient will receive a notice that they have a new memo. The target nickname/channel must be registered. Once the memo is read by its recipient, an automatic notification memo will be sent to the sender informing them that the memo has been read."
 msgstr ""
 
-msgid ""
-"Sends you the text of the memos specified. If LAST is given, sends you the memo you most recently received. If NEW is given, sends you all of your new memos. If ALL is given, sends you all of your memos. Otherwise, sends you memo number num. You can also give a list of numbers, as in this example:\n"
-"\n"
-"   READ 2-5,7-9\n"
-"      Displays memos numbered 2 through 5 and 7 through 9."
+msgid "Sends you the text of the memos specified. If LAST is given, sends you the memo you most recently received. If NEW is given, sends you all of your new memos. If ALL is given, sends you all of your memos. Otherwise, sends you memo number num. You can also give a list of numbers."
 msgstr ""
 
 msgid "Server"
@@ -5046,6 +5116,9 @@ msgstr ""
 msgid "Sets various nickname options. option can be one of:"
 msgstr ""
 
+msgid "Sets voice status on all users in the channel."
+msgstr ""
+
 msgid "Sets whether services should set channel status modes on you automatically."
 msgstr ""
 
@@ -5104,6 +5177,9 @@ msgstr ""
 
 #, c-format
 msgid "Showed %zu/%zu matches for %s."
+msgstr ""
+
+msgid "Shows the current server configuration."
 msgstr ""
 
 msgid "Sign kicks that are done with the KICK command"
@@ -5315,10 +5391,7 @@ msgid ""
 "\n"
 "The %sDEL command removes the given nick from the %s list. If a list of entry numbers is given, those entries are deleted. (See the example for LIST below.)\n"
 "\n"
-"The %sLIST command displays the %s list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   %s#channelLIST2-5,7-9\n"
-"      Lists %s entries numbered 2 through 5 and\n"
-"      7 through 9.\n"
+"The %sLIST command displays the %s list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "The %sCLEAR command clears all entries of the %s list."
 msgstr ""
@@ -5327,10 +5400,7 @@ msgstr ""
 msgid ""
 "The %sDEL command removes the given mask from the AKILL list if it is present. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
-"The %sLIST command displays the AKILL list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   %sLIST2-5,7-9\n"
-"      Lists AKILL entries numbered 2 through 5 and 7\n"
-"      through 9.\n"
+"The %sLIST command displays the AKILL list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "%sVIEW is a more verbose version of %sLIST, and will show who added an AKILL, the date it was added, and when it expires, as well as the user@host/ip mask and reason.\n"
 "\n"
@@ -5341,10 +5411,7 @@ msgstr ""
 msgid ""
 "The %sDEL command removes the given nick from the access list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.) You may remove yourself from an access list, even if you do not have access to modify that list otherwise.\n"
 "\n"
-"The %sLIST command displays the access list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   %s#channelLIST2-5,7-9\n"
-"      Lists access entries numbered 2 through 5 and\n"
-"      7 through 9.\n"
+"The %sLIST command displays the access list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "The %sVIEW command displays the access list similar to %sLIST but shows the creator and last used time.\n"
 "\n"
@@ -5354,10 +5421,7 @@ msgstr ""
 msgid ""
 "The SNLINEDEL command removes the given mask from the SNLINE list if it is present. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
-"The SNLINELIST command displays the SNLINE list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   SNLINELIST2-5,7-9\n"
-"      Lists SNLINE entries numbered 2 through 5 and 7\n"
-"      through 9.\n"
+"The SNLINELIST command displays the SNLINE list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "SNLINEVIEW is a more verbose version of SNLINELIST, and will show who added an SNLINE, the date it was added, and when it expires, as well as the realname mask and reason.\n"
 "\n"
@@ -5367,25 +5431,17 @@ msgstr ""
 msgid ""
 "The SQLINEDEL command removes the given mask from the SQLINE list if it is present. If a list of entry numbers is given, those entries are deleted. (See the example for LIST below.)\n"
 "\n"
-"The SQLINELIST command displays the SQLINE list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   SQLINELIST2-5,7-9\n"
-"      Lists SQLINE entries numbered 2 through 5 and 7\n"
-"      through 9.\n"
+"The SQLINELIST command displays the SQLINE list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "SQLINEVIEW is a more verbose version of SQLINELIST, and will show who added an SQLINE, the date it was added, and when it expires, as well as the mask and reason.\n"
 "\n"
 "SQLINECLEAR clears all entries of the SQLINE list."
 msgstr ""
 
-#, c-format
 msgid ""
 "The STATS command prints out statistics about stored nicks and memory usage.\n"
 "\n"
-"The CLEAR command lets you clean the database by removing all entries from the database that were added within time.\n"
-"\n"
-"Example:\n"
-" %sCLEAR30m\n"
-" Will remove all entries that were added within the last 30 minutes."
+"The CLEAR command lets you clean the database by removing all entries from the database that were added within time."
 msgstr ""
 
 msgid "The email parameter is optional and will set the email address for your nick immediately. You may also wish to SETHIDE it after registering if it isn't the default setting already."
@@ -5401,11 +5457,7 @@ msgid ""
 "\n"
 "Which are used to message, notice, and memo the channel respectively. With MESSAGE or NOTICE you must have a service bot assigned to and joined to your channel. Status may be a channel status such as @ or +.\n"
 "\n"
-"To remove a logging method use the same syntax as you would to add it.\n"
-"\n"
-"Example:\n"
-" %s#anopechanserv/accessMESSAGE@\n"
-" Would message any channel operators whenever someone used the ACCESS command on ChanServ on the channel."
+"To remove a logging method use the same syntax as you would to add it."
 msgstr ""
 
 #, c-format
@@ -5720,13 +5772,7 @@ msgstr ""
 msgid "This command retrieves the vhost requests."
 msgstr ""
 
-msgid ""
-"This command searches the services logfiles for messages that match the given pattern. The day and limit argument may be used to specify how many days of logs to search and the number of replies to limit to. By default this command searches one week of logs, and limits replies to 50.\n"
-"\n"
-"For example:\n"
-"    LOGSEARCH+21d+500lAnope\n"
-"      Searches the last 21 days worth of logs for messages\n"
-"      containing Anope and lists the most recent 500 of them."
+msgid "This command searches the services logfiles for messages that match the given pattern. The day and limit argument may be used to specify how many days of logs to search and the number of replies to limit to. By default this command searches one week of logs, and limits replies to 50."
 msgstr ""
 
 msgid "This command tells you what a users access is on a channel and what access entries, if any, they match. Additionally it will tell you of any auto kick entries they match. Usage of this command is limited to users who have the ability to modify access entries on the channel."
@@ -6077,6 +6123,9 @@ msgid "VHosts for account %s have been removed."
 msgstr ""
 
 msgid "VIEW host"
+msgstr ""
+
+msgid "VIEW nickname"
 msgstr ""
 
 msgid "VIEW [mask | list | id]"

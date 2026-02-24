@@ -226,16 +226,16 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-				"The \002STATS\002 command prints out statistics about stored nicks and memory usage."
-				"\n\n"
-				"The \002CLEAR\002 command lets you clean the database by removing all entries from the "
-				"database that were added within \037time\037."
-				"\n\n"
-				"Example:\n"
-				" %s\033CLEAR\03330m\n"
-				" Will remove all entries that were added within the last 30 minutes."
-			),
-			source.command.nobreak().c_str());
+			"The \002STATS\002 command prints out statistics about stored nicks and memory usage."
+			"\n\n"
+			"The \002CLEAR\002 command lets you clean the database by removing all entries from the "
+			"database that were added within \037time\037."
+		));
+
+		ExampleWrapper examples;
+		examples.AddEntry("CLEAR 30m", _(
+			"Removes all entries that were added in the last 30 minutes."
+		));
 		return true;
 	}
 };

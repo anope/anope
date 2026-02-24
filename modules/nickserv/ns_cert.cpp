@@ -496,28 +496,47 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-				"Modifies or displays the certificate list for your nick. "
-				"If you connect to IRC and provide a client certificate with a "
-				"matching fingerprint in the cert list, you will be "
-				"automatically identified to services. Services Operators "
-				"may provide a nick to modify other users' certificate lists."
-				"\n\n"
-				"Examples:"
-				"\n\n"
-				"    \002%s\033ADD\002\n"
-				"        Adds your current fingerprint to the certificate list and\n"
-				"        automatically identifies you when you connect to IRC\n"
-				"        using this fingerprint."
-				"\n\n"
-				"    \002%s\033DEL\033<fingerprint>\002\n"
-				"        Removes the fingerprint <fingerprint> from your certificate list."
-				"\n\n"
-				"    \002%s\033LIST\002\n"
-				"        Displays the current certificate list."
-			),
-			source.command.nobreak().c_str(),
-			source.command.nobreak().c_str(),
-			source.command.nobreak().c_str());
+			"Modifies or displays the certificate list for your nick. If you connect to IRC and "
+			"provide a client certificate with a matching fingerprint in the cert list, you will "
+			"be automatically identified to services. Services Operators may provide a nick to "
+			"modify other users' certificate lists."
+		));
+
+		ExampleWrapper examples;
+
+		examples.AddEntry("ADD", _(
+			"Adds your current fingerprint to your certificate list."
+		));
+		examples.AddEntry(_("ADD \037nickname\037 \037fingerprint\037"), _(
+			"Adds the specified \037fingerprint\037 to the certificate list of \037nickname\037."
+		), "nickserv/cert");
+
+		examples.AddEntry(_("DEL \037fingerprint\037"), _(
+			"Removes the specified \037fingerprint\037 from your certificate list."
+		));
+		examples.AddEntry(_("DEL \037nickname\037 \037fingerprint\037"), _(
+			"Removes the specified \037fingerprint\037 from the certificate list of "
+			"\037nickname\037."
+		), "nickserv/cert");
+
+		examples.AddEntry("LIST", _(
+			"Displays your current certificate list."
+		));
+		examples.AddEntry(_("LIST \037nickname\037"), _(
+			"Displays the current certificate list of \037nickname\037."
+		), "nickserv/cert");
+
+		examples.AddEntry("VIEW", _(
+			"Displays your current certificate list as well the details about who added each entry "
+			"and when they added it."
+		));
+		examples.AddEntry(_("VIEW \037nickname\037"), _(
+			"Displays the current certificate list of \037nickname\037 as well as the details "
+			"about who added each entry and when they added it."
+		), "nickserv/cert");
+
+		examples.SendTo(source);
+
 		return true;
 	}
 };

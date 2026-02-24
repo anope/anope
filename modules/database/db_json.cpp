@@ -219,7 +219,12 @@ private:
 			return;
 
 		for (auto it = entries.first; it != entries.second; ++it)
-			s_type->Unserialize(nullptr, it->second);
+		{
+			auto &data = it->second;
+			auto *obj = s_type->Unserialize(nullptr, data);
+			if (obj && data.id)
+				obj->object_id = data.id;
+		}
 	}
 
 	std::optional<DBData> ReadDatabase(const Anope::string &dbname)

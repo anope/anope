@@ -10,13 +10,25 @@
 
 * Non-breaking spaces in translatable messages now use 0x1B instead of 0x1A due to recent msgfmt releases treating 0x1A as an EOF character. If you have an out of tree translation you will need to update it.
 
+* User TLS certificates are now stored in their own `NSCert` table instead of as a column in the `NickCore` table. If you are reading this information you will need to update your code.
+
 ## Changes
+
+* Fixed `{botserv}:botmodes` erroneously allowing setting non-status modes on channels.
+
+* Fixed db_json restoring the object identifier when unserialising objects.
+
+* Fixed matching stacked extended bans on InspIRCd and UnrealIRCd.
+
+* Fixed parameter modes in `chanserv/mode` locks erroneously requiring a parameter to unset a lock.
 
 * The cs_set_misc and ns_set_misc modules now can use a separate title from the command name.
 
 * The cs_set_misc and ns_set_misc modules now support validation of user-specified data.
 
 * The db_atheme module can now import arbitrary metadata to fields from the ns_set_misc module.
+
+* The `nickserv/cert` command will now show the time a TLS certificate was created and the nickname of the creator if the `VIEW` subcommand is used.
 
 * The ns_set_misc module can now add account data to the WHOIS output of authenticated users on InspIRCd (with the swhois_ext module) and UnrealIRCd.
 

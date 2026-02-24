@@ -67,12 +67,12 @@ public:
 		}
 
 		ListFormatter list(source.GetAccount());
-		list.AddColumn(_("Nick")).AddColumn(_("Last mask"));
+		list.AddColumn(_("Nick")).AddColumn(_("Account")).AddColumn(_("Status"));
 		list.SetFlexible([](ListFormatter::ListEntry &row)
 		{
-			return row["Last mask"].empty()
-				? _("\002{nick}\002")
-				: _("\002{nick}\002 (last mask: {last_mask})");
+			return row["Status"].empty()
+				? _("\002{nick}\002 (account: {account})")
+				: _("\002{nick}\002 -- {status} (account: {account})");
 		});
 
 		Anope::map<NickAlias *> ordered_map;
@@ -96,11 +96,7 @@ public:
 			else if (unconfirmed && !na->nc->HasExt("UNCONFIRMED"))
 				continue;
 
-			/* We no longer compare the pattern against the output buffer.
-			 * Instead we build a nice nick!user@host buffer to compare.
-			 * The output is then generated separately. -TheShadow */
-			Anope::string buf = Anope::Format("%s!%s", na->nick.c_str(), !na->last_userhost.empty() ? na->last_userhost.c_str() : "*@*");
-			if (na->nick.equals_ci(pattern) || Anope::Match(buf, pattern, false, true))
+			if (na->nick.equals_ci(pattern) || Anope::Match(na->nick, pattern, false, true))
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= listmax)
 				{
@@ -110,14 +106,13 @@ public:
 
 					ListFormatter::ListEntry entry;
 					entry["Nick"] = (isnoexpire ? "!" : "") + na->nick;
-					if (na->nc->HasExt("HIDE_MASK") && !is_servadmin && na->nc != mync)
-						entry["Last mask"] = Language::Translate(source.GetAccount(), _("[Hostname hidden]"));
-					else if (na->nc->HasExt("NS_SUSPENDED"))
-						entry["Last mask"] = Language::Translate(source.GetAccount(), _("[Suspended]"));
+					entry["Account"] = na->nc->display;
+
+					auto &status = entry["Status"];
+					if (na->nc->HasExt("NS_SUSPENDED"))
+						status = Language::Translate(source.GetAccount(), _("Suspended"));
 					else if (na->nc->HasExt("UNCONFIRMED"))
-						entry["Last mask"] = Language::Translate(source.GetAccount(), _("[Unconfirmed]"));
-					else
-						entry["Last mask"] = is_servadmin ? na->last_userhost_real : na->last_userhost;
+						status = Language::Translate(source.GetAccount(), _("Unconfirmed"));
 					list.AddEntry(entry);
 				}
 				++count;
@@ -150,11 +145,7 @@ public:
 		));
 
 		ExampleWrapper examples;
-		examples.AddEntry("*!foobar@example.com", _(
-			"Lists all registered nicks owned by a user who last connected from the userhost "
-			"\037foobar@example.com\037 (case insensitive)."
-		));
-		examples.AddEntry("*Bot*!*@*", _(
+		examples.AddEntry("*Bot*", _(
 			"Lists all registered nicks with \037Bot\037 in their name (case insensitive)."
 		));
 		examples.AddEntry("#51-100", _(

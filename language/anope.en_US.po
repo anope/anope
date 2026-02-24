@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-24 18:12+0000\n"
-"PO-Revision-Date: 2026-02-24 18:12+0000\n"
+"POT-Creation-Date: 2026-02-24 18:55+0000\n"
+"PO-Revision-Date: 2026-02-24 18:55+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -417,13 +417,13 @@ msgstr ""
 msgid "{name}: {description}"
 msgstr ""
 
-msgid "{nick}"
-msgstr ""
-
-msgid "{nick} (last mask: {last_mask})"
+msgid "{nick} (account: {account})"
 msgstr ""
 
 msgid "{nick} ({mask}) [{real_name}]"
+msgstr ""
+
+msgid "{nick} -- {status} (account: {account})"
 msgstr ""
 
 msgid "{nick}: registered on {registered}"
@@ -3387,9 +3387,6 @@ msgstr ""
 msgid "Language for %s changed to %s."
 msgstr ""
 
-msgid "Last mask"
-msgstr ""
-
 #, c-format
 msgid "Last memo to %s has been cancelled."
 msgstr ""
@@ -3563,9 +3560,6 @@ msgid ""
 "Note that a preceding '#' specifies a range.\n"
 "\n"
 "If the DISPLAY, NOEXPIRE, SUSPENDED, or UNCONFIRMED options are given only nicks which, respectively, are display nicks, will not expire, are suspended, or are unconfirmed will be shown. If multiple options are given, nicks must match every option to be shown. Note that these options are limited to Services Operators."
-msgstr ""
-
-msgid "Lists all registered nicks owned by a user who last connected from the userhost foobar@example.com (case insensitive)."
 msgstr ""
 
 msgid "Lists all registered nicks that are the display nickname for their account."
@@ -5209,6 +5203,9 @@ msgstr ""
 msgid "Statistics reset."
 msgstr ""
 
+msgid "Status"
+msgstr ""
+
 msgid "Status updated (memos, vhost, chmodes, flags)."
 msgstr ""
 
@@ -5958,6 +5955,9 @@ msgid "Unassigns a bot from a channel"
 msgstr ""
 
 msgid "Unassigns a bot from a channel. When you use this command, the bot won't join the channel anymore. However, bot configuration for the channel is kept, so you will always be able to reassign a bot later without having to reconfigure it entirely."
+msgstr ""
+
+msgid "Unconfirmed"
 msgstr ""
 
 msgid "Underlines kicker"
@@ -6801,13 +6801,7 @@ msgstr ""
 msgid "[+expiry] channel reason"
 msgstr ""
 
-msgid "[Hostname hidden]"
-msgstr ""
-
 msgid "[Suspended]"
-msgstr ""
-
-msgid "[Unconfirmed]"
 msgstr ""
 
 msgid "[{pattern | channel} [INVISIBLE]]"

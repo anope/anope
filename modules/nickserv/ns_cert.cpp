@@ -288,29 +288,23 @@ class CommandNSCert final
 	: public Command
 {
 private:
-	void DoAdd(CommandSource &source, NickCore *nc, Anope::string certfp)
+	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		auto *cl = nc->Require<NickServ::CertList>(NICKSERV_CERT_EXT);
+		auto *nc = FindTarget(source, params.size() == 3 ? params[1] : "", true);
+		if (!nc)
+			return;
 
+		const auto certfp = FindFingerprint(source, params, nc, false);
+		if (certfp.empty())
+			return;
+
+		auto *cl = nc->Require<NickServ::CertList>(NICKSERV_CERT_EXT);
 		const auto max = Config->GetModule(this->owner).Get<unsigned>("max", "5");
 		if (cl->GetCertCount() >= max)
 		{
 			source.Reply(max, N_("The maximum of %u certificate entry has been reached.", "The maximum of %u certificate entries has been reached."),
 				max);
 			return;
-		}
-
-		if (source.GetAccount() == nc)
-		{
-			User *u = source.GetUser();
-
-			if (!u || u->fingerprint.empty())
-			{
-				source.Reply(_("You are not using a client certificate."));
-				return;
-			}
-
-			certfp = u->fingerprint;
 		}
 
 		if (cl->FindCert(certfp))
@@ -333,23 +327,17 @@ private:
 		source.Reply(_("\002%s\002 added to %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
 
-	void DoDel(CommandSource &source, NickCore *nc, Anope::string certfp)
+	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		auto *cl = nc->Require<NickServ::CertList>(NICKSERV_CERT_EXT);
-
-		if (certfp.empty())
-		{
-			User *u = source.GetUser();
-			if (u)
-				certfp = u->fingerprint;
-		}
-
-		if (certfp.empty())
-		{
-			this->OnSyntaxError(source, "DEL");
+		auto *nc = FindTarget(source, params.size() == 3 ? params[1] : "", true);
+		if (!nc)
 			return;
-		}
 
+		const auto certfp = FindFingerprint(source, params, nc, true);
+		if (certfp.empty())
+			return;
+
+		auto *cl = nc->Require<NickServ::CertList>(NICKSERV_CERT_EXT);
 		if (!cl->FindCert(certfp))
 		{
 			source.Reply(_("\002%s\002 not found on %s's certificate list."), certfp.c_str(), nc->display.c_str());
@@ -362,10 +350,13 @@ private:
 		source.Reply(_("\002%s\002 deleted from %s's certificate list."), certfp.c_str(), nc->display.c_str());
 	}
 
-	static void DoList(CommandSource &source, const NickCore *nc, bool full)
+	void DoList(CommandSource &source, const std::vector<Anope::string> &params, bool full)
 	{
-		auto *cl = nc->GetExt<NickServ::CertList>(NICKSERV_CERT_EXT);
+		auto *nc = FindTarget(source, params.size() > 1 ? params[1] : "", false);
+		if (!nc)
+			return;
 
+		auto *cl = nc->GetExt<NickServ::CertList>(NICKSERV_CERT_EXT);
 		if (!cl || !cl->GetCertCount())
 		{
 			source.Reply(_("%s's certificate list is empty."), nc->display.c_str());
@@ -383,7 +374,6 @@ private:
 					? _("\002{fingerprint}\002 -- created by {creator} at {created}")
 					: _("\002{fingerprint}\002 -- created by {creator} at {created} ({description})");
 			});
-
 		}
 		else
 		{
@@ -419,11 +409,66 @@ private:
 		list.SendTo(source);
 	}
 
+	Anope::string FindFingerprint(CommandSource &source, const std::vector<Anope::string> &params, const NickCore *nc, bool del)
+	{
+		if (source.GetAccount() != nc || del)
+		{
+			if (params.size() > 1)
+				return params.back();
+
+			this->OnSyntaxError(source, params[0]);
+			return "";
+		}
+
+		auto *u = source.GetUser();
+		if (u && !u->fingerprint.empty())
+			return u->fingerprint;
+
+		source.Reply(_("You are not using a client certificate."));
+		return "";
+	}
+
+	NickCore *FindTarget(CommandSource &source, const Anope::string &nick, bool modify)
+	{
+		if (!nick.empty())
+		{
+			const auto *na = NickAlias::Find(nick);
+			if (!na)
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				return nullptr;
+			}
+
+			NickCore *nc = na->nc;
+			if (nc != source.GetAccount() && !source.HasPriv("nickserv/cert"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return nullptr;
+			}
+
+			if (modify)
+			{
+				if (nc->HasExt("NS_SUSPENDED"))
+				{
+					source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
+					return nullptr;
+				}
+				if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.GetAccount() != nc && nc->IsServicesOper())
+				{
+					source.Reply(_("You may view but not modify the certificate list of other Services Operators."));
+					return nullptr;
+				}
+			}
+			return nc;
+		}
+		return source.nc;
+	}
+
 public:
 	CommandNSCert(Module *creator) : Command(creator, "nickserv/cert", 1, 3)
 	{
 		this->SetDesc(_("Modify the nickname client certificate list"));
-		this->SetSyntax(_("ADD [\037nickname\037] [\037fingerprint\037]"));
+		this->SetSyntax(_("ADD [\037nickname\037 \037fingerprint\037]"));
 		this->SetSyntax(_("DEL [\037nickname\037] \037fingerprint\037"));
 		this->SetSyntax(_("LIST [\037nickname\037]"));
 		this->SetSyntax(_("VIEW [\037nickname\037]"));
@@ -432,53 +477,16 @@ public:
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
 	{
 		const Anope::string &cmd = params[0];
-		Anope::string nick, certfp;
-
-		if (cmd.equals_ci("LIST") || cmd.equals_ci("VIEW"))
-			nick = params.size() > 1 ? params[1] : "";
-		else
-		{
-			nick = params.size() == 3 ? params[1] : "";
-			certfp = params.size() > 1 ? params[params.size() - 1] : "";
-		}
-
-		NickCore *nc;
-		if (!nick.empty())
-		{
-			const NickAlias *na = NickAlias::Find(nick);
-			if (na == NULL)
-			{
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-				return;
-			}
-			else if (na->nc != source.GetAccount() && !source.HasPriv("nickserv/cert"))
-			{
-				source.Reply(ACCESS_DENIED);
-				return;
-			}
-			else if (Config->GetModule("nickserv").Get<bool>("secureadmins", "yes") && source.GetAccount() != na->nc && na->nc->IsServicesOper() && !cmd.equals_ci("LIST"))
-			{
-				source.Reply(_("You may view but not modify the certificate list of other Services Operators."));
-				return;
-			}
-
-			nc = na->nc;
-		}
-		else
-			nc = source.nc;
-
 		if (cmd.equals_ci("LIST"))
-			return this->DoList(source, nc, false);
+			return this->DoList(source, params, false);
 		if (cmd.equals_ci("VIEW"))
-			return this->DoList(source, nc, true);
-		else if (nc->HasExt("NS_SUSPENDED"))
-			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
+			return this->DoList(source, params, true);
 		else if (Anope::ReadOnly)
 			source.Reply(READ_ONLY_MODE);
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(source, nc, certfp);
+			return this->DoAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(source, nc, certfp);
+			return this->DoDel(source, params);
 		else
 			this->OnSyntaxError(source, "");
 	}

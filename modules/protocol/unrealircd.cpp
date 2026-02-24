@@ -253,10 +253,12 @@ private:
 		// NEXTBANS: enables receiving named extended bans.
 		// SJSBY: enables receiving list mode setters and set timestamps.
 		// SID: communicates the unique identifier of the local server.
+		// TS: communicates the current time for clock synchronisation purposes.
 		// VHP: enable receiving the vhost in UID.
 		Uplink::Send("PROTOCTL", "BIGLINES", "EXTSWHOIS", "MLOCK", "MTAGS", "NEXTBANS", "SJSBY", "VHP");
 		Uplink::Send("PROTOCTL", "EAUTH=" + Me->GetName() + ",,,Anope-" + Anope::VersionShort());
 		Uplink::Send("PROTOCTL", "SID=" + Me->GetSID());
+		Uplink::Send("PROTOCTL", "TS=" + Anope::ToString(Anope::CurTime));
 
 		SendServer(Me);
 	}

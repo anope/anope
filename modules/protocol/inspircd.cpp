@@ -2404,7 +2404,7 @@ struct IRCDMessageUID final
 	 * 3: host
 	 * 4: dhost
 	 * 5: ident
-	 * 6: dident (v4 only)
+	 * 6: dident
 	 * 7: ip
 	 * 8: signon
 	 * 9+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
@@ -2412,7 +2412,6 @@ struct IRCDMessageUID final
 	 */
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
-		size_t offset = params[8][0] == '+' ? 0 : 1;
 		auto ts = IRCD->ExtractTimestamp(params[1]);
 
 		NickAlias *na = NULL;
@@ -2432,9 +2431,9 @@ struct IRCDMessageUID final
 					++it;
 			}
 
-		auto *u = User::OnIntroduce(params[2], params[5+offset], params[3], params[4], params[6+offset], source.GetServer(), params[params.size() - 1], ts, params[8 + offset], params[0], na ? *na->nc : NULL, { params.begin() + 9 + offset, params.end() - 1 });
+		auto *u = User::OnIntroduce(params[2], params[6], params[3], params[4], params[7], source.GetServer(), params[params.size() - 1], ts, params[9], params[0], na ? *na->nc : NULL, { params.begin() + 10, params.end() - 1 });
 		if (u)
-			u->signon = IRCD->ExtractTimestamp(params[7+offset]);
+			u->signon = IRCD->ExtractTimestamp(params[8]);
 	}
 };
 

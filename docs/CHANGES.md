@@ -69,10 +69,10 @@
   ```
   /WHOIS nick1
   * [nick1] (nick1@example.com): nick1
-  * [stest] Mastodon: @example@mastodon.social
-  * [stest] irc.example.com :Example-IRC server
+  * [nick1] Mastodon: @example@mastodon.social
+  * [nick1] irc.example.com :Example-IRC server
   ...
-  * [stest] End of WHOIS list.
+  * [nick1] End of WHOIS list.
   ```
 
 * The regex_posix module is now available on Windows (using the PCRE2 POSIX compatibility layer).

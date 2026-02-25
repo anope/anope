@@ -113,7 +113,7 @@ private:
 	std::vector<Example> entries;
 
 public:
-	void AddEntry(const Anope::string &example, const Anope::string &desc, const Anope::string &priv = "");
+	ExampleWrapper &AddEntry(const Anope::string &example, const Anope::string &desc, const Anope::string &priv = "");
 	void SendTo(CommandSource &source);
 };
 

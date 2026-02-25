@@ -1705,7 +1705,7 @@ struct IRCDMessageFIdent final
 	{
 		User *u = source.GetUser();
 		if (params[0] != "*")
-			u->SetDisplayedHost(params[0]);
+			u->SetIdent(params[0]);
 	}
 };
 

@@ -421,12 +421,15 @@ struct IRCDMessagePass final
 struct IRCDMessageNotice final
 	: Message::Notice
 {
-	IRCDMessageNotice(Module *creator) : Message::Notice(creator) { }
+	IRCDMessageNotice(Module *creator)
+		: Message::Notice(creator)
+	{
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (Servers::Capab.count("ECHO"))
-			Uplink::Send("ECHO", 'N', source.GetSource(), params[1]);
+			Uplink::Send(tags, "ECHO", 'N', source.GetSource(), params[1]);
 
 		Message::Notice::Run(source, params, tags);
 	}
@@ -435,14 +438,35 @@ struct IRCDMessageNotice final
 struct IRCDMessagePrivmsg final
 	: Message::Privmsg
 {
-	IRCDMessagePrivmsg(Module *creator) : Message::Privmsg(creator) { }
+	IRCDMessagePrivmsg(Module *creator)
+		: Message::Privmsg(creator)
+	{
+	}
 
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		if (Servers::Capab.count("ECHO"))
-			Uplink::Send("ECHO", 'P', source.GetSource(), params[1]);
+			Uplink::Send(tags, "ECHO", 'P', source.GetSource(), params[1]);
 
 		Message::Privmsg::Run(source, params, tags);
+	}
+};
+
+struct IRCDMessageTagmsg final
+	: IRCDMessage
+{
+	IRCDMessageTagmsg(Module *creator)
+		: IRCDMessage(creator, "TAGMSG", 1)
+	{
+		SetFlag(FLAG_REQUIRE_USER);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		if (Servers::Capab.count("ECHO"))
+			Uplink::Send(tags, "ECHO", 'T', source.GetSource());
+
+		// We only care about implementing ECHO for now.
 	}
 };
 
@@ -487,6 +511,7 @@ class ProtoSolanum final
 	IRCDMessagePass message_pass;
 	IRCDMessagePrivmsg message_privmsg;
 	IRCDMessageServer message_server;
+	IRCDMessageTagmsg message_tagmsg;
 
 	static void AddModes()
 	{
@@ -550,6 +575,7 @@ public:
 		, message_pass(this)
 		, message_privmsg(this)
 		, message_server(this)
+		, message_tagmsg(this)
 	{
 		if (ModuleManager::LoadModule("ratbox", User::Find(creator)) != MOD_ERR_OK)
 			throw ModuleException("Unable to load ratbox");

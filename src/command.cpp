@@ -209,7 +209,13 @@ void Command::OnServHelp(CommandSource &source, HelpWrapper &help)
 	help.AddEntry(source.command, this->GetDesc(source));
 }
 
-bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }
+bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand)
+{
+	this->SendSyntax(source);
+	source.Reply(" ");
+	source.Reply(this->GetDesc(source));
+	return true;
+}
 
 void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 {

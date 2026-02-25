@@ -50,13 +50,14 @@ public:
 
 			if (all)
 			{
-				for (const auto &[_, uc] : c->users)
+				for (const auto &[_, memb] : c->users)
 				{
-					if (uc->user->HasMode("OPER"))
+					if (memb->user->HasMode("OPER"))
 						continue;
 
-					for (auto *mode : uc->status.Modes())
-						c->RemoveMode(c->WhoSends(), mode, uc->user->GetUID(), false);
+					auto modes = memb->status.Modes();
+					for (auto *mode : modes)
+						c->RemoveMode(c->WhoSends(), mode, memb->user->GetUID(), false);
 				}
 
 				source.Reply(_("All modes cleared on %s."), c->name.c_str());

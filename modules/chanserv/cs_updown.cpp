@@ -143,7 +143,8 @@ class CommandCSDown final
 		auto *memb = c->FindUser(u);
 		if (memb != NULL)
 		{
-			for (auto *mode : memb->status.Modes())
+			auto modes = memb->status.Modes();
+			for (auto *mode : modes)
 				c->RemoveMode(NULL, mode, u->GetUID());
 		}
 	}

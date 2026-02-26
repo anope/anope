@@ -27,7 +27,6 @@ contributions they have made, are:
   * MatthewM <mcm@they-got.us>
   * Sebastian V. <hal9000@denorastats.org>
   * Alvaro Toledo <atoledo@keldon.org>
-  * Dragone2 <dragone2@risposteinformatiche.it>
   * Björn Stiddien <keeper@anope.org>
   * n0kS Phr33d0m <god@politeia.in>
   * Hendrik Jäger <gitcommit@henk.geekmail.org>
@@ -39,6 +38,7 @@ contributions they have made, are:
   * Federico G. Schwindt <fgsch@lodoss.net>
   * Alexander Barton <alex@barton.de>
   * Cronus <cronus@nite-serv.com>
+  * Dragone2 <dragone2@risposteinformatiche.it>
   * H7-25 <simos@simosnap.org>
   * Jyzee <jyzee.git@gmail.com>
   * Sebastian Barfurth <github@afreshmelon.com>

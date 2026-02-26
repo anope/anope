@@ -21,6 +21,11 @@ use warnings FATAL => qw(all);
 use File::Basename        qw(dirname);
 use File::Spec::Functions qw(catfile);
 use FindBin               qw($RealDir);
+use Digest::SHA           qw(sha256_hex);
+
+my @ignored_committers = (
+	'2f51f982f0630009bad5e02e49212112d1f25785e6ce76847a48774b42dce7e4' # requested via email
+);
 
 my %committers;
 for my $committer (split /\n+/, `git log --pretty='%an <%ae>%n%(trailers:key=Co-Authored-By,valueonly)' HEAD`) {
@@ -34,9 +39,18 @@ for my $committer (keys %committers) {
 	chomp(my $author = <$fh>);
 	close $fh;
 
-	$author = $1 if $author =~ /^(.+) <(?:\S+\@localhost|\S+\@users.noreply.github.com)>$/;
-	next if $author =~ /\[bot\]$/;
-	next if $author =~ /^\(svnadmin\)$/;
+	next unless $author =~ /^(.+) <(.+)>$/;
+	my ($author_name, $author_email) = ($1, $2);
+
+	# Skip bots and other non-human committers.
+	next if $author_name =~ /\[bot\]$/;
+	next if $author_name =~ /^\(svnadmin\)$/;
+
+	# Skip ignored committers.
+	next if grep { $_ eq sha256_hex($author_email) } @ignored_committers;
+
+	# Omit uncontactable email addresses.
+	$author = $author_name if $author_email =~ /^(?:\S+\@localhost|\S+\@users.noreply.github.com)$/;
 
 	$authors{$author} ||= 0;
 	$authors{$author} += $committers{$committer};

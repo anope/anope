@@ -16,7 +16,7 @@
 
 * Fixed `{botserv}:botmodes` erroneously allowing setting non-status modes on channels.
 
-* Fixed the consistency of indenting and line wrapping command examples in help output.
+* Fixed echoing message tags on Solanum.
 
 * Fixed handling incoming `FIDENT` messages on InspIRCd.
 
@@ -25,6 +25,8 @@
 * Fixed parameter modes in `chanserv/mode` locks erroneously requiring a parameter to unset a lock.
 
 * Fixed restoring the object identifier when unserialising objects in db_json.
+
+* Fixed the consistency of indenting and line wrapping command examples in help output.
 
 * Redesigned the output of `nickserv/list` to show more relevant information.
 

@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
-* Automatic login using a known SSL fingerprint now requires the `AUTOLOGIN` option to be set on accounts. Users can enable it on existing accounts with `/NS SET AUTOLOGIN ON`.
+* Automatic login using a known SSL fingerprint now requires the `AUTOLOGIN` option to be set on accounts with `/NS SET AUTOLOGIN ON`. Automatic login is largely obsolete now SASL EXTERNAL exists and is widely supported.
 
 * Conan 2 is now used for packaging dependencies on Windows. If you are building from source you will need to upgrade Conan.
 
@@ -12,7 +12,7 @@
 
 * User TLS certificates are now stored in their own `NSCert` table instead of as a column in the `NickCore` table. If you are reading this information you will need to update your code.
 
-## Changes
+### Changes
 
 * Fixed `{botserv}:botmodes` erroneously allowing setting non-status modes on channels.
 

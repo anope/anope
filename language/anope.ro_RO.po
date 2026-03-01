@@ -3634,10 +3634,10 @@ msgid "Lists access entries numbered 2 through 5 and 7 through 9."
 msgstr "Listează intrările de accese numerotate de la 2 la 5 și de la 7 la 9."
 
 msgid "Lists access entries on #channel numbered 2 through 5 and 7 through 9."
-msgstr "Listează intrările de accese în #canal numerotate de la 2 la 5 și de la 7 la 9."
+msgstr "Listează intrările de accese în #channel numerotate de la 2 la 5 și de la 7 la 9."
 
 msgid "Lists access entries on #channel that match *nick*."
-msgstr "Listează intrările de accese în #canal care corespund *pseudonimului*."
+msgstr "Listează intrările de accese în #channel care corespund *nick*."
 
 msgid ""
 "Lists all available bots on this network.\n"
@@ -3760,10 +3760,10 @@ msgid "Lists available bots"
 msgstr "Listează boții disponibili"
 
 msgid "Lists bad word entries on #channel numbered 2 through 5 and 7 through 9."
-msgstr "Listează intrările de cuvinte nepotrivite în #canal numerotate de la 2 la 5 și de la 7 la 9."
+msgstr "Listează intrările de cuvinte nepotrivite în #channel numerotate de la 2 la 5 și de la 7 la 9."
 
 msgid "Lists bad word entries on #channel that match *UwU*."
-msgstr "Listează intrările de cuvinte nepotrivite în #canal care corespund *UwU*."
+msgstr "Listează intrările de cuvinte nepotrivite în #channel care corespund *UwU*."
 
 msgid "Lists currently loaded modules."
 msgstr "Listează modulele încărcate în prezent."
@@ -4996,10 +4996,10 @@ msgid "Sends all services staff a memo containing memo-text."
 msgstr "Expediază întregului personal de Servicii o misivă care conține un mesaj-text."
 
 msgid "Sends the named nick or channel a memo containing memo-text. When sending to a nickname, the recipient will receive a notice that they have a new memo. The target nickname/channel must be registered."
-msgstr "Expediază pseudonimului sau canalului specificat o misivă care conține un mesaj-text. Când expediați mesaj către un pseudonim, destinatarul va primi o notificare că are un nou mesaj. Pseudonimul ori canalul destinație trebuie să fie înregistrate."
+msgstr "Expediază pseudonimului sau canalului specificat o misivă care conține un mesaj-text. Când expediați mesaj către un pseudonim, destinatarul va primi o notificare că are un nou mesaj. Pseudonimul ori canalul destinație trebuie să fie înregistrate."
 
 msgid "Sends the named nick or channel a memo containing memo-text. When sending to a nickname, the recipient will receive a notice that they have a new memo. The target nickname/channel must be registered. Once the memo is read by its recipient, an automatic notification memo will be sent to the sender informing them that the memo has been read."
-msgstr "Expediază pseudonimului sau canalului specificat o misivă care conține un mesaj-text. Când expediați un mesaj către un pseudonim, destinatarul va primi o notificare că are un nou mesaj. Pseudonimul ori canalul destinație trebuie să fie înregistrate. După ce misiva este citită de destinatar, o misivă de notificare automată va fi trimisă expeditorului, ca o informare că mesajul a fost citit."
+msgstr "Expediază pseudonimului sau canalului specificat o misivă care conține un mesaj-text. Când expediați un mesaj către un pseudonim, destinatarul va primi o notificare că are un nou mesaj. Pseudonimul ori canalul destinație trebuie să fie înregistrate. După ce misiva este citită de destinatar, o misivă de notificare automată va fi trimisă expeditorului, ca o informare că mesajul a fost citit."
 
 msgid "Sends you the text of the memos specified. If LAST is given, sends you the memo you most recently received. If NEW is given, sends you all of your new memos. If ALL is given, sends you all of your memos. Otherwise, sends you memo number num. You can also give a list of numbers."
 msgstr "Vă afișează textul misivelor specificate. Dacă se introduce LAST, vă afișează cea mai recentă misivă primită. Dacă este specificat NEW, vă afișează toate noile misive. Dacă se dă ALL, vă afișează toate notițele dumneavoastră. Altfel, vă afișează numărul misivei număr. De asemenea, puteți oferi o listă de numere."
@@ -6402,7 +6402,7 @@ msgid "Unsuspends a nickname which allows it to be used again."
 msgstr "Anulează suspendarea unui pseudonim, ceea ce permite utilizarea acestuia."
 
 msgid "Updates a selected nicks status modes on a channel. If nick is omitted then your status is updated. If channel is omitted then your channel status is updated on every channel you are in."
-msgstr "Actualizează modurile de stare ale pseudonimului selectat într-un canal. Dacă pseudonimul este omis, atunci starea dumneavoastră este actualizată. Dacă canalul este omis, atunci starea dumneavoastră de canal este actualizată în fiecare canal în care vă aflați."
+msgstr "Actualizează modurile de stare ale pseudonimului selectat într-un canal. Dacă pseudonimul este omis, atunci starea dumneavoastră este actualizată. Dacă canalul este omis, atunci starea dumneavoastră de canal este actualizată în fiecare canal în care vă aflați."
 
 msgid "Updates a selected nicks status on a channel"
 msgstr "Actualizează starea pseudonimului selectat într-un canal"

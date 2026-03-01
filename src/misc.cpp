@@ -340,20 +340,20 @@ void ExampleWrapper::SendTo(CommandSource &source)
 			header = false;
 		}
 
-		const auto *trans_command = Language::Translate(source.nc, source.command.c_str());
+		const auto *trans_example = Language::Translate(source.nc, entry.example.c_str());
 		const auto *trans_description = Language::Translate(source.nc, entry.description.c_str());
 		if (flexible)
 		{
-			source.Reply("\002%s%s%s\002: %s", source.command.c_str(), *trans_command ? " " : "",
-				trans_command, trans_description);
+			source.Reply("\002%s%s%s\002: %s", source.command.c_str(), *trans_example ? " " : "",
+				trans_example, trans_description);
 		}
 		else
 		{
 			source.Reply(" ");
-			const auto full_command = Anope::Format("%s%s%s", source.command.c_str(),
-				*trans_command ? " " : "", trans_command);
+			const auto full_example = Anope::Format("%s%s%s", source.command.c_str(),
+				*trans_example ? " " : "", trans_example);
 
-			LineWrapper elw(full_command, max_length - 2);
+			LineWrapper elw(full_example, max_length - 2);
 			for (Anope::string line; elw.GetLine(line); )
 				source.Reply("%s  \002%s\002", monospace, line.c_str());
 

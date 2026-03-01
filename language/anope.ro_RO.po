@@ -15,9 +15,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
-"Report-Msgid-Bugs-To: #anope.ro at TeraNova IRC Network\n"
-"POT-Creation-Date: 2025-10-09 17:10+0100\n"
-"PO-Revision-Date: 2025-10-09 17:10+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-01 16:00+0000\n"
+"PO-Revision-Date: 2026-03-01 17:00+0000\n"
 "Last-Translator: Cristian Anghel <kidprotect-cristian@yahoo.com>\n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -72,6 +72,10 @@ msgstr "%s a fost adăugat(ă) în lista de %s."
 #, c-format
 msgid "%s added to the AKILL list."
 msgstr "%s a fost adăugat(ă) în lista de AKILL."
+
+#, c-format
+msgid "%s added to the host offer list."
+msgstr "%s a fost adăugat(ă) în lista de oferte pentru gazde."
 
 #, c-format
 msgid "%s allows you to execute \"fantasy\" commands in the channel. Fantasy commands are commands that can be executed from messaging a channel, and provide a more convenient way to execute commands. Commands that require a channel as a parameter will automatically have that parameter given."
@@ -148,6 +152,10 @@ msgstr "%s a fost înlăturat(ă) din lista de %s."
 #, c-format
 msgid "%s deleted from the AKILL list."
 msgstr "%s a fost înlăturat(ă) din lista de AKILL."
+
+#, c-format
+msgid "%s deleted from the host offer list."
+msgstr "%s a fost înlăturat(ă) din lista de oferte pentru gazde."
 
 #, c-format
 msgid "%s disabled on channel %s."
@@ -308,6 +316,10 @@ msgid "%s not found on the AKILL list."
 msgstr "%s este de negăsit în lista de AKILL."
 
 #, c-format
+msgid "%s not found on the host offer list."
+msgstr "%s este de negăsit în lista de oferte pentru gazde."
+
+#, c-format
 msgid "%s removed from the %s access list."
 msgstr "%s a fost înlăturat(ă) din lista de accese aparținând %s."
 
@@ -354,6 +366,18 @@ msgstr "Nivelurile de acces ale utilizatorilor pot fi văzute folosind comanda
 msgid "[auto-memo] The memo you sent to %s has been viewed."
 msgstr "[confirmare] Misiva pe care ați expediat-o către %s a fost vizualizată."
 
+msgid "{fingerprint}"
+msgstr "{fingerprint}"
+
+msgid "{fingerprint} ({description})"
+msgstr "{fingerprint} ({description})"
+
+msgid "{fingerprint} -- created by {creator} at {created}"
+msgstr "{fingerprint} -- creat de {creator} pe {created}"
+
+msgid "{fingerprint} -- created by {creator} at {created} ({description})"
+msgstr "{fingerprint} -- creat de {creator} la {created} ({description})"
+
 msgid "{host}: {session} sessions"
 msgstr "{host}: {session} sesiuni"
 
@@ -396,14 +420,14 @@ msgstr "{name} = {value}"
 msgid "{name}: {description}"
 msgstr "{name}: {description}"
 
-msgid "{nick}"
-msgstr "{nick}"
-
-msgid "{nick} (last mask: {last_mask})"
-msgstr "{nick} (ultima mască: {last_mask})"
+msgid "{nick} (account: {account})"
+msgstr "{nick} (cont: {account})"
 
 msgid "{nick} ({mask}) [{real_name}]"
 msgstr "{nick} ({mask}) [{real_name}]"
+
+msgid "{nick} -- {status} (account: {account})"
+msgstr "{nick} -- {status} (cont: {account})"
 
 msgid "{nick}: registered on {registered}"
 msgstr "{nick}: înregistrat(ă) pe {registered}"
@@ -430,7 +454,7 @@ msgid "channel bantype"
 msgstr "canal tip-blocare"
 
 msgid "channel command method [status]"
-msgstr "canal commandă metodă [statut]"
+msgstr "canal commandă metodă [stare]"
 
 msgid "channel mask [reason]"
 msgstr "canal mască [motiv]"
@@ -534,6 +558,10 @@ msgstr "canal VIEW [mască | număr-intrare | listă]"
 msgid "channel VIEW [mask | list]"
 msgstr "canal VIEW [mască | listă]"
 
+#, c-format
+msgid "channel [%s]"
+msgstr "canal [%s]"
+
 msgid "channel [code]"
 msgstr "canal [cod]"
 
@@ -542,9 +570,6 @@ msgstr "canal [descriere]"
 
 msgid "channel [nick]"
 msgstr "canal [pseudonim]"
-
-msgid "channel [parameters]"
-msgstr "canal [parametri]"
 
 msgid "channel [user]"
 msgstr "canal [utilizator]"
@@ -571,16 +596,16 @@ msgid "channel {ON|OFF}"
 msgstr "canal {ON|OFF}"
 
 msgid "channel {ON|OFF} [ttb [ln [secs]]]"
-msgstr "canal {ON|OFF} [ttb [linii [secunde]]]"
+msgstr "canal {ON|OFF} [tentative [linii [secunde]]]"
 
 msgid "channel {ON|OFF} [ttb [min [percent]]]"
-msgstr "canal {ON|OFF} [ttb [minim [procentaj]]]"
+msgstr "canal {ON|OFF} [tentative [minim [procentaj]]]"
 
 msgid "channel {ON|OFF} [ttb [num]]"
-msgstr "canal {ON|OFF} [ttb [număr]]"
+msgstr "canal {ON|OFF} [tentative [număr]]"
 
 msgid "channel {ON|OFF} [ttb]"
-msgstr "canal {ON|OFF} [ttb]"
+msgstr "canal {ON|OFF} [tentative]"
 
 msgid "channel {DIS | DISABLE} type"
 msgstr "channel {DIS | DISABLE} tip"
@@ -596,9 +621,6 @@ msgstr "cod"
 
 msgid "email"
 msgstr "email"
-
-msgid "language"
-msgstr "limbă"
 
 msgid "memo-text"
 msgstr "text-misivă"
@@ -645,9 +667,6 @@ msgstr "pseudonim adresă"
 msgid "nickname email"
 msgstr "pseudonim email"
 
-msgid "nickname language"
-msgstr "pseudonim limbă"
-
 msgid "nickname message"
 msgstr "pseudonim mesaj"
 
@@ -657,17 +676,21 @@ msgstr "pseudonim afișaj-nou"
 msgid "nickname new-password"
 msgstr "pseudonim parolă-nouă"
 
-msgid "nickname timezone"
-msgstr "pseudonim fus-orar"
+#, c-format
+msgid "nickname [%s]"
+msgstr "pseudonim [%s]"
 
 msgid "nickname [code]"
 msgstr "pseudonim [cod]"
 
-msgid "nickname [parameter]"
-msgstr "pseudonim [parametru]"
+msgid "nickname [language]"
+msgstr "pseudonim [limbă]"
 
 msgid "nickname [password]"
 msgstr "pseudonim [parolă]"
+
+msgid "nickname [timezone]"
+msgstr "pseudonim [fus-orar]"
 
 msgid "nickname [+expiry] [reason]"
 msgstr "pseudonim [+expirare] [motiv]"
@@ -711,20 +734,17 @@ msgstr "parolă [email]"
 msgid "password email"
 msgstr "parolă email"
 
+msgid "pattern [DISPLAY] [NOEXPIRE] [SUSPENDED] [UNCONFIRMED]"
+msgstr "model [DISPLAY] [NOEXPIRE] [SUSPENDED] [UNCONFIRMED]"
+
 msgid "pattern [SUSPENDED] [NOEXPIRE]"
 msgstr "model [SUSPENDED] [NOEXPIRE]"
-
-msgid "pattern [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"
-msgstr "model [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"
 
 msgid "server [message]"
 msgstr "server [mesaj]"
 
 msgid "server [reason]"
 msgstr "server [motiv]"
-
-msgid "timezone"
-msgstr "fus-orar"
 
 msgid "type parameters"
 msgstr "tip parametri"
@@ -771,15 +791,7 @@ msgstr "%2d %-16s litere: %s, cuvinte: %s, linii: %s, zâmbete: %s, acțiuni: 
 
 #, c-format
 msgid "%c is an unknown status mode."
-msgstr "%c este un mod de statut necunoscut."
-
-#, c-format
-msgid "%c%c is not locked on %s."
-msgstr "%c%c nu este încuiat în %s."
-
-#, c-format
-msgid "%c%c%s has been unlocked from %s."
-msgstr "%c%c%s a fost descuiat din %s."
+msgstr "%c este un mod de stare necunoscut."
 
 #, c-format
 msgid "%d access entries from %s have been cloned to %s."
@@ -904,12 +916,20 @@ msgid "%s (%s) was last seen quitting (%s) %s ago (%s)."
 msgstr "%s (%s) a fost văzut(ă) ultima dată plecând din rețea (%s) acum %s (%s)."
 
 #, c-format
+msgid "%s (ID: %zu)"
+msgstr "%s (Identificator: %zu)"
+
+#, c-format
 msgid "%s (minimum %d/%d%%)"
 msgstr "%s (minim %d/%d%%)"
 
 #, c-format
 msgid "%s (now)"
 msgstr "%s (acum)"
+
+#, c-format
+msgid "%s [Invalid]"
+msgstr "%s [Invalid]"
 
 #, c-format
 msgid "%s access list is empty."
@@ -934,6 +954,10 @@ msgstr "Lista de cuvinte nepotrivite aparținând %s este goală."
 #, c-format
 msgid "%s can no longer be added to channel access lists."
 msgstr "%s nu mai poate fi adăugat(ă) în listele de acces ale canalelor."
+
+#, c-format
+msgid "%s can not be locked on %s."
+msgstr "%s nu poate fi încuiat în %s."
 
 #, c-format
 msgid "%s can now be added to channel access lists."
@@ -980,6 +1004,10 @@ msgid "%s currently has no memos."
 msgstr "%s nu are momentan nicio misivă."
 
 #, c-format
+msgid "%s currently has too many memos and cannot receive more."
+msgstr "%s are în prezent prea multe misive și nu mai poate primi altele."
+
+#, c-format
 msgid "%s deleted from the %s forbid list."
 msgstr "%s a fost înlăturat(ă) din lista de interziceri %s."
 
@@ -994,6 +1022,14 @@ msgstr "%s pentru %s a fost de-setat."
 #, c-format
 msgid "%s had an invalid key specified, and was thus ignored."
 msgstr "%s a avut specificată o cheie invalidă, prin urmare a fost ignorată."
+
+#, c-format
+msgid "%s has been locked on %s."
+msgstr "%s a fost descuiat din %s."
+
+#, c-format
+msgid "%s has been unlocked from %s."
+msgstr "%s a fost descuiat din %s."
 
 #, c-format
 msgid "%s has no memo limit."
@@ -1022,6 +1058,10 @@ msgstr "%s este deja acoperit(ă) de %s."
 #, c-format
 msgid "%s is already on %s's auto join list."
 msgstr "%s se află deja în lista de alăturări automate aparținând %s."
+
+#, c-format
+msgid "%s is an invalid host offer entry number."
+msgstr "%s este un număr de intrare invalid pentru oferta de gazdă."
 
 #, c-format
 msgid "%s is an unconfirmed nickname."
@@ -1074,6 +1114,10 @@ msgid "%s is not a valid logging method."
 msgstr "%s nu este o metodă de jurnalizare validă."
 
 #, c-format
+msgid "%s is not locked on %s."
+msgstr "%s nu este încuiat în %s."
+
+#, c-format
 msgid "%s is not notified of new memos."
 msgstr "%s nu este notificat(ă) despre noile misive."
 
@@ -1098,16 +1142,16 @@ msgid "%s list is empty."
 msgstr "Lista de %s este goală."
 
 #, c-format
-msgid "%s locked on %s."
-msgstr "%s este încuiat pentru %s."
-
-#, c-format
 msgid "%s not found."
 msgstr "%s nu a fost găsit(ă)."
 
 #, c-format
 msgid "%s settings:"
 msgstr "Setările %s sunt după cum urmează:"
+
+#, c-format
+msgid "%s syntax is invalid."
+msgstr "Sintaxa %s este invalidă"
 
 #, c-format
 msgid "%s was not found on %s's auto join list."
@@ -1120,6 +1164,14 @@ msgstr "%s a fost înlăturat(ă) din lista de alăturări automate aparținând
 #, c-format
 msgid "%s will not send you any notification of memos."
 msgstr "%s nu vă va expedia nicio notificare despre misive."
+
+#, c-format
+msgid "%s will now be automatically logged in when they connect using a known SSL certificate."
+msgstr "%s va fi autentificat(ă) automat atunci când se conectează utilizând un certificat SSL cunoscut."
+
+#, c-format
+msgid "%s will now not be automatically logged in when they connect using a known SSL certificate."
+msgstr "%s nu va fi autentificat(ă) automat atunci când se conectează utilizând un certificat SSL cunoscut."
 
 #, c-format
 msgid "%s will now notify you of memos when they are sent to you."
@@ -1222,9 +1274,6 @@ msgstr ", dar %s s-a dematerializat în mod misterios."
 msgid ". %s is still online."
 msgstr ". %s este încă online."
 
-msgid "<unknown>"
-msgstr "<necunoscut>"
-
 msgid "@nickname"
 msgstr "@pseudonim"
 
@@ -1257,6 +1306,9 @@ msgstr "ADD expirare {pseudonim|mască} [motiv]"
 msgid "ADD message"
 msgstr "ADD mesaj"
 
+msgid "ADD nickname fingerprint"
+msgstr "ADD pseudonim amprentă-digitală"
+
 msgid "ADD oper type"
 msgstr "ADD Operator tip"
 
@@ -1269,11 +1321,11 @@ msgstr "ADD text"
 msgid "ADD [+expiry] mask limit reason"
 msgstr "ADD [+expirare] mască limită motiv"
 
+msgid "ADD [nickname fingerprint]"
+msgstr "ADD [pseudonim amprentă-digitală]"
+
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [pseudonim] canal [cheie]"
-
-msgid "ADD [nickname] [fingerprint]"
-msgstr "ADD [pseudonim] [amprentă-digitală]"
 
 msgid "ADD [+expiry] mask reason"
 msgstr "ADD [+expirare] mască motiv"
@@ -1281,8 +1333,11 @@ msgstr "ADD [+expirare] mască motiv"
 msgid "ADD [+expiry] mask:reason"
 msgstr "ADD [+expirare] mască:motiv"
 
-msgid "ADD {NICK|CHAN|EMAIL|REGISTER} [+expiry] entry reason"
-msgstr "ADD {NICK|CHAN|EMAIL|REGISTER} [+expirare] intrare motiv"
+msgid "ADD [+expiry] vhost [reason]"
+msgstr "ADD [+expirare] mască [motiv]"
+
+msgid "ADD {CHAN|EMAIL|NICK|PASSWORD|REGISTER} [+expiry] entry reason"
+msgstr "ADD {CHAN|EMAIL|NICK|PASSWORD|REGISTER} [+expirare] intrare motiv"
 
 msgid "ADDIP server.name ip"
 msgstr "ADDIP nume.server ip"
@@ -1348,9 +1403,6 @@ msgstr "Contul %s a atins deja numărul maxim de identificări simultane (%u).
 
 msgid "Account registered"
 msgstr "Cont înregistrat"
-
-msgid "Accounts can not be registered right now. Please try again later."
-msgstr "Nu pot fi înregistrate conturi în acest moment. Vă rugăm încercați mai târziu."
 
 #, c-format
 msgid "Accounts that are not used anymore are subject to the automatic expiration, i.e. they will be deleted after %s if not used."
@@ -1425,8 +1477,17 @@ msgid "Additionally, Services Operators with the nickserv/resend permission ca
 msgstr "În plus, Operatorii de Servicii cu permisiunea nickserv/resend pot specifica un pseudonim pentru a retrimite un mesaj email de confirmare pentru un alt cont."
 
 #, c-format
-msgid "Additionally, if fantasy is enabled fantasy commands can be executed by prefixing the command name with one of the following characters: %s"
-msgstr "În plus, dacă este activată fantezia, comenzile fanteziste pot fi executate prin prefixarea numelui comenzii cu unul dintre următoarele caractere: %s"
+msgid "Additionally, if fantasy is enabled fantasy commands can be executed by prefixing the command name with one of the following fantasy prefixes: %s"
+msgstr "În plus, dacă este activată fantezia, comenzile fanteziste pot fi executate prin prefixarea numelui comenzii cu unul dintre următoarele prefixe de fantezie: %s"
+
+msgid "Adds a mode lock on the moderated, no external messages, topic lock flag modes as well as a ban on *!*@*.example.com."
+msgstr "Adaugă o încuiere de mod pentru modurile moderat, fără mesaje externe, încuierea subiectului, precum și o blocare pentru *!*@*.exemplu.ro."
+
+msgid "Adds the specified fingerprint to the certificate list of nickname."
+msgstr "Adaugă amprenta digitală specificată la lista de certificate a pseudonimului."
+
+msgid "Adds your current fingerprint to your certificate list."
+msgstr "Adaugă amprenta digitală curentă la lista de certificate a dumneavoastră."
 
 #, c-format
 msgid "All O:lines of %s have been reset."
@@ -1459,8 +1520,15 @@ msgstr "Toate misivele pentru canalul %s au fost șterse."
 msgid "All modes cleared on %s."
 msgstr "Toate modurile au fost golite în canalul %s."
 
-msgid "All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."
-msgstr "Toate conturile noi trebuie să fie validate manual de un administrator. Vă rugăm așteptați confirmarea înregistrării dumneavoastră."
+msgid "All new accounts must be confirmed by an administrator. Please wait for your registration to be confirmed."
+msgstr "Toate conturile noi trebuie să fie confirmate de un administrator. Vă rugăm așteptați confirmarea înregistrării dumneavoastră."
+
+msgid "All new accounts must be confirmed. To confirm your account, follow the instructions that were emailed to you."
+msgstr "Toate conturile noi trebuie să fie confirmate. Pentru a confirma contul dumneavoastră, urmați instrucțiunile care v-au fost trimise prin email."
+
+#, c-format
+msgid "All new accounts must be confirmed. To confirm your account, type %s."
+msgstr "Toate conturile noi trebuie să fie confirmate. Pentru a confirma contul dumneavoastră, tastați %s."
 
 msgid "All of your memos have been deleted."
 msgstr "Toate misivele dumneavoastră au fost șterse."
@@ -1575,7 +1643,7 @@ msgid "Allowed to view the access list"
 msgstr "Permite a vizualiza lista de accese"
 
 msgid "Allows Services Operators to change modes for any channel. Parameters are the same as for the standard /MODE command. Alternatively, CLEAR may be given to clear all modes on the channel. If CLEARALL is given then all modes, including user status, is removed."
-msgstr "Permite Operatorilor de Servicii să schimbe moduri pentru orice canal. Parametrii sunt aceiași ca și pentru comanda standard /MODE. Alternativ, se poate da CLEAR pentru a goli toate modurile din canal. Dacă se dă CLEARALL, atunci toate modurile, inclusiv statutul utilizatorului, sunt înlăturate."
+msgstr "Permite Operatorilor de Servicii să schimbe moduri pentru orice canal. Parametrii sunt aceiași ca și pentru comanda standard /MODE. Alternativ, se poate da CLEAR pentru a goli toate modurile din canal. Dacă se dă CLEARALL, atunci toate modurile, inclusiv starea utilizatorului, sunt înlăturate."
 
 msgid "Allows Services Operators to change modes for any user. Parameters are the same as for the standard /MODE command."
 msgstr "Permite Operatorilor de Servicii să schimbe moduri pentru orice utilizator. Parametrii sunt aceiași ca și pentru comanda standard /MODE."
@@ -1756,16 +1824,8 @@ msgstr ""
 msgid "Allows you to change and view Services Operators. Note that operators removed by this command but are still set in the configuration file are not permanently affected by this."
 msgstr "Vă permite să schimbați și să vizualizați Operatorii de Servicii. Rețineți că Operatorii înlăturați de această comandă, dar care se află încă setați în fișierul de configurare, nu sunt afectați permanent de aceasta."
 
-msgid ""
-"Allows you to change and view configuration settings. Settings changed by this command are temporary and will not be reflected back into the configuration file, and will be lost if Anope is shut down, restarted, or the configuration is reloaded.\n"
-"\n"
-"Example:\n"
-"     MODIFYnickservregdelay15m"
-msgstr ""
-"Vă permite să modificați și să vizualizați setările de configurare. Setările schimbate prin această comandă sunt temporare și nu se vor reflecta în fișierul de configurare. Aceste modificări vor fi pierdute dacă Anope este oprit, repornit, ori dacă se reîncarcă configurarea.\n"
-"\n"
-"Exemplu:\n"
-"     MODIFYnickservregdelay15m"
+msgid "Allows you to change and view configuration settings. Settings changed by this command are temporary and will not be reflected back into the configuration file, and will be lost if Anope is shut down, restarted, or the configuration is reloaded."
+msgstr "Vă permite să modificați și să vizualizați setările de configurare. Setările schimbate prin această comandă sunt temporare și nu se vor reflecta în fișierul de configurare. Aceste modificări vor fi pierdute dacă Anope este oprit, repornit, ori dacă se reîncarcă configurarea."
 
 msgid "Allows you to choose the way services are communicating with the given user. With MSG set, services will use messages, else they'll use notices."
 msgstr "Vă permite să alegeți metoda prin care serviciile comunică cu utilizatorul precizat. Cu MSG setat, serviciile vor folosi mesaje, altfel vor folosi notificări."
@@ -1782,11 +1842,11 @@ msgstr "Vă permite să deconectați un utilizator din rețea. Parametrii sunt a
 
 #, c-format
 msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on the nick. You can hide the email address (EMAIL), last seen user@host mask (MASK), the services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
-msgstr "Vă permite să împiedicați afișarea anumitor informații atunci când cineva utilizează %sINFO asupra pseudonimului. Puteți ascunde adresa de email (EMAIL), ultima mască utilizator@gazdă văzută (MASK), statutul accesului la servicii (STATUS) și ultimul mesaj de plecare din rețea (QUIT). Al doilea parametru specifică dacă informațiile ar trebui afișate (OFF) sau ascunse (ON)."
+msgstr "Vă permite să împiedicați afișarea anumitor informații atunci când cineva utilizează %sINFO asupra pseudonimului. Puteți ascunde adresa de email (EMAIL), ultima mască utilizator@gazdă văzută (MASK), starea accesului la servicii (STATUS) și ultimul mesaj de plecare din rețea (QUIT). Al doilea parametru specifică dacă informațiile ar trebui afișate (OFF) sau ascunse (ON)."
 
 #, c-format
 msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on your nick. You can hide your email address(EMAIL), last seen user@host mask (MASK), your services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
-msgstr "Vă permite să împiedicați afișarea anumitor informații atunci când cineva utilizează %sINFO asupra pseudonimului dumneavoastră. Vă puteți ascunde adresa de email (EMAIL), ultima mască utilizator@gazdă văzută (MASK), statutul accesului la servicii (STATUS) și ultimul mesaj de plecare din rețea (QUIT). Al doilea parametru specifică dacă informațiile ar trebui afișate (OFF) sau ascunse (ON)."
+msgstr "Vă permite să împiedicați afișarea anumitor informații atunci când cineva utilizează %sINFO asupra pseudonimului dumneavoastră. Vă puteți ascunde adresa de email(EMAIL), ultima mască utilizator@gazdă văzută (MASK), starea accesului la servicii (STATUS) și ultimul mesaj de plecare din rețea (QUIT). Al doilea parametru specifică dacă informațiile ar trebui afișate (OFF) sau ascunse (ON)."
 
 #, c-format
 msgid "Allows you to see %s information about a channel or a bot"
@@ -1822,9 +1882,6 @@ msgstr "Atribuie o pagină web contului dumneavoastră"
 
 msgid "Associate a greet message with your nickname"
 msgstr "Atribuie un mesaj de întâmpinare pseudonimului dumneavoastră"
-
-msgid "Associate an email address with the channel"
-msgstr "Atribuie o adresă de email unui canal"
 
 msgid "Associate an email address with your nickname"
 msgstr "Atribuie o adresă de email pseudonimului dumneavoastră"
@@ -2139,11 +2196,13 @@ msgstr "Schimbă pseudonimul de afișare folosit pentru a face refire la contul 
 msgid "Changes the founder of a channel. The new nickname must be a registered one."
 msgstr "Schimbă fondatorul unui canal. Noul pseudonim trebuie să fie unul înregistrat."
 
-msgid "Changes the language services uses when sending messages to the given user (for example, when responding to a command they send). language should be chosen from the following list of supported languages:"
-msgstr "Schimbă limba folosită de servicii pentru a trimite mesaje către utilizatorul precizat (spre exemplu, când li se răspunde unei comenzi). Limba ar trebui să fie aleasă din următoarea listă de limbi acceptate, după cum urmează:"
+#, c-format
+msgid "Changes the language services uses when sending messages to the given user (for example, when responding to a command they send). If language is not specified the default (%s) will be used. Otherwise, language should be chosen from the following list of supported languages:"
+msgstr "Schimbă limba folosită de servicii pentru a trimite mesaje către utilizatorul precizat (spre exemplu, când li se răspunde unei comenzi). Dacă limba nu este specificată, va fi utilizată valoarea implicită (%s). În caz contrar limba ar trebui să fie aleasă din următoarea listă de limbi acceptate după cum urmează:"
 
-msgid "Changes the language services uses when sending messages to you (for example, when responding to a command you send). language should be chosen from the following list of supported languages:"
-msgstr "Schimbă limba folosită de servicii pentru a vă trimite mesaje dumneavoastră (spre exemplu, când vi se răspunde unei comenzi). Limba ar trebui să fie aleasă din următoarea listă de limbi acceptate, după cum urmează:"
+#, c-format
+msgid "Changes the language services uses when sending messages to you (for example, when responding to a command you send). If language is not specified the default (%s) will be used. Otherwise, language should be chosen from the following list of supported languages:"
+msgstr "Schimbă limba folosită de servicii pentru a vă trimite mesaje dumneavoastră (spre exemplu, când vi se răspunde unei comenzi). Dacă limba nu este specificată, va fi utilizată valoarea implicită (%s). În caz contrar limba ar trebui să fie aleasă din următoarea listă de limbi acceptate după cum urmează:"
 
 msgid "Changes the password used to identify as the nick's owner."
 msgstr "Schimbă parola folosită pentru identificarea drept proprietar(ă) a pseudonimului."
@@ -2151,14 +2210,17 @@ msgstr "Schimbă parola folosită pentru identificarea drept proprietar(ă) a ps
 msgid "Changes the password used to identify you as the nick's owner."
 msgstr "Schimbă parola folosită pentru a vă identifica drept proprietar(ă) a pseudonimului."
 
+msgid "Changes the registration delay to 15 minutes."
+msgstr "Modifică întârzierea înregistrării la 15 minute."
+
 msgid "Changes the successor of a channel. If the founder's nickname expires or is dropped while the channel is still registered, the successor will become the new founder of the channel. The successor's nickname must be a registered one. If there's no successor set, then the first nickname on the access list (with the highest access, if applicable) will become the new founder, but if the access list is empty, the channel will be dropped."
 msgstr "Schimbă succesorul unui canal. Dacă pseudonimul fondatorului expiră sau este radiat în timp ce canalul este încă înregistrat, succesorul va deveni noul fondator al canalului. Pseudonimul succesorului trebuie să fie unul înregistrat. Dacă nu este stabilit un succesor, atunci primul pseudonim din lista de accese (cu cel mai mare acces, dacă este cazul) va deveni noul fondator, dar dacă lista de accese este goală, atunci canalul va fi radiat."
 
-msgid "Changes the timezone services uses when sending messages to the given user (for example, when responding to a command they send). timezone should be chosen from an entry in one of the supported timezone regions:"
-msgstr "Schimbă fusul orar pe care îl folosesc serviciile atunci când trimit mesaje către utilizatorul precizat (de exemplu, când se răspunde la o comandă primită). Fusul orar trebuie ales dintr-una dintre regiunile de fus orar acceptate după cum urmează:"
+msgid "Changes the timezone services uses when sending messages to the given user (for example, when responding to a command they send). If timezone is not specified the default (UTC) will be used. Otherwise, timezone should be chosen from an entry in one of the supported timezone regions:"
+msgstr "Schimbă fusul orar pe care îl folosesc serviciile atunci când trimit mesaje către utilizatorul precizat (de exemplu, când li se răspunde la o comandă). Dacă nu este specificat un fus orar, se va utiliza ora implicită (UTC). În caz contrar, fusul orar trebuie ales dintr-una dintre regiunile de fus orar acceptate după cum urmează:"
 
-msgid "Changes the timezone services uses when sending messages to you (for example, when responding to a command you send). timezone should be chosen from an entry in one of the supported timezone regions:"
-msgstr "Schimbă fusul orar pe care îl folosesc serviciile atunci când vă trimit mesaje dumneavoastră (de exemplu, când vi se răspunde la o comandă). Fusul orar trebuie ales dintr-una dintre regiunile de fus orar acceptate după cum urmează:"
+msgid "Changes the timezone services uses when sending messages to you (for example, when responding to a command you send). If timezone is not specified the default (UTC) will be used. Otherwise, timezone should be chosen from an entry in one of the supported timezone regions:"
+msgstr "Schimbă fusul orar pe care îl folosesc serviciile atunci când vă trimit mesaje dumneavoastră (de exemplu, când vi se răspunde la o comandă). Dacă nu este specificat un fus orar, se va utiliza ora implicită (UTC). În caz contrar, fusul orar trebuie ales dintr-una dintre regiunile de fus orar acceptate după cum urmează:"
 
 msgid "Changes when you will be notified about new memos (only for nicknames)"
 msgstr "Schimbă momentele când veți fi notificat(ă) despre noile misive (doar pentru pseudonime)"
@@ -2311,6 +2373,9 @@ msgstr "Verifică dacă _ultima_ misivă expediată pseudonimului a fost citit
 #, c-format
 msgid "Cleared info from %s."
 msgstr "Informațiile din %s au fost golite."
+
+msgid "Clears all extended bans that start with channel:."
+msgstr "Curăță toate blocările extinse care pornesc cu canalul:"
 
 msgid "Colors kicker"
 msgstr "Izgonire la culori"
@@ -2482,7 +2547,10 @@ msgid "Current AKILL list:"
 msgstr "Lista AKILL curentă este după cum urmează:"
 
 msgid "Current Session Limit Exception list:"
-msgstr "Lista de excepții curentă privind limita de sesiuni este după cum urmează:"
+msgstr "Lista curentă de excepții privind limita de sesiuni este după cum urmează:"
+
+msgid "Current host offer list:"
+msgstr "Lista curentă de oferte pentru gazde este după cum urmează:"
 
 msgid "Current module list:"
 msgstr "Lista curentă de module este după cum urmează:"
@@ -2506,6 +2574,12 @@ msgstr "Utilizatori curenți: %zu (%zu operatori)"
 msgid "DEL entry-num"
 msgstr "DEL număr-intrare"
 
+msgid "DEL fingerprint"
+msgstr "DEL amprentă-digitală"
+
+msgid "DEL nickname fingerprint"
+msgstr "DEL pseudonim amprentă-digitală"
+
 msgid "DEL oper"
 msgstr "DEL Operator"
 
@@ -2519,7 +2593,7 @@ msgid "DEL [nickname] fingerprint"
 msgstr "DEL [pseudonim] amprentă-digitală"
 
 msgid "DEL {mask | entry-num | list | id}"
-msgstr "DEL {mască | număr-intrare | listă | id}"
+msgstr "DEL {mască | număr-intrare | listă | identificator}"
 
 msgid "DEL {mask | entry-num | list}"
 msgstr "DEL {mască | număr-intrare | listă}"
@@ -2530,8 +2604,11 @@ msgstr "DEL {pseudonim|mască}"
 msgid "DEL {num | ALL}"
 msgstr "DEL {număr | ALL}"
 
-msgid "DEL {NICK|CHAN|EMAIL|REGISTER} entry"
-msgstr "DEL {NICK|CHAN|EMAIL|REGISTER} intrare"
+msgid "DEL {vhost | entry-num | list}"
+msgstr "DEL {gazdă-virtuală | număr-intrare | listă}"
+
+msgid "DEL {CHAN|EMAIL|NICK|PASSWORD|REGISTER} entry"
+msgstr "DEL {CHAN|EMAIL|NICK|PASSWORD|REGISTER} intrare"
 
 msgid "DELIP server.name ip"
 msgstr "DELIP nume.server ip"
@@ -2716,43 +2793,33 @@ msgid "Deleted %s from the AKILL list."
 msgstr "A fost înlăturat(ă) %s din lista AKILL."
 
 #, c-format
+msgid "Deleted %s from the host offer list."
+msgstr "A fost înlăturat(ă) %s din lista de oferte pentru gazde."
+
+#, c-format
 msgid "Deleted %u entry from your message queue."
 msgid_plural "Deleted %u entries from your message queue."
 msgstr[0] "%u intrare a fost ștearsă din coada de mesaje."
 msgstr[1] "%u intrări au fost șterse din coada de mesaje."
 
 #, c-format
+msgid "Deleted %zu entry from the host offer list."
+msgid_plural "Deleted %zu entries from the host offer list."
+msgstr[0] "%zu intrare a fost înlăturată din lista de oferte pentru gazde."
+msgstr[1] "%zu intrări au fost înlăturate din lista de oferte pentru gazde."
+
+#, c-format
 msgid "Deleted info from %s."
 msgstr "Informațiile din %s au fost șterse."
 
-msgid ""
-"Deletes the specified memo or memos. You can supply multiple memo numbers or ranges of numbers instead of a single number, as in the second example below.\n"
-"\n"
-"If LAST is given, the last memo will be deleted.\n"
-"\n"
-"If ALL is given, deletes all of your memos.\n"
-"\n"
-"Examples:\n"
-"\n"
-"   DEL1\n"
-"      Deletes your first memo.\n"
-"\n"
-"   DEL2-5,7-9\n"
-"      Deletes memos numbered 2 through 5 and 7 through 9."
-msgstr ""
-"Șterge misiva sau misivele specificate. Puteți furniza mai multe numere de misive, sau intervale de numere în loc de un singur număr, ca în al doilea exemplu de mai jos.\n"
-"\n"
-"Dacă LAST este specificat, atunci ultima misivă este ștearsă.\n"
-"\n"
-"Dacă ALL este specificat, atunci sunt șterse toate misivele.\n"
-"\n"
-"Exemple:\n"
-"\n"
-"   DEL1\n"
-"      Șterge prima misivă a dumneavoastră.\n"
-"\n"
-"   DEL2-5,7-9\n"
-"      Șterge misivele numerotate de la 2 la 5 și de la 7 la 9."
+msgid "Deletes all of your memos."
+msgstr "Șterge toate misivele dumneavoastră."
+
+msgid "Deletes memos numbered 2 through 5 and 7 through 9."
+msgstr "Șterge misivele numerotate de la 2 la 5 și de la 7 la 9."
+
+msgid "Deletes the specified memo or memos. You can supply multiple memo numbers or ranges of numbers instead of a single number, as in the second example below."
+msgstr "Șterge misiva sau misivele specificate. Puteți oferi mai multe numere de misive ori intervale de numere în locul unui singur număr, precum în al doilea exemplu de mai jos."
 
 msgid "Deletes the vhost assigned to the given nick from the database."
 msgstr "Șterge gazda virtuală atribuită pseudonimului precizat din baza de date."
@@ -2762,6 +2829,12 @@ msgstr "Șterge gazda virtuală pentru toate pseudonimele dintr-un cont"
 
 msgid "Deletes the vhost for all nicks in the same account as that of the given nick."
 msgstr "Șterge gazda virtuală pentru toate pseudonimele din același cont cu cel al pseudonimului precizat."
+
+msgid "Deletes your first memo."
+msgstr "Șterge prima misivă a dumneavoastră."
+
+msgid "Deletes your last memo."
+msgstr "Șterge ultima misiva a dumneavoastră."
 
 #, c-format
 msgid "Depooled %s."
@@ -2806,6 +2879,12 @@ msgstr "S-au afișat înregistrările de la %d la %d."
 msgid "Displayed records matching key %s (count: %d)."
 msgstr "S-au afișat înregistrările corespunzând cheii %s (număr: %d)."
 
+msgid "Displays all of your memos."
+msgstr "Afișează toate misivele dumneavoastră."
+
+msgid "Displays any new memos."
+msgstr "Afișează noile misive."
+
 msgid "Displays information about a given nickname"
 msgstr "Afișează informații despre un pseudonim specificat"
 
@@ -2815,8 +2894,17 @@ msgstr "Afișează informații despre pseudonimul specificat, cum ar fi propriet
 msgid "Displays information about your memos"
 msgstr "Afișează informații despre misivele dumneavoastră"
 
+msgid "Displays memos numbered 2 through 5 and 7 through 9."
+msgstr "Afișează misivele numerotate de la 2 la 7 și de la 7 la 9."
+
 msgid "Displays one or more vhost entries"
 msgstr "Afișează una sau mai multe intrări de gazde virtuale"
+
+msgid "Displays the current certificate list of nickname as well as the details about who added each entry and when they added it."
+msgstr "Afișează lista curentă de certificate a pseudonimului precum și detalii despre cine a adăugat fiecare intrare și când a adăugat-o."
+
+msgid "Displays the current certificate list of nickname."
+msgstr "Afișează lista curentă de certificate a pseudonimului."
 
 msgid "Displays the top 10 users of a channel"
 msgstr "Afișează top 10 utilizatori ai unui canal"
@@ -2838,6 +2926,15 @@ msgstr "Afișează statisticile canalului dumneavoastră"
 
 msgid "Displays your Global Stats"
 msgstr "Afișează statisticile globale ale dumneavoastră"
+
+msgid "Displays your current certificate list as well the details about who added each entry and when they added it."
+msgstr "Afișează certificatul curent al dumneavoastră precum și detalii despre cine a adăugat fiecare intrare și când a adăugat-o."
+
+msgid "Displays your current certificate list."
+msgstr "Afișează lista de certificate curente ale dumneavoastră."
+
+msgid "Displays your last memo."
+msgstr "Afișează ultima misivă a dumneavoastră."
 
 msgid "Don't use AMSGs!"
 msgstr "Nu folosiți AMSG!"
@@ -2908,11 +3005,11 @@ msgstr "Activat"
 
 #, c-format
 msgid ""
-"Enables or disables fantasy mode on a channel. When it is enabled, users will be able to use fantasy commands on a channel when prefixed with one of the following fantasy characters: %s\n"
+"Enables or disables fantasy mode on a channel. When it is enabled, users will be able to use fantasy commands on a channel when prefixed with one of the following fantasy prefixes: %s\n"
 "\n"
 "Note that users wanting to use fantasy commands MUST have enough access for both the FANTASY privilege and the command they are executing."
 msgstr ""
-"Activează sau dezactivează modul fantezie într-un canal. Când acesta este activat, utilizatorii vor putea folosi comenzile fanteziste într-un canal, atunci când au ca prefix unul dintre următoarele caractere de fantezie: %s\n"
+"Activează sau dezactivează modul fantezie într-un canal. Când acesta este activat, utilizatorii vor putea folosi comenzile fanteziste într-un canal, atunci când au ca prefix unul dintre următoarele prefixe de fantezie: %s\n"
 "\n"
 "Rețineți că utilizatorii care doresc să utilizeze comenzile fanteziste TREBUIE să aibă acces suficient atât pentru privilegiul FANTASY, cât și pentru comanda pe care o execută."
 
@@ -2927,7 +3024,7 @@ msgstr "Activează sau dezactivează modul de protecție voce într-un canal. 
 
 #, c-format
 msgid "Enables or disables %s's autoop feature for a channel. When disabled, users who join the channel will not automatically gain any status from %s."
-msgstr "Activează sau dezactivează operarea automată de către %s într-un canal. Când este dezactivată, utilizatorii care se alătură canalului nu vor obține automat niciun statut de la %s."
+msgstr "Activează sau dezactivează operarea automată de către %s într-un canal. Când este dezactivată, utilizatorii care se alătură canalului nu vor obține automat nicio stare de la %s."
 
 msgid "Enables or disables keepmodes for the given channel. If keep modes is enabled, services will remember modes set on the channel and attempt to re-set them the next time the channel is created."
 msgstr "Activează sau dezactivează păstrarea modurilor pentru canalul precizat. Dacă este activată opțiunea de păstrare a modurilor, serviciile vor reține modurile setate în canal și vor încerca să le reașeze data viitoare când canalul este creat."
@@ -2949,7 +3046,7 @@ msgstr ""
 
 #, c-format
 msgid "Enables or disables the peace option for a channel. When peace is set, a user won't be able to kick, ban or remove a channel status of a user that has a level superior or equal to theirs via %s commands."
-msgstr "Activează sau dezactivează opțiunea de pace într-un canal. Când opțiunea de pace este activă, un utilizator nu va putea izgoni, bloca sau înlătura statutul în canal al altui utilizator care are un nivel superior sau egal cu al său prin comenzile %s."
+msgstr "Activează sau dezactivează opțiunea de pace într-un canal. Când opțiunea de pace este activă, un utilizator nu va putea izgoni, bloca sau înlătura starea în canal a altui utilizator care are un nivel superior sau egal cu al său prin comenzile %s."
 
 msgid "Enables or disables the private option for a channel."
 msgstr "Activează sau dezactivează opțiunea de privat într-un canal."
@@ -2961,7 +3058,7 @@ msgid "Enables or disables the secure founder option for a channel. When secu
 msgstr "Activează sau dezactivează opțiunea de fondator securizat într-un canal. Când opțiunea de fondator securizat este activă, doar fondatorul real va avea dreptul să radieze canalul, să schimbe fondatorul și succesorul acestuia; dar nu și cei care au acces la nivel de fondator prin comanda acces/qop."
 
 msgid "Enables or disables the secure ops option for a channel. When secure ops is set, users who are not on the access list will not be allowed channel operator status."
-msgstr "Activează sau dezactivează opțiunea de operator securizat într-un canal. Când opțiunea de operator securizat este activă, utilizatorii care nu se află în lista de accese nu vor putea avea statut de operator în canal."
+msgstr "Activează sau dezactivează opțiunea de operator securizat într-un canal. Când opțiunea de operator securizat este activă, utilizatorii care nu se află în lista de accese nu vor putea avea starea de operator în canal."
 
 #, c-format
 msgid "Enables or disables the topic retention option for a channel. When %s is set, the topic for the channel will be remembered by %s even after the last user leaves the channel, and will be restored the next time the channel is created."
@@ -3020,6 +3117,9 @@ msgstr "Sfârșitul listei de interziceri - %zu/%zu intrări afișate."
 
 msgid "End of forbid list."
 msgstr "Sfârșitul listei de interziceri."
+
+msgid "End of host offer list."
+msgstr "Sfârșitul listei de oferte pentru gazde."
 
 #, c-format
 msgid "End of list - %d channels shown."
@@ -3087,6 +3187,9 @@ msgstr "Eroare! Gazda virtuală este prea lungă, vă rugăm să utilizați un n
 msgid "Error! The vident is too long, please use an ident shorter than %zu characters."
 msgstr "Eroare! Identitatea virtuală este prea lungă, vă rugăm utilizați o identitate mai scurtă de %zu caractere."
 
+msgid "Examples:"
+msgstr "Exemple:"
+
 #, c-format
 msgid "Exception for %s has been updated to %d."
 msgstr "Excepția pentru %s a fost actualizată la %d."
@@ -3106,8 +3209,8 @@ msgid "Fantasy"
 msgstr "Fantezie"
 
 #, c-format
-msgid "Fantasy commands may be prefixed with one of the following characters: %s"
-msgstr "Comenzile fanteziste pot avea ca prefix unul dintre următoarele caractere: %s"
+msgid "Fantasy commands may be prefixed with one of the following fantasy prefixes: %s"
+msgstr "Comenzile fanteziste pot avea ca prefix unul dintre următoarele prefixe de fantezie: %s"
 
 #, c-format
 msgid "Fantasy mode is now off on channel %s."
@@ -3118,7 +3221,10 @@ msgid "Fantasy mode is now on on channel %s."
 msgstr "Modul fantezie este acum activat în canalul %s."
 
 msgid "Find a user's status on a channel"
-msgstr "Află statutul unui utilizator într-un canal"
+msgstr "Află starea unui utilizator într-un canal"
+
+msgid "Fingerprint"
+msgstr "Amprentă digitală"
 
 #, c-format
 msgid "Fingerprint %s already present on %s's certificate list."
@@ -3156,6 +3262,10 @@ msgstr "Lista de interziceri este goală."
 
 msgid "Forbid list:"
 msgstr "Lista de interziceri este după cum urmează:"
+
+#, c-format
+msgid "Forbid on %s can not be removed as it is from a file."
+msgstr "Interzicerea pentru %s nu poate fi înlăturată deoarece provine dintr-un fișier."
 
 #, c-format
 msgid "Forbid on %s was not found."
@@ -3197,11 +3307,11 @@ msgstr "Utilizatorul fantomă folosind pseudonimul dumneavoastră a fost deconec
 
 #, c-format
 msgid "Gives %s status to the selected nicks on a channel. If nick is not given, it will %s you."
-msgstr "Oferă statutul de %s pseudonimului selectat într-un canal. Dacă pseudonimul nu este precizat, atunci veți primi dumneavoastră statutul de %s."
+msgstr "Oferă starea de %s pseudonimului selectat într-un canal. Dacă pseudonimul nu este precizat, atunci veți primi dumneavoastră starea de %s."
 
 #, c-format
 msgid "Gives you or the specified nick %s status on a channel"
-msgstr "Vă oferă dumneavoastră sau pseudonimului specificat statutul de %s într-un canal"
+msgstr "Vă oferă dumneavoastră sau pseudonimului specificat starea de %s într-un canal"
 
 msgid "Greet"
 msgstr "Întâmpinare"
@@ -3238,11 +3348,25 @@ msgid "Host"
 msgstr "Gazdă"
 
 #, c-format
+msgid "Host offer %s already exists."
+msgstr "Oferta de gazdă %s există deja."
+
+msgid "Host offer list has been cleared."
+msgstr "Lista de oferte pentru gazdă a fost golită."
+
+msgid "Host offer list is empty."
+msgstr "Lista de oferte pentru gazde este goală."
+
+#, c-format
 msgid "Hosts with at least %d sessions:"
 msgstr "Gazdele cu cel puțin %d sesiuni sunt după cum urmează:"
 
+#, c-format
+msgid "I have not seen %s."
+msgstr "Nu am văzut pe %s."
+
 msgid "ID"
-msgstr "ID"
+msgstr "Identificator"
 
 msgid "INFO [type]"
 msgstr "INFO [tip]"
@@ -3365,17 +3489,23 @@ msgstr "LIMIT impus de "
 msgid "LIMIT enforced on %s, %zu users removed."
 msgstr "LIMIT impus pentru %s, %zu utilizatori înlăturați."
 
+msgid "LIST nickname"
+msgstr "LIST pseudonim"
+
 msgid "LIST threshold"
 msgstr "LIST de prag"
 
 msgid "LIST [mask | list | id]"
-msgstr "LIST [mască | listă | id]"
+msgstr "LIST [mască | listă | identificator]"
 
 msgid "LIST [mask | list]"
 msgstr "LIST [mască | listă]"
 
 msgid "LIST [nickname]"
 msgstr "LIST [pseudonim]"
+
+msgid "LIST [vhost-mask | entry-num | list]"
+msgstr "LIST [mască-virtuală | număr-intrare | listă]"
 
 #, c-format
 msgid "Language changed to %s."
@@ -3384,9 +3514,6 @@ msgstr "Limba a fost schimbată în %s."
 #, c-format
 msgid "Language for %s changed to %s."
 msgstr "Limba pentru %s a fost schimbată în %s."
-
-msgid "Last mask"
-msgstr "Ultima mască"
 
 #, c-format
 msgid "Last memo to %s has been cancelled."
@@ -3444,8 +3571,8 @@ msgid "List channels you have access on"
 msgstr "Listează canalele la care aveți acces"
 
 #, c-format
-msgid "List for mode %c is full."
-msgstr "Lista pentru modul %c este plină."
+msgid "List for modes %s is full."
+msgstr "Lista pentru moduri %s este plină."
 
 msgid "List loaded modules"
 msgstr "Listează modulele încărcate"
@@ -3461,11 +3588,56 @@ msgstr "Lista pseudonimelor care aparțin lui %s este după cum urmează:"
 msgid "List of nicknames belonging to your account:"
 msgstr "Lista pseudonimelor aparținând contului dumneavoastră este după cum urmează:"
 
+msgid "List or take a vhost from the host offer list"
+msgstr "Listați sau luați o gazdă virtuală din lista de oferte pentru gazde"
+
+#, c-format
+msgid ""
+"List or take an offered vhost.\n"
+"\n"
+"With no parameters, a user@host or host mask, an entry number, or a list (e.g. 1-3,5) offered vhosts will be shown. If ALL is specified vhosts that can not be taken will be labelled with [Invalid] instead of being omitted.\n"
+"The offered vhosts may contain template variables. The supported template variables are:\n"
+"  {account}  - Your current account.\n"
+"  {network}  - The name of this IRC network.\n"
+"  {nick}     - Your current nickname.\n"
+"  {regdate}  - The YYYY-MM-DD date at which your nick was registered.\n"
+"  {regepoch} - The UNIX time at which your nick was registered.\n"
+"\n"
+"With %sTAKE an offered vhost will be applied. You must specify the offered template variable or the entry number for the offered vhost you want to use. Once a vhost is taken you can not take another one for %s."
+msgstr ""
+"Listați sau luați o gazdă virtuală oferită.\n"
+"Fără parametri, fără un utilizator@gazdă sau fără masca gazdei, fără un număr de intrare ori fără o listă (de exemplu: 1-3,5), vor fi afișate gazdele virtuale oferite. Dacă se specifică ALL, gazdele virtuale care nu pot fi preluate vor fi etichetate cu [Invalid] în loc să fie omise. Gazdele virtuale oferite pot conține variabile șablon. Variabilele șablon acceptate sunt:\n"
+"  {account}  - Contul curent al dumneavoastră.\n"
+"  {network}  - Numele acestei rețele IRC.\n"
+"  {nick}     - Pseudonimul curent al dumneavoastră.\n"
+"  {regdate}  - Data AAAA-LL-ZZ la care a fost înregistrat pseudonimul dumneavoastră.\n"
+"  {regepoch} - Timpul în format UNIX la care a fost înregistrat pseudonimul dumneavoastră.\n"
+"\n"
+"Cu %sTAKE se va aplica o gazdă virtuală oferită. Trebuie să specificați variabila șablon oferită sau numărul de intrare pentru gazda virtuală oferită pe care doriți să o utilizați. Odată ce un vhost este ocupat, nu mai puteți lua altul timp de %s."
+
 msgid "List the options"
 msgstr "Listează opțiunile"
 
 msgid "List your memos"
 msgstr "Listează misivele dumneavoastră"
+
+msgid "Lists AKILL entries numbered 2 through 5 and 7 through 9."
+msgstr "Listează intrările AKILL numerotate de la 2 la 5 și de la 7 la 9."
+
+msgid "Lists SNLINE entries numbered 2 through 5 and 7 through 9."
+msgstr "Listează intrările SNLINE numerotate de la 2 la 5 și de la 7 la 9."
+
+msgid "Lists SQLINE entries numbered 2 through 5 and 7 through 9."
+msgstr "Listează intrările SQLINE numerotate de la 2 la 5 și de la 7 la 9."
+
+msgid "Lists access entries numbered 2 through 5 and 7 through 9."
+msgstr "Listează intrările de accese numerotate de la 2 la 5 și de la 7 la 9."
+
+msgid "Lists access entries on #channel numbered 2 through 5 and 7 through 9."
+msgstr "Listează intrările de accese în #canal numerotate de la 2 la 5 și de la 7 la 9."
+
+msgid "Lists access entries on #channel that match *nick*."
+msgstr "Listează intrările de accese în #canal care corespund *pseudonimului*."
 
 msgid ""
 "Lists all available bots on this network.\n"
@@ -3515,78 +3687,56 @@ msgid ""
 "\n"
 "Note that a preceding '#' specifies a range, channel names are to be written without '#'.\n"
 "\n"
-"If the SUSPENDED or NOEXPIRE options are given, only channels which, respectively, are SUSPENDED or have the NOEXPIRE flag set will be displayed. If multiple options are given, all channels matching at least one option will be displayed. Note that these options are limited to Services Operators.\n"
-"\n"
-"Examples:\n"
-"\n"
-"    LIST*anope*\n"
-"        Lists all registered channels with anope in their\n"
-"        names (case insensitive).\n"
-"\n"
-"    LIST*NOEXPIRE\n"
-"        Lists all registered channels which have been set to not expire.\n"
-"\n"
-"    LIST #51-100\n"
-"        Lists all registered channels within the given range (51-100)."
+"If the SUSPENDED or NOEXPIRE options are given, only channels which, respectively, are SUSPENDED or have the NOEXPIRE flag set will be displayed. If multiple options are given, all channels matching at least one option will be displayed. Note that these options are limited to Services Operators."
 msgstr ""
 "Listează toate canalele înregistrate care corespund modelului specificat. Canalele cu opțiunea PRIVATE setată vor fi afișate numai Operatorilor de Servicii cu acces corespunzător. Canalele cu opțiunea NOEXPIRE setată vor avea ca prefix un ! pentru ca Operatorii de Servicii să le poată vedea.\n"
 "\n"
 "Rețineți că precedarea cu '#' specifică un interval, numele canalelor trebuie scrise fără '#'.\n"
 "\n"
-"Dacă sunt precizate opțiunile SUSPENDED sau NOEXPIRE, vor fi afișate doar canalele care sunt SUSPENDED sau care au stegulețul NOEXPIRE setat. Dacă sunt specificate mai multe opțiuni, vor fi afișate toate canalele care corespund cel puțin uneia dintre opțiuni. Rețineți că aceste opțiuni sunt limitate la Operatorii de Servicii.\n"
-"\n"
-"Exemple:\n"
-"\n"
-"    LIST*anope*\n"
-"        Listează toate canalele înregistrate cu anope în numele lor (fără distincție între majuscule și minuscule).\n"
-"\n"
-"    LIST*NOEXPIRE\n"
-"        Listează toate canalele înregistrate care au fost setate să nu expire.\n"
-"\n"
-"    LIST #51-100\n"
-"        Listează toate canalele înregistrate din intervalul menționat (51-100)."
+"Dacă sunt precizate opțiunile SUSPENDED sau NOEXPIRE, vor fi afișate doar canalele care sunt SUSPENDED sau care au stegulețul NOEXPIRE setat. Dacă sunt specificate mai multe opțiuni, vor fi afișate toate canalele care corespund cel puțin uneia dintre opțiuni. Rețineți că aceste opțiuni sunt limitate la Operatorii de Servicii."
+
+msgid "Lists all registered channels that have been set to not expire."
+msgstr "Listează toate canalele înregistrate care au fost setate să nu expire."
+
+msgid "Lists all registered channels that have been suspended."
+msgstr "Listează toate canalele înregistrate care au fost suspendate."
+
+msgid "Lists all registered channels with anope in their name (case insensitive). "
+msgstr "Listează toate canalele înregistrate cu anope în numele lor (fără a ține cont de majuscule ori minuscule)."
+
+msgid "Lists all registered channels within the given range (51-100)."
+msgstr "Listează toate canalele înregistrate în intervalul menționat (51-100)."
 
 msgid ""
 "Lists all registered nicknames which match the given pattern, in nick!user@host format. Nicks with the PRIVATE option set will only be displayed to Services Operators with the proper access. Nicks with the NOEXPIRE option set will have a ! prefixed to the nickname for Services Operators to see.\n"
 "\n"
 "Note that a preceding '#' specifies a range.\n"
 "\n"
-"If the SUSPENDED, UNCONFIRMED or NOEXPIRE options are given, only nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the NOEXPIRE flag set will be displayed. If multiple options are given, all nicks matching at least one option will be displayed. Note that these options are limited to Services Operators.\n"
-"\n"
-"Examples:\n"
-"\n"
-"    LIST *!joeuser@foo.com\n"
-"        Lists all registered nicks owned by joeuser@foo.com.\n"
-"\n"
-"    LIST *Bot*!*@*\n"
-"        Lists all registered nicks with Bot in their\n"
-"        names (case insensitive).\n"
-"\n"
-"    LIST * NOEXPIRE\n"
-"        Lists all registered nicks which have been set to not expire.\n"
-"\n"
-"    LIST #51-100\n"
-"        Lists all registered nicks within the given range (51-100)."
+"If the DISPLAY, NOEXPIRE, SUSPENDED, or UNCONFIRMED options are given only nicks which, respectively, are display nicks, will not expire, are suspended, or are unconfirmed will be shown. If multiple options are given, nicks must match every option to be shown. Note that these options are limited to Services Operators."
 msgstr ""
 "Listează toate pseudonimele înregistrate care corespund modelului precizat, în formatul pseudonim!utilizator@gazdă. Pseudonimele cu opțiunea PRIVATE setată vor fi afișate doar Operatorilor de Servicii cu accesul corespunzător. Pseudonimele cu opțiunea NOEXPIRE setată vor avea ca prefix un ! pentru ca Operatorii de Servicii să le poată vedea.\n"
 "\n"
 "Rețineți că precedarea cu '#' specifică un interval.\n"
 "\n"
-"Dacă sunt precizate opțiunile SUSPENDED, UNCONFIRMED sau NOEXPIRE, vor fi afișate doar pseudonimele care sunt SUSPENDED, UNCONFIRMED sau au stegulețul NOEXPIRE setat. Dacă sunt specificate mai multe opțiuni, vor fi afișate toate pseudonimele care corespund cu cel puțin o opțiune. Rețineți că aceste opțiuni sunt limitate la Operatorii de Servicii.\n"
-"\n"
-"Exemple:\n"
-"\n"
-"    LIST *!ion@popescu.com\n"
-"        Listează toate pseudonimele înregistrate deținute de ion@popescu.com.\n"
-"\n"
-"    LIST *Bot*!*@*\n"
-"        Listează toate pseudonimele înregistrate cu Bot în numele lor (fără distincție între majuscule și minuscule).\n"
-"\n"
-"    LIST * NOEXPIRE\n"
-"        Listează toate pseudonimele înregistrate care au fost setate să nu expire.\n"
-"\n"
-"    LIST #51-100\n"
-"        Listează toate pseudonimele înregistrate în intervalul menționat (51-100)."
+"Dacă sunt precizate opțiunile DISPLAY, NOEXPIRE, SUSPENDED sau UNCONFIRMED, vor fi afișate doar pseudonimele care sunt de afișare, nu vor expira, sunt suspendate sau sunt neconfirmate. Dacă sunt oferite mai multe opțiuni, pseudonimele trebuie să corespundă fiecărei opțiuni pentru a fi afișate. Rețineți că aceste opțiuni sunt limitate la Operatorii de Servicii."
+
+msgid "Lists all registered nicks that are the display nickname for their account."
+msgstr "Listează toate pseudonimele înregistrate care sunt pseudonime de afișare pentru contul lor."
+
+msgid "Lists all registered nicks that have been set to not expire."
+msgstr "Listează toate pseudonimele înregistrate care au fost setate să nu expire."
+
+msgid "Lists all registered nicks that have been suspended."
+msgstr "Listează toate pseudonimele înregistrate care au fost suspendate."
+
+msgid "Lists all registered nicks that have not been confirmed yet."
+msgstr "Listează toate pseudonimele înregistrate care nu au fost încă confirmate."
+
+msgid "Lists all registered nicks with Bot in their name (case insensitive)."
+msgstr "Listează toate pseudonimele înregistrate cu Bot în numele lor (fără a ține cont de majuscule ori minuscule)."
+
+msgid "Lists all registered nicks within the given range (51-100)."
+msgstr "Listează toate pseudonimele în intervalul menționat (51-100)."
 
 msgid "Lists all user records"
 msgstr "Listează toate înregistrările utilizatorilor"
@@ -3600,17 +3750,20 @@ msgstr ""
 "\n"
 "Dacă este specificat un model, listează doar utilizatorii care corespund acestuia (trebuie să aibă formatul pseudonim!utilizator@gazdă[#nume-real]). Dacă este specificat canalul, sunt listați doar utilizatorii care se află în canalul precizat. Dacă este specificat INVISIBLE, vor fi listați doar utilizatorii cu stegulețul +i."
 
-msgid ""
-"Lists any memos you currently have. With NEW, lists only new (unread) memos. Unread memos are marked with a \"*\" to the left of the memo number. You can also specify a list of numbers, as in the example below:\n"
-"   LIST 2-5,7-9\n"
-"      Lists memos numbered 2 through 5 and 7 through 9."
-msgstr ""
-"Listează toate misivele pe care le aveți în prezent. Cu NEW, listează doar misivele noi (necitite). Misivele necitite sunt marcate cu o \"*\" în stânga numărului misivei. De asemenea, puteți specifica o listă de numere, ca în exemplul de mai jos:\n"
-"   LIST 2-5,7-9\n"
-"      Listează misivele numerotate de la 2 la 5 și de la 7 la 9."
+msgid "Lists any memos you currently have. With NEW, lists only new (unread) memos. Unread memos are marked with a \"*\" to the left of the memo number. You can also specify a list of numbers."
+msgstr "Listează toate misivele pe care le aveți în prezent. Cu NEW, listează doar misivele noi (necitite). Misivele necitite sunt marcate cu o \"*\" în stânga numărului misivei. De asemenea, puteți specifica o listă de numere."
+
+msgid "Lists any new memos."
+msgstr "Listează misivele noi."
 
 msgid "Lists available bots"
 msgstr "Listează boții disponibili"
+
+msgid "Lists bad word entries on #channel numbered 2 through 5 and 7 through 9."
+msgstr "Listează intrările de cuvinte nepotrivite în #canal numerotate de la 2 la 5 și de la 7 la 9."
+
+msgid "Lists bad word entries on #channel that match *UwU*."
+msgstr "Listează intrările de cuvinte nepotrivite în #canal care corespund *UwU*."
 
 msgid "Lists currently loaded modules."
 msgstr "Listează modulele încărcate în prezent."
@@ -3620,6 +3773,9 @@ msgstr "Listează informații despre canalul înregistrat specificat"
 
 msgid "Lists information about the specified registered channel, including its founder, time of registration, last time used, and description. If the user issuing the command has the appropriate access for it, then the successor, last topic set, settings and expiration time will also be displayed when applicable."
 msgstr "Listează informații despre canalul înregistrat specificat, inclusiv fondatorul său, ora înregistrării, ultima utilizare și descrierea acestuia. Dacă utilizatorul care execută comanda are accesul corespunzător pentru aceasta, atunci când este cazul vor fi afișate și succesorul, ultimul subiect stabilit, setările și timpul de expirare."
+
+msgid "Lists memos numbered 2 through 5 and 7 through 9."
+msgstr "Listează misivele numerotate de la 2 la 5 și de la 7 la 9."
 
 msgid "Load a module"
 msgstr "Încarcă un modul"
@@ -3676,37 +3832,15 @@ msgid ""
 "\n"
 "The %sLOCK command allows you to add, delete, and view mode locks on a channel. If a mode is locked on or off, services will not allow that mode to be changed. The SET command will clear all existing mode locks and set the new one given, while ADD and DEL modify the existing mode lock.\n"
 "\n"
-"Example:\n"
-"     %s#channel%sADD+bmnt*!*@*aol*\n"
-"\n"
-"\n"
 "The %sSET command allows you to set modes through services. Wildcards * and ? may be given as parameters for list and status modes.\n"
-"\n"
-"Example:\n"
-"     %s#channelSET+v*\n"
-"       Sets voice status to all users in the channel.\n"
-"\n"
-"     %s#channelSET-b~c:*\n"
-"       Clears all extended bans that start with ~c:\n"
 "\n"
 "The %sCLEAR command is an easy way to clear modes on a channel. what may be any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If what is not given then all basic modes are removed."
 msgstr ""
 "Controlează în principal încuierile modurilor în canale și accesul la moduri în canale (care sunt diferite de accesele în canale).\n"
 "\n"
-"Comanda %sLOCK vă permite să adăugați, să ștergeți și să vizualizați blocări de mod într-un canal. Dacă un mod este încuiat sau nu, serviciile nu vor permite schimbarea modului respectiv. Comanda SET va goli toate încuierile de mod existente și va seta pe cea precizată, în timp ce ADD și DEL modifică încuierea de mod existentă.\n"
+"Comanda %sLOCK vă permite să adăugați, să ștergeți și să vizualizați încuieri de mod într-un canal. Dacă un mod este încuiat sau nu, serviciile nu vor permite schimbarea modului respectiv. Comanda SET va goli toate încuierile de mod existente și va seta pe cea precizată, în timp ce ADD și DEL modifică încuierea de mod existentă.\n"
 "\n"
-"Exemplu:\n"
-"     %s#canal%sADD+bmnt*!*@*aol*\n"
-"\n"
-"\n"
-"Comanda %sSET vă permite să setați modurile prin intermediul serviciilor. Caracterele wildcard * și ? pot fi menționate ca parametri pentru modurile de listă și statut.\n"
-"\n"
-"Exemplu:\n"
-"     %s#canalSET+v*\n"
-"       Setează statutul de membru voce pentru toți utilizatorii din canal.\n"
-"\n"
-"     %s#canalSET-b~c:*\n"
-"       Golește toate blocările extinse care încep cu ~c:\n"
+"Comanda %sSET vă permite să setați modurile prin intermediul serviciilor. Caracterele wildcard * și ? pot fi menționate ca parametri pentru modurile de listă și stare.\n"
 "\n"
 "Comanda %sCLEAR este o modalitate ușoară de a goli modurile dintr-un canal. ce poate fi orice nume de mod. Exemplele includ blocări, excepții, suprascrieri de invitații, operatori, semi-operatori și membri voce. Dacă ce nu este menționat, atunci toate modurile de bază sunt înlăturate."
 
@@ -3744,7 +3878,7 @@ msgstr ""
 "\n"
 "Comanda %sLIST afișează lista de izgoniri automate sau, opțional, doar acele intrări care corespund măștii precizate.\n"
 "\n"
-"Comanda %sVIEW este o versiune mai detaliată a comenzii %sLIST.\n"
+"Comanda %sVIEW este o versiune mai detaliată a comenzii %sLIST.\n"
 "\n"
 "Comanda %sENFORCE determină %s să impună lista curentă de izgoniri automate prin înlăturarea utilizatorilor care corespund deja unei măști izgonite.\n"
 "\n"
@@ -3756,7 +3890,7 @@ msgid ""
 "\n"
 "The %sADD command adds the given mask to the access list with the given user level; if the mask is already present on the list, its access level is changed to the level specified in the command. The level specified may be a numerical level or the name of a privilege (eg AUTOOP). When a user joins the channel the access they receive is from the highest level entry in the access list."
 msgstr ""
-"Întreține lista de accese într-un canal. Lista de accese specifică căror utilizatori li se permite statutul de operator de canal sau accesul la comenzile %s în canal. Diferite niveluri de utilizator permit accesul la diferite subseturi de privilegii. Orice utilizator înregistrat care nu se află în lista de accese are un nivel de utilizator de 0, iar orice utilizator neînregistrat are un nivel de utilizator de -1.\n"
+"Întreține lista de accese într-un canal. Lista de accese specifică căror utilizatori li se permite starea de operator de canal sau accesul la comenzile %s în canal. Diferite niveluri de utilizator permit accesul la diferite subseturi de privilegii. Orice utilizator înregistrat care nu se află în lista de accese are un nivel de utilizator de 0, iar orice utilizator neînregistrat are un nivel de utilizator de -1.\n"
 "\n"
 "Comanda %sADD adaugă masca precizată la lista de accese cu nivelul de utilizator precizat; dacă masca este deja prezentă în listă, nivelul său de acces este modificat la nivelul specificat în comandă. Nivelul specificat poate fi un nivel numeric sau numele unui privilegiu (de exemplu AUTOOP). Când un utilizator se alătură canalului, accesul pe care îl primește este cel de la intrarea cu cel mai înalt nivel din lista de accese."
 
@@ -3768,10 +3902,7 @@ msgid ""
 "\n"
 "The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
-"The LIST command displays the bad words list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   #channelLIST2-5,7-9\n"
-"      Lists bad words entries numbered 2 through 5 and\n"
-"      7 through 9.\n"
+"The LIST command displays the bad words list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "The CLEAR command clears all entries from the bad words list."
 msgstr ""
@@ -3781,9 +3912,7 @@ msgstr ""
 "\n"
 "Comanda DEL înlătură cuvântul precizat din lista de cuvinte nepotrivite. Dacă este furnizată o listă de numere de intrare, acele intrări sunt șterse.  (Vezi exemplul pentru LIST de mai jos.)\n"
 "\n"
-"Comanda LIST afișează lista de cuvinte nepotrivite. Dacă este precizată o mască wildcard, vor fi afișate doar intrările care corespund măștii. Dacă este furnizată o listă de numere de intrare, sunt afișate doar acele intrări; de exemplu:\n"
-"   #canalLIST2-5,7-9\n"
-"      Listează intrările de cuvinte vulgare numerotate de la 2 la 5 și de la 7 la 9.\n"
+"Comanda LIST afișează lista de cuvinte nepotrivite. Dacă este precizată o mască wildcard, vor fi afișate doar intrările care corespund măștii. Dacă este furnizată o listă de numere de intrare, sunt afișate doar acele intrări.\n"
 "\n"
 "Comanda CLEAR golește toate intrările din lista de cuvinte nepotrivite."
 
@@ -3832,6 +3961,9 @@ msgstr "Manipulează lista de AKILL"
 
 msgid "Manipulate the DefCon system"
 msgstr "Manipulează sistemul DEFCON"
+
+msgid "Manipulate the host offer list"
+msgstr "Manipulează lista de oferte pentru gazde"
 
 msgid "Manipulate the topic of the specified channel"
 msgstr "Manipulează subiectul canalului specificat"
@@ -3904,8 +4036,8 @@ msgid "Method"
 msgstr "Metodă"
 
 #, c-format
-msgid "Missing parameter for mode %c."
-msgstr "Parametru lipsă pentru modul %c."
+msgid "Missing parameter for modes %s."
+msgstr "Parametru lipsă pentru modurile %s."
 
 #, c-format
 msgid "Missing passwords: %zu"
@@ -3920,7 +4052,7 @@ msgstr "Modul %s este un mod virtual și nu poate fi golit."
 
 #, c-format
 msgid "Mode %s is not a status or list mode."
-msgstr "Modul %s nu este un mod de statut sau de listă."
+msgstr "Modul %s nu este un mod de stare sau de listă."
 
 msgid "Mode lock"
 msgstr "Încuiere de mod"
@@ -3936,35 +4068,8 @@ msgstr "Moduri"
 msgid "Modes cleared on %s and the channel destroyed."
 msgstr "Modurile au fost golite în %s și canalul a fost distrus."
 
-#, c-format
-msgid ""
-"Modifies or displays the certificate list for your nick. If you connect to IRC and provide a client certificate with a matching fingerprint in the cert list, you will be automatically identified to services. Services Operators may provide a nick to modify other users' certificate lists.\n"
-"\n"
-"Examples:\n"
-"\n"
-"    %sADD\n"
-"        Adds your current fingerprint to the certificate list and\n"
-"        automatically identifies you when you connect to IRC\n"
-"        using this fingerprint.\n"
-"\n"
-"    %sDEL<fingerprint>\n"
-"        Removes the fingerprint <fingerprint> from your certificate list.\n"
-"\n"
-"    %sLIST\n"
-"        Displays the current certificate list."
-msgstr ""
-"Modifică sau afișează lista de certificate pentru pseudonimul dumneavoastră. Dacă vă conectați la IRC și furnizați un certificat de client cu o amprentă digitală potrivită în lista de certificate, veți fi identificat(ă) automat la servicii. Operatorii de Servicii pot prezenta un pseudonim pentru a modifica listele de certificate ale altor utilizatori.\n"
-"\n"
-"Exemple:\n"
-"\n"
-"    %sADD\n"
-"        Adaugă amprenta digitală curentă a dumneavoastră la lista de certificate și vă identifică automat atunci când vă conectați la IRC folosind această amprentă.\n"
-"\n"
-"    %sDEL<fingerprint>\n"
-"        Înlătură amprenta digitală <fingerprint> din lista de certificate.\n"
-"\n"
-"    %sLIST\n"
-"        Afișează lista curentă de certificate."
+msgid "Modifies or displays the certificate list for your nick. If you connect to IRC and provide a client certificate with a matching fingerprint in the cert list, you will be automatically identified to services. Services Operators may provide a nick to modify other users' certificate lists."
+msgstr "Modifică sau afișează lista de certificate pentru pseudonimul dumneavoastră. Dacă vă conectați la IRC și furnizați un certificat de client cu o amprentă digitală potrivită în lista de certificate, veți fi identificat(ă) automat la servicii. Operatorii de Servicii pot prezenta un pseudonim pentru a modifica listele de certificate ale altor utilizatori."
 
 #, c-format
 msgid "Modify the list of %s users"
@@ -4214,6 +4319,9 @@ msgstr "Nu există intrări corespunzătoare în lista %s."
 msgid "No matching entries on the AKILL list."
 msgstr "Nu există intrări corespunzătoare în lista AKILL."
 
+msgid "No matching entries on the host offer list."
+msgstr "Nu există intrări corespunzătoare în lista de oferte pentru gazde."
+
 msgid "No memo was cancelable."
 msgstr "Nicio misivă nu putea fi anulată."
 
@@ -4265,7 +4373,7 @@ msgstr "Modul fără boți este acum activat în canalul %s."
 
 #, c-format
 msgid "Non-status modes cleared on %s."
-msgstr "Modurile fără de statut au fost golite în %s."
+msgstr "Modurile fără stare au fost golite în %s."
 
 msgid "None"
 msgstr "Niciuna"
@@ -4281,8 +4389,48 @@ msgstr "Rețineți, totuși, dacă succesorul are deja prea multe canale înregi
 msgid "Nothing to do."
 msgstr "Nu este nimic de făcut."
 
+msgid "Now"
+msgstr "Acum"
+
 msgid "Number"
 msgstr "Număr"
+
+#, c-format
+msgid ""
+"Offer stock vhosts to unprivileged users.\n"
+"The %sADD command adds an offered vhost. If expiry is provided then the offered vhost will only be available for a limited time. The vhost field may contain template variables. The supported template variables are:\n"
+"  {account}  - Your current account.\n"
+"  {network}  - The name of this IRC network.\n"
+"  {nick}     - Your current nickname.\n"
+"  {regdate}  - The YYYY-MM-DD date at which your nick was registered.\n"
+"  {regepoch} - The UNIX time at which your nick was registered.\n"
+"\n"
+"The %sCLEAR command removes all offered vhosts.\n"
+"\n"
+"The %sDEL command removes an offered vhost.\n"
+"\n"
+"The %sLIST command displays the offered vhosts, or optionally only those offered vhosts which match the given mask.\n"
+"\n"
+"The %sVIEW command is a more verbose version of the %sLIST command."
+msgstr ""
+"Oferă gazde virtuale standard utilizatorilor neprivilegiați.\n"
+"Comanda %sADD adaugă un vhost oferit. Dacă este furnizată o perioadă de expiry, atunci gazda virtuală oferită va fi disponibilă doar pentru o perioadă limitată de timp. Câmpul vhost poate conține variabile șablon. Variabilele șablon acceptate sunt:\n"
+"  {account}  - Contul dumneavoastră curent.\n"
+"  {network}  - Numele acestei rețele IRC.\n"
+"  {nick}     - Pseudonimul dumneavoastră curent.\n"
+"  {regdate}  - Data AAAA-LL-ZZ la care pseudonimul dumneavoastră a fost înregistrat.\n"
+"  {regepoch} - Timpul UNIX la care pseudonimul dumneavoastră a fost înregistrat.\n"
+"\n"
+"Comanda %sCLEAR îlătură toate gazdele virtuale oferite.\n"
+"\n"
+"Comanda %sDEL înlătură o gazdă virtuală oferită.\n"
+"\n"
+"Comanda %sLIST afișează gazdele virtuale oferite sau, opțional, doar acele gazde virtuale oferite care corespund măștii date.\n"
+"\n"
+"Comanda %sVIEW este o versiune mai detaliată a comenzii %sLIST."
+
+msgid "Offered vhost"
+msgstr "Gazdă virtuală oferită"
 
 msgid "Online from"
 msgstr "Conectat(ă) din"
@@ -4358,9 +4506,6 @@ msgstr "Parola este incorectă."
 msgid "Password reset email for %s has been sent."
 msgstr "A fost trimis mesajul de email de resetare a parolei pentru %s."
 
-msgid "Passwords can not be changed right now. Please try again later."
-msgstr "Parolele nu pot fi schimbate momentan. Vă rugăm să încercați din nou mai târziu."
-
 #, c-format
 msgid "Passwords encrypted with %s: %zu"
 msgstr "Parolele criptate cu %s: %zu"
@@ -4386,8 +4531,8 @@ msgstr "Vă rugăm confirmați că doriți să radiați %s cu %s%s%s"
 msgid "Please contact an Operator to get a vhost assigned to this nick."
 msgstr "Vă rugăm să contactați un Operator pentru a obține o gazdă virtuală atribuită acestui pseudonim."
 
-msgid "Please try again with a more obscure password. Passwords should not be something that could be easily guessed (e.g. your real name or your nick) and cannot contain the space or tab characters."
-msgstr "Vă rugăm să încercați din nou cu o parolă mai puțin cunoscută. Parolele nu ar trebui să fie ceva care ar putea fi ușor de ghicit (de exemplu, numele dumneavoastră real sau pseudonimul dumneavoastră) și trebuie să nu conțină spațiu ori caractere de tabulare."
+msgid "Please try again with a more obscure password. Passwords should not be something that could be easily guessed (e.g. your real name or your nick) and cannot contain a space character."
+msgstr "Vă rugăm să încercați din nou cu o parolă mai puțin cunoscută. Parolele nu ar trebui să fie ceva care ar putea fi ușor de ghicit (de exemplu, numele dumneavoastră real sau pseudonimul dumneavoastră) și pot conține caracterul spațiu."
 
 msgid "Please use a valid server name when juping."
 msgstr "Vă rugăm să folosiți un nume de server valid pentru juping."
@@ -4402,6 +4547,10 @@ msgstr "Vă rugăm să așteptați %s și să încercați din nou."
 #, c-format
 msgid "Please wait %s before requesting a new vhost."
 msgstr "Vă rugăm să așteptați %s înainte de a solicita o nouă gazdă virtuală."
+
+#, c-format
+msgid "Please wait %s before taking a new vhost."
+msgstr "Vă rugăm să așteptați %s înainte de a lua o nouă gazdă virtuală."
 
 #, c-format
 msgid "Please wait %s before using the %s command again."
@@ -4658,17 +4807,26 @@ msgstr "Serverul %s a fost înlăturat."
 
 #, c-format
 msgid "Removes %s status from the selected nicks on a channel. If nick is not given, it will de%s you."
-msgstr "Înlătură statutul %s de la pseudonimul selectat într-un canal. Dacă pseudonimul nu este specificat, statutul dumneavoastră %s va fi înlăturat."
+msgstr "Înlătură starea %s de la pseudonimul selectat într-un canal. Dacă pseudonimul nu este specificat, starea dumneavoastră %s va fi înlăturată."
 
 #, c-format
 msgid "Removes %s status from you or the specified nick on a channel"
-msgstr "Înlătură statutul %s de la dumneavoastră sau de la pseudonimul specificat dintr-un canal"
+msgstr "Înlătură starea %s de la dumneavoastră sau de la pseudonimul specificat într-un canal"
 
 msgid "Removes a selected nicks status from a channel"
-msgstr "Înlătură statutul unui pseudonim selectat într-un canal"
+msgstr "Înlătură starea unui pseudonim selectat într-un canal"
 
 msgid "Removes a selected nicks status modes on a channel. If nick is omitted then your status is removed. If channel is omitted then your channel status is removed on every channel you are in."
-msgstr "Înlătură modurile de statut ale pseudonimului selectat într-un canal. Dacă pseudonimul nu este specificat, atunci statutul dumneavoastră este înlăturat. Dacă canalul nu este specificat, atunci statutul duneavoastră de canal este înlăturat din fiecare canal în care vă aflați."
+msgstr "Înlătură modurile de stare ale pseudonimului selectat într-un canal. Dacă pseudonimul nu este specificat, atunci starea dumneavoastră este înlăturată. Dacă canalul nu este specificat, atunci starea duneavoastră de canal este înlăturată din fiecare canal în care vă aflați."
+
+msgid "Removes all entries that were added in the last 30 minutes."
+msgstr "Înlătură toate intrările care au fost adăugate în ultimele 30 de minute."
+
+msgid "Removes the specified fingerprint from the certificate list of nickname."
+msgstr "Înlătură amprenta digitală specificată din lista de certificate a pseudonimului."
+
+msgid "Removes the specified fingerprint from your certificate list."
+msgstr "Înlătură amprenta digitală specificată din lista de certificate a dumneavoastră."
 
 #, c-format
 msgid "Removing %s because %s covers it."
@@ -4757,6 +4915,9 @@ msgstr "Salvează bazele de date și reporniți serviciile"
 msgid "Searches logs for a matching pattern"
 msgstr "Caută în jurnale un model corespunzător"
 
+msgid "Searches the last 21 days worth of logs for messages containing Anope and lists the most recent 500 of them."
+msgstr "Caută în jurnalele din ultimele 21 de zile mesaje care conțin Anope și listează cele mai recente 500 dintre acestea."
+
 msgid "Secure founder"
 msgstr "Fondator securizat"
 
@@ -4819,6 +4980,15 @@ msgstr "Trimite un cod de confirmare la adresa de email a pseudonimului cu instr
 msgid "Sends a memo and requests a read receipt"
 msgstr "Expediază o misivă și solicită o confirmare de citire"
 
+msgid "Sends a memo to the channel when someone uses the chanserv/xop command on #anope."
+msgstr "Expediază o misivă către canal atunci când cineva utilizează comanda chanserv/xop în #anope."
+
+msgid "Sends a message to channel operators and above when someone uses the chanserv/access command on #anope."
+msgstr "Expediază o misivă către operatorii de canal și superiorilor atunci când cineva utilizează comanda chanserv/access în #anope."
+
+msgid "Sends a notice to channel voices and above when someone uses the chanserv/flags command on #anope."
+msgstr "Trimite o notificare utilizatorilor voce sau superiorilor unui canal atunci când cineva utilizează comanda chanserv/flags în #anope."
+
 msgid "Sends all registered users a memo containing memo-text."
 msgstr "Expediază tuturor utilizatorilor înregistrați o misivă care conține un mesaj-text."
 
@@ -4831,16 +5001,8 @@ msgstr "Expediază pseudonimului sau canalului specificat o misivă care conțin
 msgid "Sends the named nick or channel a memo containing memo-text. When sending to a nickname, the recipient will receive a notice that they have a new memo. The target nickname/channel must be registered. Once the memo is read by its recipient, an automatic notification memo will be sent to the sender informing them that the memo has been read."
 msgstr "Expediază pseudonimului sau canalului specificat o misivă care conține un mesaj-text. Când expediați un mesaj către un pseudonim, destinatarul va primi o notificare că are un nou mesaj. Pseudonimul ori canalul destinație trebuie să fie înregistrate. După ce misiva este citită de destinatar, o misivă de notificare automată va fi trimisă expeditorului, ca o informare că mesajul a fost citit."
 
-msgid ""
-"Sends you the text of the memos specified. If LAST is given, sends you the memo you most recently received. If NEW is given, sends you all of your new memos. If ALL is given, sends you all of your memos. Otherwise, sends you memo number num. You can also give a list of numbers, as in this example:\n"
-"\n"
-"   READ 2-5,7-9\n"
-"      Displays memos numbered 2 through 5 and 7 through 9."
-msgstr ""
-"Vă afișează textul misivelor specificate. Dacă se introduce LAST, vă afișează cea mai recentă misivă primită. Dacă este specificat NEW, vă afișează toate noile misive. Dacă se dă ALL, vă afișează toate notițele dumneavoastră. Altfel, vă afișează numărul misivei număr. De asemenea, puteți oferi o listă de numere, ca în exemplul următor:\n"
-"\n"
-"   READ 2-5,7-9\n"
-"      Afișează misivele numerotate de la 2 la 5 și de la 7 la 9."
+msgid "Sends you the text of the memos specified. If LAST is given, sends you the memo you most recently received. If NEW is given, sends you all of your new memos. If ALL is given, sends you all of your memos. Otherwise, sends you memo number num. You can also give a list of numbers."
+msgstr "Vă afișează textul misivelor specificate. Dacă se introduce LAST, vă afișează cea mai recentă misivă primită. Dacă este specificat NEW, vă afișează toate noile misive. Dacă se dă ALL, vă afișează toate notițele dumneavoastră. Altfel, vă afișează numărul misivei număr. De asemenea, puteți oferi o listă de numere."
 
 msgid "Server"
 msgstr "Server"
@@ -4894,7 +5056,7 @@ msgid "Server %s must be quit before it can be deleted."
 msgstr "Serverul %s trebuie îndepărtat înainte de a putea fi șters."
 
 msgid "Server: {server} = {ip} -- limit: {limit}; state: {state}"
-msgstr "Server: {server} = {ip} -- limită: {limit}; statut: {state}"
+msgstr "Server: {server} = {ip} -- limită: {limit}; stare: {state}"
 
 msgid "Servers"
 msgstr "Servere"
@@ -4962,7 +5124,7 @@ msgstr "Servicii active %s."
 
 #, c-format
 msgid "Services will from now on set status modes on %s in channels."
-msgstr "Serviciile vor seta de acum înainte moduri de statut pentru %s în canale."
+msgstr "Serviciile vor seta de acum înainte moduri de stare pentru %s în canale."
 
 #, c-format
 msgid "Services will no longer automatically give modes to users in %s."
@@ -4970,7 +5132,7 @@ msgstr "Serviciile nu vor mai oferi automat moduri utilizatorilor în %s."
 
 #, c-format
 msgid "Services will no longer set status modes on %s in channels."
-msgstr "Serviciile nu vor mai seta moduri de statut pentru %s în canale."
+msgstr "Serviciile nu vor mai seta moduri de stare pentru %s în canale."
 
 #, c-format
 msgid "Services will now automatically give modes to users in %s."
@@ -5067,7 +5229,7 @@ msgid ""
 msgstr ""
 "Activează sau dezactivează izgonirea la AMSG. Când este activată, botul va izgoni utilizatorii care trimit același mesaj către mai multe canale unde se află %s boți.\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 #, c-format
 msgid ""
@@ -5081,7 +5243,7 @@ msgstr ""
 "\n"
 "Puteți defini cuvinte nepotrivite pentru canalul dumneavoastră folosind comanda BADWORDS. Tastați %sBADWORDS pentru mai multe informații.\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 msgid ""
 "Sets the ban type that will be used by services whenever they need to ban someone from your channel.\n"
@@ -5109,7 +5271,7 @@ msgid ""
 msgstr ""
 "Activează sau dezactivează izgonirea la îngroșări. Când este activată, această opțiune informează botul să izgonească utilizatorii care folosesc caractere îngroșate.\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 #, c-format
 msgid ""
@@ -5123,7 +5285,7 @@ msgstr ""
 "\n"
 "Botul izgonește doar dacă există un cel puțin un minim de caractere majuscule iar acestea constituie cel puțin un procentaj%% din totalul liniei de text (dacă nu sunt specificate, valorile implicite sunt de 10 caractere și 25%%).\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 msgid ""
 "Sets the colors kicker on or off. When enabled, this option tells the bot to kick users who use colors.\n"
@@ -5132,7 +5294,7 @@ msgid ""
 msgstr ""
 "Activează sau dezactivează izgonirea la culori. Când este activată, această opțiune informează botul să izgonească utilizatorii care folosesc culori.\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 msgid "Sets the description for the channel, which shows up with the LIST and INFO commands."
 msgstr "Setează descrierea canalului, care va apărea prin comenzile LIST și INFO."
@@ -5144,7 +5306,7 @@ msgid ""
 msgstr ""
 "Activează sau dezactivează izgonirea la inundări. Când este activată, această opțiune informează botul să izgonească utilizatorii care inundă în canal folosind un minim de linii în secunde (dacă nu sunt specificate, valorile implicite sunt 6 linii în 10 secunde).\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 msgid ""
 "Sets the italics kicker on or off. When enabled, this option tells the bot to kick users who use italics. \n"
@@ -5153,7 +5315,7 @@ msgid ""
 msgstr ""
 "Activează sau dezactivează izgonirea la înclinări. Când este activată, această opțiune informează botul să izgonească utilizatorii care folosesc caractere înclinate.\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 msgid "Sets the maximum number of memos you can receive"
 msgstr "Setează numărul maxim de misive pe care le puteți primi"
@@ -5165,7 +5327,7 @@ msgid ""
 msgstr ""
 "Activează sau dezactivează izgonirea la repetări. Când este activată, această opțiune informează botul să izgonească utilizatorii care se repetă de un număr de ori (dacă valoarea numerică nu este specificată, valoarea implicită este 3).\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 msgid ""
 "Sets the reverses kicker on or off. When enabled, this option tells the bot to kick users who use reverses. \n"
@@ -5174,7 +5336,7 @@ msgid ""
 msgstr ""
 "Activează sau dezactivează izgonirea la inversări. Când este activată, această opțiune informează botul să izgonească utilizatorii care folosesc inversări.\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 msgid "Sets the time bot bans expire in. If enabled, any bans placed by bots, such as flood kicker, badwords kicker, etc. will automatically be removed after the given time. Set to 0 to disable bans from automatically expiring."
 msgstr "Setează timpul în care expiră blocările făcute de boți. Dacă este activată, orice blocare plasată de boți, cum ar fi izgonirea la inundări, izgonirea la cuvinte nepotrivite și așa mai departe, vor fi înlăturate automat după expirarea timpului precizat. Setați 0 pentru a dezactiva expirarea automată a blocărilor."
@@ -5186,7 +5348,7 @@ msgid ""
 msgstr ""
 "Activează sau dezactivează izgonirea la sublinieri. Când este activată, această opțiune informează botul să izgonească utilizatorii care folosesc sublinieri.\n"
 "\n"
-"ttb reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați ttb pentru a dezactiva blocările activate."
+"tentative reprezintă de câte ori un utilizator poate fi izgonit înainte de a fi blocat. Nu utilizați tentative pentru a dezactiva blocările activate."
 
 msgid ""
 "Sets the vhost for all nicks in the same account as that of the given nick. If your IRCD supports vidents, then using SETALL <nick> <ident>@<hostmask> will set idents for users as well as vhosts.\n"
@@ -5209,8 +5371,11 @@ msgstr "Setează diverse opțiuni ale misivelor. opțiunea poate fi după cum 
 msgid "Sets various nickname options. option can be one of:"
 msgstr "Setează diverse opțiuni ale pseudonimului. opțiunea poate fi după cum urmează:"
 
+msgid "Sets voice status on all users in the channel."
+msgstr "Setează starea voce pentru toți utilizatorii din canal."
+
 msgid "Sets whether services should set channel status modes on you automatically."
-msgstr "Setează dacă serviciile ar trebui să seteze automat modurile de statut în canal pentru dumneavoastră."
+msgstr "Setează dacă serviciile ar trebui să seteze automat modurile de stare în canal pentru dumneavoastră."
 
 msgid "Sets whether the given channel will expire. Setting this to ON prevents the channel from expiring."
 msgstr "Setează dacă canalul precizat va expira. Activarea acestei opțiuni previne expirarea canalului."
@@ -5219,8 +5384,12 @@ msgid "Sets whether the given nickname can be added to a channel access list."
 msgstr "Setează dacă pseudonimul precizat poate fi adăugat la o listă de accese a vreunui canal."
 
 #, c-format
+msgid "Sets whether the given nickname should automatically be logged in when they connect using a known SSL certificate. You can configure their SSL certificate using the %s command."
+msgstr "Setează dacă pseudonimul precizat ar trebui să fie autentificat automat atunci când se conectează utilizând un certificat SSL cunoscut. Puteți configura certificatul SSL al acestuia utilizând comanda %s."
+
+#, c-format
 msgid "Sets whether the given nickname will be given its status modes in channels automatically. Set to ON to allow %s to set status modes on the given nickname automatically when it is entering channels. Note that depending on channel settings some modes may not get set automatically."
-msgstr "Setează dacă pseudonimul precizat va primi automat modurile sale de statut în canale. Setați la ON pentru a permite %s să seteze automat modurile de statut pentru pseudonimul precizat atunci când acesta intră în canale. Rețineți că, în funcție de setările canalelor, este posibil ca unele moduri să nu fie setate automat."
+msgstr "Setează dacă pseudonimul precizat va primi automat modurile sale de stare în canale. Setați la ON pentru a permite %s să seteze automat modurile de stare pentru pseudonimul precizat atunci când acesta intră în canale. Rețineți că, în funcție de setările canalelor, este posibil ca unele moduri să nu fie setate automat."
 
 msgid "Sets whether the given nickname will expire. Setting this to ON prevents the nickname from expiring."
 msgstr "Setează dacă pseudonimul precizat va expira. Setarea acestei opțiuni la ON previne expirarea pseudonimului."
@@ -5228,13 +5397,20 @@ msgstr "Setează dacă pseudonimul precizat va expira. Setarea acestei opțiuni 
 msgid "Sets whether you can be added to a channel access list."
 msgstr "Setează dacă puteți fi adăugat(ă) la o listă de accese a vreunui canal."
 
+msgid "Sets whether you should automatically be logged in when you connect using a known SSL certificate."
+msgstr "Setează dacă ar trebui să fiți autentificat(ă) automat atunci când vă conectați utilizând un certificat SSL cunoscut."
+
+#, c-format
+msgid "Sets whether you should automatically be logged in when you connect using a known SSL certificate. You can configure your SSL certificate using the %s command."
+msgstr "Setează dacă ar trebui să fiți autentificat(ă) automat atunci când vă conectați utilizând un certificat SSL cunoscut. Puteți configura certificatul SSL al dumneavoastră utilizând comanda %s."
+
 #, c-format
 msgid "Sets whether you will be given your channel status modes automatically. Set to ON to allow %s to set status modes on you automatically when entering channels. Note that depending on channel settings some modes may not get set automatically."
-msgstr "Setează dacă veți primi automat modurile de statut în canale. Setați la ON pentru a permite %s să vă seteze automat modurile de statut atunci când intrați în canale. Rețineți că, în funcție de setările canalelor, este posibil ca unele moduri să nu fie setate automat."
+msgstr "Setează dacă veți primi automat modurile de stare în canale. Setați la ON pentru a permite %s să vă seteze automat modurile de stare atunci când intrați în canale. Rețineți că, în funcție de setările canalelor, este posibil ca unele moduri să nu fie setate automat."
 
 #, c-format
 msgid "Setting %s not known. Type %sLEVELS for a list of valid settings."
-msgstr "Setarea %s nu este cunoscută. Tastați %sLEVELS pentru o listă de setări valide."
+msgstr "Setarea %s nu este cunoscută. Tastați %sLEVELS  pentru o listă de setări valide."
 
 msgid "Setting for DEBUG must be ON, OFF, or a positive number."
 msgstr "Setarea pentru DEBUG trebuie să fie ON, OFF sau un număr pozitiv."
@@ -5249,14 +5425,17 @@ msgid "Setting for super admin must be ON or OFF."
 msgstr "Setarea pentru SUPERADMIN trebuie să fie ON sau OFF."
 
 msgid "Should services automatically give status to users"
-msgstr "Setează automatizarea statutului utilizatorilor"
+msgstr "Setează automatizarea stării utilizatorilor"
 
 msgid "Show status of services and network"
-msgstr "Afișează statutul serviciilor și al rețelei"
+msgstr "Afișează starea serviciilor și al rețelei"
 
 #, c-format
 msgid "Showed %zu/%zu matches for %s."
 msgstr "Au fost afișate %zu/%zu corespunderi pentru %s."
+
+msgid "Shows the current server configuration."
+msgstr "Afișează configurația curentă a serverului."
 
 msgid "Sign kicks that are done with the KICK command"
 msgstr "Semnează izgonirie executate prin comanda KICK"
@@ -5276,52 +5455,8 @@ msgstr "Opțiunea de izgoniri semnate pentru %s este acum activată."
 msgid "Signed kicks"
 msgstr "Izgoniri semnate"
 
-#, c-format
-msgid "Sorry, %s currently has too many memos and cannot receive more."
-msgstr "Ne pare rău, %s are în prezent prea multe misive și nu mai poate primi altele."
-
-#, c-format
-msgid "Sorry, %s is temporarily unavailable."
-msgstr "Ne pare rău, %s este temporar indisponibil."
-
-#, c-format
-msgid "Sorry, I have not seen %s."
-msgstr "Ne pare rău, nu am văzut pe %s."
-
-#, c-format
-msgid "Sorry, the maximum of %d auto join entries has been reached."
-msgstr "Ne pare rău, a fost atins numărul maxim de %d intrări pentru alăturări automate."
-
-#, c-format
-msgid "Sorry, the maximum of %d certificate entries has been reached."
-msgstr "Ne pare rău, a fost atins numărul maxim de %d intrări pentru certificate."
-
-#, c-format
-msgid "Sorry, the memo ignore list for %s is full."
-msgstr "Ne pare rău, lista de ignorare a misivelor pentru %s este plină."
-
-#, c-format
-msgid "Sorry, you can only have %d access entries on a channel, including access entries from other channels."
-msgstr "Ne pare rău, puteți avea doar %d intrări de accese într-un canal, inclusiv intrările de accese în alte canale."
-
-#, c-format
-msgid "Sorry, you can only have %d autokick masks on a channel."
-msgstr "Ne pare rău, puteți avea doar %d măști de izgoniri automate într-un canal."
-
-#, c-format
-msgid "Sorry, you can only have %d bad words entries on a channel."
-msgstr "Ne pare rău, puteți avea doar %d intrări de cuvinte nepotrivite într-un canal."
-
-#, c-format
-msgid "Sorry, you have already exceeded your limit of %d channels."
-msgstr "Ne pare rău, ați depășit deja limita de %d canale."
-
-#, c-format
-msgid "Sorry, you have already reached your limit of %d channels."
-msgstr "Ne pare rău, ați atins deja limita de %d canale."
-
 msgid "State"
-msgstr "Statut"
+msgstr "Stare"
 
 msgid "Statistics and maintenance for seen data"
 msgstr "Statistici și întreținere pentru datele vizualizate"
@@ -5329,8 +5464,11 @@ msgstr "Statistici și întreținere pentru datele vizualizate"
 msgid "Statistics reset."
 msgstr "Statisticile au fost resetate."
 
+msgid "Status"
+msgstr "Stare"
+
 msgid "Status updated (memos, vhost, chmodes, flags)."
-msgstr "Statutul a fost actualizat (misive, gazde virtuale, moduri, stegulețe)."
+msgstr "Starea a fost actualizată (misive, gazde virtuale, moduri, stegulețe)."
 
 msgid "Stop flooding!"
 msgstr "Vă rugăm opriți inundarea!"
@@ -5339,10 +5477,10 @@ msgid "Stop repeating yourself!"
 msgstr "Vă rugăm nu vă mai repetați!"
 
 msgid "Stricter control of channel founder status"
-msgstr "Securizează statutul fondatorului de canal"
+msgstr "Securizează starea fondatorului de canal"
 
 msgid "Stricter control of chanop status"
-msgstr "Securizează statutul operatorului de canal"
+msgstr "Securizează starea operatorului de canal"
 
 msgid "Successor"
 msgstr "Succesor"
@@ -5490,6 +5628,9 @@ msgstr ""
 "\n"
 "Această opțiune nu este persistentă și ar trebui utilizată doar atunci când este nevoie, apoi setată din nou pe OFF când nu mai este necesară."
 
+msgid "TAKE {vhost | entry-num}"
+msgstr "TAKE {gazdă-virtuală | număr-intrare}"
+
 #, c-format
 msgid "Tells %s that you are really the owner of this nick. Many commands require you to authenticate yourself with this command before you use them. The password should be the same one you sent with the REGISTER command."
 msgstr "Informează %s că sunteți proprietarul real al acestui pseudonim. Multe comenzi necesită identificare cu această comandă înainte de a fi utilizate. Parola este cea pe care ați furnizat-o odată cu comanda REGISTER."
@@ -5548,15 +5689,16 @@ msgstr ""
 "Pentru o listă a caracteristicilor și funcțiilor ale căror niveluri pot fi setate, consultați HELP%sDESC."
 
 #, c-format
+msgid "The %s command is temporarily unavailable. Please try again later."
+msgstr "Comanda %s este temporar indisponibilă. Vă rugăm să încercați din nou mai târziu."
+
+#, c-format
 msgid ""
 "The %sADD command adds the given nickname to the %s list.\n"
 "\n"
 "The %sDEL command removes the given nick from the %s list. If a list of entry numbers is given, those entries are deleted. (See the example for LIST below.)\n"
 "\n"
-"The %sLIST command displays the %s list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   %s#channelLIST2-5,7-9\n"
-"      Lists %s entries numbered 2 through 5 and\n"
-"      7 through 9.\n"
+"The %sLIST command displays the %s list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "The %sCLEAR command clears all entries of the %s list."
 msgstr ""
@@ -5564,9 +5706,7 @@ msgstr ""
 "\n"
 "Comanda %sDEL înlătură pseudonimul precizat din lista %s. Dacă este specificată o listă cu numere de intrare, acele intrări sunt înlăturate. (Vedeți exemplul pentru LIST de mai jos.)\n"
 "\n"
-"Comanda %sLIST afișează lista %s. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări; de exemplu:\n"
-"   %s#canalLIST2-5,7-9\n"
-"      Listează intrările %s numerotate de la 2 la 5 și de la 7 la 9.\n"
+"Comanda %sLIST afișează lista %s. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări.\n"
 "\n"
 "Comanda %sCLEAR golește toate intrările din lista %s."
 
@@ -5574,10 +5714,7 @@ msgstr ""
 msgid ""
 "The %sDEL command removes the given mask from the AKILL list if it is present. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
-"The %sLIST command displays the AKILL list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   %sLIST2-5,7-9\n"
-"      Lists AKILL entries numbered 2 through 5 and 7\n"
-"      through 9.\n"
+"The %sLIST command displays the AKILL list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "%sVIEW is a more verbose version of %sLIST, and will show who added an AKILL, the date it was added, and when it expires, as well as the user@host/ip mask and reason.\n"
 "\n"
@@ -5585,22 +5722,17 @@ msgid ""
 msgstr ""
 "Comanda %sDEL înlătură masca precizată din lista AKILL dacă este prezentă. Dacă este specificată o listă de numere de intrare, acele intrări sunt înlăturate. (Vedeți exemplul pentru LIST de mai jos.)\n"
 "\n"
-"Comanda %sLIST afișează lista AKILL. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări; de exemplu:\n"
-"   %sLIST2-5,7-9\n"
-"      Listează intrările AKILL numerotate de la 2 la 5 și de la 7 la 9.\n"
+"Comanda %sLIST afișează lista AKILL. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări.\n"
 "\n"
-"%sVIEW este o versiune mai detaliată a %sLIST și va afișa cine a adăugat un AKILL, data la care a fost adăugat și când expiră, precum și masca utilizator@gazdă/ip și motivul.\n"
+"Comanda %sVIEW este o versiune mai detaliată a %sLIST și va afișa cine a adăugat un AKILL, data la care a fost adăugat și când expiră, precum și masca utilizator@gazdă/ip și motivul.\n"
 "\n"
-"%sCLEAR golește toate intrările din lista AKILL."
+"Comanda %sCLEAR golește toate intrările din lista AKILL."
 
 #, c-format
 msgid ""
 "The %sDEL command removes the given nick from the access list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.) You may remove yourself from an access list, even if you do not have access to modify that list otherwise.\n"
 "\n"
-"The %sLIST command displays the access list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   %s#channelLIST2-5,7-9\n"
-"      Lists access entries numbered 2 through 5 and\n"
-"      7 through 9.\n"
+"The %sLIST command displays the access list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "The %sVIEW command displays the access list similar to %sLIST but shows the creator and last used time.\n"
 "\n"
@@ -5608,21 +5740,16 @@ msgid ""
 msgstr ""
 "Comanda %sDEL înlătură pseudonimul precizat din lista de accese. Dacă este furnizată o listă de numere de intrare, acele intrări sunt înlăturate. (Vedeți exemplul pentru LIST de mai jos.) Vă puteți înlătura dintr-o listă de acces, chiar dacă nu aveți acces pentru a modifica lista respectivă în alt mod.\n"
 "\n"
-"Comanda %sLIST afișează lista de accese. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări; de exemplu:\n"
-"   %s#canalLIST2-5,7-9\n"
-"      Listează intrările de accese numerotate de la 2 la 5 și de la 7 la 9.\n"
+"Comanda %sLIST afișează lista de accese. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări.\n"
 "\n"
 "Comanda %sVIEW afișează lista de accese similară cu comanda %sLIST, dar arată în plus creatorul și timpul ultimei utilizări.\n"
 "\n"
-"%sCLEAR golește toate intrările din lista de accese."
+"Comanda %sCLEAR golește toate intrările din lista de accese."
 
 msgid ""
 "The SNLINEDEL command removes the given mask from the SNLINE list if it is present. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
 "\n"
-"The SNLINELIST command displays the SNLINE list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   SNLINELIST2-5,7-9\n"
-"      Lists SNLINE entries numbered 2 through 5 and 7\n"
-"      through 9.\n"
+"The SNLINELIST command displays the SNLINE list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "SNLINEVIEW is a more verbose version of SNLINELIST, and will show who added an SNLINE, the date it was added, and when it expires, as well as the realname mask and reason.\n"
 "\n"
@@ -5630,21 +5757,16 @@ msgid ""
 msgstr ""
 "Comanda SNLINEDEL înlătură masca precizată din lista SNLINE dacă aceasta este prezentă. Dacă este furnizată o listă de numere de intrare, acele intrări sunt înlăturate. (Vedeți exemplul pentru LIST de mai jos.)\n"
 "\n"
-"Comanda SNLINELIST LIST afișează lista SNLINE. Dacă este precizată o mască wildcard, vor fi afișate doar intrările care corespund măștii. Dacă este furnizată o listă de numere de intrare, sunt afișate doar acele intrări; de exemplu:\n"
-"   SNLINELIST2-5,7-9\n"
-"      Listează intrările SNLINE numerotate de la 2 la 5 și de la 7 la 9.\n"
+"Comanda SNLINELIST LIST afișează lista SNLINE. Dacă este precizată o mască wildcard, vor fi afișate doar intrările care corespund măștii. Dacă este furnizată o listă de numere de intrare, sunt afișate doar acele intrări.\n"
 "\n"
-"SNLINEVIEW este o versiune mai detaliată a SNLINELIST și va afișa cine a adăugat un SNLINE, data la care a fost adăugat și când expiră, precum și masca numelui real și motivul.\n"
+"Comanda SNLINEVIEW este o versiune mai detaliată a SNLINELIST și va afișa cine a adăugat un SNLINE, data la care a fost adăugat și când expiră, precum și masca numelui real și motivul.\n"
 "\n"
-"SNLINECLEAR golește toate intrările din lista SNLINE."
+"Comanda SNLINECLEAR golește toate intrările din lista SNLINE."
 
 msgid ""
 "The SQLINEDEL command removes the given mask from the SQLINE list if it is present. If a list of entry numbers is given, those entries are deleted. (See the example for LIST below.)\n"
 "\n"
-"The SQLINELIST command displays the SQLINE list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown; for example:\n"
-"   SQLINELIST2-5,7-9\n"
-"      Lists SQLINE entries numbered 2 through 5 and 7\n"
-"      through 9.\n"
+"The SQLINELIST command displays the SQLINE list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
 "SQLINEVIEW is a more verbose version of SQLINELIST, and will show who added an SQLINE, the date it was added, and when it expires, as well as the mask and reason.\n"
 "\n"
@@ -5652,31 +5774,20 @@ msgid ""
 msgstr ""
 "Comanda SQLINEDEL înlătură masca precizată din lista SQLINE dacă aceasta este prezentă. Dacă este furnizată o listă de numere de intrare, acele intrări sunt înlăturate. (Vedeți exemplul pentru LIST de mai jos.)\n"
 "\n"
-"Comanda SQLINELIST afișează lista SQLINE. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări; de exemplu:\n"
-"   SQLINELIST2-5,7-9\n"
-"      Listează intrările SQLINE numerotate de la 2 la 5 și de la 7 la 9.\n"
+"Comanda SQLINELIST afișează lista SQLINE. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări.\n"
 "\n"
-"SQLINEVIEW este o versiune mai detaliată a SQLINELIST și va afișa cine a adăugat un SQLINE, data la care a fost adăugat și când expiră, precum și masca și motivul.\n"
+"Comanda SQLINEVIEW este o versiune mai detaliată a SQLINELIST și va afișa cine a adăugat un SQLINE, data la care a fost adăugat și când expiră, precum și masca și motivul.\n"
 "\n"
-"SQLINECLEAR golește toate intrările din lista SQLINE."
+"Comanda SQLINECLEAR golește toate intrările din lista SQLINE."
 
-#, c-format
 msgid ""
 "The STATS command prints out statistics about stored nicks and memory usage.\n"
 "\n"
-"The CLEAR command lets you clean the database by removing all entries from the database that were added within time.\n"
-"\n"
-"Example:\n"
-" %sCLEAR30m\n"
-" Will remove all entries that were added within the last 30 minutes."
+"The CLEAR command lets you clean the database by removing all entries from the database that were added within time."
 msgstr ""
 "Comanda STATS oferă statistici despre pseudonimele stocate și utilizarea memoriei.\n"
 "\n"
-"Comanda CLEAR vă permite să goliți baza de date prin ștergerea tuturor intrărilor din baza de date care au fost adăugate în intervalul de timp specificat.\n"
-"\n"
-"Exemplu:\n"
-" %sCLEAR30m\n"
-" Va goli toate intrările adăugate în ultimele 30 de minute."
+"Comanda CLEAR vă permite să goliți baza de date prin ștergerea tuturor intrărilor din baza de date care au fost adăugate în intervalul de timp specificat."
 
 msgid "The email parameter is optional and will set the email address for your nick immediately. You may also wish to SETHIDE it after registering if it isn't the default setting already."
 msgstr "Parametrul email este opțional și va seta imediat adresa de email pentru pseudonimul dumneavoastră. Este posibil să doriți, de asemenea, a utiliza SETHIDE după înregistrare, dacă ascunderea adresei de email nu este deja o setare implicită."
@@ -5691,25 +5802,17 @@ msgid ""
 "\n"
 "Which are used to message, notice, and memo the channel respectively. With MESSAGE or NOTICE you must have a service bot assigned to and joined to your channel. Status may be a channel status such as @ or +.\n"
 "\n"
-"To remove a logging method use the same syntax as you would to add it.\n"
-"\n"
-"Example:\n"
-" %s#anopechanserv/accessMESSAGE@\n"
-" Would message any channel operators whenever someone used the ACCESS command on ChanServ on the channel."
+"To remove a logging method use the same syntax as you would to add it."
 msgstr ""
 "Comanda %s permite utilizatorilor să configureze setările de înregistrare în jurnal pentru canalele lor. Dacă nu sunt furnizați parametri, această comandă listează metodele de înregistrare curente pentru acest canal.\n"
 "\n"
 "Altfel, comanda trebuie să fie un nume de comandă, iar metoda este una dintre următoarele metode de înregistrare în jurnal:\n"
 "\n"
-" MESSAGE [statut], NOTICE [statut], MEMO\n"
+" MESSAGE[stare], NOTICE[stare], MEMO\n"
 "\n"
-"Care sunt folosite pentru a trimite mesaje, a notifica, și a trimite misive canalului respectiv. Pentru mesaj (MESSAGE) sau notificare (NOTICE) trebuie să aveți un bot de serviciu asociat și alăturat canalului dumneavoastră. Statutul poate fi un statut al canalului, cum ar fi @ sau +.\n"
+"Care sunt folosite pentru a trimite mesaje, a notifica, și a trimite misive canalului respectiv. Pentru mesaj (MESSAGE) sau notificare (NOTICE) trebuie să aveți un bot de serviciu asociat și alăturat canalului dumneavoastră. Starea poate fi una de canal, cum ar fi @ sau +.\n"
 "\n"
-"Pentru a înlătura o metodă de înregistrare în jurnal, utilizați aceeași sintaxă ca pentru a o adăuga.\n"
-"\n"
-"Examplu:\n"
-" %s#anopechanserv/accessMESSAGE@\n"
-" Trimite un mesaj tuturor operatorilor de fiecare dată când cineva folosește în canal comanda ACCESS aparținând serviciului ChanServ."
+"Pentru a înlătura o metodă de înregistrare în jurnal, utilizați aceeași sintaxă ca pentru a o adăuga."
 
 #, c-format
 msgid "The %s list for %s is full."
@@ -5805,12 +5908,28 @@ msgid "The mask must contain at least one non wildcard character."
 msgstr "Masca trebuie să conțină cel puțin un caracter non-wildcard."
 
 #, c-format
+msgid "The maximum of %u auto join entry has been reached."
+msgid_plural "The maximum of %u auto join entries has been reached."
+msgstr[0] "Ne pare rău, a fost atins numărul maxim de %u intrări pentru alăturări automate."
+msgstr[1] "Ne pare rău, a fost atins numărul maxim de %u intrări pentru alăturări automate."
+
+#, c-format
+msgid "The maximum of %u certificate entry has been reached."
+msgid_plural "The maximum of %u certificate entries has been reached."
+msgstr[0] "Ne pare rău, a fost atins numărul maxim de %u intrări pentru certificate."
+msgstr[1] "Ne pare rău, a fost atins numărul maxim de %u intrări pentru certificate."
+
+#, c-format
+msgid "The memo ignore list for %s is full."
+msgstr "Ne pare rău, lista de ignorare a misivelor pentru %s este plină."
+
+#, c-format
 msgid "The memo limit for %s may not be changed."
 msgstr "Limita de misive pentru %s nu poate fi modificată."
 
 #, c-format
-msgid "The mode lock list of %s is full."
-msgstr "Lista de încuieri de mod pentru %s este plină."
+msgid "The mode lock list of %s is full, unable to lock %s."
+msgstr "Lista de încuieri de mod pentru %s este plină, prin urmare nu se poate încuia %s."
 
 #, c-format
 msgid "The network name you specified is incorrect. Did you mean to run %s on a different network?"
@@ -5848,16 +5967,23 @@ msgid "The password reset request for %s has expired."
 msgstr "Solicitarea de resetare a parolei pentru %s a expirat."
 
 #, c-format
+msgid "The password you specified is forbidden by %s: %s"
+msgstr "Parola specificată de dumneavoastră este interzisă de %s: %s"
+
+msgid "The password you specified is forbidden."
+msgstr "Parola specificată de dumneavoastră este interzisă."
+
+#, c-format
 msgid "The registration confirmation code you specified for %s is incorrect."
 msgstr "Codul de confirmare a înregistrării specificat pentru %s este incorect."
 
 #, c-format
 msgid "The services access status of %s will now be hidden from %s INFO displays."
-msgstr "Statutul accesului la servicii al utilizatorului %s va fi acum ascuns în comanda INFO a %s."
+msgstr "Starea accesului la servicii a utilizatorului %s va fi de acum ascunsă în comanda INFO a %s."
 
 #, c-format
 msgid "The services access status of %s will now be shown in %s INFO displays."
-msgstr "Statutul accesului la servicii al utilizatorului %s va fi acum afișat în comanda INFO a %s."
+msgstr "Starea accesului la servicii a utilizatorului %s va fi de acum afișată în comanda INFO a %s."
 
 msgid "The session exception list is empty."
 msgstr "Lista de excepții de sesiune este goală."
@@ -5952,7 +6078,7 @@ msgid ""
 "\n"
 "The POOL and DEPOOL commands actually add and remove servers to their given zones."
 msgstr ""
-"Această comandă permite gestionarea zonelor DNS utilizate pentru controlul serverelor către care sunt direcționați utilizatorii la conectare. Omiterea tuturor parametrilor afișează statutul zonei DNS.\n"
+"Această comandă permite gestionarea zonelor DNS utilizate pentru controlul serverelor către care sunt direcționați utilizatorii la conectare. Omiterea tuturor parametrilor afișează starea zonei DNS.\n"
 "\n"
 "ADDZONE adaugă o zonă, de exemplu ro.rețeaua-dumneavoastră.tld. Serverele pot fi apoi adăugate la această zonă prin comanda ADDSERVER.\n"
 "\n"
@@ -6022,19 +6148,8 @@ msgstr "Această comandă reîncarcă modulul numit nume-modul."
 msgid "This command retrieves the vhost requests."
 msgstr "Această comandă preia solicitările de gazdă virtuală."
 
-msgid ""
-"This command searches the services logfiles for messages that match the given pattern. The day and limit argument may be used to specify how many days of logs to search and the number of replies to limit to. By default this command searches one week of logs, and limits replies to 50.\n"
-"\n"
-"For example:\n"
-"    LOGSEARCH+21d+500lAnope\n"
-"      Searches the last 21 days worth of logs for messages\n"
-"      containing Anope and lists the most recent 500 of them."
-msgstr ""
-"Această comandă caută în fișierele de jurnal ale serviciilor mesaje care se potrivesc cu modelul precizat. Argumentele zi și limită pot fi folosite pentru a specifica câte zile de jurnale să caute și numărul de răspunsuri la care să se limiteze. În mod implicit, această comandă caută o săptămână de jurnale și limitează răspunsurile la 50.\n"
-"\n"
-"De exemplu:\n"
-"   LOGSEARCH+21d+500lAnope\n"
-"      Caută în jurnalele din ultimele 21 de zile mesajele care conțin Anope și listează cele mai recente 500 dintre acestea."
+msgid "This command searches the services logfiles for messages that match the given pattern. The day and limit argument may be used to specify how many days of logs to search and the number of replies to limit to. By default this command searches one week of logs, and limits replies to 50."
+msgstr "Această comandă caută în fișierele de jurnal ale serviciilor mesaje care se potrivesc cu modelul precizat. Argumentele zi și limită pot fi folosite pentru a specifica câte zile de jurnale să caute și numărul de răspunsuri la care să se limiteze. În mod implicit, această comandă caută o săptămână de jurnale și limitează răspunsurile la 50."
 
 msgid "This command tells you what a users access is on a channel and what access entries, if any, they match. Additionally it will tell you of any auto kick entries they match. Usage of this command is limited to users who have the ability to modify access entries on the channel."
 msgstr "Această comandă vă informează ce acces are un utilizator într-un canal și ce intrări de acces corespund, dacă există. În plus, vă va informa despre intrările de izgoniri automate care se potrivesc. Utilizarea acestei comenzi este limitată la utilizatorii care au posibilitatea de a modifica intrările de acces în canal."
@@ -6200,10 +6315,7 @@ msgstr "Tastați %sopțiunea pentru mai multe informații despre o anumită
 
 #, c-format
 msgid "Type %sregion to list timezones for a region."
-msgstr "Tastați %sregiune pentru a lista fusurile orare ale unei regiuni."
-
-msgid "Un-Load a module"
-msgstr "Aruncă un modul"
+msgstr "Tastați %sregiunea pentru a lista fusurile orare ale unei regiuni."
 
 #, c-format
 msgid "Unable to find regex engine %s."
@@ -6227,8 +6339,14 @@ msgstr "Disociază un bot dintr-un canal"
 msgid "Unassigns a bot from a channel. When you use this command, the bot won't join the channel anymore. However, bot configuration for the channel is kept, so you will always be able to reassign a bot later without having to reconfigure it entirely."
 msgstr "Disociază un bot dintr-un canal. Când utilizați această comandă, botul nu se va mai alătura canalului. Cu toate acestea, configurația botului pentru canal este păstrată, astfel încât veți putea întotdeauna să reasociați un bot mai târziu, fără a fi nevoie să-l reconfigurați în întregime."
 
+msgid "Unconfirmed"
+msgstr "Neconfirmat"
+
 msgid "Underlines kicker"
 msgstr "Izgonire la sublinieri"
+
+msgid "Unknown"
+msgstr "Necunoscut"
 
 msgid "Unknown SET option."
 msgstr "Opțiune SET necunoscută."
@@ -6254,8 +6372,8 @@ msgid "Unknown command %s. Type %s for help."
 msgstr "Comandă necunoscută %s. Tastați %s pentru ajutor."
 
 #, c-format
-msgid "Unknown mode character %c ignored."
-msgstr "Caracterul de mod necunoscut %c este ignorat."
+msgid "Unknown modes %s ignored."
+msgstr "Modurile necunoscute %s au fost ignorate."
 
 #, c-format
 msgid "Unknown parameter: %s"
@@ -6264,6 +6382,9 @@ msgstr "Parametru necunoscut: %s"
 #, c-format
 msgid "Unknown passwords: %zu"
 msgstr "Parole necunoscute: %zu"
+
+msgid "Unload a module"
+msgstr "Descarcă un modul"
 
 msgid "Unpooled"
 msgstr "Decolectivizat"
@@ -6281,16 +6402,16 @@ msgid "Unsuspends a nickname which allows it to be used again."
 msgstr "Anulează suspendarea unui pseudonim, ceea ce permite utilizarea acestuia."
 
 msgid "Updates a selected nicks status modes on a channel. If nick is omitted then your status is updated. If channel is omitted then your channel status is updated on every channel you are in."
-msgstr "Actualizează modurile de statut ale pseudonimului selectat într-un canal. Dacă pseudonimul este omis, atunci statutul dumneavoastră este actualizat. Dacă canalul este omis, atunci statutul dumneavoastră de canal este actualizat în fiecare canal în care vă aflați."
+msgstr "Actualizează modurile de stare ale pseudonimului selectat într-un canal. Dacă pseudonimul este omis, atunci starea dumneavoastră este actualizată. Dacă canalul este omis, atunci starea dumneavoastră de canal este actualizată în fiecare canal în care vă aflați."
 
 msgid "Updates a selected nicks status on a channel"
-msgstr "Actualizează statutul pseudonimului selectat într-un canal"
+msgstr "Actualizează starea pseudonimului selectat într-un canal"
 
 msgid "Updates your current status, i.e. it checks for new memos"
-msgstr "Actualizează statutul dumneavoastră actual, adică verifică dacă există noi misive"
+msgstr "Actualizează starea dumneavoastră actuală, adică verifică dacă există noi misive"
 
 msgid "Updates your current status, i.e. it checks for new memos, sets needed channel modes and updates your vhost and your userflags (lastseentime, etc)."
-msgstr "Actualizează statutul dumneavoastră actual, adică verifică dacă există noi misive, setează modurile de canal necesare apoi vă actualizează gazda virtuală și datele salvate (ultima conectare și altele)."
+msgstr "Actualizează starea dumneavoastră actuală, adică verifică dacă există noi misive, setează modurile de canal necesare apoi vă actualizează gazda virtuală și datele salvate (ultima conectare și altele)."
 
 msgid "Updating databases."
 msgstr "Se actualizează bazele de date."
@@ -6317,7 +6438,7 @@ msgid "Used to manage the list of privileged users"
 msgstr "Vă permite să gestionați lista de utilizatori privilegiați"
 
 msgid "Used to modify the channel status of you or other users"
-msgstr "Vă permite să modificați statutul de canal al dumneavoastră sau al altor utilizatori"
+msgstr "Vă permite să modificați starea de canal a dumneavoastră sau a altor utilizatori"
 
 #, c-format
 msgid "User %s isn't currently logged in to an account."
@@ -6386,11 +6507,20 @@ msgstr "Gazda virtuală pentru contul %s a fost înlăturată."
 msgid "VIEW host"
 msgstr "VIEW gazdă"
 
+msgid "VIEW nickname"
+msgstr "VIEW pseudonim"
+
 msgid "VIEW [mask | list | id]"
-msgstr "VIEW [mască | listă | id]"
+msgstr "VIEW [mască | listă | identificator]"
 
 msgid "VIEW [mask | list]"
 msgstr "VIEW [mască | listă]"
+
+msgid "VIEW [nickname]"
+msgstr "VIEW [pseudonim]"
+
+msgid "VIEW [vhost-mask | entry-num | list]"
+msgstr "VIEW [mască | număr-intrare | listă]"
 
 msgid "Validates a previously requested vhost using DNS"
 msgstr "Validează o gazdă virtuală solicitată, utilizând DNS"
@@ -6557,6 +6687,26 @@ msgid "You can not send a single message while you have messages queued."
 msgstr "Nu puteți trimite niciun mesaj cât timp aveți mesaje în coadă."
 
 #, c-format
+msgid "You can only have %d autokick masks on a channel."
+msgstr "Puteți avea doar %d măști de izgoniri automate într-un canal."
+
+#, c-format
+msgid "You can only have %d bad words entries on a channel."
+msgstr "Puteți avea doar %d intrări de cuvinte nepotrivite într-un canal."
+
+#, c-format
+msgid "You can only have %u access entry on a channel, including access entries from other channels."
+msgid_plural "You can only have %u access entries on a channel, including access entries from other channels."
+msgstr[0] "Pteți avea doar %u intrare de acces într-un canal, inclusiv intrările de accese în alte canale."
+msgstr[1] "Puteți avea doar %u intrări de accese într-un canal, inclusiv intrările de accese în alte canale."
+
+#, c-format
+msgid "You can only have %u access entry on a channel."
+msgid_plural "You can only have %u access entries on a channel."
+msgstr[0] "Puteți avea doar %u intrare de acces într-un canal."
+msgstr[1] "Puteți avea doar %u intrări de accese într-un canal."
+
+#, c-format
 msgid "You can't %s yourself!"
 msgstr "Nu puteți folosi %s asupra dumneavoastră!"
 
@@ -6566,6 +6716,10 @@ msgstr "Nu puteți adăuga un canal la propria sa listă de acces."
 #, c-format
 msgid "You can't logout %s, they are a Services Operator."
 msgstr "Nu puteți deidentifica pe %s deoarece este Operator de Servicii."
+
+#, c-format
+msgid "You cannot add a malformed mask to an access list. Did you mean to add %s instead?"
+msgstr "Nu puteți adăuga o mască incorectă la o listă de accese. Ați dorit să adăugați %s în schimb?"
 
 #, c-format
 msgid "You cannot set the %c flag."
@@ -6638,6 +6792,14 @@ msgid "You have a new memo from %s. Type %s%zu to read it."
 msgstr "Aveți o misivă nouă de la %s. Tastați %s%zu pentru a o citi."
 
 #, c-format
+msgid "You have already exceeded your limit of %d channels."
+msgstr "Ați depășit deja limita de %d canale."
+
+#, c-format
+msgid "You have already reached your limit of %d channels."
+msgstr "Ați atins deja limita de %d canale."
+
+#, c-format
 msgid "You have been invited to %s by %s."
 msgstr "Ați fost invitat(ă) în %s de către %s."
 
@@ -6684,8 +6846,8 @@ msgid "You may drop any nick within your account."
 msgstr "Puteți radia orice pseudonim din contul dumneavoastră."
 
 #, c-format
-msgid "You may not (un)lock mode %c."
-msgstr "Nu aveți dreptul să descuiați modul %c."
+msgid "You may not (un)lock modes %s from %s."
+msgstr "Nu puteți încuia sau descuia modurile %s din %s."
 
 msgid "You may not change the email address of an unconfirmed account."
 msgstr "Nu aveți dreptul să modificați adresa de email a unui cont neconfirmat."
@@ -6729,11 +6891,17 @@ msgstr "Trebuie să fiți identificat(ă) într-un cont pentru a utiliza comanda
 msgid "You must confirm your account before you can register a channel."
 msgstr "Trebuie să vă confirmați contul înainte de a putea înregistra un canal."
 
+msgid "You must confirm your account before you can view the host offer list."
+msgstr "Trebuie să vă confirmați contul înainte de a putea vizualiza lista de oferte pentru gazde."
+
 msgid "You must confirm your account before you may request a vhost."
 msgstr "Trebuie să vă confirmați contul înainte de a putea solicita o gazdă virtuală."
 
 msgid "You must confirm your account before you may send a memo."
 msgstr "Trebuie să vă confirmați contul înainte de a putea trimite o misivă."
+
+msgid "You must confirm your account before you may take a vhost."
+msgstr "Trebuie să vă confirmați contul înainte de a putea lua o gazdă virtuală."
 
 #, c-format
 msgid "You must have the %s(ME) privilege on the channel to use this command."
@@ -6816,18 +6984,11 @@ msgstr "Serverul dumneavoastră de IRCd nu acceptă identități virtuale. Dacă
 
 #, c-format
 msgid "Your SSL certificate fingerprint %s has been automatically added to your certificate list."
-msgstr "Amprenta electronică a certificatului SSL %s a fost adăugată automat la lista de certificate a dumneavoastră."
+msgstr "Amprenta digitală a certificatului SSL %s a fost adăugată automat la lista de certificate a dumneavoastră."
 
 #, c-format
 msgid "Your account %s has been successfully created."
 msgstr "Contul dumneavoastră %s a fost creat cu succes."
-
-msgid "Your account is not confirmed. To confirm it, follow the instructions that were emailed to you."
-msgstr "Contul dumneavoastră nu este confirmat. Pentru a-l confirma, urmați instrucțiunile care v-au fost trimise prin email."
-
-#, c-format
-msgid "Your account is not confirmed. To confirm it, type %s."
-msgstr "Contul dumneavoastră nu este confirmat. Pentru a-l confirma, tastați %s."
 
 #, c-format
 msgid "Your account will expire, if not confirmed, in %s."
@@ -6896,12 +7057,12 @@ msgid "Your oper block doesn't require logging in."
 msgstr "Blocul de operare al dumneavoastră nu necesită autentificare."
 
 #, c-format
-msgid "Your password is too long. It must be shorter than %u characters."
-msgstr "Parola dumneavoastră este prea lungă. Aceasta trebuie să fie mai scurtă de %u caractere."
+msgid "Your password is too long. It must be shorter than %zu characters."
+msgstr "Parola dumneavoastră este prea lungă. Aceasta trebuie să fie mai scurtă de %zu caractere."
 
 #, c-format
-msgid "Your password is too short. It must be longer than %u characters."
-msgstr "Parola dumneavoastră este prea scurtă. Aceasta trebuie să fie mai lungă de %u caractere."
+msgid "Your password is too short. It must be longer than %zu characters."
+msgstr "Parola dumneavoastră este prea scurtă. Aceasta trebuie să fie mai lungă de %zu caractere."
 
 msgid "Your requested vhost has been approved."
 msgstr "Gazda virtuală solicitată de dumneavoastră a fost aprobată."
@@ -6915,6 +7076,9 @@ msgstr "Gazda virtuală solicitată de dumneavoastră a fost respinsă. Motivul:
 
 msgid "Your requested vhost has been validated via DNS."
 msgstr "Gazda virtuală solicitată de dumneavoastră a fost validată prin DNS."
+
+msgid "Your vhost"
+msgstr "Gazda virtuală a dumneavoastră"
 
 #, c-format
 msgid "Your vhost %s has been requested."
@@ -7001,13 +7165,16 @@ msgid "[channel] [nick]"
 msgstr "[canal] [pseudonim]"
 
 msgid "[channel] {num | list | LAST | ALL}"
-msgstr "[canal] {număr | listă | LAST | ALL}"
+msgstr "[canal] {numră | listă | LAST | ALL}"
 
 msgid "[channel] {num | list | LAST | NEW | ALL}"
 msgstr "[canal] {număr | listă | LAST | NEW | ALL}"
 
 msgid "[key|#X-Y]"
 msgstr "[cheie|#X-Y]"
+
+msgid "[language]"
+msgstr "[limbă]"
 
 msgid "[message]"
 msgstr "[mesaj]"
@@ -7030,23 +7197,23 @@ msgstr "[pseudonim] cod"
 msgid "[parameter]"
 msgstr "[parametru]"
 
+msgid "[timezone]"
+msgstr "[fus-orar]"
+
+msgid "[vhost-mask | entry-num | list] [ALL]"
+msgstr "[mască-virtuală | număr-intrare | listă] [ALL]"
+
 msgid "[+daysd] [+limitl] pattern"
 msgstr "[+ziled] [+limităl] model"
 
 msgid "[+expiry] channel reason"
 msgstr "[+expirare] canal motiv"
 
-msgid "[Hostname hidden]"
-msgstr "[Numele de gazdă ascuns]"
-
 msgid "[Suspended]"
 msgstr "[Suspendat]"
 
-msgid "[Unconfirmed]"
-msgstr "[Neconfirmat]"
-
 msgid "[{pattern | channel} [INVISIBLE]]"
-msgstr "[{model | canal} [INVISIBLE]]"
+msgstr "[{șablon | canal} [INVISIBLE]]"
 
 msgid "[{pattern | nick} [SECRET]]"
 msgstr "[{model | pseudonim} [SECRET]]"
@@ -7067,6 +7234,9 @@ msgstr "litere: %s, cuvinte: %s, linii: %s, zâmbete: %s, acțiuni: %s"
 
 msgid "not assigned yet"
 msgstr "încă neasociat"
+
+msgid "value"
+msgstr "valoare"
 
 msgid "vhost"
 msgstr "gazdă virtuală"
@@ -7148,6 +7318,24 @@ msgstr "{number}: {mask} = {level} -- creat de {creator}; ultima dată văzut 
 
 msgid "{number}: {nick} = {vhost} -- created by {creator} at {created}"
 msgstr "{number}: {nick} = {vhost} -- creat de {creator} la {created}"
+
+msgid "{number}: {offered_vhost} / {your_vhost} -- {expires}"
+msgstr "{number}: {offered_vhost} / {your_vhost} -- {expires}"
+
+msgid "{number}: {offered_vhost} / {your_vhost} -- {expires} ({reason})"
+msgstr "{number}: {offered_vhost} / {your_vhost} -- {expires} ({reason})"
+
+msgid "{number}: {vhost}"
+msgstr "{number}: {vhost}"
+
+msgid "{number}: {vhost} ({reason})"
+msgstr "{number}: {vhost} ({reason})"
+
+msgid "{number}: {vhost} -- created by {creator} on {created}; {expires}"
+msgstr "{number}: {vhost} -- creat de {creator} pe {created}; {expires}"
+
+msgid "{number}: {vhost} -- created by {creator} on {created}; {expires} ({reason})"
+msgstr "{number}: {vhost} -- creat de {creator} pe {created}; {expires} ({reason})"
 
 msgid "{number}: {word} -- type: {type}"
 msgstr "{number}: {word} -- tip: {type}"

@@ -169,7 +169,7 @@ void Channel::DeleteUser(User *user)
 
 Membership *Channel::FindUser(User *u) const
 {
-	ChanUserList::const_iterator it = this->users.find(u);
+	auto it = this->users.find(u);
 	if (it != this->users.end())
 		return it->second;
 	return NULL;
@@ -308,7 +308,7 @@ void Channel::SetModeInternal(MessageSource &setter, ChannelMode *ocm, const Mod
 
 	if (cm->type == MODE_LIST)
 	{
-		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
+		auto *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
 		cml->OnAdd(this, mdata.value);
 	}
 
@@ -366,7 +366,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 
 	if (cm->type == MODE_LIST)
 	{
-		for (Channel::ModeList::iterator it = modes.lower_bound(cm->name), it_end = modes.upper_bound(cm->name); it != it_end; ++it)
+		for (auto it = modes.lower_bound(cm->name), it_end = modes.upper_bound(cm->name); it != it_end; ++it)
 			if (param.equals_ci(it->second.value))
 			{
 				this->modes.erase(it);
@@ -378,7 +378,7 @@ void Channel::RemoveModeInternal(MessageSource &setter, ChannelMode *ocm, const 
 
 	if (cm->type == MODE_LIST)
 	{
-		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
+		auto *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
 		cml->OnDel(this, param);
 	}
 
@@ -416,7 +416,7 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const ModeData &data, bool e
 		return;
 	else if (cm->type == MODE_PARAM)
 	{
-		ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
+		auto *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 		if (!cmp->IsValid(mdata.value))
 			return;
 
@@ -432,7 +432,7 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const ModeData &data, bool e
 	}
 	else if (cm->type == MODE_LIST)
 	{
-		ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
+		auto *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
 
 		if (!cml->IsValid(mdata.value))
 			return;
@@ -494,7 +494,7 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &wpar
 	if (cm->type == MODE_PARAM)
 	{
 		param.clear();
-		ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
+		auto *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 		if (!cmp->minus_no_arg)
 			this->GetParam(cmp->name, param);
 	}
@@ -676,7 +676,7 @@ void Channel::SetModesInternal(MessageSource &source, const Anope::string &modes
 		}
 		else if (cm->type == MODE_PARAM)
 		{
-			ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
+			auto *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 
 			if (!add && cmp->minus_no_arg)
 			{
@@ -948,7 +948,7 @@ BotInfo *Channel::WhoSends() const
 
 Channel *Channel::Find(const Anope::string &name)
 {
-	channel_map::const_iterator it = ChannelList.find(name);
+	auto it = ChannelList.find(name);
 
 	if (it != ChannelList.end())
 		return it->second;

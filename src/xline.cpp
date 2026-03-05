@@ -238,7 +238,7 @@ void XLineManager::RegisterXLineManager(XLineManager *xlm)
 
 void XLineManager::UnregisterXLineManager(XLineManager *xlm)
 {
-	std::list<XLineManager *>::iterator it = std::find(XLineManagers.begin(), XLineManagers.end(), xlm);
+	auto it = std::find(XLineManagers.begin(), XLineManagers.end(), xlm);
 
 	if (it != XLineManagers.end())
 		XLineManagers.erase(it);
@@ -320,11 +320,11 @@ void XLineManager::RemoveXLine(XLine *x)
 {
 	/* called from the destructor */
 
-	std::vector<XLine *>::iterator it = std::find(this->xlines->begin(), this->xlines->end(), x);
+	auto it = std::find(this->xlines->begin(), this->xlines->end(), x);
 
 	if (!x->id.empty())
 	{
-		std::multimap<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID->find(x->id), it3 = XLinesByUID->upper_bound(x->id);
+		auto it2 = XLinesByUID->find(x->id), it3 = XLinesByUID->upper_bound(x->id);
 		for (; it2 != XLinesByUID->end() && it2 != it3; ++it2)
 			if (it2->second == x)
 			{
@@ -342,11 +342,11 @@ void XLineManager::RemoveXLine(XLine *x)
 
 bool XLineManager::DelXLine(XLine *x)
 {
-	std::vector<XLine *>::iterator it = std::find(this->xlines->begin(), this->xlines->end(), x);
+	auto it = std::find(this->xlines->begin(), this->xlines->end(), x);
 
 	if (!x->id.empty())
 	{
-		std::multimap<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID->find(x->id), it3 = XLinesByUID->upper_bound(x->id);
+		auto it2 = XLinesByUID->find(x->id), it3 = XLinesByUID->upper_bound(x->id);
 		for (; it2 != XLinesByUID->end() && it2 != it3; ++it2)
 			if (it2->second == x)
 			{
@@ -441,9 +441,9 @@ bool XLineManager::CanAdd(CommandSource &source, const Anope::string &mask, time
 
 XLine *XLineManager::HasEntry(const Anope::string &mask)
 {
-	std::multimap<Anope::string, XLine *, ci::less>::iterator it = XLinesByUID->find(mask);
+	auto it = XLinesByUID->find(mask);
 	if (it != XLinesByUID->end())
-		for (std::multimap<Anope::string, XLine *, ci::less>::iterator it2 = XLinesByUID->upper_bound(mask); it != it2; ++it)
+		for (auto it2 = XLinesByUID->upper_bound(mask); it != it2; ++it)
 			if (it->second->manager == NULL || it->second->manager == this)
 			{
 				it->second->QueueUpdate();

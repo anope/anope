@@ -48,7 +48,7 @@ public:
 		}
 
 		// Rate limit logins to 1/sec
-		time_t *last_login = na->nc->GetExt<time_t>("webcpanel_last_login");
+		auto *last_login = na->nc->GetExt<time_t>("webcpanel_last_login");
 		if (last_login != NULL && Anope::CurTime == *last_login)
 		{
 			this->OnFail();
@@ -113,7 +113,7 @@ bool WebCPanel::Index::OnRequest(HTTP::Provider *server, const Anope::string &pa
 		// Rate limit check.
 		Anope::string ip = client->clientaddr.addr();
 
-		Anope::unordered_map<time_t>::iterator it = last_login_attempt.find(ip);
+		auto it = last_login_attempt.find(ip);
 		if (it != last_login_attempt.end())
 		{
 			time_t last_time = it->second;

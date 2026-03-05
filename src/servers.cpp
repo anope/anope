@@ -272,7 +272,7 @@ void Server::Sync(bool sync_links)
 		FOREACH_MOD(OnPreUplinkSync, (this));
 	}
 
-	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end;)
+	for (auto it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end;)
 	{
 		Channel *c = it->second;
 		++it;

@@ -77,10 +77,10 @@ OperInfoImpl::~OperInfoImpl()
 	Extensible *e = OperInfos::Find(target);
 	if (e)
 	{
-		OperInfos *op  = e->GetExt<OperInfos>("operinfo");
+		auto *op  = e->GetExt<OperInfos>("operinfo");
 		if (op)
 		{
-			std::vector<OperInfo *>::iterator it = std::find((*op)->begin(), (*op)->end(), this);
+			auto it = std::find((*op)->begin(), (*op)->end(), this);
 			if (it != (*op)->end())
 				(*op)->erase(it);
 		}
@@ -96,7 +96,7 @@ Serializable *OperInfoTypeImpl::Unserialize(Serializable *obj, Serialize::Data &
 	if (!e)
 		return NULL;
 
-	OperInfos *oi = e->Require<OperInfos>("operinfo");
+	auto *oi = e->Require<OperInfos>("operinfo");
 	OperInfoImpl *o;
 	if (obj)
 		o = anope_dynamic_static_cast<OperInfoImpl *>(obj);
@@ -162,7 +162,7 @@ public:
 				return;
 			}
 
-			OperInfos *oi = e->Require<OperInfos>("operinfo");
+			auto *oi = e->Require<OperInfos>("operinfo");
 
 			if ((*oi)->size() >= Config->GetModule(this->module).Get<unsigned>("max", "10"))
 			{
@@ -195,7 +195,7 @@ public:
 				return;
 			}
 
-			OperInfos *oi = e->GetExt<OperInfos>("operinfo");
+			auto *oi = e->GetExt<OperInfos>("operinfo");
 
 			if (!oi)
 			{
@@ -234,7 +234,7 @@ public:
 		}
 		else if (cmd.equals_ci("CLEAR"))
 		{
-			OperInfos *oi = e->GetExt<OperInfos>("operinfo");
+			auto *oi = e->GetExt<OperInfos>("operinfo");
 
 			if (!oi)
 			{

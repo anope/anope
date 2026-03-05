@@ -61,7 +61,7 @@ NickAlias::~NickAlias()
 	if (this->nc)
 	{
 		/* Next: see if our core is still useful. */
-		std::vector<NickAlias *>::iterator it = std::find(this->nc->aliases->begin(), this->nc->aliases->end(), this);
+		auto it = std::find(this->nc->aliases->begin(), this->nc->aliases->end(), this);
 		if (it != this->nc->aliases->end())
 			this->nc->aliases->erase(it);
 		if (this->nc->aliases->empty())
@@ -139,7 +139,7 @@ void NickAlias::UpdateSeen(User *u)
 
 NickAlias *NickAlias::Find(const Anope::string &nick)
 {
-	nickalias_map::const_iterator it = NickAliasList->find(nick);
+	auto it = NickAliasList->find(nick);
 	if (it != NickAliasList->end())
 	{
 		it->second->QueueUpdate();
@@ -203,7 +203,7 @@ Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &d
 
 	if (na->nc != core)
 	{
-		std::vector<NickAlias *>::iterator it = std::find(na->nc->aliases->begin(), na->nc->aliases->end(), na);
+		auto it = std::find(na->nc->aliases->begin(), na->nc->aliases->end(), na);
 		if (it != na->nc->aliases->end())
 			na->nc->aliases->erase(it);
 

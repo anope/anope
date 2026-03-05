@@ -473,7 +473,7 @@ bool RedisSocket::Read(const char *buffer, size_t l)
 				 * __keyevent@0__:set
 				 * key
 				 */
-				std::map<Anope::string, Interface *>::iterator it = this->subinterfaces.find(r.multi_bulk[1]->bulk);
+				auto it = this->subinterfaces.find(r.multi_bulk[1]->bulk);
 				if (it != this->subinterfaces.end())
 					it->second->OnResult(r);
 			}
@@ -553,14 +553,14 @@ public:
 			const Anope::string &n = redis.Get<const Anope::string>("name"),
 						&ip = redis.Get<const Anope::string>("ip");
 			int port = redis.Get<int>("port");
-			unsigned db = redis.Get<unsigned>("db");
+			auto db = redis.Get<unsigned>("db");
 
 			delete services[n];
 			services[n] = new MyRedisService(this, n, ip, port, db);
 			new_services.push_back(n);
 		}
 
-		for (std::map<Anope::string, MyRedisService *>::iterator it = services.begin(); it != services.end();)
+		for (auto it = services.begin(); it != services.end();)
 		{
 			Provider *p = it->second;
 			++it;

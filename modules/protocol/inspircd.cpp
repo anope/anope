@@ -205,7 +205,7 @@ public:
 		ListLimits *limits = maxlist.Get(c);
 		if (limits)
 		{
-			ListLimits::const_iterator limit = limits->find(cm->mchar);
+			auto limit = limits->find(cm->mchar);
 			if (limit != limits->end())
 				return limit->second;
 		}
@@ -2416,7 +2416,7 @@ struct IRCDMessageUID final
 
 		NickAlias *na = NULL;
 		if (SASL::service)
-			for (std::list<SASLUser>::iterator it = saslusers.begin(); it != saslusers.end();)
+			for (auto it = saslusers.begin(); it != saslusers.end();)
 			{
 				SASLUser &u = *it;
 

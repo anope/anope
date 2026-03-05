@@ -37,7 +37,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTP::Provider *server, const Anope::s
 		}
 		if (message.post_data.count("greet") > 0)
 		{
-			Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
+			auto *greet = na->nc->GetExt<Anope::string>("greet");
 			const Anope::string &post_greet = HTTP::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
 
 			if (post_greet.empty())
@@ -130,7 +130,7 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTP::Provider *server, const Anope::s
 	replacements["REGISTERED"] = Anope::strftime(na->nc->registered, na->nc);
 	if (na->HasVHost())
 		replacements["VHOST"] = na->GetVHostMask();
-	Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
+	auto *greet = na->nc->GetExt<Anope::string>("greet");
 	if (greet)
 		replacements["GREET"] = *greet;
 	if (na->nc->HasExt("AUTOOP"))

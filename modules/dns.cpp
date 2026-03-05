@@ -729,7 +729,7 @@ public:
 		delete udpsock;
 		delete tcpsock;
 
-		for (std::map<unsigned short, Request *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end;)
+		for (auto it = this->requests.begin(), it_end = this->requests.end(); it != it_end;)
 		{
 			Request *request = it->second;
 			++it;
@@ -909,7 +909,7 @@ public:
 			return true;
 		}
 
-		std::map<unsigned short, Request *>::iterator it = this->requests.find(recv_packet.id);
+		auto it = this->requests.find(recv_packet.id);
 		if (it == this->requests.end())
 		{
 			Log(LOG_DEBUG_2) << "Resolver: Received an answer for something we didn't request";
@@ -1043,7 +1043,7 @@ private:
 	 */
 	bool CheckCache(Request *request)
 	{
-		cache_map::iterator it = this->cache.find(*request);
+		auto it = this->cache.find(*request);
 		if (it != this->cache.end())
 		{
 			Query &record = it->second;
@@ -1070,7 +1070,7 @@ public:
 
 	~ModuleDNS() override
 	{
-		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
+		for (auto it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
 		{
 			Socket *s = it->second;
 			++it;
@@ -1096,8 +1096,8 @@ public:
 		for (int i = 0; i < block.CountBlock("notify"); ++i)
 		{
 			const auto &n = block.GetBlock("notify", i);
-			Anope::string nip = n.Get<Anope::string>("ip");
-			short nport = n.Get<short>("port");
+			auto nip = n.Get<Anope::string>("ip");
+			auto nport = n.Get<short>("port");
 
 			notify.emplace_back(nip, nport);
 		}
@@ -1149,7 +1149,7 @@ public:
 
 	void OnModuleUnload(User *u, Module *m) override
 	{
-		for (std::map<unsigned short, Request *>::iterator it = this->manager.requests.begin(), it_end = this->manager.requests.end(); it != it_end;)
+		for (auto it = this->manager.requests.begin(), it_end = this->manager.requests.end(); it != it_end;)
 		{
 			unsigned short id = it->first;
 			Request *req = it->second;

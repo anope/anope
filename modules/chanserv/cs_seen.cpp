@@ -41,7 +41,7 @@ struct SeenInfo final
 
 	~SeenInfo() override
 	{
-		database_map::iterator iter = database.find(nick);
+		auto iter = database.find(nick);
 		if (iter != database.end() && iter->second == this)
 			database.erase(iter);
 	}
@@ -144,7 +144,7 @@ struct SeenInfoType final
 
 static SeenInfo *FindInfo(const Anope::string &nick)
 {
-	database_map::iterator iter = database.find(nick);
+	auto iter = database.find(nick);
 	if (iter != database.end())
 		return iter->second;
 	return NULL;
@@ -203,7 +203,7 @@ public:
 			time = Anope::CurTime - time;
 			database_map::iterator buf;
 			size_t counter = 0;
-			for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end;)
+			for (auto it = database.begin(), it_end = database.end(); it != it_end;)
 			{
 				buf = it;
 				++it;
@@ -379,9 +379,9 @@ public:
 			return;
 
 		auto previous_size = database.size();
-		for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end;)
+		for (auto it = database.begin(), it_end = database.end(); it != it_end;)
 		{
-			database_map::iterator cur = it;
+			auto cur = it;
 			++it;
 
 			if ((Anope::CurTime - cur->second->last) > purgetime)

@@ -47,7 +47,7 @@ public:
 			return;
 		}
 
-		unsigned reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
+		auto reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);
 
@@ -90,7 +90,7 @@ public:
 			Log(LOG_COMMAND, source, this, ci) << "for " << mask;
 
 			int matched = 0, kicked = 0;
-			for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end;)
+			for (auto it = c->users.begin(), it_end = c->users.end(); it != it_end;)
 			{
 				auto *memb = it->second;
 				++it;

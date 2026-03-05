@@ -73,7 +73,7 @@ public:
 			{
 				if (!u->chans.empty())
 				{
-					NSRecoverInfo *ei = source.GetUser()->Extend<NSRecoverInfo>("recover");
+					auto *ei = source.GetUser()->Extend<NSRecoverInfo>("recover");
 					for (auto &[chan, cuc] : u->chans)
 						(*ei)[chan->name] = cuc->status;
 				}
@@ -108,7 +108,7 @@ public:
 
 			if (IRCD->CanSVSNick)
 			{
-				NSRecoverSvsnick *svs = u->Extend<NSRecoverSvsnick>("svsnick");
+				auto *svs = u->Extend<NSRecoverSvsnick>("svsnick");
 				svs->from = source.GetUser();
 				svs->to = u->nick;
 			}
@@ -253,7 +253,7 @@ public:
 			BotInfo *NickServ = Config->GetClient("NickServ");
 
 			if (ei != NULL && NickServ != NULL)
-				for (NSRecoverInfo::iterator it = ei->begin(), it_end = ei->end(); it != it_end;)
+				for (auto it = ei->begin(), it_end = ei->end(); it != it_end;)
 				{
 					Channel *c = Channel::Find(it->first);
 					const Anope::string &cname = it->first;
@@ -288,7 +288,7 @@ public:
 
 			if (ei != NULL)
 			{
-				NSRecoverInfo::iterator it = ei->find(c->name);
+				auto it = ei->find(c->name);
 				if (it != ei->end())
 				{
 					for (auto mode : it->second.Modes())

@@ -201,7 +201,7 @@ class CommandCSAKick final
 			return;
 		}
 
-		for (Channel::ChanUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+		for (auto it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
 			auto *memb = it->second;
 			++it;
@@ -223,7 +223,7 @@ class CommandCSAKick final
 		const NickAlias *na = NickAlias::Find(mask);
 		NickCore *nc = NULL;
 		const ChanServ::AutoKick *akick;
-		unsigned reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
+		auto reasonmax = Config->GetModule("chanserv").Get<unsigned>("reasonmax", "200");
 
 		if (reason.length() > reasonmax)
 			reason = reason.substr(0, reasonmax);

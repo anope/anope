@@ -86,7 +86,7 @@ struct DefconConfig final
 
 	bool GetDefConParam(const Anope::string &name, Anope::string &buf)
 	{
-	       std::map<Anope::string, Anope::string>::iterator it = DefConModesOnParams.find(name);
+	       auto it = DefConModesOnParams.find(name);
 
 	       buf.clear();
 

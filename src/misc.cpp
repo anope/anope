@@ -105,7 +105,7 @@ void NumberList::Process()
 
 	if (this->desc)
 	{
-		for (std::set<unsigned>::reverse_iterator it = numbers.rbegin(), it_end = numbers.rend(); it != it_end; ++it)
+		for (auto it = numbers.rbegin(), it_end = numbers.rend(); it != it_end; ++it)
 			this->HandleNumber(*it);
 	}
 	else

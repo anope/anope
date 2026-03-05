@@ -224,7 +224,7 @@ class ModuleProxyScan final
 
 		void Tick() override
 		{
-			for (std::set<ProxyConnect *>::iterator it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end;)
+			for (auto it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end;)
 			{
 				ProxyConnect *p = *it;
 				++it;
@@ -246,19 +246,19 @@ public:
 
 	~ModuleProxyScan() override
 	{
-		for (std::set<ProxyConnect *>::iterator it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end;)
+		for (auto it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end;)
 		{
 			ProxyConnect *p = *it;
 			++it;
 			delete p;
 		}
 
-		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
+		for (auto it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
 		{
 			Socket *s = it->second;
 			++it;
 
-			ClientSocket *cs = dynamic_cast<ClientSocket *>(s);
+			auto *cs = dynamic_cast<ClientSocket *>(s);
 			if (cs != NULL && cs->ls == this->listener)
 				delete s;
 		}

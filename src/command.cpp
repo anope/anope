@@ -235,7 +235,7 @@ namespace
 	void HandleUnknownCommand(CommandSource& source, const Anope::string &message)
 	{
 		// Try to find a similar command.
-		size_t distance = Config->GetBlock("options").Get<size_t>("didyoumeandifference", "4");
+		auto distance = Config->GetBlock("options").Get<size_t>("didyoumeandifference", "4");
 		Anope::string similar;
 		auto umessage = message.upper();
 		for (const auto &[command, info] : source.service->commands)
@@ -282,7 +282,7 @@ bool Command::Run(CommandSource &source, const Anope::string &message)
 	std::vector<Anope::string> params;
 	spacesepstream(message).GetTokens(params);
 
-	CommandInfo::map::const_iterator it = source.service->commands.end();
+	auto it = source.service->commands.end();
 	unsigned count = 0;
 	for (unsigned max = params.size(); it == source.service->commands.end() && max > 0; --max)
 	{

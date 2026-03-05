@@ -49,7 +49,7 @@ bool Extensible::HasExt(const Anope::string &name) const
 
 void Extensible::ExtensibleSerialize(const Extensible *e, const Serializable *s, Serialize::Data &data)
 {
-	for (std::set<ExtensibleBase *>::iterator it = e->extension_items.begin(); it != e->extension_items.end(); ++it)
+	for (auto it = e->extension_items.begin(); it != e->extension_items.end(); ++it)
 	{
 		ExtensibleBase *eb = *it;
 		eb->ExtensibleSerialize(e, s, data);

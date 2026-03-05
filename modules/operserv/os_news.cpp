@@ -265,7 +265,7 @@ protected:
 					source.Reply(READ_ONLY_MODE);
 				if (!text.equals_ci("ALL"))
 				{
-					unsigned num = Anope::Convert<unsigned>(text, 0);
+					auto num = Anope::Convert<unsigned>(text, 0);
 					if (num > 0 && num <= list.size())
 					{
 						OperServ::news_service->DelNewsItem(list[num - 1]);

@@ -58,7 +58,7 @@ public:
 		{
 			if (!source.GetUser())
 				return;
-			for (User::ChanUserList::iterator it = source.GetUser()->chans.begin(); it != source.GetUser()->chans.end(); ++it)
+			for (auto it = source.GetUser()->chans.begin(); it != source.GetUser()->chans.end(); ++it)
 			{
 				Channel *c = it->second->chan;
 				SetModes(source.GetUser(), c);
@@ -162,7 +162,7 @@ public:
 		{
 			if (!source.GetUser())
 				return;
-			for (User::ChanUserList::iterator it = source.GetUser()->chans.begin(); it != source.GetUser()->chans.end(); ++it)
+			for (auto it = source.GetUser()->chans.begin(); it != source.GetUser()->chans.end(); ++it)
 			{
 				Channel *c = it->second->chan;
 				RemoveAll(source.GetUser(), c);

@@ -124,7 +124,7 @@ public:
 		for (auto idx = reason_idx; idx < params.size(); ++idx)
 			reason.append(reason.empty() ? "" : " ").append(params[idx]);
 
-		NSSuspendInfo *si = nc->Extend<NSSuspendInfo>("NS_SUSPENDED");
+		auto *si = nc->Extend<NSSuspendInfo>("NS_SUSPENDED");
 		si->what = nc->display;
 		si->by = source.GetNick();
 		si->reason = reason;
@@ -199,7 +199,7 @@ public:
 			return;
 		}
 
-		NSSuspendInfo *si = na->nc->GetExt<NSSuspendInfo>("NS_SUSPENDED");
+		auto *si = na->nc->GetExt<NSSuspendInfo>("NS_SUSPENDED");
 
 		Log(LOG_ADMIN, source, this) << "for " << na->nick << " which was suspended by " << (!si->by.empty() ? si->by : "(none)") << " for: " << (!si->reason.empty() ? si->reason : "No reason");
 
@@ -258,7 +258,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Anope::string s = conf.GetModule(this).Get<Anope::string>("show");
+		auto s = conf.GetModule(this).Get<Anope::string>("show");
 		commasepstream(s).GetTokens(show);
 		std::transform(show.begin(), show.end(), show.begin(), trim());
 	}

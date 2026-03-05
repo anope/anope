@@ -34,10 +34,10 @@ struct AJoinEntry final
 
 	~AJoinEntry() override
 	{
-		AJoinList *channels = owner->GetExt<AJoinList>("ajoinlist");
+		auto *channels = owner->GetExt<AJoinList>("ajoinlist");
 		if (channels)
 		{
-			std::vector<AJoinEntry *>::iterator it = std::find((*channels)->begin(), (*channels)->end(), this);
+			auto it = std::find((*channels)->begin(), (*channels)->end(), this);
 			if (it != (*channels)->end())
 				(*channels)->erase(it);
 		}
@@ -89,7 +89,7 @@ struct AJoinEntryType final
 
 		if (!obj)
 		{
-			AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
+			auto *channels = nc->Require<AJoinList>("ajoinlist");
 			(*channels)->push_back(aj);
 		}
 
@@ -108,7 +108,7 @@ class CommandNSAJoin final
 {
 	static void DoList(CommandSource &source, NickCore *nc)
 	{
-		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
+		auto *channels = nc->Require<AJoinList>("ajoinlist");
 
 		if ((*channels)->empty())
 			source.Reply(_("%s's auto join list is empty."), nc->display.c_str());
@@ -141,7 +141,7 @@ class CommandNSAJoin final
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &chans, const Anope::string &keys)
 	{
 		const auto ajoinmax = Config->GetModule(this->owner).Get<unsigned>("ajoinmax");
-		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
+		auto *channels = nc->Require<AJoinList>("ajoinlist");
 
 		Anope::string addedchans;
 		Anope::string alreadyadded;
@@ -208,7 +208,7 @@ class CommandNSAJoin final
 
 	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &chans)
 	{
-		AJoinList *channels = nc->Require<AJoinList>("ajoinlist");
+		auto *channels = nc->Require<AJoinList>("ajoinlist");
 		Anope::string delchans;
 		Anope::string notfoundchans;
 		commasepstream sep(chans);
@@ -344,7 +344,7 @@ public:
 		if (!NickServ)
 			return;
 
-		AJoinList *channels = u->Account()->GetExt<AJoinList>("ajoinlist");
+		auto *channels = u->Account()->GetExt<AJoinList>("ajoinlist");
 		if (channels == NULL)
 			return;
 

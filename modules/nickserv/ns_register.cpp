@@ -181,7 +181,7 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) override
 	{
-		unsigned int minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
+		auto minpasslen = Config->GetModule("nickserv").Get<unsigned>("minpasslen", "10");
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(

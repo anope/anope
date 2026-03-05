@@ -50,7 +50,7 @@ NickCore::~NickCore()
 	if (!this->chanaccess->empty())
 		Log(LOG_DEBUG) << "Non-empty chanaccess list in destructor!";
 
-	for (std::list<User *>::iterator it = this->users.begin(); it != this->users.end();)
+	for (auto it = this->users.begin(); it != this->users.end();)
 	{
 		User *user = *it++;
 		user->Logout();
@@ -243,7 +243,7 @@ void NickCore::GetChannelReferences(std::deque<ChannelInfo *> &queue)
 
 NickCore *NickCore::Find(const Anope::string &nick)
 {
-	nickcore_map::const_iterator it = NickCoreList->find(nick);
+	auto it = NickCoreList->find(nick);
 	if (it != NickCoreList->end())
 	{
 		it->second->QueueUpdate();

@@ -38,7 +38,7 @@ struct DNSZone final
 
 	~DNSZone() override
 	{
-		std::vector<DNSZone *>::iterator it = std::find(zones->begin(), zones->end(), this);
+		auto it = std::find(zones->begin(), zones->end(), this);
 		if (it != zones->end())
 			zones->erase(it);
 	}
@@ -127,7 +127,7 @@ public:
 
 	~DNSServer() override
 	{
-		std::vector<DNSServer *>::iterator it = std::find(dns_servers->begin(), dns_servers->end(), this);
+		auto it = std::find(dns_servers->begin(), dns_servers->end(), this);
 		if (it != dns_servers->end())
 			dns_servers->erase(it);
 	}

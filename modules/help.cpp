@@ -138,7 +138,7 @@ public:
 					full_command += " " + params[i];
 				full_command.erase(full_command.begin());
 
-				CommandInfo::map::const_iterator it = map.find(full_command);
+				auto it = map.find(full_command);
 				if (it == map.end())
 					continue;
 

@@ -20,7 +20,7 @@
 
 static void *entry_point(void *parameter)
 {
-	Thread *thread = static_cast<Thread *>(parameter);
+	auto *thread = static_cast<Thread *>(parameter);
 	thread->Run();
 	thread->SetExitState();
 	return NULL;

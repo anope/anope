@@ -116,7 +116,7 @@ public:
 		for (auto idx = reason_idx; idx < params.size(); ++idx)
 			reason.append(reason.empty() ? "" : " ").append(params[idx]);
 
-		CSSuspendInfo *si = ci->Extend<CSSuspendInfo>("CS_SUSPENDED");
+		auto *si = ci->Extend<CSSuspendInfo>("CS_SUSPENDED");
 		si->what = ci->name;
 		si->by = source.GetNick();
 		si->reason = reason;
@@ -186,7 +186,7 @@ public:
 		}
 
 		/* Only UNSUSPEND already suspended channels */
-		CSSuspendInfo *si = ci->GetExt<CSSuspendInfo>("CS_SUSPENDED");
+		auto *si = ci->GetExt<CSSuspendInfo>("CS_SUSPENDED");
 		if (!si)
 		{
 			source.Reply(_("Channel \002%s\002 isn't suspended."), ci->name.c_str());
@@ -254,7 +254,7 @@ public:
 
 	void OnReload(Configuration::Conf &conf) override
 	{
-		Anope::string s = conf.GetModule(this).Get<Anope::string>("show");
+		auto s = conf.GetModule(this).Get<Anope::string>("show");
 		commasepstream(s).GetTokens(show);
 		std::transform(show.begin(), show.end(), show.begin(), trim());
 	}

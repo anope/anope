@@ -147,7 +147,7 @@ struct BadWordsImpl final
 
 BadWordsImpl::~BadWordsImpl()
 {
-	for (list::iterator it = badwords->begin(); it != badwords->end();)
+	for (auto it = badwords->begin(); it != badwords->end();)
 	{
 		auto *bw = *it;
 		++it;
@@ -160,10 +160,10 @@ BadWordImpl::~BadWordImpl()
 	ChannelInfo *ci = ChannelInfo::Find(chan);
 	if (ci)
 	{
-		BadWordsImpl *badwords = ci->GetExt<BadWordsImpl>(BOTSERV_BAD_WORDS_EXT);
+		auto *badwords = ci->GetExt<BadWordsImpl>(BOTSERV_BAD_WORDS_EXT);
 		if (badwords)
 		{
-			BadWordsImpl::list::iterator it = std::find(badwords->badwords->begin(), badwords->badwords->end(), this);
+			auto it = std::find(badwords->badwords->begin(), badwords->badwords->end(), this);
 			if (it != badwords->badwords->end())
 				badwords->badwords->erase(it);
 		}
@@ -193,7 +193,7 @@ Serializable *BadWordTypeImpl::Unserialize(Serializable *obj, Serialize::Data &d
 	bw->word = sword;
 	bw->type = StringToType(n);
 
-	BadWordsImpl *bws = ci->Require<BadWordsImpl>(BOTSERV_BAD_WORDS_EXT);
+	auto *bws = ci->Require<BadWordsImpl>(BOTSERV_BAD_WORDS_EXT);
 	if (!obj)
 		bws->badwords->push_back(bw);
 
@@ -337,7 +337,7 @@ private:
 			realword = word.substr(0, pos);
 		}
 
-		unsigned badwordsmax = Config->GetModule(this->module).Get<unsigned>("badwordsmax");
+		auto badwordsmax = Config->GetModule(this->module).Get<unsigned>("badwordsmax");
 		if (badwords->GetBadWordCount() >= badwordsmax)
 		{
 			source.Reply(_("You can only have %d bad words entries on a channel."), badwordsmax);

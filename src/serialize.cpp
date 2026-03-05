@@ -208,7 +208,7 @@ void Type::UpdateTimestamp()
 
 Type *Serialize::Type::Find(const Anope::string &name)
 {
-	std::map<Anope::string, Type *>::iterator it = Types.find(name);
+	auto it = Types.find(name);
 	if (it != Types.end())
 		return it->second;
 	return NULL;

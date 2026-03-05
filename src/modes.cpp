@@ -206,7 +206,7 @@ ChannelModeVirtual<T>::~ChannelModeVirtual()
 {
 	if (basech)
 	{
-		std::vector<ChannelMode *>::iterator it = std::find(basech->listeners.begin(), basech->listeners.end(), this);
+		auto it = std::find(basech->listeners.begin(), basech->listeners.end(), this);
 		if (it != basech->listeners.end())
 			basech->listeners.erase(it);
 	}
@@ -325,7 +325,7 @@ public:
 template<typename List, typename Object>
 static StackerInfo *GetInfo(List &l, Object *o)
 {
-	typename List::const_iterator it = l.find(o);
+	auto it = l.find(o);
 	if (it != l.end())
 		return it->second;
 
@@ -384,7 +384,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 
 	if (cm->type == MODE_STATUS)
 	{
-		ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
+		auto *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 		unsigned want = cms->symbol;
 		if (want >= ChannelModesIdx.size())
 			ChannelModesIdx.resize(want + 1);
@@ -421,7 +421,7 @@ void ModeManager::RemoveUserMode(UserMode *um)
 
 	UserModesByName.erase(um->name);
 
-	std::vector<UserMode *>::iterator it = std::find(UserModes.begin(), UserModes.end(), um);
+	auto it = std::find(UserModes.begin(), UserModes.end(), um);
 	if (it != UserModes.end())
 		UserModes.erase(it);
 
@@ -447,7 +447,7 @@ void ModeManager::RemoveChannelMode(ChannelMode *cm)
 
 	if (cm->type == MODE_STATUS)
 	{
-		ChannelModeStatus *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
+		auto *cms = anope_dynamic_static_cast<ChannelModeStatus *>(cm);
 		unsigned want = cms->symbol;
 
 		if (want >= ChannelModesIdx.size())
@@ -463,7 +463,7 @@ void ModeManager::RemoveChannelMode(ChannelMode *cm)
 
 	ChannelModesByName.erase(cm->name);
 
-	std::vector<ChannelMode *>::iterator it = std::find(ChannelModes.begin(), ChannelModes.end(), cm);
+	auto it = std::find(ChannelModes.begin(), ChannelModes.end(), cm);
 	if (it != ChannelModes.end())
 		ChannelModes.erase(it);
 
@@ -490,7 +490,7 @@ UserMode *ModeManager::FindUserModeByChar(char mode)
 
 ChannelMode *ModeManager::FindChannelModeByName(const Anope::string &name)
 {
-	std::map<Anope::string, ChannelMode *>::iterator it = ChannelModesByName.find(name);
+	auto it = ChannelModesByName.find(name);
 	if (it != ChannelModesByName.end())
 		return it->second;
 	return NULL;
@@ -498,7 +498,7 @@ ChannelMode *ModeManager::FindChannelModeByName(const Anope::string &name)
 
 UserMode *ModeManager::FindUserModeByName(const Anope::string &name)
 {
-	std::map<Anope::string, UserMode *>::iterator it = UserModesByName.find(name);
+	auto it = UserModesByName.find(name);
 	if (it != UserModesByName.end())
 		return it->second;
 	return NULL;
@@ -614,7 +614,7 @@ void ModeManager::ProcessModes()
 template<typename T>
 static void StackerDel(std::map<T *, StackerInfo *> &map, T *obj)
 {
-	typename std::map<T *, StackerInfo *>::iterator it = map.find(obj);
+	auto it = map.find(obj);
 	if (it != map.end())
 	{
 		StackerInfo *si = it->second;
@@ -636,12 +636,12 @@ void ModeManager::StackerDel(Channel *c)
 
 void ModeManager::StackerDel(Mode *m)
 {
-	for (std::map<User *, StackerInfo *>::const_iterator it = UserStackerObjects.begin(), it_end = UserStackerObjects.end(); it != it_end;)
+	for (auto it = UserStackerObjects.begin(), it_end = UserStackerObjects.end(); it != it_end;)
 	{
 		StackerInfo *si = it->second;
 		++it;
 
-		for (StackerInfo::ModeList::iterator it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
+		for (auto it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
 		{
 			if (it2->first == m)
 				it2 = si->AddModes.erase(it2);
@@ -649,7 +649,7 @@ void ModeManager::StackerDel(Mode *m)
 				++it2;
 		}
 
-		for (StackerInfo::ModeList::iterator it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
+		for (auto it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
 		{
 			if (it2->first == m)
 				it2 = si->DelModes.erase(it2);
@@ -658,12 +658,12 @@ void ModeManager::StackerDel(Mode *m)
 		}
 	}
 
-	for (std::map<Channel *, StackerInfo *>::const_iterator it = ChannelStackerObjects.begin(), it_end = ChannelStackerObjects.end(); it != it_end;)
+	for (auto it = ChannelStackerObjects.begin(), it_end = ChannelStackerObjects.end(); it != it_end;)
 	{
 		StackerInfo *si = it->second;
 		++it;
 
-		for (StackerInfo::ModeList::iterator it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
+		for (auto it2 = si->AddModes.begin(), it2_end = si->AddModes.end(); it2 != it2_end;)
 		{
 			if (it2->first == m)
 				it2 = si->AddModes.erase(it2);
@@ -671,7 +671,7 @@ void ModeManager::StackerDel(Mode *m)
 				++it2;
 		}
 
-		for (StackerInfo::ModeList::iterator it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
+		for (auto it2 = si->DelModes.begin(), it2_end = si->DelModes.end(); it2 != it2_end;)
 		{
 			if (it2->first == m)
 				it2 = si->DelModes.erase(it2);
@@ -804,7 +804,7 @@ bool Entry::Matches(User *u, bool full) const
 		ChannelMode *cm = ModeManager::FindChannelModeByName(this->name);
 		if (cm != NULL && cm->type == MODE_LIST)
 		{
-			ChannelModeList *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
+			auto *cml = anope_dynamic_static_cast<ChannelModeList *>(cm);
 			return cml->Matches(u, this);
 		}
 	}

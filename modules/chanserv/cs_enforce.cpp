@@ -177,7 +177,7 @@ private:
 
 		std::vector<User *> users;
 		/* The newer users are at the end of the list, so kick users starting from the end */
-		for (Channel::ChanUserList::reverse_iterator it = ci->c->users.rbegin(), it_end = ci->c->users.rend(); it != it_end; ++it)
+		for (auto it = ci->c->users.rbegin(), it_end = ci->c->users.rend(); it != it_end; ++it)
 		{
 			auto *memb = it->second;
 			User *user = memb->user;

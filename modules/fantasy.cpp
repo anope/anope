@@ -147,7 +147,7 @@ public:
 		if (params.empty())
 			return;
 
-		CommandInfo::map::const_iterator it = Config->Fantasy.end();
+		auto it = Config->Fantasy.end();
 		unsigned count = 0;
 		for (unsigned max = params.size(); it == Config->Fantasy.end() && max > 0; --max)
 		{

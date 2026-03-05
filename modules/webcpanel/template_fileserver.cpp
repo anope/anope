@@ -83,7 +83,7 @@ static Anope::string FindReplacement(const TemplateFileServer::Replacements &r, 
 		}
 	}
 
-	TemplateFileServer::Replacements::const_iterator it = r.find(key);
+	auto it = r.find(key);
 	if (it != r.end())
 		return it->second;
 	return "";

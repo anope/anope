@@ -466,7 +466,7 @@ int16_t ChannelInfo::GetLevel(const Anope::string &priv) const
 		return ACCESS_INVALID;
 	}
 
-	Anope::map<int16_t>::const_iterator it = this->levels.find(priv);
+	auto it = this->levels.find(priv);
 	if (it == this->levels.end())
 		return 0;
 	return it->second;
@@ -514,7 +514,7 @@ Anope::string ChannelInfo::GetIdealBan(User *u) const
 
 ChannelInfo *ChannelInfo::Find(const Anope::string &name)
 {
-	registered_channel_map::const_iterator it = RegisteredChannelList->find(name);
+	auto it = RegisteredChannelList->find(name);
 	if (it != RegisteredChannelList->end())
 	{
 		it->second->QueueUpdate();

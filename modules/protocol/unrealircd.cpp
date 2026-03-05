@@ -640,7 +640,7 @@ namespace UnrealExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			ModData *moddata = u->GetExt<ModData>("ClientModData");
+			auto *moddata = u->GetExt<ModData>("ClientModData");
 			return moddata != NULL && moddata->find("operclass") != moddata->end() && Anope::Match((*moddata)["operclass"], e->GetMask());
 		}
 	};
@@ -674,7 +674,7 @@ namespace UnrealExtBan
 
 		bool Matches(User *u, const Entry *e) override
 		{
-			ModData *moddata = u->GetExt<ModData>("ClientModData");
+			auto *moddata = u->GetExt<ModData>("ClientModData");
 			if (moddata == NULL || moddata->find("geoip") == moddata->end())
 				return false;
 

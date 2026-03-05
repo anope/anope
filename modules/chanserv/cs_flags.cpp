@@ -28,7 +28,7 @@ public:
 
 	bool HasPriv(const Anope::string &priv) const override
 	{
-		std::map<Anope::string, char>::iterator it = defaultFlags.find(priv);
+		auto it = defaultFlags.find(priv);
 		return it != defaultFlags.end() && this->flags.count(it->second) > 0;
 	}
 
@@ -301,7 +301,7 @@ class CommandCSFlags final
 		ServiceReference<AccessProvider> provider("AccessProvider", "access/flags");
 		if (!provider)
 			return;
-		FlagsChanAccess *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
+		auto *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
 		access->SetMask(mask, ci);
 			access->creator = source.GetNick();
 		access->description = current ? current->description : description;

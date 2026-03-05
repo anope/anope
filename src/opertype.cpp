@@ -28,7 +28,7 @@ Oper::Oper(const Anope::string &n, OperType *o) : name(n), ot(o)
 
 Oper::~Oper()
 {
-	std::vector<Oper *>::iterator it = std::find(opers.begin(), opers.end(), this);
+	auto it = std::find(opers.begin(), opers.end(), this);
 	if (it != opers.end())
 		opers.erase(it);
 }

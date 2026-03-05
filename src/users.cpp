@@ -99,7 +99,7 @@ static void CollideKill(User *target, const Anope::string &reason)
 		IRCD->SendQuit(target, reason);
 
 		// Reintroduce my client
-		if (BotInfo *bi = dynamic_cast<BotInfo *>(target))
+		if (auto *bi = dynamic_cast<BotInfo *>(target))
 			bi->OnKill();
 		else
 			target->Quit(reason);
@@ -415,7 +415,7 @@ void User::Logout()
 
 	Log(this, "account") << "is no longer identified as " << this->nc->display;
 
-	std::list<User *>::iterator it = std::find(this->nc->users.begin(), this->nc->users.end(), this);
+	auto it = std::find(this->nc->users.begin(), this->nc->users.end(), this);
 	if (it != this->nc->users.end())
 		this->nc->users.erase(it);
 
@@ -741,7 +741,7 @@ const User::ModeList &User::GetModeList() const
 
 Membership *User::FindChannel(Channel *c) const
 {
-	User::ChanUserList::const_iterator it = this->chans.find(c);
+	auto it = this->chans.find(c);
 	if (it != this->chans.end())
 		return it->second;
 	return NULL;
@@ -854,7 +854,7 @@ User *User::Find(const Anope::string &name, bool nick_only)
 {
 	if (!nick_only && IRCD && IRCD->RequiresID)
 	{
-		user_map::iterator it = UserListByUID.find(name);
+		auto it = UserListByUID.find(name);
 		if (it != UserListByUID.end())
 			return it->second;
 
@@ -862,7 +862,7 @@ User *User::Find(const Anope::string &name, bool nick_only)
 			return NULL;
 	}
 
-	user_map::iterator it = UserListByNick.find(name);
+	auto it = UserListByNick.find(name);
 	if (it != UserListByNick.end())
 		return it->second;
 

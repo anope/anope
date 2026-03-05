@@ -32,7 +32,7 @@ public:
 
 	bool HasPriv(const Anope::string &priv) const override
 	{
-		for (std::vector<Anope::string>::iterator it = std::find(order.begin(), order.end(), this->type); it != order.end(); ++it)
+		for (auto it = std::find(order.begin(), order.end(), this->type); it != order.end(); ++it)
 		{
 			const std::vector<Anope::string> &privs = permissions[*it];
 			if (std::find(privs.begin(), privs.end(), priv) != privs.end())
@@ -55,7 +55,7 @@ public:
 	{
 		if (access->provider->name == "access/xop")
 		{
-			const XOPChanAccess *xaccess = anope_dynamic_static_cast<const XOPChanAccess *>(access);
+			const auto *xaccess = anope_dynamic_static_cast<const XOPChanAccess *>(access);
 			return xaccess->type;
 		}
 		else
@@ -128,7 +128,7 @@ private:
 		bool override = false;
 		const NickAlias *na = NULL;
 
-		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
+		auto cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
 			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccess::DetermineLevel(highest)) : order.end();
 
 		if (!access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))
@@ -252,7 +252,7 @@ private:
 		ServiceReference<AccessProvider> provider("AccessProvider", "access/xop");
 		if (!provider)
 			return;
-		XOPChanAccess *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
+		auto *acc = anope_dynamic_static_cast<XOPChanAccess *>(provider->Create());
 		acc->SetMask(mask, ci);
 		acc->creator = source.GetNick();
 		acc->description = description;
@@ -311,7 +311,7 @@ private:
 			}
 		}
 
-		std::vector<Anope::string>::iterator cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
+		auto cmd_it = std::find(order.begin(), order.end(), source.command.upper()),
 			access_it = highest ? std::find(order.begin(), order.end(), XOPChanAccess::DetermineLevel(highest)) : order.end();
 
 		if (!mask.equals_ci(nc->display) && !access.founder && (!access.HasPriv("ACCESS_CHANGE") || cmd_it <= access_it))

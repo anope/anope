@@ -202,7 +202,7 @@ public:
 
 			source.Reply(_("Users list:"));
 
-			for (Anope::map<User *>::const_iterator it = ordered_map.begin(); it != ordered_map.end(); ++it)
+			for (auto it = ordered_map.begin(); it != ordered_map.end(); ++it)
 			{
 				User *u2 = it->second;
 

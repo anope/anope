@@ -84,7 +84,7 @@ void TimerManager::AddTimer(Timer *t)
 void TimerManager::DelTimer(Timer *t)
 {
 	std::pair<std::multimap<time_t, Timer *>::iterator, std::multimap<time_t, Timer *>::iterator> itpair = Timers.equal_range(t->GetTimer());
-	for (std::multimap<time_t, Timer *>::iterator i = itpair.first; i != itpair.second; ++i)
+	for (auto i = itpair.first; i != itpair.second; ++i)
 	{
 		if (i->second == t)
 		{
@@ -98,7 +98,7 @@ void TimerManager::TickTimers()
 {
 	while (!Timers.empty())
 	{
-		std::multimap<time_t, Timer *>::iterator it = Timers.begin();
+		auto it = Timers.begin();
 		Timer *t = it->second;
 
 		if (t->GetTimer() > Anope::CurTime)
@@ -115,7 +115,7 @@ void TimerManager::TickTimers()
 
 void TimerManager::DeleteTimersFor(Module *m)
 {
-	for (std::multimap<time_t, Timer *>::iterator it = Timers.begin(), it_next = it; it != Timers.end(); it = it_next)
+	for (auto it = Timers.begin(), it_next = it; it != Timers.end(); it = it_next)
 	{
 		++it_next;
 		if (it->second->GetOwner() == m)

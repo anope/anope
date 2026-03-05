@@ -320,7 +320,7 @@ public:
 		}
 
 		NickCore *nc = na->nc;
-		unsigned max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
+		auto max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
 		if (max_reg && nc->channelcount >= max_reg && !source.HasPriv("chanserv/no-register-limit"))
 		{
 			source.Reply(_("\002%s\002 has too many channels registered."), na->nick.c_str());
@@ -1018,7 +1018,7 @@ public:
 			"channel will be dropped."
 		));
 
-		unsigned max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
+		auto max_reg = Config->GetModule("chanserv").Get<unsigned>("maxregistered");
 		if (max_reg)
 		{
 			source.Reply(" ");
@@ -1112,7 +1112,7 @@ class CSSet final
 			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
-			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(s);
+			const auto *ci = anope_dynamic_static_cast<const ChannelInfo *>(s);
 			Anope::string modes;
 			for (const auto &[last_mode, last_data] : ci->last_modes)
 			{
@@ -1138,7 +1138,7 @@ class CSSet final
 			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
-			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
+			auto *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
 			Anope::string modes;
 			data["last_modes"] >> modes;
 			ci->last_modes.clear();

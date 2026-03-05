@@ -115,7 +115,7 @@ public:
 		, nick(na->nick)
 	{
 		/* Erase the current release timer and use the new one */
-		Anope::map<NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
+		auto nit = NickServReleases.find(this->nick);
 		if (nit != NickServReleases.end())
 		{
 			IRCD->SendQuit(nit->second);
@@ -379,7 +379,7 @@ public:
 		Log(NickServ, "nick") << "Deleting account " << nc->display;
 
 		/* Clean up this nick core from any users online */
-		for (std::list<User *>::iterator it = nc->users.begin(); it != nc->users.end();)
+		for (auto it = nc->users.begin(); it != nc->users.end();)
 		{
 			User *user = *it++;
 			IRCD->SendLogout(user);
@@ -610,7 +610,7 @@ public:
 
 		time_t nickserv_expire = Config->GetModule(this).Get<time_t>("expire", "1y");
 
-		for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; )
+		for (auto it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end; )
 		{
 			NickAlias *na = it->second;
 			++it;

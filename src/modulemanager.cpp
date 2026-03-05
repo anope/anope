@@ -149,7 +149,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	}
 
 	dlerror();
-	Module *(*func)(const Anope::string &, const Anope::string &) = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
+	auto *func = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
 	err = dlerror();
 	if (!func)
 	{
@@ -233,7 +233,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 ModuleVersion ModuleManager::GetVersion(void *handle)
 {
 	dlerror();
-	ModuleVersionC (*func)() = function_cast<ModuleVersionC (*)()>(dlsym(handle, "AnopeVersion"));;
+	auto *func = function_cast<ModuleVersionC (*)()>(dlsym(handle, "AnopeVersion"));;
 	if (!func)
 	{
 		Log() << "No version function found, not an Anope module";
@@ -314,7 +314,7 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 	Log(LOG_DEBUG) << "Unloading module " << m->name;
 
 	dlerror();
-	void (*destroy_func)(Module *m) = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
+	auto *destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
 	const char *err = dlerror();
 	if (!destroy_func || (err && *err))
 	{
@@ -339,7 +339,7 @@ void ModuleManager::DetachAll(Module *mod)
 {
 	for (auto &mods : EventHandlers)
 	{
-		std::vector<Module *>::iterator it2 = std::find(mods.begin(), mods.end(), mod);
+		auto it2 = std::find(mods.begin(), mods.end(), mod);
 		if (it2 != mods.end())
 			mods.erase(it2);
 	}

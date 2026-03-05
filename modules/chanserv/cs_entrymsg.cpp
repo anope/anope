@@ -98,7 +98,7 @@ Serializable *EntryMsgTypeImpl::Unserialize(Serializable *obj, Serialize::Data &
 
 	if (obj)
 	{
-		EntryMsgImpl *msg = anope_dynamic_static_cast<EntryMsgImpl *>(obj);
+		auto *msg = anope_dynamic_static_cast<EntryMsgImpl *>(obj);
 		msg->chan = ci->name;
 		data["creator"] >> msg->creator;
 		data["message"] >> msg->message;

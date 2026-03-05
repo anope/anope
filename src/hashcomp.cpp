@@ -26,7 +26,7 @@ static unsigned char case_map_upper[256], case_map_lower[256];
 /* called whenever Anope::casemap is modified to rebuild the casemap cache */
 void Anope::CaseMapRebuild()
 {
-	const std::ctype<char> &ct = std::use_facet<std::ctype<char> >(Anope::casemap);
+	const auto &ct = std::use_facet<std::ctype<char> >(Anope::casemap);
 
 	for (unsigned i = 0; i < sizeof(case_map_upper); ++i)
 	{

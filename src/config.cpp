@@ -80,7 +80,7 @@ const Block::item_map &Block::GetItems() const
 
 template<> const Anope::string Block::Get(const Anope::string &tag, const Anope::string &def) const
 {
-	Anope::map<Anope::string>::const_iterator it = items.find(tag);
+	auto it = items.find(tag);
 	if (it != items.end())
 		return it->second;
 
@@ -611,7 +611,7 @@ void Conf::Post(Conf *old)
 			if (o->ot == NULL)
 			{
 				/* Oper block has lost type */
-				std::vector<Oper *>::iterator it = std::find(old->Opers.begin(), old->Opers.end(), o);
+				auto it = std::find(old->Opers.begin(), old->Opers.end(), o);
 				if (it != old->Opers.end())
 					old->Opers.erase(it);
 
@@ -652,7 +652,7 @@ Block &Conf::GetModule(const Module *m)
 
 Block &Conf::GetModule(const Anope::string &mname)
 {
-	std::map<Anope::string, Block *>::iterator it = modules.find(mname);
+	auto it = modules.find(mname);
 	if (it != modules.end())
 		return *it->second;
 
@@ -678,7 +678,7 @@ Block &Conf::GetModule(const Anope::string &mname)
 
 BotInfo *Conf::GetClient(const Anope::string &cname)
 {
-	Anope::map<Anope::string>::iterator it = bots.find(cname);
+	auto it = bots.find(cname);
 	if (it != bots.end())
 		return BotInfo::Find(!it->second.empty() ? it->second : cname, true);
 
@@ -895,7 +895,7 @@ void Conf::LoadConf(File &file)
 				}
 
 				Block *b = block_stack.empty() ? this : block_stack.top();
-				block_map::iterator it = b->blocks.emplace(wordbuffer, Configuration::Block(wordbuffer));
+				auto it = b->blocks.emplace(wordbuffer, Configuration::Block(wordbuffer));
 				b = &it->second;
 				b->linenum = linenumber;
 				block_stack.push(b);

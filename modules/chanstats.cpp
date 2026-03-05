@@ -235,7 +235,7 @@ class MChanstats final
 		for (int i = 0; i < r.Rows(); ++i)
 		{
 			const std::map<Anope::string, Anope::string> &map = r.Row(i);
-			for (std::map<Anope::string, Anope::string>::const_iterator it = map.begin(); it != map.end(); ++it)
+			for (auto it = map.begin(); it != map.end(); ++it)
 				TableList.push_back(it->second);
 		}
 		query = "SHOW PROCEDURE STATUS WHERE `Db` = Database();";
@@ -254,7 +254,7 @@ class MChanstats final
 
 	bool HasTable(const Anope::string &table)
 	{
-		for (std::vector<Anope::string>::const_iterator it = TableList.begin(); it != TableList.end(); ++it)
+		for (auto it = TableList.begin(); it != TableList.end(); ++it)
 			if (*it == table)
 				return true;
 		return false;
@@ -262,7 +262,7 @@ class MChanstats final
 
 	bool HasProcedure(const Anope::string &table)
 	{
-		for (std::vector<Anope::string>::const_iterator it = ProcedureList.begin(); it != ProcedureList.end(); ++it)
+		for (auto it = ProcedureList.begin(); it != ProcedureList.end(); ++it)
 			if (*it == table)
 				return true;
 		return false;
@@ -270,7 +270,7 @@ class MChanstats final
 
 	bool HasEvent(const Anope::string &table)
 	{
-		for (std::vector<Anope::string>::const_iterator it = EventList.begin(); it != EventList.end(); ++it)
+		for (auto it = EventList.begin(); it != EventList.end(); ++it)
 			if (*it == table)
 				return true;
 		return false;

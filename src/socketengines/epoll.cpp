@@ -93,7 +93,7 @@ void SocketEngine::Process()
 	{
 		epoll_event &ev = events[i];
 
-		std::map<int, Socket *>::iterator it = Sockets.find(ev.data.fd);
+		auto it = Sockets.find(ev.data.fd);
 		if (it == Sockets.end())
 			continue;
 		Socket *s = it->second;

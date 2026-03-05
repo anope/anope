@@ -146,7 +146,7 @@ public:
 
 		NickAlias *target, *na = NickAlias::Find(source.GetNick());
 		time_t reg_delay = Config->GetModule("nickserv").Get<time_t>("regdelay");
-		unsigned maxaliases = Config->GetModule(this->owner).Get<unsigned>("maxaliases");
+		auto maxaliases = Config->GetModule(this->owner).Get<unsigned>("maxaliases");
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (user && Anope::CurTime < user->lastnickreg + reg_delay)
@@ -258,7 +258,7 @@ public:
 		{
 			NickCore *oldcore = na->nc;
 
-			std::vector<NickAlias *>::iterator it = std::find(oldcore->aliases->begin(), oldcore->aliases->end(), na);
+			auto it = std::find(oldcore->aliases->begin(), oldcore->aliases->end(), na);
 			if (it != oldcore->aliases->end())
 				oldcore->aliases->erase(it);
 

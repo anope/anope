@@ -276,7 +276,7 @@ private:
 		ServiceReference<AccessProvider> provider("AccessProvider", "access/access");
 		if (!provider)
 			return;
-		AccessChanAccess *access = anope_dynamic_static_cast<AccessChanAccess *>(provider->Create());
+		auto *access = anope_dynamic_static_cast<AccessChanAccess *>(provider->Create());
 		access->SetMask(mask, ci);
 		access->creator = source.GetNick();
 		access->level = level;
@@ -960,7 +960,7 @@ public:
 			/* Access accessprovider is the only accessprovider with the concept of negative access,
 			 * so check they don't have negative access
 			 */
-			const AccessChanAccess *aca = anope_dynamic_static_cast<const AccessChanAccess *>(highest);
+			const auto *aca = anope_dynamic_static_cast<const AccessChanAccess *>(highest);
 
 			if (aca->level < 0)
 				return EVENT_CONTINUE;

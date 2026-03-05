@@ -44,7 +44,7 @@ public:
 
 	bool ProcessMessage(SASL::Session *sess, const SASL::Message &m) override
 	{
-		Session *mysess = anope_dynamic_static_cast<Session *>(sess);
+		auto *mysess = anope_dynamic_static_cast<Session *>(sess);
 
 		if (m.type == "S")
 		{

@@ -354,7 +354,7 @@ public:
 
 	~HTTPD() override
 	{
-		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
+		for (auto it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
 		{
 			Socket *s = it->second;
 			++it;
@@ -447,7 +447,7 @@ public:
 			spacesepstream(ext_header).GetTokens(p->ext_headers);
 		}
 
-		for (std::map<Anope::string, MyHTTPProvider *>::iterator it = this->providers.begin(), it_end = this->providers.end(); it != it_end;)
+		for (auto it = this->providers.begin(), it_end = this->providers.end(); it != it_end;)
 		{
 			HTTP::Provider *p = it->second;
 			++it;

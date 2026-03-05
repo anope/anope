@@ -73,7 +73,7 @@ public:
 		}
 
 		Anope::string spattern = "#" + pattern;
-		unsigned listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
+		auto listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
 
 		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
 

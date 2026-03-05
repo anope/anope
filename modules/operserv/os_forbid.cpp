@@ -325,7 +325,7 @@ public:
 					for (const auto &[_, user] : UserListByNick)
 						module->OnUserNickChange(user, "");
 
-					for (nickalias_map::const_iterator it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end;)
+					for (auto it = NickAliasList->begin(), it_end = NickAliasList->end(); it != it_end;)
 					{
 						NickAlias *na = it->second;
 						++it;
@@ -346,7 +346,7 @@ public:
 				{
 					int chan_matches = 0, ci_matches = 0;
 
-					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end;)
+					for (auto it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end;)
 					{
 						Channel *c = it->second;
 						++it;
@@ -369,7 +369,7 @@ public:
 
 						++chan_matches;
 
-						for (Channel::ChanUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end;)
+						for (auto cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end;)
 						{
 							User *u = cit->first;
 							++cit;
@@ -383,7 +383,7 @@ public:
 						}
 					}
 
-					for (registered_channel_map::const_iterator it = RegisteredChannelList->begin(); it != RegisteredChannelList->end();)
+					for (auto it = RegisteredChannelList->begin(); it != RegisteredChannelList->end();)
 					{
 						ChannelInfo *ci = it->second;
 						++it;

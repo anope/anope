@@ -51,7 +51,7 @@ struct KickerDataImpl final
 			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
-			const ChannelInfo *ci = anope_dynamic_static_cast<const ChannelInfo *>(e);
+			const auto *ci = anope_dynamic_static_cast<const ChannelInfo *>(e);
 			auto *kd = this->Get(ci);
 			if (kd == NULL)
 				return;
@@ -85,7 +85,7 @@ struct KickerDataImpl final
 			if (s->GetSerializableType()->GetName() != CHANNELINFO_TYPE)
 				return;
 
-			ChannelInfo *ci = anope_dynamic_static_cast<ChannelInfo *>(e);
+			auto *ci = anope_dynamic_static_cast<ChannelInfo *>(e);
 			auto *kd = ci->Require<BotServ::KickerData>(BOTSERV_KICKER_DATA_EXT);
 
 			data["kickerdata:amsgs"] >> kd->amsgs;
@@ -988,7 +988,7 @@ public:
 	void purge()
 	{
 		time_t keepdata = Config->GetModule(me).Get<time_t>("keepdata");
-		for (data_type::iterator it = data_map.begin(), it_end = data_map.end(); it != it_end;)
+		for (auto it = data_map.begin(), it_end = data_map.end(); it != it_end;)
 		{
 			const Anope::string &user = it->first;
 			Data &bd = it->second;
@@ -1038,7 +1038,7 @@ public:
 
 		for (auto &[_, c] : ChannelList)
 		{
-			BanData *bd = c->GetExt<BanData>("bandata");
+			auto *bd = c->GetExt<BanData>("bandata");
 			if (bd != NULL)
 			{
 				bd->purge();
@@ -1488,7 +1488,7 @@ public:
 
 			if (ud->lastline.equals_ci(realbuf) && !ud->lasttarget.empty() && !ud->lasttarget.equals_ci(ci->name))
 			{
-				for (User::ChanUserList::iterator it = u->chans.begin(); it != u->chans.end();)
+				for (auto it = u->chans.begin(); it != u->chans.end();)
 				{
 					Channel *chan = it->second->chan;
 					++it;

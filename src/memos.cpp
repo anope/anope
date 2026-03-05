@@ -31,7 +31,7 @@ Memo::~Memo()
 {
 	if (mi)
 	{
-		std::vector<Memo *>::iterator it = std::find(mi->memos->begin(), mi->memos->end(), this);
+		auto it = std::find(mi->memos->begin(), mi->memos->end(), this);
 
 		if (it != mi->memos->end())
 			mi->memos->erase(it);
@@ -115,7 +115,7 @@ void MemoInfo::Del(unsigned index)
 
 	Memo *m = this->GetMemo(index);
 
-	std::vector<Memo *>::iterator it = std::find(memos->begin(), memos->end(), m);
+	auto it = std::find(memos->begin(), memos->end(), m);
 	if (it != memos->end())
 		memos->erase(it);
 

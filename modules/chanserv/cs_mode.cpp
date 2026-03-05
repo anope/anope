@@ -601,7 +601,7 @@ class CommandCSMode final
 									}
 								}
 
-								for (Channel::ChanUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end;)
+								for (auto it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end;)
 								{
 									auto *memb = it->second;
 									++it;
@@ -1102,7 +1102,7 @@ public:
 				Anope::string param;
 				if (cm->type == MODE_PARAM)
 				{
-					ChannelModeParam *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
+					auto *cmp = anope_dynamic_static_cast<ChannelModeParam *>(cm);
 					if (add || !cmp->minus_no_arg)
 					{
 						sep.GetToken(param);

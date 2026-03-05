@@ -74,7 +74,7 @@ void IdentifyRequest::Dispatch()
 
 void IdentifyRequest::ModuleUnload(Module *m)
 {
-	for (std::set<IdentifyRequest *>::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end;)
+	for (auto it = Requests.begin(), it_end = Requests.end(); it != it_end;)
 	{
 		IdentifyRequest *ir = *it;
 		++it;

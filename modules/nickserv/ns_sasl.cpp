@@ -115,7 +115,7 @@ public:
 
 	Anope::string GetAgent()
 	{
-		Anope::string agent = Config->GetModule(Service::owner).Get<Anope::string>("agent", "NickServ");
+		auto agent = Config->GetModule(Service::owner).Get<Anope::string>("agent", "NickServ");
 		BotInfo *bi = Config->GetClient(agent);
 		if (bi)
 			agent = bi->GetUID();

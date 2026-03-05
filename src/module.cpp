@@ -81,12 +81,12 @@ Module::~Module()
 	/* Clear any active timers this module has */
 	TimerManager::DeleteTimersFor(this);
 
-	std::list<Module *>::iterator it = std::find(ModuleManager::Modules.begin(), ModuleManager::Modules.end(), this);
+	auto it = std::find(ModuleManager::Modules.begin(), ModuleManager::Modules.end(), this);
 	if (it != ModuleManager::Modules.end())
 		ModuleManager::Modules.erase(it);
 
 #if HAVE_LOCALIZATION
-	std::vector<Anope::string>::iterator dit = std::find(Language::Domains.begin(), Language::Domains.end(), this->name);
+	auto dit = std::find(Language::Domains.begin(), Language::Domains.end(), this->name);
 	if (dit != Language::Domains.end())
 		Language::Domains.erase(dit);
 #endif

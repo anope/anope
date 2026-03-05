@@ -90,7 +90,7 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 		/* Special case for /join 0 */
 		if (channel == "0")
 		{
-			for (User::ChanUserList::iterator it = user->chans.begin(), it_end = user->chans.end(); it != it_end; )
+			for (auto it = user->chans.begin(), it_end = user->chans.end(); it != it_end; )
 			{
 				auto *memb = it->second;
 				Channel *c = memb->chan;

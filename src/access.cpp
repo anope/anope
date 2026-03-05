@@ -46,7 +46,7 @@ void PrivilegeManager::AddPrivilege(Privilege p)
 
 void PrivilegeManager::RemovePrivilege(Privilege &p)
 {
-	std::vector<Privilege>::iterator it = std::find(Privileges.begin(), Privileges.end(), p);
+	auto it = std::find(Privileges.begin(), Privileges.end(), p);
 	if (it != Privileges.end())
 		Privileges.erase(it);
 
@@ -82,7 +82,7 @@ AccessProvider::AccessProvider(Module *o, const Anope::string &n) : Service(o, "
 
 AccessProvider::~AccessProvider()
 {
-	std::list<AccessProvider *>::iterator it = std::find(Providers.begin(), Providers.end(), this);
+	auto it = std::find(Providers.begin(), Providers.end(), this);
 	if (it != Providers.end())
 		Providers.erase(it);
 }
@@ -104,7 +104,7 @@ ChanAccess::~ChanAccess()
 {
 	if (this->ci)
 	{
-		std::vector<ChanAccess *>::iterator it = std::find(this->ci->access->begin(), this->ci->access->end(), this);
+		auto it = std::find(this->ci->access->begin(), this->ci->access->end(), this);
 		if (it != this->ci->access->end())
 			this->ci->access->erase(it);
 

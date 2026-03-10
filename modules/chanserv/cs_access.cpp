@@ -23,6 +23,17 @@ static inline void reset_levels(ChannelInfo *ci)
 		ci->SetLevel(priv, level);
 }
 
+static Anope::string LevelToString(CommandSource &source, int16_t level)
+{
+	if (level == ACCESS_INVALID)
+		return Language::Translate(source.GetAccount(), _("(disabled)"));
+
+	if (level == ACCESS_FOUNDER)
+		return Language::Translate(source.GetAccount(), _("(founder only)"));
+
+	return Anope::ToString(level);
+}
+
 class AccessChanAccess final
 	: public ChanAccess
 {
@@ -768,14 +779,7 @@ class CommandCSLevels final
 
 			ListFormatter::ListEntry entry;
 			entry["Name"] = p.name;
-
-			if (j == ACCESS_INVALID)
-				entry["Level"] = Language::Translate(source.GetAccount(), _("(disabled)"));
-			else if (j == ACCESS_FOUNDER)
-				entry["Level"] = Language::Translate(source.GetAccount(), _("(founder only)"));
-			else
-				entry["Level"] = Anope::ToString(j);
-
+			entry["Level"] = LevelToString(source, j);
 			list.AddEntry(entry);
 		}
 
@@ -852,13 +856,14 @@ public:
 			source.Reply(_("The following feature/function names are available:"));
 
 			ListFormatter list(source.GetAccount());
-			list.AddColumn(_("Name")).AddColumn(_("Description"));
-			list.SetFlexible(_("\002{name}\002: {description}"));
+			list.AddColumn(_("Name")).AddColumn(_("Default")).AddColumn(_("Description"));
+			list.SetFlexible(_("\002{name}\002: defaults to {default} ({description})"));
 
 			for (const auto &p : PrivilegeManager::GetPrivileges())
 			{
 				ListFormatter::ListEntry entry;
 				entry["Name"] = p.name;
+				entry["Default"] = LevelToString(source, defaultLevels[p.name]);
 				entry["Description"] = Language::Translate(source.nc, p.desc.c_str());
 				list.AddEntry(entry);
 			}

@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-24 18:55+0000\n"
-"PO-Revision-Date: 2026-02-24 18:55+0000\n"
+"POT-Creation-Date: 2026-03-10 23:30+0000\n"
+"PO-Revision-Date: 2026-03-10 23:30+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -414,7 +414,7 @@ msgstr ""
 msgid "{name} = {value}"
 msgstr ""
 
-msgid "{name}: {description}"
+msgid "{name}: defaults to {default} ({description})"
 msgstr ""
 
 msgid "{nick} (account: {account})"
@@ -2527,6 +2527,9 @@ msgid "Deactivates the vhost currently assigned to the nick in use. When you use
 msgstr ""
 
 msgid "Deactivates your assigned vhost"
+msgstr ""
+
+msgid "Default"
 msgstr ""
 
 #, c-format

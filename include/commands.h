@@ -189,5 +189,5 @@ public:
 	 * @param name If found, is set to the command name, eg REGISTER
 	 * @return true if the given command service exists
 	 */
-	static bool FindCommandFromService(const Anope::string &command_service, BotInfo *&bi, Anope::string &name);
+	static bool FindFromService(const Anope::string &command_service, BotInfo *&bi, Anope::string &name);
 };

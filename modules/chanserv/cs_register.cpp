@@ -105,7 +105,7 @@ public:
 
 		BotInfo *bi;
 		Anope::string cmd;
-		if (Command::FindCommandFromService("chanserv/access", bi, cmd))
+		if (Command::FindFromService("chanserv/access", bi, cmd))
 		{
 			source.Reply(" ");
 			source.Reply(_(

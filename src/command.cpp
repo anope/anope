@@ -364,9 +364,10 @@ bool Command::Run(CommandSource &source, const Anope::string &cmdname, const Com
 	return true;
 }
 
-bool Command::FindCommandFromService(const Anope::string &command_service, BotInfo *&bot, Anope::string &name)
+bool Command::FindFromService(const Anope::string &command_service, BotInfo *&bot, Anope::string &name)
 {
-	bot = NULL;
+	bot = nullptr;
+	name.clear();
 
 	for (const auto &[_, bi] : *BotListByNick)
 	{
@@ -377,9 +378,11 @@ bool Command::FindCommandFromService(const Anope::string &command_service, BotIn
 
 			bot = bi;
 			name = c_name;
-			return true;
+
+			if (!info.hide)
+				return true;
 		}
 	}
 
-	return false;
+	return name.empty();
 }

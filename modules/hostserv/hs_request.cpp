@@ -285,7 +285,7 @@ public:
 
 		BotInfo *bi;
 		Anope::string cmd;
-		if (dnsmanager && Command::FindCommandFromService("hostserv/validate", bi, cmd))
+		if (dnsmanager && Command::FindFromService("hostserv/validate", bi, cmd))
 		{
 			source.Reply(_(
 					"Your vhost \002%s\002 has been requested. If the requested vhost is for a valid "

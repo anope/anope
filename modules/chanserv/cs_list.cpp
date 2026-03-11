@@ -245,7 +245,7 @@ public:
 
 		BotInfo *bi;
 		Anope::string cmd;
-		if (Command::FindCommandFromService("chanserv/list", bi, cmd))
+		if (Command::FindFromService("chanserv/list", bi, cmd))
 		{
 			source.Reply(_("When \002private\002 is set, the channel will not appear in %s's %s command."),
 				bi->nick.c_str(), cmd.c_str());

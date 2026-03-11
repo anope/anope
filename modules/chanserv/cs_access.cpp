@@ -671,7 +671,7 @@ public:
 
 		BotInfo *bi;
 		Anope::string cmd;
-		if (Command::FindCommandFromService("chanserv/levels", bi, cmd))
+		if (Command::FindFromService("chanserv/levels", bi, cmd))
 		{
 			source.Reply(" ");
 			source.Reply(_(

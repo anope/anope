@@ -90,7 +90,7 @@ public:
 
 		BotInfo *bi;
 		Anope::string cmd;
-		if (Command::FindCommandFromService("memoserv/del", bi, cmd))
+		if (Command::FindFromService("memoserv/del", bi, cmd))
 		{
 			if (ci)
 				source.Reply(_("To delete, type: \002%s %s %d\002"), bi->GetQueryCommand({}, cmd).c_str(), ci->name.c_str(), index + 1);

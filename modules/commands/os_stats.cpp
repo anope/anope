@@ -107,7 +107,7 @@ class CommandOSStats : public Command
 		{
 			/* SQLINEs */
 			source.Reply(_("Current number of SQLINEs: \002%d\002"), sqlines->GetCount());
-			timeout = Config->GetModule("operserv")->Get<time_t>("sglineexpiry", "30d") + 59;
+			timeout = Config->GetModule("operserv")->Get<time_t>("sqlineexpiry", "30d") + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SQLINE expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)

@@ -54,71 +54,30 @@ Stats *Stats::me = nullptr;
 class CommandOSStats final
 	: public Command
 {
+private:
 	ServiceReference<XLineManager> akills, snlines, sqlines;
+
+	static void ReportXLineStats(CommandSource& source, XLineManager* xlm, const char* type, const char* config)
+	{
+		source.Reply(_("Current number of %ss: \002%zu\002"), type, xlm->GetCount());
+
+		const auto timeout = Config->GetModule("operserv").Get<time_t>(config, "30d");
+		if (timeout)
+			source.Reply(_("Default %s expiry time: \002%s\002"), type, Anope::Duration(timeout, source.nc, true).c_str());
+		else
+			source.Reply(_("Default %s expiry time: \002No expiration\002"), type);
+	}
 private:
 	void DoStatsAkill(CommandSource &source)
 	{
-		int timeout;
 		if (akills)
-		{
-			/* AKILLs */
-			source.Reply(_("Current number of AKILLs: \002%zu\002"), akills->GetCount());
-			timeout = Config->GetModule("operserv").Get<time_t>("autokillexpiry", "30d") + 59;
-			if (timeout >= 172800)
-				source.Reply(_("Default AKILL expiry time: \002%d days\002"), timeout / 86400);
-			else if (timeout >= 86400)
-				source.Reply(_("Default AKILL expiry time: \0021 day\002"));
-			else if (timeout >= 7200)
-				source.Reply(_("Default AKILL expiry time: \002%d hours\002"), timeout / 3600);
-			else if (timeout >= 3600)
-				source.Reply(_("Default AKILL expiry time: \0021 hour\002"));
-			else if (timeout >= 120)
-				source.Reply(_("Default AKILL expiry time: \002%d minutes\002"), timeout / 60);
-			else if (timeout >= 60)
-				source.Reply(_("Default AKILL expiry time: \0021 minute\002"));
-			else
-				source.Reply(_("Default AKILL expiry time: \002No expiration\002"));
-		}
+			ReportXLineStats(source, *akills, "AKILL", "autokillexpiry");
+
 		if (snlines)
-		{
-			/* SNLINEs */
-			source.Reply(_("Current number of SNLINEs: \002%zu\002"), snlines->GetCount());
-			timeout = Config->GetModule("operserv").Get<time_t>("snlineexpiry", "30d") + 59;
-			if (timeout >= 172800)
-				source.Reply(_("Default SNLINE expiry time: \002%d days\002"), timeout / 86400);
-			else if (timeout >= 86400)
-				source.Reply(_("Default SNLINE expiry time: \0021 day\002"));
-			else if (timeout >= 7200)
-				source.Reply(_("Default SNLINE expiry time: \002%d hours\002"), timeout / 3600);
-			else if (timeout >= 3600)
-				source.Reply(_("Default SNLINE expiry time: \0021 hour\002"));
-			else if (timeout >= 120)
-				source.Reply(_("Default SNLINE expiry time: \002%d minutes\002"), timeout / 60);
-			else if (timeout >= 60)
-				source.Reply(_("Default SNLINE expiry time: \0021 minute\002"));
-			else
-				source.Reply(_("Default SNLINE expiry time: \002No expiration\002"));
-		}
+			ReportXLineStats(source, *snlines, "SNLINE", "snlineexpiry");
+
 		if (sqlines)
-		{
-			/* SQLINEs */
-			source.Reply(_("Current number of SQLINEs: \002%zu\002"), sqlines->GetCount());
-			timeout = Config->GetModule("operserv").Get<time_t>("sglineexpiry", "30d") + 59;
-			if (timeout >= 172800)
-				source.Reply(_("Default SQLINE expiry time: \002%d days\002"), timeout / 86400);
-			else if (timeout >= 86400)
-				source.Reply(_("Default SQLINE expiry time: \0021 day\002"));
-			else if (timeout >= 7200)
-				source.Reply(_("Default SQLINE expiry time: \002%d hours\002"), timeout / 3600);
-			else if (timeout >= 3600)
-				source.Reply(_("Default SQLINE expiry time: \0021 hour\002"));
-			else if (timeout >= 120)
-				source.Reply(_("Default SQLINE expiry time: \002%d minutes\002"), timeout / 60);
-			else if (timeout >= 60)
-				source.Reply(_("Default SQLINE expiry time: \0021 minute\002"));
-			else
-				source.Reply(_("Default SQLINE expiry time: \002No expiration\002"));
-		}
+			ReportXLineStats(source, *sqlines, "SQLINE", "sqlineexpiry");
 	}
 
 	static void DoStatsReset(CommandSource &source)

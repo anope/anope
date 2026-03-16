@@ -169,7 +169,7 @@ public:
 				if (!nc->o)
 					continue;
 
-				source.Reply(_("%-8s %s"), nc->o->name.c_str(), nc->o->ot->GetName().c_str());
+				source.Reply("%-8s %s", nc->o->name.c_str(), nc->o->ot->GetName().c_str());
 				if (std::find(Config->Opers.begin(), Config->Opers.end(), nc->o) != Config->Opers.end())
 					source.Reply(_("   This oper is configured in the configuration file."));
 				for (auto *u : nc->users)

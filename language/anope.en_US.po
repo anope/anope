@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-10 23:30+0000\n"
-"PO-Revision-Date: 2026-03-10 23:30+0000\n"
+"POT-Creation-Date: 2026-03-16 15:17+0000\n"
+"PO-Revision-Date: 2026-03-16 15:17+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -776,10 +776,6 @@ msgid " but %s mysteriously dematerialized."
 msgstr ""
 
 msgid "\"Jupiter\" a server"
-msgstr ""
-
-#, c-format
-msgid "%-8s %s"
 msgstr ""
 
 #, c-format
@@ -2450,15 +2446,7 @@ msgid "Current module list:"
 msgstr ""
 
 #, c-format
-msgid "Current number of AKILLs: %zu"
-msgstr ""
-
-#, c-format
-msgid "Current number of SNLINEs: %zu"
-msgstr ""
-
-#, c-format
-msgid "Current number of SQLINEs: %zu"
+msgid "Current number of %ss: %zu"
 msgstr ""
 
 #, c-format
@@ -2533,75 +2521,11 @@ msgid "Default"
 msgstr ""
 
 #, c-format
-msgid "Default AKILL expiry time: %d days"
+msgid "Default %s expiry time: %s"
 msgstr ""
 
 #, c-format
-msgid "Default AKILL expiry time: %d hours"
-msgstr ""
-
-#, c-format
-msgid "Default AKILL expiry time: %d minutes"
-msgstr ""
-
-msgid "Default AKILL expiry time: 1 day"
-msgstr ""
-
-msgid "Default AKILL expiry time: 1 hour"
-msgstr ""
-
-msgid "Default AKILL expiry time: 1 minute"
-msgstr ""
-
-msgid "Default AKILL expiry time: No expiration"
-msgstr ""
-
-#, c-format
-msgid "Default SNLINE expiry time: %d days"
-msgstr ""
-
-#, c-format
-msgid "Default SNLINE expiry time: %d hours"
-msgstr ""
-
-#, c-format
-msgid "Default SNLINE expiry time: %d minutes"
-msgstr ""
-
-msgid "Default SNLINE expiry time: 1 day"
-msgstr ""
-
-msgid "Default SNLINE expiry time: 1 hour"
-msgstr ""
-
-msgid "Default SNLINE expiry time: 1 minute"
-msgstr ""
-
-msgid "Default SNLINE expiry time: No expiration"
-msgstr ""
-
-#, c-format
-msgid "Default SQLINE expiry time: %d days"
-msgstr ""
-
-#, c-format
-msgid "Default SQLINE expiry time: %d hours"
-msgstr ""
-
-#, c-format
-msgid "Default SQLINE expiry time: %d minutes"
-msgstr ""
-
-msgid "Default SQLINE expiry time: 1 day"
-msgstr ""
-
-msgid "Default SQLINE expiry time: 1 hour"
-msgstr ""
-
-msgid "Default SQLINE expiry time: 1 minute"
-msgstr ""
-
-msgid "Default SQLINE expiry time: No expiration"
+msgid "Default %s expiry time: No expiration"
 msgstr ""
 
 msgid "Define messages to be randomly shown to users at logon"

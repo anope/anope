@@ -286,7 +286,7 @@ class CommandCSFlags final
 			if (current != NULL)
 			{
 				ci->EraseAccess(current_idx - 1);
-				FOREACH_MOD(OnAccessDel, (ci, source, current));
+				FOREACH_MOD(OnAccessDel, (ci, source, current, false));
 				delete current;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << mask;
 				source.Reply(_("\002%s\002 removed from the %s access list."), mask.c_str(), ci->name.c_str());
@@ -314,7 +314,7 @@ class CommandCSFlags final
 
 		ci->AddAccess(access);
 
-		FOREACH_MOD(OnAccessAdd, (ci, source, access));
+		FOREACH_MOD(OnAccessAdd, (ci, source, access, false));
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to modify " << mask << "'s flags to " << access->AccessSerialize();
 		if (p != NULL)
@@ -408,6 +408,80 @@ class CommandCSFlags final
 		}
 	}
 
+	void DoMigrate(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	{
+		auto override = false;
+		const auto source_access = source.AccessFor(ci);
+
+		unsigned migrated = 0, notmigrated = 0;
+		Anope::string migratedmask, notmigratedmask;
+		const auto &entry = params.size() > 2 ? params[2] : "*";
+		for (auto idx = ci->GetAccessCount(); idx > 0; --idx)
+		{
+			auto *access = ci->GetAccess(idx - 1);
+			if (access->provider->name == "access/flags")
+				continue; // Already using flags.
+
+			if (!Anope::Match(access->Mask(), entry))
+				continue; // Not this entry.
+
+			std::set<char> newflags;
+			for (auto &[priv, flag] : defaultFlags)
+			{
+				if (access->HasPriv(priv))
+					continue; // Source doesn't have this flag.
+
+				// Check that the source has access to set this entry.
+				if (!override && !source_access.HasPriv(priv) && !source_access.founder)
+				{
+					if (!source.HasPriv("chanserv/access/modify"))
+					{
+						notmigrated++;
+						notmigratedmask = access->Mask();
+						continue; // No privs
+					}
+
+					override = true;
+				}
+
+				newflags.insert(flag);
+			}
+
+			migrated++;
+			migratedmask = access->Mask();
+
+			auto *newaccess = anope_dynamic_static_cast<FlagsChanAccess *>(FlagsAccessProvider::ap->Create());
+			newaccess->SetMask(access->Mask(), ci);
+			newaccess->creator = access->creator;
+			newaccess->description = access->description;
+			newaccess->created = access->created;
+			newaccess->flags = newflags;
+
+			ci->EraseAccess(idx - 1);
+			FOREACH_MOD(OnAccessDel, (ci, source, access, true));
+			delete access;
+
+			ci->AddAccess(newaccess);
+			FOREACH_MOD(OnAccessAdd, (ci, source, newaccess, true));
+		}
+
+		if (migrated == 1)
+		{
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to migrate " << migratedmask;
+			source.Reply(CHAN_ACCESS_MIGRATED_1, migratedmask.c_str(), source.command.nobreak().c_str());
+		}
+		else if (migrated > 1)
+		{
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to migrate " << migrated << " access entries";
+			source.Reply(migrated, CHAN_ACCESS_MIGRATED_N, migrated, source.command.nobreak().c_str());
+		}
+
+		if (notmigrated == 1)
+			source.Reply(CHAN_ACCESS_NOT_MIGRATED_1, notmigratedmask.c_str(), source.command.nobreak().c_str());
+		else if (notmigrated > 1)
+			source.Reply(migrated, CHAN_ACCESS_NOT_MIGRATED_N, notmigrated, source.command.nobreak().c_str());
+	}
+
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
 		if (!source.IsFounder(ci) && !source.HasPriv("chanserv/access/modify"))
@@ -431,6 +505,7 @@ public:
 		this->SetDesc(_("Modify the list of privileged users"));
 		this->SetSyntax(_("\037channel\037 [MODIFY] \037mask\037 \037changes\037 [\037description\037]"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | +\037flags\037] [ALL]"));
+		this->SetSyntax(_("\037channel\037 MIGRATE [\037mask\037]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
@@ -463,6 +538,8 @@ public:
 			source.Reply(READ_ONLY_MODE);
 		else if (is_list)
 			this->DoList(source, ci, params);
+		else if (cmd.equals_ci("MIGRATE"))
+			this->DoMigrate(source, ci, params);
 		else if (cmd.equals_ci("CLEAR"))
 			this->DoClear(source, ci);
 		else

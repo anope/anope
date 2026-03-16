@@ -601,15 +601,17 @@ public:
 	 * @param ci The channel
 	 * @param source The source of the command
 	 * @param access The access entry that was removed
+	 * @param migrated Whether the access entry was deleted because of being migrated to another system.
 	 */
-	virtual void OnAccessDel(ChannelInfo *ci, CommandSource &source, ChanAccess *access) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
+	virtual void OnAccessDel(ChannelInfo *ci, CommandSource &source, ChanAccess *access, bool migrated) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
 
 	/** Called when access is added
 	 * @param ci The channel
 	 * @param source The source of the command
 	 * @param access The access changed
+	 * @param migrated Whether the access entry was added because of being migrated to another system.
 	 */
-	virtual void OnAccessAdd(ChannelInfo *ci, CommandSource &source, ChanAccess *access) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
+	virtual void OnAccessAdd(ChannelInfo *ci, CommandSource &source, ChanAccess *access, bool migrated) ATTR_NOT_NULL(2, 4) { throw NotImplementedException(); }
 
 	/** Called when the access list is cleared
 	 * @param ci The channel

@@ -263,7 +263,7 @@ private:
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask;
 
-		FOREACH_MOD(OnAccessAdd, (ci, source, acc));
+		FOREACH_MOD(OnAccessAdd, (ci, source, acc, false));
 		source.Reply(_("\002%s\002 added to %s %s list."), acc->Mask().c_str(), ci->name.c_str(), source.command.nobreak().c_str());
 	}
 
@@ -372,7 +372,7 @@ private:
 					nicks += caccess->Mask();
 
 					ci->EraseAccess(number - 1);
-					FOREACH_MOD(OnAccessDel, (ci, source, caccess));
+					FOREACH_MOD(OnAccessDel, (ci, source, caccess, false));
 					delete caccess;
 				}
 			}
@@ -395,7 +395,7 @@ private:
 					source.Reply(_("\002%s\002 deleted from %s %s list."), a->Mask().c_str(), ci->name.c_str(), source.command.nobreak().c_str());
 
 					ci->EraseAccess(i);
-					FOREACH_MOD(OnAccessDel, (ci, source, a));
+					FOREACH_MOD(OnAccessDel, (ci, source, a, false));
 					delete a;
 
 					return;

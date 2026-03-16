@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-16 19:04+0000\n"
-"PO-Revision-Date: 2026-03-16 19:04+0000\n"
+"POT-Creation-Date: 2026-03-16 19:13+0000\n"
+"PO-Revision-Date: 2026-03-16 19:13+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -110,6 +110,10 @@ msgid "%s already exists on the EXCEPTION list."
 msgstr ""
 
 #, c-format
+msgid "%s can not be migrated to the %s access system because they have privileges that you do not."
+msgstr ""
+
+#, c-format
 msgid "%s cannot be taken as times to ban."
 msgstr ""
 
@@ -171,6 +175,10 @@ msgstr ""
 
 #, c-format
 msgid "%s has been joined to %s."
+msgstr ""
+
+#, c-format
+msgid "%s has been migrated to the %s access system."
 msgstr ""
 
 #, c-format
@@ -339,6 +347,18 @@ msgstr ""
 #, c-format
 msgid "%s will now permanently be ignored."
 msgstr ""
+
+#, c-format
+msgid "%u entry can not be migrated to the %s access system because they have privileges that you do not."
+msgid_plural "%u entries can not be migrated to the %s access system because they have privileges that you do not."
+msgstr[0] ""
+msgstr[1] ""
+
+#, c-format
+msgid "%u entry has been migrated to the %s access system."
+msgid_plural "%u entries have been migrated to the %s access system."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "ADD nick user host real"
 msgstr ""
@@ -538,6 +558,9 @@ msgid "channel LIST [mask | +flags] [ALL]"
 msgstr ""
 
 msgid "channel LOCK {ADD|DEL|SET|LIST} [what]"
+msgstr ""
+
+msgid "channel MIGRATE [mask]"
 msgstr ""
 
 msgid "channel PREPEND topic"

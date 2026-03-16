@@ -296,7 +296,7 @@ private:
 		access->description = description;
 		ci->AddAccess(access);
 
-		FOREACH_MOD(OnAccessAdd, (ci, source, access));
+		FOREACH_MOD(OnAccessAdd, (ci, source, access, false));
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to add " << mask << " with level " << level;
 		if (p != NULL)
@@ -387,7 +387,7 @@ private:
 
 					ci->EraseAccess(Number - 1);
 
-					FOREACH_MOD(OnAccessDel, (ci, source, access));
+					FOREACH_MOD(OnAccessDel, (ci, source, access, false));
 					delete access;
 				}
 			}
@@ -413,7 +413,7 @@ private:
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to delete " << access->Mask();
 
 						ci->EraseAccess(i - 1);
-						FOREACH_MOD(OnAccessDel, (ci, source, access));
+						FOREACH_MOD(OnAccessDel, (ci, source, access, false));
 						delete access;
 					}
 					return;

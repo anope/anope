@@ -18,9 +18,9 @@ class StatusUpdate final
 	: public Module
 {
 private:
-	void OnAccessChange(ChannelInfo *ci, ChanAccess *access, bool adding)
+	void OnAccessChange(ChannelInfo *ci, ChanAccess *access, bool migrated, bool adding)
 	{
-		if (!ci->c)
+		if (!ci->c || migrated)
 			return;
 
 		for (const auto &[_, uc] : ci->c->users)
@@ -50,14 +50,14 @@ public:
 	{
 	}
 
-	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
+	void OnAccessAdd(ChannelInfo *ci, CommandSource &, ChanAccess *access, bool migrated) override
 	{
-		OnAccessChange(ci, access, true);
+		OnAccessChange(ci, access, migrated, true);
 	}
 
-	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access) override
+	void OnAccessDel(ChannelInfo *ci, CommandSource &, ChanAccess *access, bool migrated) override
 	{
-		OnAccessChange(ci, access, false);
+		OnAccessChange(ci, access, migrated, false);
 	}
 };
 

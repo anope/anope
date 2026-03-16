@@ -381,13 +381,14 @@ void HelpWrapper::SendTo(CommandSource &source)
 
 	for (const auto &[entry_name, entry_desc] :  entries)
 	{
+		const auto *trans_desc = Language::Translate(source.nc, entry_desc.c_str());
 		if (flexible)
 		{
-			source.Reply("\002%s\002: %s", entry_name.c_str(), entry_desc.c_str());
+			source.Reply("\002%s\002: %s", entry_name.c_str(), trans_desc);
 		}
 		else
 		{
-			LineWrapper lw(Language::Translate(source.nc, entry_desc.c_str()), max_length);
+			LineWrapper lw(trans_desc, max_length);
 			Anope::string line;
 
 			Anope::string padding(longest - entry_name.utf8length(), ' ');

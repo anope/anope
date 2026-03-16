@@ -331,6 +331,7 @@ class CommandCSFlags final
 	static void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &arg = params.size() > 2 ? params[2] : "";
+		const auto show_all = params.size() > 3 && params[3].equals_ci("ALL");
 
 		if (!ci->GetAccessCount())
 		{
@@ -348,6 +349,7 @@ class CommandCSFlags final
 		});
 
 		unsigned count = 0;
+		unsigned foreign = 0;
 		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 		{
 			const ChanAccess *access = ci->GetAccess(i);
@@ -366,6 +368,12 @@ class CommandCSFlags final
 				}
 				else if (!Anope::Match(access->Mask(), arg))
 					continue;
+			}
+
+			if (!show_all && access->provider->name != "access/flags")
+			{
+				foreign++;
+				continue;
 			}
 
 			ListFormatter::ListEntry entry;
@@ -389,6 +397,14 @@ class CommandCSFlags final
 				source.Reply(_("End of access list."));
 			else
 				source.Reply(_("End of access list - %d/%d entries shown."), count, ci->GetAccessCount());
+		}
+
+		if (foreign)
+		{
+			const auto full_command = Anope::Format("%s %s LIST %s", source.command.c_str(),
+				ci->name.c_str(), arg.empty() ? "*" : arg.c_str()).nobreak();
+
+			source.Reply(foreign, CHAN_ACCESS_FOREIGN, foreign, full_command.c_str());
 		}
 	}
 
@@ -414,7 +430,7 @@ public:
 	{
 		this->SetDesc(_("Modify the list of privileged users"));
 		this->SetSyntax(_("\037channel\037 [MODIFY] \037mask\037 \037changes\037 [\037description\037]"));
-		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | +\037flags\037]"));
+		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | +\037flags\037] [ALL]"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
@@ -487,7 +503,8 @@ public:
 				"The \002LIST\002 command allows you to list existing entries on the channel access list. "
 				"If a mask is given, the mask is wildcard matched against all existing entries on the "
 				"access list, and only those entries are returned. If a set of flags is given, only those "
-				"on the access list with the specified flags are returned."
+				"on the access list with the specified flags are returned. The \002ALL\002 option allows "
+				"listing entries from other access systems as well as flags."
 				"\n\n"
 				"The \002CLEAR\002 command clears the channel access list. This requires channel founder access."
 				"\n\n"

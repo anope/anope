@@ -141,6 +141,7 @@ namespace Language
 #define CHAN_ACCESS_LIMIT_DEEP      N_("You can only have %u access entry on a channel, including access entries from other channels.", "You can only have %u access entries on a channel, including access entries from other channels.")
 #define CHAN_ACCESS_LEVEL_RANGE      _("Access level must be between %d and %d inclusive.")
 #define CHAN_ACCESS_MALFORMED        _("You cannot add a malformed mask to an access list. Did you mean to add %s instead?")
+#define CHAN_ACCESS_FOREIGN         N_("%u access entry from other access systems not shown; use \002%s\033ALL\002 to view all access entries.", "%u access entries from other access systems not shown; use \002%s\033ALL\002 to view all access entries.")
 #define CHAN_EXCEPTED                _("\002%s\002 matches an except on %s and cannot be banned until the except has been removed.")
 #define CHAN_INFO_HEADER             _("Information about channel \002%s\002:")
 #define CHAN_LIMIT_EXCEEDED          _("You have already exceeded your limit of \002%d\002 channels.")

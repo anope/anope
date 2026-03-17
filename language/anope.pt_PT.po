@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-03-17 11:36+0100\n"
-"PO-Revision-Date: 2026-03-17 22:21+0100\n"
+"PO-Revision-Date: 2026-03-17 23:31+0100\n"
 "Last-Translator: PeGaSuS <25697531+TehPeGaSuS@users.noreply.github.com>\n"
 "Language-Team: Portuguese (Portugal)\n"
 "Language: pt_PT\n"
@@ -1326,7 +1326,7 @@ msgid "A notification memo has been sent to %s informing them you have read thei
 msgstr "Foi enviado um memo de notificação para %s a informar que leste o memo dele(a)."
 
 msgid "A vhost must be in the format of a valid hostname."
-msgstr "Um vhost deve estar no formato de um nome de anfitrião válido."
+msgstr "Um vhost deve estar no formato de um hostname válido."
 
 msgid "A vident must be in the format of a valid ident."
 msgstr "Um vident deve estar no formato de um ident válido."
@@ -1338,7 +1338,7 @@ msgid "ADD message"
 msgstr "ADD mensagem"
 
 msgid "ADD nickname fingerprint"
-msgstr "ADD nickname impressão_digital"
+msgstr "ADD nickname impressão digital"
 
 msgid "ADD oper type"
 msgstr "ADD oper tipo"
@@ -1353,7 +1353,7 @@ msgid "ADD [+expiry] mask limit reason"
 msgstr "ADD [+expira] máscara limite motivo"
 
 msgid "ADD [nickname fingerprint]"
-msgstr "ADD [nickname impressão_digital]"
+msgstr "ADD [nickname impressão digital]"
 
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [nickname] canal [chave]"
@@ -1452,7 +1452,7 @@ msgid "Activate the requested vhost for the given nick."
 msgstr "Ativar o vhost solicitado para o nick indicado."
 
 msgid "Activates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see the vhost instead of your real host/IP address."
-msgstr "Ativa o vhost atualmente atribuído ao nick em uso. Quando usas este comando, qualquer utilizador que faça /whois verá o vhost em vez do teu anfitrião/endereço IP real."
+msgstr "Ativa o vhost atualmente atribuído ao nick em uso. Quando usas este comando, qualquer utilizador que faça /whois verá o vhost em vez do teu host/endereço IP real."
 
 msgid "Activates your assigned vhost"
 msgstr "Ativa o teu vhost atribuído"
@@ -1524,10 +1524,10 @@ msgid "Adds a mode lock on the moderated, no external messages, topic lock flag 
 msgstr "Adiciona um bloqueio de modo nos modos moderated, no external messages, topic lock, bem como um ban em *!*@*.example.com."
 
 msgid "Adds a new bot with the nickname Chii, username chobit, hostname persocom.test, and realname Chii Motosuwa."
-msgstr "Adiciona um novo bot com o nickname Chii, nome de utilizador chobit, nome de anfitrião persocom.test, e nome ral Chii Motosuwa."
+msgstr "Adiciona um novo bot com o nickname Chii, username chobit, hostname persocom.test, e realname Chii Motosuwa."
 
 msgid "Adds the specified fingerprint to the certificate list of nickname."
-msgstr "Adiciona a impressão_digital especificada à lista de certificados de nickname."
+msgstr "Adiciona a impressão digital especificada à lista de certificados de nickname."
 
 msgid "Adds your current fingerprint to your certificate list."
 msgstr "Adiciona a tua impressão digital atual à tua lista de certificados."
@@ -1705,9 +1705,9 @@ msgid ""
 msgstr ""
 "Permite que Operadores de Serviços criem, modifiquem e apaguem bots que os utilizadores poderão usar nos seus próprios canais.\n"
 "\n"
-"%sADD adiciona um bot com o nickname, nome de utilizador, nome de anfitrião e nome real fornecidos.\n"
+"%sADD adiciona um bot com o nickname, username, hostname e realname fornecidos.\n"
 "\n"
-"%sCHANGE permite-te alterar o nickname, nome de utilizador, nome de anfitrião ou nome real de um bot sem o apagar (e todos os dados associados a ele).\n"
+"%sCHANGE permite-te alterar o nickname, username, hostname ou realname de um bot sem o apagar (e todos os dados associados a ele).\n"
 "\n"
 "%sDEL remove o bot indicado da lista de bots.\n"
 "\n"
@@ -1718,7 +1718,7 @@ msgid ""
 "\n"
 "Ignores will not be enforced on IRC Operators."
 msgstr ""
-"Permite que Operadores de Serviços façam os serviços ignorar um nick ou máscara por um certo tempo ou até ao próximo reinício. O formato de tempo padrão é segundos. Podes especificá-lo usando unidades. As unidades válidas são: s para segundos, m para minutos, h para horas e d para dias. Combinações destas unidades não são permitidas. Para fazer os serviços ignorar o utilizador permanentemente, escreve 0 como tempo. Ao adicionar uma máscara, deve estar no formato nick!user@anfitrião, tudo o resto será considerado um nick. Caracteres curinga são permitidos.\n"
+"Permite que Operadores de Serviços façam os serviços ignorar um nick ou máscara por um certo tempo ou até ao próximo reinício. O formato de tempo padrão é segundos. Podes especificá-lo usando unidades. As unidades válidas são: s para segundos, m para minutos, h para horas e d para dias. Combinações destas unidades não são permitidas. Para fazer os serviços ignorar o utilizador permanentemente, escreve 0 como tempo. Ao adicionar uma máscara, deve estar no formato nick!user@host, tudo o resto será considerado um nick. Caracteres curinga são permitidos.\n"
 "\n"
 "Ignorados não serão aplicados a Operadores de IRC."
 
@@ -1730,7 +1730,7 @@ msgid ""
 msgstr ""
 "Permite que Operadores de Serviços manipulem a lista AKILL. Se um utilizador correspondente a uma máscara AKILL tentar conectar-se, os serviços emitirão um KILL para esse utilizador e, em tipos de servidor suportados, instruirão todos os servidores a adicionar um ban para a máscara à qual o utilizador correspondeu.\n"
 "\n"
-"%sADD adiciona a máscara fornecida à lista AKILL com o motivo fornecido, que deve ser fornecido. A máscara deve estar no formato nick!user@anfitrião#realname, embora apenas user@anfitrião seja obrigatório. Se for especificado um nome real, o motivo deve ser precedido por :. expiração é especificado como um número inteiro seguido de d (dias), h (horas) ou m (minutos). Combinações (como 1h30m) não são permitidas. Se um especificador de unidade não for incluído, o padrão são dias (portanto, +30 sozinho significa 30 dias). Para adicionar um AKILL que não expira, usa +0. Se a máscara a ser adicionada começar com +, deve ser fornecido um tempo de expiração, mesmo que seja o mesmo que o padrão. O tempo de expiração padrão atual do AKILL pode ser encontrado com o comando STATSAKILL."
+"%sADD adiciona a máscara fornecida à lista AKILL com o motivo fornecido, que deve ser fornecido. A máscara deve estar no formato nick!user@host#realname, embora apenas user@host seja obrigatório. Se for especificado um realname, o motivo deve ser precedido por :. expiração é especificado como um número inteiro seguido de d (dias), h (horas) ou m (minutos). Combinações (como 1h30m) não são permitidas. Se um especificador de unidade não for incluído, o padrão são dias (portanto, +30 sozinho significa 30 dias). Para adicionar um AKILL que não expira, usa +0. Se a máscara a ser adicionada começar com +, deve ser fornecido um tempo de expiração, mesmo que seja o mesmo que o padrão. O tempo de expiração padrão atual do AKILL pode ser encontrado com o comando STATSAKILL."
 
 msgid ""
 "Allows Services Operators to manipulate the SNLINE list. If a user with a realname matching an SNLINE mask attempts to connect, services will not allow them to pursue their IRC session.\n"
@@ -1766,15 +1766,15 @@ msgid ""
 "\n"
 "Note that a connecting client will \"use\" the first exception their host matches."
 msgstr ""
-"Permite que Operadores de Serviços manipulem a lista de anfitriãos que têm limites de sessão específicos - permitindo que certas máquinas, como servidores shell, suportem mais do que o número padrão de clientes de cada vez. Quando um anfitrião atinge o seu limite de sessão, todos os clientes a tentar conectar-se desse anfitrião serão mortos. Antes de o utilizador ser morto, é notificado sobre uma fonte de ajuda relativa à limitação de sessão. O conteúdo deste aviso é uma definição de configuração.\n"
+"Permite que Operadores de Serviços manipulem a lista de anfitriãos que têm limites de sessão específicos - permitindo que certas máquinas, como servidores shell, suportem mais do que o número padrão de clientes de cada vez. Quando um host atinge o seu limite de sessão, todos os clientes a tentar conectar-se desse host serão mortos. Antes de o utilizador ser morto, é notificado sobre uma fonte de ajuda relativa à limitação de sessão. O conteúdo deste aviso é uma definição de configuração.\n"
 "\n"
-"%sADD adiciona a máscara de anfitrião fornecida à lista de exceções. Nota que as máscaras nick!user@anfitrião e user@anfitrião são inválidas! Apenas máscaras de anfitrião reais, como box.anfitrião.dom e *.anfitrião.dom, são permitidas porque a limitação de sessões não tem em conta nomes de nick ou user. limite deve ser um número maior ou igual a zero. Isto determina quantas sessões este anfitrião pode suportar de cada vez. Um valor de zero significa que o anfitrião tem um limite de sessão ilimitado. Consulta a ajuda do AKILL para detalhes sobre o formato do parâmetro opcional expira. \n"
+"%sADD adiciona a máscara de host fornecida à lista de exceções. Nota que as máscaras nick!user@anfitrião e user@anfitrião são inválidas! Apenas máscaras de host reais, como box.host.dom e *.host.dom, são permitidas porque a limitação de sessões não tem em conta nomes de nick ou user. limite deve ser um número maior ou igual a zero. Isto determina quantas sessões este host pode suportar de cada vez. Um valor de zero significa que o host tem um limite de sessão ilimitado. Consulta a ajuda do AKILL para detalhes sobre o formato do parâmetro opcional expira. \n"
 "\n"
 "%sDEL remove a máscara fornecida da lista de exceções.\n"
 "\n"
-"%sLIST e %sVIEW mostram todas as sessões atuais; se a máscara opcional for fornecida, a lista é limitada às sessões que correspondem à máscara. A diferença é que %sVIEW é mais verboso, exibindo o nome da pessoa que adicionou a exceção, o seu limite de sessão, motivo, máscara de anfitrião e a data e hora de expiração. \n"
+"%sLIST e %sVIEW mostram todas as sessões atuais; se a máscara opcional for fornecida, a lista é limitada às sessões que correspondem à máscara. A diferença é que %sVIEW é mais verboso, exibindo o nome da pessoa que adicionou a exceção, o seu limite de sessão, motivo, máscara de host e a data e hora de expiração. \n"
 "\n"
-"Nota que um cliente a conectar-se \"usará\" a primeira exceção à qual o seu anfitrião corresponder."
+"Nota que um cliente a conectar-se \"usará\" a primeira exceção à qual o seu host corresponder."
 
 #, c-format
 msgid ""
@@ -1790,7 +1790,7 @@ msgstr ""
 "\n"
 "%sLIST lista anfitriãos com pelo menos limiar sessões. O limiar deve ser um número maior que 1. Isto é para evitar a listagem acidental do grande número de anfitriãos com sessão única.\n"
 "\n"
-"%sVIEW mostra informações detalhadas sobre um anfitrião específico - incluindo a contagem atual de sessões e o limite de sessão. O valor de anfitrião não pode incluir caracteres curinga. \n"
+"%sVIEW mostra informações detalhadas sobre um host específico - incluindo a contagem atual de sessões e o limite de sessão. O valor de anfitrião não pode incluir caracteres curinga. \n"
 "\n"
 "Consulta a ajuda do EXCEPTION para mais informações sobre a limitação de sessão e como definir limites de sessão específicos para certos anfitriãos e grupos dos mesmos."
 
@@ -1878,18 +1878,18 @@ msgid "Allows you to choose the way services are communicating with you. With %
 msgstr "Permite-te escolher a forma como os serviços comunicam contigo. Com %s definido, os serviços usarão mensagens, caso contrário, usarão notificações."
 
 msgid "Allows you to ignore users by nick or host from memoing you or a channel. If someone on the memo ignore list tries to memo you or a channel, they will not be told that you have them ignored."
-msgstr "Permite-te ignorar utilizadores por nick ou anfitrião de te enviarem memos a ti ou a um canal. Se alguém na lista de ignorados de memo tentar enviar-te um memo a ti ou a um canal, não lhe será dito que o tens ignorado."
+msgstr "Permite-te ignorar utilizadores por nick ou host de te enviarem memos a ti ou a um canal. Se alguém na lista de ignorados de memo tentar enviar-te um memo a ti ou a um canal, não lhe será dito que o tens ignorado."
 
 msgid "Allows you to kill a user from the network. Parameters are the same as for the standard /KILL command."
 msgstr "Permite-te matar um utilizador da rede. Os parâmetros são os mesmos que para o comando /KILL padrão."
 
 #, c-format
 msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on the nick. You can hide the email address (EMAIL), last seen user@host mask (MASK), the services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
-msgstr "Permite-te impedir que certas informações sejam exibidas quando alguém faz um %sINFO no nick. Podes esconder o endereço de email (EMAIL), a última máscara user@anfitrião vista (MASK), o status de acesso aos serviços (STATUS) e a última mensagem de quit (QUIT). O segundo parâmetro especifica se a informação deve ser exibida (OFF) ou escondida (ON)."
+msgstr "Permite-te impedir que certas informações sejam exibidas quando alguém faz um %sINFO no nick. Podes esconder o endereço de email (EMAIL), a última máscara user@host vista (MASK), o status de acesso aos serviços (STATUS) e a última mensagem de quit (QUIT). O segundo parâmetro especifica se a informação deve ser exibida (OFF) ou escondida (ON)."
 
 #, c-format
 msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on your nick. You can hide your email address(EMAIL), last seen user@host mask (MASK), your services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
-msgstr "Permite-te impedir que certas informações sejam exibidas quando alguém faz um %sINFO no teu nick. Podes esconder o teu endereço de email (EMAIL), a tua última máscara user@anfitrião vista (MASK), o teu status de acesso aos serviços (STATUS) e a tua última mensagem de quit (QUIT). O segundo parâmetro especifica se a informação deve ser exibida (OFF) ou escondida (ON)."
+msgstr "Permite-te impedir que certas informações sejam exibidas quando alguém faz um %sINFO no teu nick. Podes esconder o teu endereço de email (EMAIL), a tua última máscara user@host vista (MASK), o teu status de acesso aos serviços (STATUS) e a tua última mensagem de quit (QUIT). O segundo parâmetro especifica se a informação deve ser exibida (OFF) ou escondida (ON)."
 
 #, c-format
 msgid "Allows you to see %s information about a channel or a bot"
@@ -2087,7 +2087,7 @@ msgid "Bot hosts may only be %zu characters long."
 msgstr "Os anfitriãos de bot só podem ter %zu caracteres."
 
 msgid "Bot hosts may only contain valid host characters."
-msgstr "Os anfitriãos de bot só podem conter caracteres de anfitrião válidos."
+msgstr "Os anfitriãos de bot só podem conter caracteres de host válidos."
 
 #, c-format
 msgid "Bot idents may only be %zu characters long."
@@ -2234,7 +2234,7 @@ msgid "Changed usermodes of %s to %s."
 msgstr "Usermodes de %s alterados para %s."
 
 msgid "Changes all of the information of the bot called Chii. The new nickname will be Mahoro, the new username will be saint, the new hostname will be vesper.test, and the new realname will be Mahoro Andou."
-msgstr "Altera todas as informações do bot chamado Chii. O novo nickname será Mahoro, o novo nome de utilizador será saint, a nova máscara de anfitrião será vesper.test, e o novo nome real Mahoro Andou."
+msgstr "Altera todas as informações do bot chamado Chii. O novo nickname será Mahoro, o novo username será saint, a nova máscara de host será vesper.test, e o novo realname Mahoro Andou."
 
 msgid "Changes the display nickname used to refer to the account. The new displaynickname must already be associated with the account."
 msgstr "Altera o nickname de exibição usado para se referir à conta. O novo nickname de exibição já deve estar associado à conta."
@@ -2631,10 +2631,10 @@ msgid "DEL entry-num"
 msgstr "DEL num-entrada"
 
 msgid "DEL fingerprint"
-msgstr "DEL impressão_digital"
+msgstr "DEL impressão digital"
 
 msgid "DEL nickname fingerprint"
-msgstr "DEL nickname impressão_digital"
+msgstr "DEL nickname impressão digital"
 
 msgid "DEL oper"
 msgstr "DEL oper"
@@ -2646,7 +2646,7 @@ msgid "DEL [nickname] channel"
 msgstr "DEL [nickname] canal"
 
 msgid "DEL [nickname] fingerprint"
-msgstr "DEL [nickname] impressão_digital"
+msgstr "DEL [nickname] impressão digital"
 
 msgid "DEL {mask | entry-num | list | id}"
 msgstr "DEL {máscara | num-entrada | lista | id}"
@@ -2686,7 +2686,7 @@ msgid "Date/Time"
 msgstr "Data/Hora"
 
 msgid "Deactivates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see your real host/IP address."
-msgstr "Desativa o vhost atualmente atribuído ao nick em uso. Quando usas este comando, qualquer utilizador que faça /whois verá o teu anfitrião/endereço IP real."
+msgstr "Desativa o vhost atualmente atribuído ao nick em uso. Quando usas este comando, qualquer utilizador que faça /whois verá o teu host/endereço IP real."
 
 msgid "Deactivates your assigned vhost"
 msgstr "Desativa o teu vhost atribuído"
@@ -3185,7 +3185,7 @@ msgstr "Erro ao recarregar o ficheiro de configuração: %s"
 
 #, c-format
 msgid "Error! The vhost is too long, please use a hostname shorter than %zu characters."
-msgstr "Erro! O vhost é demasiado longo, por favor usa um nome de anfitrião com menos de %zu caracteres."
+msgstr "Erro! O vhost é demasiado longo, por favor usa um hostname com menos de %zu caracteres."
 
 #, c-format
 msgid "Error! The vident is too long, please use an ident shorter than %zu characters."
@@ -3427,7 +3427,7 @@ msgid "Invalid expiry time."
 msgstr "Tempo de expiração inválido."
 
 msgid "Invalid hostmask. Only real hostmasks are valid, as exceptions are not matched against nicks or usernames."
-msgstr "Máscara de anfitrião inválida. Apenas máscara de anfitriãos reais são válidas, pois as exceções não são comparadas com nicks ou usernames."
+msgstr "Máscara de host inválida. Apenas máscara de anfitriãos reais são válidas, pois as exceções não são comparadas com nicks ou usernames."
 
 #, c-format
 msgid "Invalid limit %s, using %d."
@@ -3614,7 +3614,7 @@ msgid ""
 msgstr ""
 "Lista ou pega num vhost oferecido.\n"
 "\n"
-"Sem parâmetros, será mostrado um user@anfitrião ou máscara de anfitrião, um número de entrada, ou uma lista (ex: 1-3,5) de vhosts oferecidos. Se for especificado ALL, os vhosts que não podem ser obtidos serão marcados com [Invalid] em vez de serem omitidos.\n"
+"Sem parâmetros, será mostrado um user@host ou máscara de host, um número de entrada, ou uma lista (ex: 1-3,5) de vhosts oferecidos. Se for especificado ALL, os vhosts que não podem ser obtidos serão marcados com [Invalid] em vez de serem omitidos.\n"
 "Os vhosts oferecidos podem conter variáveis de modelo. As variáveis de modelo suportadas são:\n"
 "  {account}  - A tua conta atual.\n"
 "  {network}  - O nome desta rede IRC.\n"
@@ -3760,7 +3760,7 @@ msgid ""
 msgstr ""
 "Lista todos os utilizadores atualmente online na rede IRC, quer o seu nick esteja registado ou não.\n"
 "\n"
-"Se padrão for fornecido, lista apenas os utilizadores que lhe correspondem (deve estar no formato nick!user@anfitrião[#realname]). Se canal for fornecido, lista apenas os utilizadores que estão no canal indicado. Se INVISIBLE for especificado, apenas os utilizadores com a flag +i serão listados."
+"Se padrão for fornecido, lista apenas os utilizadores que lhe correspondem (deve estar no formato nick!user@host[#realname]). Se canal for fornecido, lista apenas os utilizadores que estão no canal indicado. Se INVISIBLE for especificado, apenas os utilizadores com a flag +i serão listados."
 
 msgid "Lists any memos you currently have. With NEW, lists only new (unread) memos. Unread memos are marked with a \"*\" to the left of the memo number. You can also specify a list of numbers."
 msgstr "Lista quaisquer memos que tenhas atualmente. Com NEW, lista apenas memos novos (não lidos). Memos não lidos são marcados com um \"*\" à esquerda do número do memo. Também podes especificar uma lista de números."
@@ -4538,7 +4538,7 @@ msgid "Please contact an Operator to get a vhost assigned to this nick."
 msgstr "Por favor, contacta um Operador para obter um vhost atribuído a este nick."
 
 msgid "Please try again with a more obscure password. Passwords should not be something that could be easily guessed (e.g. your real name or your nick) and cannot contain a space character."
-msgstr "Por favor, tenta novamente com uma palavra-passe mais obscura. As palavras-passe não devem ser algo que possa ser facilmente adivinhado (por exemplo, o teu nome real ou o teu nick) e não podem conter espaços."
+msgstr "Por favor, tenta novamente com uma palavra-passe mais obscura. As palavras-passe não devem ser algo que possa ser facilmente adivinhado (por exemplo, o teu realname ou o teu nick) e não podem conter espaços."
 
 msgid "Please use a valid server name when juping."
 msgstr "Por favor, usa um nome de servidor válido ao fazer jupe."
@@ -4659,7 +4659,7 @@ msgid "Protection is now on for %s."
 msgstr "A proteção está agora ativada para %s."
 
 msgid "Puts an AKILL for every nick on the specified channel. It uses the entire real ident@host for every nick, and then enforces the AKILL."
-msgstr "Coloca um AKILL para cada nick no canal especificado. Usa o ident@anfitrião real completo para cada nick e depois aplica o AKILL."
+msgstr "Coloca um AKILL para cada nick no canal especificado. Usa o ident@host real completo para cada nick e depois aplica o AKILL."
 
 msgid "REGONLY enforced by "
 msgstr "REGONLY aplicado por "
@@ -4764,7 +4764,7 @@ msgstr ""
 "\n"
 "Orientações para escolher palavras-passe:\n"
 "\n"
-"As palavras-passe não devem ser facilmente adivinháveis. Por exemplo, usar o teu nome real como palavra-passe é má ideia. Usar o teu nickname como palavra-passe é uma ideia muito pior ;) e, de facto, o %s não o permitirá. Além disso, palavras-passe curtas são vulneráveis a pesquisas de tentativa e erro, por isso deves escolher uma palavra-passe com pelo menos %u caracteres. Finalmente, o caractere de espaço não pode ser usado em palavras-passe."
+"As palavras-passe não devem ser facilmente adivinháveis. Por exemplo, usar o teu realname como palavra-passe é má ideia. Usar o teu nickname como palavra-passe é uma ideia muito pior ;) e, de facto, o %s não o permitirá. Além disso, palavras-passe curtas são vulneráveis a pesquisas de tentativa e erro, por isso deves escolher uma palavra-passe com pelo menos %u caracteres. Finalmente, o caractere de espaço não pode ser usado em palavras-passe."
 
 msgid "Registration is currently disabled."
 msgstr "O registo está atualmente desativado."
@@ -4832,10 +4832,10 @@ msgid "Removes the greet message of zebra."
 msgstr "Remove a mensagem de saudação de zebra."
 
 msgid "Removes the specified fingerprint from the certificate list of nickname."
-msgstr "Remove a impressão_digital especificada da lista de certificados de nickname."
+msgstr "Remove a impressão digital especificada da lista de certificados de nickname."
 
 msgid "Removes the specified fingerprint from your certificate list."
-msgstr "Remove a impressão_digital especificada da tua lista de certificados."
+msgstr "Remove a impressão digital especificada da tua lista de certificados."
 
 msgid "Removes your greet message."
 msgstr "Remove a tua mensagem de saudação."
@@ -5283,9 +5283,9 @@ msgstr ""
 "\n"
 "Tipo de ban é um número entre 0 e 3 que significa:\n"
 "\n"
-"0: ban na forma *!user@anfitrião\n"
-"1: ban na forma *!*user@anfitrião\n"
-"2: ban na forma *!*@anfitrião\n"
+"0: ban na forma *!user@host\n"
+"1: ban na forma *!*user@host\n"
+"2: ban na forma *!*@host\n"
 "3: ban na forma *!*user@*.dominio"
 
 msgid ""
@@ -5379,12 +5379,12 @@ msgid ""
 "\n"
 "* NOTE, this will not update the vhost for any nicks added to the account after this command was used."
 msgstr ""
-"Define o vhost para todos os nicks na mesma conta que a do nick indicado. Se o teu IRCD suporta vidents, então usar SETALL <nick> <ident>@<máscara de anfitrião> definirá idents para os utilizadores, bem como vhosts.\n"
+"Define o vhost para todos os nicks na mesma conta que a do nick indicado. Se o teu IRCD suporta vidents, então usar SETALL <nick> <ident>@<máscara de host> definirá idents para os utilizadores, bem como vhosts.\n"
 "\n"
 "* NOTA, isto não atualizará o vhost para quaisquer nicks adicionados à conta depois de este comando ser usado."
 
 msgid "Sets the vhost for the given nick to that of the given hostmask. If your IRCD supports vidents, then using SET <nick> <ident>@<hostmask> set idents for users as well as vhosts."
-msgstr "Define o vhost para o nick indicado para o da máscara de anfitrião fornecida. Se o teu IRCD suporta vidents, então usar SET <nick> <ident>@<máscara de anfitrião> definirá idents para os utilizadores, bem como vhosts."
+msgstr "Define o vhost para o nick indicado para o da máscara de host fornecida. Se o teu IRCD suporta vidents, então usar SET <nick> <ident>@<máscara de host> definirá idents para os utilizadores, bem como vhosts."
 
 msgid "Sets various global services options. Option names currently defined are:"
 msgstr "Define várias opções globais dos serviços. Os nomes de opção atualmente definidos são:"
@@ -5754,7 +5754,7 @@ msgstr ""
 "\n"
 "O comando %sLIST mostra a lista AKILL. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
 "\n"
-"%sVIEW é uma versão mais detalhada de %sLIST e mostrará quem adicionou um AKILL, a data em que foi adicionado e quando expira, bem como a máscara user@anfitrião/ip e o motivo.\n"
+"%sVIEW é uma versão mais detalhada de %sLIST e mostrará quem adicionou um AKILL, a data em que foi adicionado e quando expira, bem como a máscara user@host/ip e o motivo.\n"
 "\n"
 "%sCLEAR limpa todas as entradas da lista AKILL."
 
@@ -5904,7 +5904,7 @@ msgstr "A máscara fornecida também pode ser um canal, que usará a lista de ac
 
 #, c-format
 msgid "The host %s currently has %d sessions with a limit of %d because it matches entry: %s."
-msgstr "O anfitrião %s tem atualmente %d sessões com um limite de %d porque corresponde à entrada: %s."
+msgstr "O host %s tem atualmente %d sessões com um limite de %d porque corresponde à entrada: %s."
 
 #, c-format
 msgid "The last memo you sent to %s (sent on %s) has been read."
@@ -5924,11 +5924,11 @@ msgstr "A última mensagem de quit de %s será agora mostrada nas exibições 
 
 #, c-format
 msgid "The last seen user@host mask of %s will now be hidden from %s INFO displays."
-msgstr "A última máscara user@anfitrião vista de %s será agora escondida das exibições de INFO do %s."
+msgstr "A última máscara user@host vista de %s será agora escondida das exibições de INFO do %s."
 
 #, c-format
 msgid "The last seen user@host mask of %s will now be shown in %s INFO displays."
-msgstr "A última máscara user@anfitrião vista de %s será agora mostrada nas exibições de INFO do %s."
+msgstr "A última máscara user@host vista de %s será agora mostrada nas exibições de INFO do %s."
 
 #, c-format
 msgid "The limit on %s is not valid."
@@ -6575,7 +6575,7 @@ msgid "View and change configuration file settings"
 msgstr "Ver e alterar definições do ficheiro de configuração"
 
 msgid "View the list of host sessions"
-msgstr "Ver a lista de sessões de anfitrião"
+msgstr "Ver a lista de sessões de host"
 
 msgid "Voices protection"
 msgstr "Proteção de voices"

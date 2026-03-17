@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-03-17 11:36+0100\n"
-"PO-Revision-Date: 2026-03-17 22:15+0100\n"
+"PO-Revision-Date: 2026-03-17 22:21+0100\n"
 "Last-Translator: PeGaSuS <25697531+TehPeGaSuS@users.noreply.github.com>\n"
 "Language-Team: Portuguese (Portugal)\n"
 "Language: pt_PT\n"
@@ -179,7 +179,7 @@ msgstr "%s entrou em %s."
 
 #, c-format
 msgid "%s has been migrated to the %s access system."
-msgstr "%s  foi removido da lista de acesso %s."
+msgstr "%s foi migrada para o sistema de acesso %s."
 
 #, c-format
 msgid "%s has been parted from %s."

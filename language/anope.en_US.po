@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-16 19:13+0000\n"
-"PO-Revision-Date: 2026-03-16 19:13+0000\n"
+"POT-Creation-Date: 2026-03-17 00:48+0000\n"
+"PO-Revision-Date: 2026-03-17 00:49+0000\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -648,9 +648,6 @@ msgstr ""
 msgid "memo-text"
 msgstr ""
 
-msgid "message"
-msgstr ""
-
 msgid "modname"
 msgstr ""
 
@@ -690,9 +687,6 @@ msgstr ""
 msgid "nickname email"
 msgstr ""
 
-msgid "nickname message"
-msgstr ""
-
 msgid "nickname new-display"
 msgstr ""
 
@@ -707,6 +701,9 @@ msgid "nickname [code]"
 msgstr ""
 
 msgid "nickname [language]"
+msgstr ""
+
+msgid "nickname [message]"
 msgstr ""
 
 msgid "nickname [password]"
@@ -802,6 +799,12 @@ msgid " but %s mysteriously dematerialized."
 msgstr ""
 
 msgid "\"Jupiter\" a server"
+msgstr ""
+
+msgid "#chat hello all"
+msgstr ""
+
+msgid "#chat is eating pizza"
 msgstr ""
 
 #, c-format
@@ -1442,6 +1445,15 @@ msgstr ""
 msgid "Activates your assigned vhost"
 msgstr ""
 
+msgid "Add smeg to the bad word list of #channel. If a user says only this word in a message they will be kicked."
+msgstr ""
+
+msgid "Add smeg to the bad word list of #channel. If a user says this word anywhere in a message they will be kicked."
+msgstr ""
+
+msgid "Add smeg to the bad word list of #channel. If a user says this word at the start of a message they will be kicked."
+msgstr ""
+
 msgid "Add a nick to an account"
 msgstr ""
 
@@ -1497,6 +1509,9 @@ msgid "Additionally, if fantasy is enabled fantasy commands can be executed by p
 msgstr ""
 
 msgid "Adds a mode lock on the moderated, no external messages, topic lock flag modes as well as a ban on *!*@*.example.com."
+msgstr ""
+
+msgid "Adds a new bot with the nickname Chii, username chobit, hostname persocom.test, and realname Chii Motosuwa."
 msgstr ""
 
 msgid "Adds the specified fingerprint to the certificate list of nickname."
@@ -1668,7 +1683,7 @@ msgstr ""
 msgid ""
 "Allows Services Operators to create, modify, and delete bots that users will be able to use on their own channels.\n"
 "\n"
-"%sADD adds a bot with the given nickname, username, hostname and realname. Since no integrity checks are done for these settings, be really careful.\n"
+"%sADD adds a bot with the given nickname, username, hostname and realname.\n"
 "\n"
 "%sCHANGE allows you to change the nickname, username, hostname or realname of a bot without deleting it (and all the data associated with it).\n"
 "\n"
@@ -1819,6 +1834,9 @@ msgid "As a Services Operator, you may drop any nick."
 msgstr ""
 
 msgid "Assigns a bot to a channel"
+msgstr ""
+
+msgid "Assigns the OperServ bot to #opers."
 msgstr ""
 
 msgid "Assigns the specified bot to a channel. You can then configure the bot for the channel so it fits your needs."
@@ -2137,6 +2155,9 @@ msgstr ""
 msgid "Changed usermodes of %s to %s."
 msgstr ""
 
+msgid "Changes all of the information of the bot called Chii. The new nickname will be Mahoro, the new username will be saint, the new hostname will be vesper.test, and the new realname will be Mahoro Andou."
+msgstr ""
+
 msgid "Changes the display nickname used to refer to the account. The new displaynickname must already be associated with the account."
 msgstr ""
 
@@ -2144,6 +2165,12 @@ msgid "Changes the display nickname used to refer to your account. The new displ
 msgstr ""
 
 msgid "Changes the founder of a channel. The new nickname must be a registered one."
+msgstr ""
+
+msgid "Changes the greet message of alien to I come in peace."
+msgstr ""
+
+msgid "Changes the greet message of the specified nickname. This message will be displayed when joining a channel that has GREET option enabled, provided that the user has the necessary access on it."
 msgstr ""
 
 #, c-format
@@ -2173,6 +2200,12 @@ msgid "Changes the timezone services uses when sending messages to you (for exam
 msgstr ""
 
 msgid "Changes when you will be notified about new memos (only for nicknames)"
+msgstr ""
+
+msgid "Changes your greet message to I come in peace."
+msgstr ""
+
+msgid "Changes your greet message. This message will be displayed when joining a channel that has GREET option enabled, provided that you have the necessary access on it."
 msgstr ""
 
 #, c-format
@@ -2322,6 +2355,9 @@ msgstr ""
 
 #, c-format
 msgid "Cleared info from %s."
+msgstr ""
+
+msgid "Clears all bad word entries set on #channel."
 msgstr ""
 
 msgid "Clears all extended bans that start with channel:."
@@ -2665,7 +2701,16 @@ msgstr[1] ""
 msgid "Deleted info from %s."
 msgstr ""
 
+msgid "Deletes heck from the bad word list of #channel."
+msgstr ""
+
+msgid "Deletes a bot called Mahoro."
+msgstr ""
+
 msgid "Deletes all of your memos."
+msgstr ""
+
+msgid "Deletes bad word entries set on #channel numbered 2 through 5 and 7 through 9."
 msgstr ""
 
 msgid "Deletes memos numbered 2 through 5 and 7 through 9."
@@ -3195,6 +3240,9 @@ msgstr ""
 msgid "Hosts with at least %d sessions:"
 msgstr ""
 
+msgid "I come in peace"
+msgstr ""
+
 #, c-format
 msgid "I have not seen %s."
 msgstr ""
@@ -3469,6 +3517,9 @@ msgid ""
 "Note that these options are limited to Services Operators."
 msgstr ""
 
+msgid "Lists all bad word entries set on #channel."
+msgstr ""
+
 msgid "Lists all channel records"
 msgstr ""
 
@@ -3557,10 +3608,10 @@ msgstr ""
 msgid "Lists available bots"
 msgstr ""
 
-msgid "Lists bad word entries on #channel numbered 2 through 5 and 7 through 9."
+msgid "Lists bad word entries set on #channel numbered 2 through 5 and 7 through 9."
 msgstr ""
 
-msgid "Lists bad word entries on #channel that match *UwU*."
+msgid "Lists bad word entries set on #channel that match *frack*."
 msgstr ""
 
 msgid "Lists currently loaded modules."
@@ -3675,7 +3726,7 @@ msgid ""
 "\n"
 "The ADD command adds the given word to the bad words list. If SINGLE is specified, a kick will be done only if a user says the entire word. If START is specified, a kick will be done if a user says a word that starts with word. If END is specified, a kick will be done if a user says a word that ends with word. If you don't specify anything, a kick will be issued every time word is said by a user. This will be shown in the LIST output as ANY.\n"
 "\n"
-"The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
+"The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.\n"
 "\n"
 "The LIST command displays the bad words list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
@@ -3695,12 +3746,6 @@ msgid "Makes the bot say the specified text on the specified channel"
 msgstr ""
 
 msgid "Makes the bot say the specified text on the specified channel."
-msgstr ""
-
-msgid "Makes the given message the greet of the nickname, that will be displayed when joining a channel that has GREET option enabled, provided that the user has the necessary access on it."
-msgstr ""
-
-msgid "Makes the given message the greet of your nickname, that will be displayed when joining a channel that has GREET option enabled, provided that you have the necessary access on it."
 msgstr ""
 
 msgid "Manage DNS zones for this network"
@@ -4565,14 +4610,23 @@ msgstr ""
 msgid "Removes all entries that were added in the last 30 minutes."
 msgstr ""
 
+msgid "Removes the greet message of zebra."
+msgstr ""
+
 msgid "Removes the specified fingerprint from the certificate list of nickname."
 msgstr ""
 
 msgid "Removes the specified fingerprint from your certificate list."
 msgstr ""
 
+msgid "Removes your greet message."
+msgstr ""
+
 #, c-format
 msgid "Removing %s because %s covers it."
+msgstr ""
+
+msgid "Renames an existing bot called Elda to Chii."
 msgstr ""
 
 msgid "Repeat kicker"
@@ -4726,6 +4780,9 @@ msgstr ""
 msgid "Sends a memo to the channel when someone uses the chanserv/xop command on #anope."
 msgstr ""
 
+msgid "Sends a message to #chat saying hello all."
+msgstr ""
+
 msgid "Sends a message to channel operators and above when someone uses the chanserv/access command on #anope."
 msgstr ""
 
@@ -4736,6 +4793,9 @@ msgid "Sends all registered users a memo containing memo-text."
 msgstr ""
 
 msgid "Sends all services staff a memo containing memo-text."
+msgstr ""
+
+msgid "Sends an action message to #chat saying is eating pizza."
 msgstr ""
 
 msgid "Sends the named nick or channel a memo containing memo-text. When sending to a nickname, the recipient will receive a notice that they have a new memo. The target nickname/channel must be registered."
@@ -4964,6 +5024,9 @@ msgstr ""
 msgid "Set your nickname password"
 msgstr ""
 
+msgid "Sets bot bans on #wibble to expire after 15 minutes."
+msgstr ""
+
 #, c-format
 msgid ""
 "Sets the AMSG kicker on or off. When enabled, the bot will kick users who send the same message to multiple channels where %s bots are.\n"
@@ -5130,6 +5193,12 @@ msgstr ""
 
 #, c-format
 msgid "Showed %zu/%zu matches for %s."
+msgstr ""
+
+msgid "Shows information about the ChanServ bot."
+msgstr ""
+
+msgid "Shows information about the bot assigned to #example and its kickers and options."
 msgstr ""
 
 msgid "Shows the current server configuration."
@@ -5914,6 +5983,9 @@ msgid "Unassigns a bot from a channel"
 msgstr ""
 
 msgid "Unassigns a bot from a channel. When you use this command, the bot won't join the channel anymore. However, bot configuration for the channel is kept, so you will always be able to reassign a bot later without having to reconfigure it entirely."
+msgstr ""
+
+msgid "Unassigns a previously assigned bot from #opers."
 msgstr ""
 
 msgid "Unconfirmed"
@@ -6767,6 +6839,9 @@ msgid "[{pattern | channel} [INVISIBLE]]"
 msgstr ""
 
 msgid "[{pattern | nick} [SECRET]]"
+msgstr ""
+
+msgid "alien I come in peace"
 msgstr ""
 
 msgid "does not expire"

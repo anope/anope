@@ -496,7 +496,7 @@ public:
 				"\n\n"
 				"The \002DEL\002 command removes the given word from the "
 				"bad words list. If a list of entry numbers is given, those "
-				"entries are deleted.  (See the example for LIST below.)"
+				"entries are deleted."
 				"\n\n"
 				"The \002LIST\002 command displays the bad words list. If "
 				"a wildcard mask is given, only those entries matching the "
@@ -509,14 +509,44 @@ public:
 			source.service->GetQueryCommand("generic/help").c_str(),
 			source.command.nobreak().c_str());
 
-		ExampleWrapper examples;
-		examples.AddEntry("#channel LIST 2-5,7-9", _(
-			"Lists bad word entries on \037#channel\037 numbered 2 through 5 and 7 through 9."
-		));
-		examples.AddEntry("#channel LIST *UwU*", _(
-			"Lists bad word entries on \037#channel\037 that match \037*UwU*\037."
-		));
-		examples.SendTo(source);
+		ExampleWrapper()
+			.AddEntry("#channel ADD smeg", _(
+				"Add \035smeg\035 to the bad word list of \035#channel\035. If a user says this "
+				"word anywhere in a message they will be kicked."
+			))
+			.AddEntry("#channel ADD smeg SINGLE", _(
+				"Add \035smeg\035 to the bad word list of \035#channel\035. If a user says only "
+				"this word in a message they will be kicked."
+			))
+			.AddEntry("#channel ADD smeg START", _(
+				"Add \035smeg\035 to the bad word list of \035#channel\035. If a user says this "
+				"word at the start of a message they will be kicked."
+			))
+			.AddEntry("#channel ADD smeg END", _(
+				"Add \035smeg\035 to the bad word list of \035#channel\035. If a user says this "
+				"word at the start of a message they will be kicked."
+			))
+			.AddEntry("#channel CLEAR", _(
+				"Clears all bad word entries set on \035#channel\035."
+			))
+			.AddEntry("#channel DEL 2-5,7-9", _(
+				"Deletes bad word entries set on \035#channel\035 numbered 2 through 5 and 7 "
+				"through 9."
+			))
+			.AddEntry("#channel DEL heck", _(
+				"Deletes \035heck\035 from the bad word list of \035#channel\035."
+			))
+			.AddEntry("#channel LIST", _(
+				"Lists all bad word entries set on \035#channel\035."
+			))
+			.AddEntry("#channel LIST 2-5,7-9", _(
+				"Lists bad word entries set on \035#channel\035 numbered 2 through 5 and 7 through "
+				"9."
+			))
+			.AddEntry("#channel LIST *frack*", _(
+				"Lists bad word entries set on \035#channel\035 that match \035*frack*\035."
+			))
+			.SendTo(source);
 
 		return true;
 	}

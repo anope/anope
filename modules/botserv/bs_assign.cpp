@@ -84,6 +84,13 @@ public:
 			"can then configure the bot for the channel so it fits "
 			"your needs."
 		));
+
+		ExampleWrapper()
+			.AddEntry("#opers OperServ", _(
+				"Assigns the \037OperServ\037 bot to \037#opers\037."
+			))
+			.SendTo(source);
+
 		return true;
 	}
 };
@@ -150,6 +157,13 @@ public:
 			"be able to reassign a bot later without having to reconfigure "
 			"it entirely."
 		));
+
+		ExampleWrapper()
+			.AddEntry("#opers", _(
+				"Unassigns a previously assigned bot from \037#opers\037."
+			))
+			.SendTo(source);
+
 		return true;
 	}
 };

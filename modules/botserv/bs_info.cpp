@@ -104,6 +104,17 @@ public:
 			"you'll get information about a bot, such as creation "
 			"time or number of channels it is on."
 		), source.service->nick.c_str());
+
+		ExampleWrapper()
+			.AddEntry("#example", _(
+				"Shows information about the bot assigned to \035#example\035 and its kickers and "
+				"options."
+			))
+			.AddEntry("ChanServ", _(
+				"Shows information about the \035ChanServ\035 bot."
+			))
+			.SendTo(source);
+
 		return true;
 	}
 

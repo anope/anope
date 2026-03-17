@@ -351,8 +351,7 @@ public:
 				"channels."
 				"\n\n"
 				"\002%s\033ADD\002 adds a bot with the given nickname, username, "
-				"hostname and realname. Since no integrity checks are done "
-				"for these settings, be really careful."
+				"hostname and realname."
 				"\n\n"
 				"\002%s\033CHANGE\002 allows you to change the nickname, username, hostname "
 				"or realname of a bot without deleting it (and "
@@ -367,6 +366,25 @@ public:
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str(),
 			source.command.nobreak().c_str());
+
+		ExampleWrapper()
+			.AddEntry("ADD Chii chobit persocom.test Chii Motosuwa", _(
+				"Adds a new bot with the nickname \035Chii\035, username \035chobit\035, hostname "
+				"\035persocom.test\035, and realname \035Chii Motosuwa\035."
+			))
+			.AddEntry("CHANGE Elda Chii", _(
+				"Renames an existing bot called \035Elda\035 to \035Chii\035."
+			))
+			.AddEntry("CHANGE Chii Mahoro saint vesper.test Mahoro Andou", _(
+				"Changes all of the information of the bot called \035Chii\035. The new nickname "
+				"will be \035Mahoro\035, the new username will be \035saint\035, the new hostname "
+				"will be \035vesper.test\035, and the new realname will be \035Mahoro Andou\035."
+			))
+			.AddEntry("DEL Mahoro", _(
+				"Deletes a bot called \035Mahoro\035."
+			))
+			.SendTo(source);
+
 		return true;
 	}
 };

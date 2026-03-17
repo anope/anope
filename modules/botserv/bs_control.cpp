@@ -71,6 +71,13 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Makes the bot say the specified text on the specified channel."));
+
+		ExampleWrapper()
+			.AddEntry(_("#chat hello all"), _(
+				"Sends a message to \035#chat\035 saying \035hello all\035."
+			))
+			.SendTo(source);
+
 		return true;
 	}
 };
@@ -126,9 +133,16 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Makes the bot do the equivalent of a \"/me\" command "
-			"on the specified channel using the specified text."
+			"Makes the bot do the equivalent of a \"/me\" command on the specified channel using "
+			"the specified text."
 		));
+
+		ExampleWrapper()
+			.AddEntry(_("#chat is eating pizza"), _(
+				"Sends an action message to \035#chat\035 saying \035is eating pizza\035."
+			))
+			.SendTo(source);
+
 		return true;
 	}
 };

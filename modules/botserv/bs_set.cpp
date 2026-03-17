@@ -166,6 +166,13 @@ public:
 			"be removed after the given time. Set to 0 to disable bans from "
 			"automatically expiring."
 		));
+
+		ExampleWrapper()
+			.AddEntry("#wibble 15m", _(
+				"Sets bot bans on \035#wibble\035 to expire after \03515 minutes\035."
+			))
+			.SendTo(source);
+
 		return true;
 	}
 };

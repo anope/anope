@@ -88,7 +88,7 @@ public:
 	CommandNSSetGreet(Module *creator, const Anope::string &sname = "nickserv/set/greet", size_t min = 0) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Associate a greet message with your nickname"));
-		this->SetSyntax(_("\037message\037"));
+		this->SetSyntax(_("[\037message\037]"));
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -136,11 +136,19 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Makes the given message the greet of your nickname, that "
-			"will be displayed when joining a channel that has GREET "
-			"option enabled, provided that you have the necessary "
-			"access on it."
+			"Changes your greet message. This message will be displayed when joining a channel "
+			"that has GREET option enabled, provided that you have the necessary access on it."
 		));
+
+		ExampleWrapper()
+			.AddEntry(_("I come in peace"), _(
+				"Changes your greet message to \035I come in peace\035."
+			))
+			.AddEntry("", _(
+				"Removes your greet message."
+			))
+			.SendTo(source);
+
 		return true;
 	}
 };
@@ -152,7 +160,7 @@ public:
 	CommandNSSASetGreet(Module *creator) : CommandNSSetGreet(creator, "nickserv/saset/greet", 1)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037message\037"));
+		this->SetSyntax(_("\037nickname\037 [\037message\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -165,11 +173,20 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Makes the given message the greet of the nickname, that "
-			"will be displayed when joining a channel that has GREET "
-			"option enabled, provided that the user has the necessary "
-			"access on it."
+			"Changes the greet message of the specified nickname. This message will be displayed "
+			"when joining a channel that has GREET option enabled, provided that the user has the "
+			"necessary access on it."
 		));
+
+		ExampleWrapper()
+			.AddEntry(_("alien I come in peace"), _(
+				"Changes the greet message of \035alien\035 to \035I come in peace\035."
+			))
+			.AddEntry("zebra", _(
+				"Removes the greet message of \035zebra\035."
+			))
+			.SendTo(source);
+
 		return true;
 	}
 };

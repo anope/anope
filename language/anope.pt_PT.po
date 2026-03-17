@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-03-17 11:36+0100\n"
-"PO-Revision-Date: 2026-03-17 23:31+0100\n"
+"PO-Revision-Date: 2026-03-17 23:38+0100\n"
 "Last-Translator: PeGaSuS <25697531+TehPeGaSuS@users.noreply.github.com>\n"
 "Language-Team: Portuguese (Portugal)\n"
 "Language: pt_PT\n"
@@ -364,10 +364,10 @@ msgstr[0] "A entrada %u foi migrada para o sistema de acesso %s."
 msgstr[1] "As entradas %u foram migradas para o sistema de acesso %s."
 
 msgid "ADD nick user host real"
-msgstr "ADD nick user anfitrião real"
+msgstr "ADD nick user host real"
 
 msgid "CHANGE oldnick newnick [user [host [real]]]"
-msgstr "CHANGE nick-antigo novo-nick [user [anfitrião [real]]]"
+msgstr "CHANGE nick-antigo novo-nick [user [host [real]]]"
 
 msgid "DEL nick"
 msgstr "DEL nick"
@@ -673,7 +673,7 @@ msgid "nick channel [reason]"
 msgstr "nick canal [motivo]"
 
 msgid "nick hostmask"
-msgstr "nick máscara de anfitrião"
+msgstr "nick hostname"
 
 msgid "nick newnick"
 msgstr "nick novonick"
@@ -1766,13 +1766,13 @@ msgid ""
 "\n"
 "Note that a connecting client will \"use\" the first exception their host matches."
 msgstr ""
-"Permite que Operadores de Serviços manipulem a lista de anfitriãos que têm limites de sessão específicos - permitindo que certas máquinas, como servidores shell, suportem mais do que o número padrão de clientes de cada vez. Quando um host atinge o seu limite de sessão, todos os clientes a tentar conectar-se desse host serão mortos. Antes de o utilizador ser morto, é notificado sobre uma fonte de ajuda relativa à limitação de sessão. O conteúdo deste aviso é uma definição de configuração.\n"
+"Permite que Operadores de Serviços manipulem a lista de hosts que têm limites de sessão específicos - permitindo que certas máquinas, como servidores shell, suportem mais do que o número padrão de clientes de cada vez. Quando um host atinge o seu limite de sessão, todos os clientes a tentar conectar-se desse host serão mortos. Antes de o utilizador ser morto, é notificado sobre uma fonte de ajuda relativa à limitação de sessão. O conteúdo deste aviso é uma definição de configuração.\n"
 "\n"
-"%sADD adiciona a máscara de host fornecida à lista de exceções. Nota que as máscaras nick!user@anfitrião e user@anfitrião são inválidas! Apenas máscaras de host reais, como box.host.dom e *.host.dom, são permitidas porque a limitação de sessões não tem em conta nomes de nick ou user. limite deve ser um número maior ou igual a zero. Isto determina quantas sessões este host pode suportar de cada vez. Um valor de zero significa que o host tem um limite de sessão ilimitado. Consulta a ajuda do AKILL para detalhes sobre o formato do parâmetro opcional expira. \n"
+"%sADD adiciona a hostname fornecida à lista de exceções. Nota que as máscaras nick!user@host e user@host são inválidas! Apenas máscaras de host reais, como box.host.dom e *.host.dom, são permitidas porque a limitação de sessões não tem em conta nomes de nick ou user. limite deve ser um número maior ou igual a zero. Isto determina quantas sessões este host pode suportar de cada vez. Um valor de zero significa que o host tem um limite de sessão ilimitado. Consulta a ajuda do AKILL para detalhes sobre o formato do parâmetro opcional expira. \n"
 "\n"
 "%sDEL remove a máscara fornecida da lista de exceções.\n"
 "\n"
-"%sLIST e %sVIEW mostram todas as sessões atuais; se a máscara opcional for fornecida, a lista é limitada às sessões que correspondem à máscara. A diferença é que %sVIEW é mais verboso, exibindo o nome da pessoa que adicionou a exceção, o seu limite de sessão, motivo, máscara de host e a data e hora de expiração. \n"
+"%sLIST e %sVIEW mostram todas as sessões atuais; se a máscara opcional for fornecida, a lista é limitada às sessões que correspondem à máscara. A diferença é que %sVIEW é mais verboso, exibindo o nome da pessoa que adicionou a exceção, o seu limite de sessão, motivo, hostname e a data e hora de expiração. \n"
 "\n"
 "Nota que um cliente a conectar-se \"usará\" a primeira exceção à qual o seu host corresponder."
 
@@ -1788,11 +1788,11 @@ msgid ""
 msgstr ""
 "Permite que Operadores de Serviços vejam a lista de sessões.\n"
 "\n"
-"%sLIST lista anfitriãos com pelo menos limiar sessões. O limiar deve ser um número maior que 1. Isto é para evitar a listagem acidental do grande número de anfitriãos com sessão única.\n"
+"%sLIST lista hosts com pelo menos limiar sessões. O limiar deve ser um número maior que 1. Isto é para evitar a listagem acidental do grande número de hosts com sessão única.\n"
 "\n"
-"%sVIEW mostra informações detalhadas sobre um host específico - incluindo a contagem atual de sessões e o limite de sessão. O valor de anfitrião não pode incluir caracteres curinga. \n"
+"%sVIEW mostra informações detalhadas sobre um host específico - incluindo a contagem atual de sessões e o limite de sessão. O valor de host não pode incluir caracteres curinga. \n"
 "\n"
-"Consulta a ajuda do EXCEPTION para mais informações sobre a limitação de sessão e como definir limites de sessão específicos para certos anfitriãos e grupos dos mesmos."
+"Consulta a ajuda do EXCEPTION para mais informações sobre a limitação de sessão e como definir limites de sessão específicos para certos hosts e grupos dos mesmos."
 
 msgid ""
 "Allows manipulating the topic of the specified channel. The SET command changes the topic of the channel to the given topic or unsets the topic if no topic is given. The APPEND command appends the given topic to the existing topic. \n"
@@ -2084,10 +2084,10 @@ msgstr "Os bans de bot deixarão de expirar automaticamente."
 
 #, c-format
 msgid "Bot hosts may only be %zu characters long."
-msgstr "Os anfitriãos de bot só podem ter %zu caracteres."
+msgstr "Os hosts de bot só podem ter %zu caracteres."
 
 msgid "Bot hosts may only contain valid host characters."
-msgstr "Os anfitriãos de bot só podem conter caracteres de host válidos."
+msgstr "Os hosts de bot só podem conter caracteres de host válidos."
 
 #, c-format
 msgid "Bot idents may only be %zu characters long."
@@ -2234,7 +2234,7 @@ msgid "Changed usermodes of %s to %s."
 msgstr "Usermodes de %s alterados para %s."
 
 msgid "Changes all of the information of the bot called Chii. The new nickname will be Mahoro, the new username will be saint, the new hostname will be vesper.test, and the new realname will be Mahoro Andou."
-msgstr "Altera todas as informações do bot chamado Chii. O novo nickname será Mahoro, o novo username será saint, a nova máscara de host será vesper.test, e o novo realname Mahoro Andou."
+msgstr "Altera todas as informações do bot chamado Chii. O novo nickname será Mahoro, o novo username será saint, a nova hostname será vesper.test, e o novo realname Mahoro Andou."
 
 msgid "Changes the display nickname used to refer to the account. The new displaynickname must already be associated with the account."
 msgstr "Altera o nickname de exibição usado para se referir à conta. O novo nickname de exibição já deve estar associado à conta."
@@ -3353,7 +3353,7 @@ msgstr "Anfitrião"
 
 #, c-format
 msgid "Host offer %s already exists."
-msgstr "Vanfitrião oferecido %s já existe."
+msgstr "Vhost oferecido %s já existe."
 
 msgid "Host offer list has been cleared."
 msgstr "A lista de vhosts oferecidos foi limpa."
@@ -3427,7 +3427,7 @@ msgid "Invalid expiry time."
 msgstr "Tempo de expiração inválido."
 
 msgid "Invalid hostmask. Only real hostmasks are valid, as exceptions are not matched against nicks or usernames."
-msgstr "Máscara de host inválida. Apenas máscara de anfitriãos reais são válidas, pois as exceções não são comparadas com nicks ou usernames."
+msgstr "Máscara de host inválida. Apenas hostnames reais são válidas, pois as exceções não são comparadas com nicks ou usernames."
 
 #, c-format
 msgid "Invalid limit %s, using %d."
@@ -3614,7 +3614,7 @@ msgid ""
 msgstr ""
 "Lista ou pega num vhost oferecido.\n"
 "\n"
-"Sem parâmetros, será mostrado um user@host ou máscara de host, um número de entrada, ou uma lista (ex: 1-3,5) de vhosts oferecidos. Se for especificado ALL, os vhosts que não podem ser obtidos serão marcados com [Invalid] em vez de serem omitidos.\n"
+"Sem parâmetros, será mostrado um user@host ou hostname, um número de entrada, ou uma lista (ex: 1-3,5) de vhosts oferecidos. Se for especificado ALL, os vhosts que não podem ser obtidos serão marcados com [Invalid] em vez de serem omitidos.\n"
 "Os vhosts oferecidos podem conter variáveis de modelo. As variáveis de modelo suportadas são:\n"
 "  {account}  - A tua conta atual.\n"
 "  {network}  - O nome desta rede IRC.\n"
@@ -3726,7 +3726,7 @@ msgid ""
 "\n"
 "If the DISPLAY, NOEXPIRE, SUSPENDED, or UNCONFIRMED options are given only nicks which, respectively, are display nicks, will not expire, are suspended, or are unconfirmed will be shown. If multiple options are given, nicks must match every option to be shown. Note that these options are limited to Services Operators."
 msgstr ""
-"Lista todos os nicknames registados que correspondem ao padrão indicado, no formato nick!user@anfitrião. Nicks com a opção PRIVATE definida só serão exibidos a Operadores de Serviços com o acesso adequado. Nicks com a opção NOEXPIRE definida terão um ! prefixado ao nickname para os Operadores de Serviços verem.\n"
+"Lista todos os nicknames registados que correspondem ao padrão indicado, no formato nick!user@host. Nicks com a opção PRIVATE definida só serão exibidos a Operadores de Serviços com o acesso adequado. Nicks com a opção NOEXPIRE definida terão um ! prefixado ao nickname para os Operadores de Serviços verem.\n"
 "\n"
 "Nota que um '#' precedente especifica um intervalo.\n"
 "\n"
@@ -3978,7 +3978,7 @@ msgid "Mask"
 msgstr "Máscara"
 
 msgid "Mask must be in the form user@host."
-msgstr "A máscara deve estar na forma user@anfitrião."
+msgstr "A máscara deve estar na forma user@host."
 
 msgid "Masks and unregistered users may not be on access lists."
 msgstr "Máscaras e utilizadores não registados não podem estar em listas de acesso."
@@ -4436,7 +4436,7 @@ msgstr ""
 "O comando %sVIEW é uma versão mais detalhada do comando %sLIST."
 
 msgid "Offered vhost"
-msgstr "Vanfitrião oferecido"
+msgstr "Vhost oferecido"
 
 msgid "Online from"
 msgstr "Online desde"
@@ -5379,12 +5379,12 @@ msgid ""
 "\n"
 "* NOTE, this will not update the vhost for any nicks added to the account after this command was used."
 msgstr ""
-"Define o vhost para todos os nicks na mesma conta que a do nick indicado. Se o teu IRCD suporta vidents, então usar SETALL <nick> <ident>@<máscara de host> definirá idents para os utilizadores, bem como vhosts.\n"
+"Define o vhost para todos os nicks na mesma conta que a do nick indicado. Se o teu IRCD suporta vidents, então usar SETALL <nick> <ident>@<hostname> definirá idents para os utilizadores, bem como vhosts.\n"
 "\n"
 "* NOTA, isto não atualizará o vhost para quaisquer nicks adicionados à conta depois de este comando ser usado."
 
 msgid "Sets the vhost for the given nick to that of the given hostmask. If your IRCD supports vidents, then using SET <nick> <ident>@<hostmask> set idents for users as well as vhosts."
-msgstr "Define o vhost para o nick indicado para o da máscara de host fornecida. Se o teu IRCD suporta vidents, então usar SET <nick> <ident>@<máscara de host> definirá idents para os utilizadores, bem como vhosts."
+msgstr "Define o vhost para o nick indicado para o da hostname fornecida. Se o teu IRCD suporta vidents, então usar SET <nick> <ident>@<hostname> definirá idents para os utilizadores, bem como vhosts."
 
 msgid "Sets various global services options. Option names currently defined are:"
 msgstr "Define várias opções globais dos serviços. Os nomes de opção atualmente definidos são:"
@@ -6538,7 +6538,7 @@ msgid "VHosts for account %s have been removed."
 msgstr "VAnfitriãos para a conta %s foram removidos."
 
 msgid "VIEW host"
-msgstr "VIEW anfitrião"
+msgstr "VIEW host"
 
 msgid "VIEW nickname"
 msgstr "VIEW nickname"

@@ -7393,6 +7393,3 @@ msgstr "{number}: {message} -- criado por {creator} em {created}"
 
 msgid "{number}: {text} -- created by {creator} on {created}"
 msgstr "{number}: {text} -- criado por {creator} a {created}"
-
-#~ msgid "message"
-#~ msgstr "mensagem"

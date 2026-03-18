@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-16 15:17+0000\n"
-"PO-Revision-Date: 2026-03-16 18:18+0100\n"
+"POT-Creation-Date: 2026-03-17 11:36+0100\n"
+"PO-Revision-Date: 2026-03-18 15:31+0100\n"
 "Last-Translator: PeGaSuS <25697531+TehPeGaSuS@users.noreply.github.com>\n"
 "Language-Team: Portuguese (Portugal)\n"
 "Language: pt_PT\n"
@@ -47,7 +47,7 @@ msgstr "%s adicionado à lista de acesso de %s no nível %d."
 
 #, c-format
 msgid "%s added to %s access list at privilege %s (level %d)"
-msgstr "%s adicionado à lista de acesso de %s no privilégio %s (nível %d)"
+msgstr "%s adicionado à lista de acesso de %s com o privilégio %s (nível %d)"
 
 #, c-format
 msgid "%s added to %s autokick list."
@@ -108,6 +108,10 @@ msgstr "%s já existe na lista de autokick de %s."
 #, c-format
 msgid "%s already exists on the EXCEPTION list."
 msgstr "%s já existe na lista EXCEPTION."
+
+#, c-format
+msgid "%s can not be migrated to the %s access system because they have privileges that you do not."
+msgstr "%s pode ser migrado para o sistema de acesso %s porque possui privilégios que o tu não possuis."
 
 #, c-format
 msgid "%s cannot be taken as times to ban."
@@ -172,6 +176,10 @@ msgstr "%s foi convidado para %s."
 #, c-format
 msgid "%s has been joined to %s."
 msgstr "%s entrou em %s."
+
+#, c-format
+msgid "%s has been migrated to the %s access system."
+msgstr "%s foi migrada para o sistema de acesso %s."
 
 #, c-format
 msgid "%s has been parted from %s."
@@ -343,11 +351,23 @@ msgstr "%s será agora ignorado por %s."
 msgid "%s will now permanently be ignored."
 msgstr "%s será agora ignorado permanentemente."
 
+#, c-format
+msgid "%u entry can not be migrated to the %s access system because they have privileges that you do not."
+msgid_plural "%u entries can not be migrated to the %s access system because they have privileges that you do not."
+msgstr[0] "A entrada %u não pode ser migrada para o sistema de acesso %s porque possui privilégios que tu não possuis."
+msgstr[1] "As entradas %u não podem ser migradas para o sistema de acesso %s porque possuem privilégios que tu não possuis."
+
+#, c-format
+msgid "%u entry has been migrated to the %s access system."
+msgid_plural "%u entries have been migrated to the %s access system."
+msgstr[0] "A entrada %u foi migrada para o sistema de acesso %s."
+msgstr[1] "As entradas %u foram migradas para o sistema de acesso %s."
+
 msgid "ADD nick user host real"
-msgstr "ADD nick user anfitrião real"
+msgstr "ADD nick user host real"
 
 msgid "CHANGE oldnick newnick [user [host [real]]]"
-msgstr "CHANGE nick-antigo novo-nick [user [anfitrião [real]]]"
+msgstr "CHANGE nick-antigo novo-nick [user [host [real]]]"
 
 msgid "DEL nick"
 msgstr "DEL nick"
@@ -356,7 +376,7 @@ msgid "ON is essentially LOGON and NEW combined."
 msgstr "ON é essencialmente LOGON e NEW combinados."
 
 msgid "SET kills all operators from the given server and prevents operators from opering up on the given server. REVOKE removes this restriction."
-msgstr "SET mata todos os operadores do servidor indicado e impede que operadores se tornem oper nesse servidor. REVOKE remove esta restrição."
+msgstr "SET killa todos os operadores do servidor indicado e impede que operadores se tornem oper nesse servidor. REVOKE remove esta restrição."
 
 #, c-format
 msgid "User access levels can be seen by using the %s command; type %sLEVELS for information."
@@ -534,11 +554,17 @@ msgstr "canal LIST [máscara | num-entrada | lista]"
 msgid "channel LIST [mask | list]"
 msgstr "canal LIST [máscara | lista]"
 
-msgid "channel LIST [mask | +flags]"
-msgstr "canal LIST [máscara | +flags]"
+msgid "channel LIST [mask | list] [ALL]"
+msgstr "canal LIST [máscara | lista] [ALL]"
+
+msgid "channel LIST [mask | +flags] [ALL]"
+msgstr "canal LIST [máscara | +flags] [ALL]"
 
 msgid "channel LOCK {ADD|DEL|SET|LIST} [what]"
 msgstr "canal LOCK {ADD|DEL|SET|LIST} [o_quê]"
+
+msgid "channel MIGRATE [mask]"
+msgstr "canal MIGRATE [máscara]"
 
 msgid "channel PREPEND topic"
 msgstr "canal PREPEND tópico"
@@ -555,8 +581,8 @@ msgstr "canal SET tipo nível"
 msgid "channel VIEW [mask | entry-num | list]"
 msgstr "canal VIEW [máscara | num-entrada | lista]"
 
-msgid "channel VIEW [mask | list]"
-msgstr "canal VIEW [máscara | lista]"
+msgid "channel VIEW [mask | list] [ALL]"
+msgstr "canal VIEW [máscara | lista] [ALL]"
 
 #, c-format
 msgid "channel [%s]"
@@ -625,9 +651,6 @@ msgstr "email"
 msgid "memo-text"
 msgstr "texto-memo"
 
-msgid "message"
-msgstr "mensagem"
-
 msgid "modname"
 msgstr "nomemod"
 
@@ -650,7 +673,7 @@ msgid "nick channel [reason]"
 msgstr "nick canal [motivo]"
 
 msgid "nick hostmask"
-msgstr "nick máscara de anfitrião"
+msgstr "nick hostname"
 
 msgid "nick newnick"
 msgstr "nick novonick"
@@ -667,9 +690,6 @@ msgstr "nickname endereço"
 msgid "nickname email"
 msgstr "nickname email"
 
-msgid "nickname message"
-msgstr "nickname mensagem"
-
 msgid "nickname new-display"
 msgstr "nickname novo-display"
 
@@ -685,6 +705,9 @@ msgstr "nickname [código]"
 
 msgid "nickname [language]"
 msgstr "nickname [idioma]"
+
+msgid "nickname [message]"
+msgstr "nickname [mensagem]"
 
 msgid "nickname [password]"
 msgstr "nickname [palavra-passe]"
@@ -780,6 +803,12 @@ msgstr " mas %s desmaterializou-se misteriosamente."
 
 msgid "\"Jupiter\" a server"
 msgstr "\"Jupiter\" um servidor"
+
+msgid "#chat hello all"
+msgstr "#chat Olá a todos"
+
+msgid "#chat is eating pizza"
+msgstr "#chat está a comer pizza"
 
 #, c-format
 msgid "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
@@ -1069,7 +1098,7 @@ msgid ""
 "\n"
 "The MODIFY command allows you to modify the access list. If the mask is not already on the access list it is added, then the changes are applied. If the mask has no more flags, then the mask is removed from the access list. Additionally, you may use +* or -* to add or remove all flags, respectively. You are only able to modify the access list if you have the proper permission on the channel, and even then you can only give other people access to the equivalent of what your access is.\n"
 "\n"
-"The LIST command allows you to list existing entries on the channel access list. If a mask is given, the mask is wildcard matched against all existing entries on the access list, and only those entries are returned. If a set of flags is given, only those on the access list with the specified flags are returned.\n"
+"The LIST command allows you to list existing entries on the channel access list. If a mask is given, the mask is wildcard matched against all existing entries on the access list, and only those entries are returned. If a set of flags is given, only those on the access list with the specified flags are returned. The ALL option allows listing entries from other access systems as well as flags.\n"
 "\n"
 "The CLEAR command clears the channel access list. This requires channel founder access.\n"
 "\n"
@@ -1077,13 +1106,13 @@ msgid ""
 msgstr ""
 "%s é outra forma de modificar a lista de acesso do canal, semelhante aos métodos XOP e ACCESS.\n"
 "\n"
-"O comando MODIFY permite-te modificar a lista de acesso. Se a máscara ainda não estiver na lista de acesso, é adicionada e depois as alterações são aplicadas. Se a máscara não tiver mais flags, a máscara é removida da lista de acesso. Além disso, podes usar +* ou -* para adicionar ou remover todas as flags, respetivamente. Só podes modificar a lista de acesso se tiveres a permissão adequada no canal, e mesmo assim só podes dar a outras pessoas acesso equivalente ao que tens.\n"
+"O comando MODIFY permite modificar a lista de acesso. Se a máscara ainda não estiver na lista de acesso, ela é adicionada e, em seguida, as alterações são aplicadas. Se a máscara já não tiver mais flags, ela é removida da lista de acesso. Além disso, podes usar +* ou -* para adicionar ou remover todos os flags, respetivamente. Só é possível modificar a lista de acesso se tiveres a permissão adequada no canal e, mesmo assim, só podes conceder a outras pessoas acesso equivalente ao teu.\n"
 "\n"
-"O comando LIST permite-te listar as entradas existentes na lista de acesso do canal. Se for fornecida uma máscara, ela é comparada com todas as entradas existentes na lista de acesso e apenas essas entradas são retornadas. Se for fornecido um conjunto de flags, apenas as entradas na lista de acesso com as flags especificadas são retornadas.\n"
+"O comando LIST permite listar as entradas existentes na lista de acesso do canal. Se for especificada uma máscara, esta é comparada com todas as entradas existentes na lista de acesso através de curingas, sendo que apenas essas entradas são apresentadas. Se for especificado um conjunto de flags, apenas as entradas da lista de acesso que possuam os flags especificados são apresentadas. A opção ALL permite listar entradas de outros sistemas de acesso, bem como flags.\n"
 "\n"
-"O comando CLEAR limpa a lista de acesso do canal. Isto requer acesso de fundador do canal.\n"
+"O comando CLEAR apaga a lista de acesso ao canal. Para tal, é necessário ter acesso de fundador do canal.\n"
 "\n"
-"As flags disponíveis são:"
+"Os flags disponíveis são:"
 
 #, c-format
 msgid "%s is currently online."
@@ -1206,6 +1235,12 @@ msgid "%s's memo limit is %d."
 msgstr "O limite de memos de %s é %d."
 
 #, c-format
+msgid "%u access entry from other access systems not shown; use %sALL to view all access entries."
+msgid_plural "%u access entries from other access systems not shown; use %sALL to view all access entries."
+msgstr[0] "%u entrada de acesso proveniente de outros sistemas de acesso não apresentado; utilize %sALL para visualizar todas as entradas de acesso."
+msgstr[1] "%u entradas de acesso de outros sistemas de acesso não apresentados; utilize %sALL para visualizar todas as entradas de acesso."
+
+#, c-format
 msgid "%u channel"
 msgid_plural "%u channels"
 msgstr[0] "%u canal"
@@ -1241,7 +1276,7 @@ msgid "* Ignore non-opers with a message"
 msgstr "* Ignorar não-opers com uma mensagem"
 
 msgid "* Kill any new clients connecting"
-msgstr "* Matar quaisquer novos clientes a conectar"
+msgstr "* Killa quaisquer novos clientes a conectar"
 
 msgid "* No mode lock changes"
 msgstr "* Sem alterações de bloqueio de modos"
@@ -1291,7 +1326,7 @@ msgid "A notification memo has been sent to %s informing them you have read thei
 msgstr "Foi enviado um memo de notificação para %s a informar que leste o memo dele(a)."
 
 msgid "A vhost must be in the format of a valid hostname."
-msgstr "Um vhost deve estar no formato de um anfitriãoname válido."
+msgstr "Um vhost deve estar no formato de um hostname válido."
 
 msgid "A vident must be in the format of a valid ident."
 msgstr "Um vident deve estar no formato de um ident válido."
@@ -1303,7 +1338,7 @@ msgid "ADD message"
 msgstr "ADD mensagem"
 
 msgid "ADD nickname fingerprint"
-msgstr "ADD nickname impressão_digital"
+msgstr "ADD nickname impressão digital"
 
 msgid "ADD oper type"
 msgstr "ADD oper tipo"
@@ -1318,7 +1353,7 @@ msgid "ADD [+expiry] mask limit reason"
 msgstr "ADD [+expira] máscara limite motivo"
 
 msgid "ADD [nickname fingerprint]"
-msgstr "ADD [nickname impressão_digital]"
+msgstr "ADD [nickname impressão digital]"
 
 msgid "ADD [nickname] channel [key]"
 msgstr "ADD [nickname] canal [chave]"
@@ -1417,10 +1452,19 @@ msgid "Activate the requested vhost for the given nick."
 msgstr "Ativar o vhost solicitado para o nick indicado."
 
 msgid "Activates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see the vhost instead of your real host/IP address."
-msgstr "Ativa o vhost atualmente atribuído ao nick em uso. Quando usas este comando, qualquer utilizador que faça /whois verá o vhost em vez do teu anfitrião/endereço IP real."
+msgstr "Ativa o vhost atualmente atribuído ao nick em uso. Quando usas este comando, qualquer utilizador que faça /whois verá o vhost em vez do teu host/endereço IP real."
 
 msgid "Activates your assigned vhost"
 msgstr "Ativa o teu vhost atribuído"
+
+msgid "Add smeg to the bad word list of #channel. If a user says only this word in a message they will be kicked."
+msgstr "Adiciona smeg à lista de palavrões do #canal. Se um utilizador escrever apenas esta palavra numa mensagem, será kickado."
+
+msgid "Add smeg to the bad word list of #channel. If a user says this word anywhere in a message they will be kicked."
+msgstr "Adiciona smeg à lista de palavrões do #canal. Se um utilizador disser esta palavra em qualquer parte de uma mensagem, será kickado."
+
+msgid "Add smeg to the bad word list of #channel. If a user says this word at the start of a message they will be kicked."
+msgstr "Adiciona smeg à lista de palavrões do #canal. Se um utilizador disser esta palavra no início de uma mensagem, será kickado."
 
 msgid "Add a nick to an account"
 msgstr "Adicionar um nick a uma conta"
@@ -1479,8 +1523,11 @@ msgstr "Além disso, se o fantasia estiver ativado, os comandos fantasia podem s
 msgid "Adds a mode lock on the moderated, no external messages, topic lock flag modes as well as a ban on *!*@*.example.com."
 msgstr "Adiciona um bloqueio de modo nos modos moderated, no external messages, topic lock, bem como um ban em *!*@*.example.com."
 
+msgid "Adds a new bot with the nickname Chii, username chobit, hostname persocom.test, and realname Chii Motosuwa."
+msgstr "Adiciona um novo bot com o nickname Chii, username chobit, hostname persocom.test, e realname Chii Motosuwa."
+
 msgid "Adds the specified fingerprint to the certificate list of nickname."
-msgstr "Adiciona a impressão_digital especificada à lista de certificados de nickname."
+msgstr "Adiciona a impressão digital especificada à lista de certificados de nickname."
 
 msgid "Adds your current fingerprint to your certificate list."
 msgstr "Adiciona a tua impressão digital atual à tua lista de certificados."
@@ -1648,7 +1695,7 @@ msgstr "Permite que Operadores de Serviços alterem modos para qualquer utilizad
 msgid ""
 "Allows Services Operators to create, modify, and delete bots that users will be able to use on their own channels.\n"
 "\n"
-"%sADD adds a bot with the given nickname, username, hostname and realname. Since no integrity checks are done for these settings, be really careful.\n"
+"%sADD adds a bot with the given nickname, username, hostname and realname.\n"
 "\n"
 "%sCHANGE allows you to change the nickname, username, hostname or realname of a bot without deleting it (and all the data associated with it).\n"
 "\n"
@@ -1658,20 +1705,20 @@ msgid ""
 msgstr ""
 "Permite que Operadores de Serviços criem, modifiquem e apaguem bots que os utilizadores poderão usar nos seus próprios canais.\n"
 "\n"
-"%sADD adiciona um bot com o nickname, username, anfitriãoname e realname fornecidos. Como não são feitas verificações de integridade para estas definições, tem muito cuidado.\n"
+"%sADD adiciona um bot com o nickname, username, hostname e realname fornecidos.\n"
 "\n"
-"%sCHANGE permite-te alterar o nickname, username, anfitriãoname ou realname de um bot sem o apagar (e todos os dados associados a ele).\n"
+"%sCHANGE permite-te alterar o nickname, username, hostname ou realname de um bot sem o apagar (e todos os dados associados a ele).\n"
 "\n"
 "%sDEL remove o bot indicado da lista de bots.\n"
 "\n"
-"Nota: Não podes criar um bot com um nick que esteja atualmente registado. Se um utilizador não registado estiver a usar o nick, será morto."
+"Nota: Não podes criar um bot com um nick que esteja atualmente registado. Se um utilizador não registado estiver a usar o nick, será killado."
 
 msgid ""
 "Allows Services Operators to make services ignore a nick or mask for a certain time or until the next restart. The default time format is seconds. You can specify it by using units. Valid units are: s for seconds, m for minutes, h for hours and d for days. Combinations of these units are not permitted. To make services permanently ignore the user, type 0 as time. When adding a mask, it should be in the format nick!user@host, everything else will be considered a nick. Wildcards are permitted.\n"
 "\n"
 "Ignores will not be enforced on IRC Operators."
 msgstr ""
-"Permite que Operadores de Serviços façam os serviços ignorar um nick ou máscara por um certo tempo ou até ao próximo reinício. O formato de tempo padrão é segundos. Podes especificá-lo usando unidades. As unidades válidas são: s para segundos, m para minutos, h para horas e d para dias. Combinações destas unidades não são permitidas. Para fazer os serviços ignorar o utilizador permanentemente, escreve 0 como tempo. Ao adicionar uma máscara, deve estar no formato nick!user@anfitrião, tudo o resto será considerado um nick. Caracteres curinga são permitidos.\n"
+"Permite que Operadores de Serviços façam os serviços ignorar um nick ou máscara por um certo tempo ou até ao próximo reinício. O formato de tempo padrão é segundos. Podes especificá-lo usando unidades. As unidades válidas são: s para segundos, m para minutos, h para horas e d para dias. Combinações destas unidades não são permitidas. Para fazer os serviços ignorar o utilizador permanentemente, escreve 0 como tempo. Ao adicionar uma máscara, deve estar no formato nick!user@host, tudo o resto será considerado um nick. Caracteres curinga são permitidos.\n"
 "\n"
 "Ignorados não serão aplicados a Operadores de IRC."
 
@@ -1683,7 +1730,7 @@ msgid ""
 msgstr ""
 "Permite que Operadores de Serviços manipulem a lista AKILL. Se um utilizador correspondente a uma máscara AKILL tentar conectar-se, os serviços emitirão um KILL para esse utilizador e, em tipos de servidor suportados, instruirão todos os servidores a adicionar um ban para a máscara à qual o utilizador correspondeu.\n"
 "\n"
-"%sADD adiciona a máscara fornecida à lista AKILL com o motivo fornecido, que deve ser fornecido. A máscara deve estar no formato nick!user@anfitrião#realname, embora apenas user@anfitrião seja obrigatório. Se for especificado um nome real, o motivo deve ser precedido por :. expiração é especificado como um número inteiro seguido de d (dias), h (horas) ou m (minutos). Combinações (como 1h30m) não são permitidas. Se um especificador de unidade não for incluído, o padrão são dias (portanto, +30 sozinho significa 30 dias). Para adicionar um AKILL que não expira, usa +0. Se a máscara a ser adicionada começar com +, deve ser fornecido um tempo de expiração, mesmo que seja o mesmo que o padrão. O tempo de expiração padrão atual do AKILL pode ser encontrado com o comando STATSAKILL."
+"%sADD adiciona a máscara fornecida à lista AKILL com o motivo fornecido, que deve ser fornecido. A máscara deve estar no formato nick!user@host#realname, embora apenas user@host seja obrigatório. Se for especificado um realname, o motivo deve ser precedido por :. expiração é especificado como um número inteiro seguido de d (dias), h (horas) ou m (minutos). Combinações (como 1h30m) não são permitidas. Se um especificador de unidade não for incluído, o padrão são dias (portanto, +30 sozinho significa 30 dias). Para adicionar um AKILL que não expira, usa +0. Se a máscara a ser adicionada começar com +, deve ser fornecido um tempo de expiração, mesmo que seja o mesmo que o padrão. O tempo de expiração padrão atual do AKILL pode ser encontrado com o comando STATSAKILL."
 
 msgid ""
 "Allows Services Operators to manipulate the SNLINE list. If a user with a realname matching an SNLINE mask attempts to connect, services will not allow them to pursue their IRC session.\n"
@@ -1719,15 +1766,15 @@ msgid ""
 "\n"
 "Note that a connecting client will \"use\" the first exception their host matches."
 msgstr ""
-"Permite que Operadores de Serviços manipulem a lista de anfitriãos que têm limites de sessão específicos - permitindo que certas máquinas, como servidores shell, suportem mais do que o número padrão de clientes de cada vez. Quando um anfitrião atinge o seu limite de sessão, todos os clientes a tentar conectar-se desse anfitrião serão mortos. Antes de o utilizador ser morto, é notificado sobre uma fonte de ajuda relativa à limitação de sessão. O conteúdo deste aviso é uma definição de configuração.\n"
+"Permite que Operadores de Serviços manipulem a lista de hosts que têm limites de sessão específicos - permitindo que certas máquinas, como servidores shell, suportem mais do que o número padrão de clientes de cada vez. Quando um host atinge o seu limite de sessão, todos os clientes a tentar conectar-se desse host serão mortos. Antes de o utilizador ser morto, é notificado sobre uma fonte de ajuda relativa à limitação de sessão. O conteúdo deste aviso é uma definição de configuração.\n"
 "\n"
-"%sADD adiciona a máscara de anfitrião fornecida à lista de exceções. Nota que as máscaras nick!user@anfitrião e user@anfitrião são inválidas! Apenas máscaras de anfitrião reais, como box.anfitrião.dom e *.anfitrião.dom, são permitidas porque a limitação de sessões não tem em conta nomes de nick ou user. limite deve ser um número maior ou igual a zero. Isto determina quantas sessões este anfitrião pode suportar de cada vez. Um valor de zero significa que o anfitrião tem um limite de sessão ilimitado. Consulta a ajuda do AKILL para detalhes sobre o formato do parâmetro opcional expira. \n"
+"%sADD adiciona a hostname fornecida à lista de exceções. Nota que as máscaras nick!user@host e user@host são inválidas! Apenas máscaras de host reais, como box.host.dom e *.host.dom, são permitidas porque a limitação de sessões não tem em conta nomes de nick ou user. limite deve ser um número maior ou igual a zero. Isto determina quantas sessões este host pode suportar de cada vez. Um valor de zero significa que o host tem um limite de sessão ilimitado. Consulta a ajuda do AKILL para detalhes sobre o formato do parâmetro opcional expira. \n"
 "\n"
 "%sDEL remove a máscara fornecida da lista de exceções.\n"
 "\n"
-"%sLIST e %sVIEW mostram todas as sessões atuais; se a máscara opcional for fornecida, a lista é limitada às sessões que correspondem à máscara. A diferença é que %sVIEW é mais verboso, exibindo o nome da pessoa que adicionou a exceção, o seu limite de sessão, motivo, máscara de anfitrião e a data e hora de expiração. \n"
+"%sLIST e %sVIEW mostram todas as sessões atuais; se a máscara opcional for fornecida, a lista é limitada às sessões que correspondem à máscara. A diferença é que %sVIEW é mais verboso, exibindo o nome da pessoa que adicionou a exceção, o seu limite de sessão, motivo, hostname e a data e hora de expiração. \n"
 "\n"
-"Nota que um cliente a conectar-se \"usará\" a primeira exceção à qual o seu anfitrião corresponder."
+"Nota que um cliente a conectar-se \"usará\" a primeira exceção à qual o seu host corresponder."
 
 #, c-format
 msgid ""
@@ -1741,11 +1788,11 @@ msgid ""
 msgstr ""
 "Permite que Operadores de Serviços vejam a lista de sessões.\n"
 "\n"
-"%sLIST lista anfitriãos com pelo menos limiar sessões. O limiar deve ser um número maior que 1. Isto é para evitar a listagem acidental do grande número de anfitriãos com sessão única.\n"
+"%sLIST lista hosts com pelo menos limiar sessões. O limiar deve ser um número maior que 1. Isto é para evitar a listagem acidental do grande número de hosts com sessão única.\n"
 "\n"
-"%sVIEW exibe informações detalhadas sobre um anfitrião específico - incluindo a contagem atual de sessões e o limite de sessão. O valor de anfitrião não pode incluir caracteres curinga. \n"
+"%sVIEW mostra informações detalhadas sobre um host específico - incluindo a contagem atual de sessões e o limite de sessão. O valor de host não pode incluir caracteres curinga. \n"
 "\n"
-"Consulta a ajuda do EXCEPTION para mais informações sobre a limitação de sessão e como definir limites de sessão específicos para certos anfitriãos e grupos dos mesmos."
+"Consulta a ajuda do EXCEPTION para mais informações sobre a limitação de sessão e como definir limites de sessão específicos para certos hosts e grupos dos mesmos."
 
 msgid ""
 "Allows manipulating the topic of the specified channel. The SET command changes the topic of the channel to the given topic or unsets the topic if no topic is given. The APPEND command appends the given topic to the existing topic. \n"
@@ -1831,18 +1878,18 @@ msgid "Allows you to choose the way services are communicating with you. With %
 msgstr "Permite-te escolher a forma como os serviços comunicam contigo. Com %s definido, os serviços usarão mensagens, caso contrário, usarão notificações."
 
 msgid "Allows you to ignore users by nick or host from memoing you or a channel. If someone on the memo ignore list tries to memo you or a channel, they will not be told that you have them ignored."
-msgstr "Permite-te ignorar utilizadores por nick ou anfitrião de te enviarem memos a ti ou a um canal. Se alguém na lista de ignorados de memo tentar enviar-te um memo a ti ou a um canal, não lhe será dito que o tens ignorado."
+msgstr "Permite-te ignorar utilizadores por nick ou host de te enviarem memos a ti ou a um canal. Se alguém na lista de ignorados de memo tentar enviar-te um memo a ti ou a um canal, não lhe será dito que o tens ignorado."
 
 msgid "Allows you to kill a user from the network. Parameters are the same as for the standard /KILL command."
 msgstr "Permite-te matar um utilizador da rede. Os parâmetros são os mesmos que para o comando /KILL padrão."
 
 #, c-format
 msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on the nick. You can hide the email address (EMAIL), last seen user@host mask (MASK), the services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
-msgstr "Permite-te impedir que certas informações sejam exibidas quando alguém faz um %sINFO no nick. Podes esconder o endereço de email (EMAIL), a última máscara user@anfitrião vista (MASK), o status de acesso aos serviços (STATUS) e a última mensagem de quit (QUIT). O segundo parâmetro especifica se a informação deve ser exibida (OFF) ou escondida (ON)."
+msgstr "Permite-te impedir que certas informações sejam exibidas quando alguém faz um %sINFO no nick. Podes esconder o endereço de email (EMAIL), a última máscara user@host vista (MASK), o status de acesso aos serviços (STATUS) e a última mensagem de quit (QUIT). O segundo parâmetro especifica se a informação deve ser exibida (OFF) ou escondida (ON)."
 
 #, c-format
 msgid "Allows you to prevent certain pieces of information from being displayed when someone does a %sINFO on your nick. You can hide your email address(EMAIL), last seen user@host mask (MASK), your services access status (STATUS) and last quit message (QUIT). The second parameter specifies whether the information should be displayed (OFF) or hidden (ON)."
-msgstr "Permite-te impedir que certas informações sejam exibidas quando alguém faz um %sINFO no teu nick. Podes esconder o teu endereço de email (EMAIL), a tua última máscara user@anfitrião vista (MASK), o teu status de acesso aos serviços (STATUS) e a tua última mensagem de quit (QUIT). O segundo parâmetro especifica se a informação deve ser exibida (OFF) ou escondida (ON)."
+msgstr "Permite-te impedir que certas informações sejam exibidas quando alguém faz um %sINFO no teu nick. Podes esconder o teu endereço de email (EMAIL), a tua última máscara user@host vista (MASK), o teu status de acesso aos serviços (STATUS) e a tua última mensagem de quit (QUIT). O segundo parâmetro especifica se a informação deve ser exibida (OFF) ou escondida (ON)."
 
 #, c-format
 msgid "Allows you to see %s information about a channel or a bot"
@@ -1863,6 +1910,9 @@ msgstr "Como Operador de Serviços, podes remover qualquer nick."
 
 msgid "Assigns a bot to a channel"
 msgstr "Atribui um bot a um canal"
+
+msgid "Assigns the OperServ bot to #opers."
+msgstr "Atribui o bot OperServ ao canal #opers."
 
 msgid "Assigns the specified bot to a channel. You can then configure the bot for the channel so it fits your needs."
 msgstr "Atribui o bot especificado a um canal. Podes então configurar o bot para o canal para que se ajuste às tuas necessidades."
@@ -2034,10 +2084,10 @@ msgstr "Os bans de bot deixarão de expirar automaticamente."
 
 #, c-format
 msgid "Bot hosts may only be %zu characters long."
-msgstr "Os anfitriãos de bot só podem ter %zu caracteres."
+msgstr "Os hosts de bot só podem ter %zu caracteres."
 
 msgid "Bot hosts may only contain valid host characters."
-msgstr "Os anfitriãos de bot só podem conter caracteres de anfitrião válidos."
+msgstr "Os hosts de bot só podem conter caracteres de host válidos."
 
 #, c-format
 msgid "Bot idents may only be %zu characters long."
@@ -2183,6 +2233,9 @@ msgstr "Alterar modos de utilizador"
 msgid "Changed usermodes of %s to %s."
 msgstr "Usermodes de %s alterados para %s."
 
+msgid "Changes all of the information of the bot called Chii. The new nickname will be Mahoro, the new username will be saint, the new hostname will be vesper.test, and the new realname will be Mahoro Andou."
+msgstr "Altera todas as informações do bot chamado Chii. O novo nickname será Mahoro, o novo username será saint, a nova hostname será vesper.test, e o novo realname Mahoro Andou."
+
 msgid "Changes the display nickname used to refer to the account. The new displaynickname must already be associated with the account."
 msgstr "Altera o nickname de exibição usado para se referir à conta. O novo nickname de exibição já deve estar associado à conta."
 
@@ -2191,6 +2244,12 @@ msgstr "Altera o nickname de exibição usado para se referir à tua conta. O no
 
 msgid "Changes the founder of a channel. The new nickname must be a registered one."
 msgstr "Altera o fundador de um canal. O novo nickname tem de ser registado."
+
+msgid "Changes the greet message of alien to I come in peace."
+msgstr "Altera a mensagem de saudação de alien para Eu venho em paz."
+
+msgid "Changes the greet message of the specified nickname. This message will be displayed when joining a channel that has GREET option enabled, provided that the user has the necessary access on it."
+msgstr "Altera a mensagem de saudação do nickname especificado. Esta mensagem será exibida ao entrar num canal que tenha a opção GREET ativada, desde que o utilizador tenha os direitos de acesso necessários nesse canal."
 
 #, c-format
 msgid "Changes the language services uses when sending messages to the given user (for example, when responding to a command they send). If language is not specified the default (%s) will be used. Otherwise, language should be chosen from the following list of supported languages:"
@@ -2220,6 +2279,12 @@ msgstr "Altera o fuso horário que os serviços usam ao enviar mensagens para ti
 
 msgid "Changes when you will be notified about new memos (only for nicknames)"
 msgstr "Altera quando serás notificado sobre novos memos (apenas para nicknames)"
+
+msgid "Changes your greet message to I come in peace."
+msgstr "Altera a tua mensagem de saudação para Eu venho em paz."
+
+msgid "Changes your greet message. This message will be displayed when joining a channel that has GREET option enabled, provided that you have the necessary access on it."
+msgstr "Altera a tua mensagem de saudação. Esta mensagem será exibida quando entrares num canal que tenha a opção GREET ativada, desde que tenhas os direitos de acesso necessários nesse canal."
 
 #, c-format
 msgid "Changing your usermodes to %s"
@@ -2370,6 +2435,9 @@ msgstr "Verifica se o _último_ memo que enviaste para nick foi lido ou não. 
 msgid "Cleared info from %s."
 msgstr "Informação removida de %s."
 
+msgid "Clears all bad word entries set on #channel."
+msgstr "Limpa todas as entradas de palavrões definidas no #canal."
+
 msgid "Clears all extended bans that start with channel:."
 msgstr "Remove todos os bans estendidos que começam com canal:."
 
@@ -2517,7 +2585,7 @@ msgstr ""
 "\n"
 "O comando %sDEL remove a mensagem especificada da lista de mensagens mostradas aos utilizadores quando entram no canal. Podes remover uma mensagem especificando o seu número, que podes obter listando as mensagens conforme explicado abaixo.\n"
 "\n"
-"O comando %sLIST exibe uma listagem das mensagens mostradas aos utilizadores quando entram no canal.\n"
+"O comando %sLIST mostra uma listagem das mensagens mostradas aos utilizadores quando entram no canal.\n"
 "\n"
 "O comando %sCLEAR limpa todas as entradas da lista de mensagens mostradas aos utilizadores quando entram no canal, desativando efetivamente as mensagens de entrada.\n"
 "\n"
@@ -2563,10 +2631,10 @@ msgid "DEL entry-num"
 msgstr "DEL num-entrada"
 
 msgid "DEL fingerprint"
-msgstr "DEL impressão_digital"
+msgstr "DEL impressão digital"
 
 msgid "DEL nickname fingerprint"
-msgstr "DEL nickname impressão_digital"
+msgstr "DEL nickname impressão digital"
 
 msgid "DEL oper"
 msgstr "DEL oper"
@@ -2578,7 +2646,7 @@ msgid "DEL [nickname] channel"
 msgstr "DEL [nickname] canal"
 
 msgid "DEL [nickname] fingerprint"
-msgstr "DEL [nickname] impressão_digital"
+msgstr "DEL [nickname] impressão digital"
 
 msgid "DEL {mask | entry-num | list | id}"
 msgstr "DEL {máscara | num-entrada | lista | id}"
@@ -2618,7 +2686,7 @@ msgid "Date/Time"
 msgstr "Data/Hora"
 
 msgid "Deactivates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see your real host/IP address."
-msgstr "Desativa o vhost atualmente atribuído ao nick em uso. Quando usas este comando, qualquer utilizador que faça /whois verá o teu anfitrião/endereço IP real."
+msgstr "Desativa o vhost atualmente atribuído ao nick em uso. Quando usas este comando, qualquer utilizador que faça /whois verá o teu host/endereço IP real."
 
 msgid "Deactivates your assigned vhost"
 msgstr "Desativa o teu vhost atribuído"
@@ -2739,8 +2807,17 @@ msgstr[1] "%zu entradas removidas da lista de vhosts oferecidos."
 msgid "Deleted info from %s."
 msgstr "Informação removida de %s."
 
+msgid "Deletes heck from the bad word list of #channel."
+msgstr "Remove heck da lista de palavrões do #canal."
+
+msgid "Deletes a bot called Mahoro."
+msgstr "Remove um bot chamado Mahoro."
+
 msgid "Deletes all of your memos."
 msgstr "Apaga todos os teus memos."
+
+msgid "Deletes bad word entries set on #channel numbered 2 through 5 and 7 through 9."
+msgstr "Elimina as entradas de palavrões do #canal numeradas de 2 a 5 e de 7 a 9."
 
 msgid "Deletes memos numbered 2 through 5 and 7 through 9."
 msgstr "Apaga os memos numerados de 2 a 5 e de 7 a 9."
@@ -2890,14 +2967,14 @@ msgstr "Remove o nick indicado da base de dados. Depois de o teu nickname ser re
 
 #, c-format
 msgid "Edits or displays the list of logon news messages. When a user connects to the network, these messages will be sent to them. However, no more than %d messages will be sent in order to avoid flooding the user. If there are more news messages, only the most recent will be sent."
-msgstr "Edita ou exibe a lista de mensagens de notícias de logon. Quando um utilizador se conecta à rede, estas mensagens ser-lhe-ão enviadas. No entanto, não serão enviadas mais de %d mensagens para evitar flood ao utilizador. Se houver mais mensagens de notícias, apenas as mais recentes serão enviadas."
+msgstr "Edita ou mostra a lista de mensagens de notícias de logon. Quando um utilizador se conecta à rede, estas mensagens ser-lhe-ão enviadas. No entanto, não serão enviadas mais de %d mensagens para evitar flood ao utilizador. Se houver mais mensagens de notícias, apenas as mais recentes serão enviadas."
 
 #, c-format
 msgid "Edits or displays the list of oper news messages. When a user opers up (with the /OPER command), these messages will be sent to them. However, no more than %d messages will be sent in order to avoid flooding the user. If there are more news messages, only the most recent will be sent."
-msgstr "Edita ou exibe a lista de mensagens de notícias de oper. Quando um utilizador se torna oper (com o comando /OPER), estas mensagens ser-lhe-ão enviadas. No entanto, não serão enviadas mais de %d mensagens para evitar flood ao utilizador. Se houver mais mensagens de notícias, apenas as mais recentes serão enviadas."
+msgstr "Edita ou mostra a lista de mensagens de notícias de oper. Quando um utilizador se torna oper (com o comando /OPER), estas mensagens ser-lhe-ão enviadas. No entanto, não serão enviadas mais de %d mensagens para evitar flood ao utilizador. Se houver mais mensagens de notícias, apenas as mais recentes serão enviadas."
 
 msgid "Edits or displays the list of random news messages. When a user connects to the network, one (and only one) of the random news will be randomly chosen and sent to them."
-msgstr "Edita ou exibe a lista de mensagens de notícias aleatórias. Quando um utilizador se conecta à rede, uma (e apenas uma) das notícias aleatórias será escolhida aleatoriamente e enviada para ele."
+msgstr "Edita ou mostra a lista de mensagens de notícias aleatórias. Quando um utilizador se conecta à rede, uma (e apenas uma) das notícias aleatórias será escolhida aleatoriamente e enviada para ele."
 
 msgid "Email address"
 msgstr "Endereço de email"
@@ -3108,7 +3185,7 @@ msgstr "Erro ao recarregar o ficheiro de configuração: %s"
 
 #, c-format
 msgid "Error! The vhost is too long, please use a hostname shorter than %zu characters."
-msgstr "Erro! O vhost é demasiado longo, por favor usa um anfitriãoname com menos de %zu caracteres."
+msgstr "Erro! O vhost é demasiado longo, por favor usa um hostname com menos de %zu caracteres."
 
 #, c-format
 msgid "Error! The vident is too long, please use an ident shorter than %zu characters."
@@ -3276,7 +3353,7 @@ msgstr "Anfitrião"
 
 #, c-format
 msgid "Host offer %s already exists."
-msgstr "Vanfitrião oferecido %s já existe."
+msgstr "Vhost oferecido %s já existe."
 
 msgid "Host offer list has been cleared."
 msgstr "A lista de vhosts oferecidos foi limpa."
@@ -3287,6 +3364,9 @@ msgstr "A lista de vhosts oferecidos está vazia."
 #, c-format
 msgid "Hosts with at least %d sessions:"
 msgstr "Anfitriãos com pelo menos %d sessões:"
+
+msgid "I come in peace"
+msgstr "Eu venho em paz"
 
 #, c-format
 msgid "I have not seen %s."
@@ -3347,7 +3427,7 @@ msgid "Invalid expiry time."
 msgstr "Tempo de expiração inválido."
 
 msgid "Invalid hostmask. Only real hostmasks are valid, as exceptions are not matched against nicks or usernames."
-msgstr "Máscara de anfitrião inválida. Apenas máscara de anfitriãos reais são válidas, pois as exceções não são comparadas com nicks ou usernames."
+msgstr "Máscara de host inválida. Apenas hostnames reais são válidas, pois as exceções não são comparadas com nicks ou usernames."
 
 #, c-format
 msgid "Invalid limit %s, using %d."
@@ -3407,7 +3487,7 @@ msgstr ""
 "Por padrão, limitado a AOPs ou aqueles com nível de acesso 5 ou superior no canal. Os fundadores do canal também podem especificar máscaras."
 
 msgid "Kill a user"
-msgstr "Matar um utilizador"
+msgstr "Killa um utilizador"
 
 msgid "LIMIT enforced by "
 msgstr "LIMIT aplicado por "
@@ -3534,7 +3614,7 @@ msgid ""
 msgstr ""
 "Lista ou pega num vhost oferecido.\n"
 "\n"
-"Sem parâmetros, será mostrado um user@anfitrião ou máscara de anfitrião, um número de entrada, ou uma lista (ex: 1-3,5) de vhosts oferecidos. Se for especificado ALL, os vhosts que não podem ser obtidos serão marcados com [Invalid] em vez de serem omitidos.\n"
+"Sem parâmetros, será mostrado um user@host ou hostname, um número de entrada, ou uma lista (ex: 1-3,5) de vhosts oferecidos. Se for especificado ALL, os vhosts que não podem ser obtidos serão marcados com [Invalid] em vez de serem omitidos.\n"
 "Os vhosts oferecidos podem conter variáveis de modelo. As variáveis de modelo suportadas são:\n"
 "  {account}  - A tua conta atual.\n"
 "  {network}  - O nome desta rede IRC.\n"
@@ -3580,6 +3660,9 @@ msgstr ""
 "Se as opções OPERONLY, UNUSED ou VANITY forem fornecidas, apenas os bots que, respetivamente, são apenas para opers, não usados ou foram adicionados em tempo de execução serão exibidos. Se várias opções forem fornecidas, todos os nicks que correspondam a pelo menos uma opção serão exibidos.\n"
 "\n"
 "Nota que estas opções estão limitadas a Operadores de Serviços."
+
+msgid "Lists all bad word entries set on #channel."
+msgstr "Lista todas as entradas de palavrões definidas no #canal."
 
 msgid "Lists all channel records"
 msgstr "Lista todos os registos de canais"
@@ -3643,7 +3726,7 @@ msgid ""
 "\n"
 "If the DISPLAY, NOEXPIRE, SUSPENDED, or UNCONFIRMED options are given only nicks which, respectively, are display nicks, will not expire, are suspended, or are unconfirmed will be shown. If multiple options are given, nicks must match every option to be shown. Note that these options are limited to Services Operators."
 msgstr ""
-"Lista todos os nicknames registados que correspondem ao padrão indicado, no formato nick!user@anfitrião. Nicks com a opção PRIVATE definida só serão exibidos a Operadores de Serviços com o acesso adequado. Nicks com a opção NOEXPIRE definida terão um ! prefixado ao nickname para os Operadores de Serviços verem.\n"
+"Lista todos os nicknames registados que correspondem ao padrão indicado, no formato nick!user@host. Nicks com a opção PRIVATE definida só serão exibidos a Operadores de Serviços com o acesso adequado. Nicks com a opção NOEXPIRE definida terão um ! prefixado ao nickname para os Operadores de Serviços verem.\n"
 "\n"
 "Nota que um '#' precedente especifica um intervalo.\n"
 "\n"
@@ -3677,7 +3760,7 @@ msgid ""
 msgstr ""
 "Lista todos os utilizadores atualmente online na rede IRC, quer o seu nick esteja registado ou não.\n"
 "\n"
-"Se padrão for fornecido, lista apenas os utilizadores que lhe correspondem (deve estar no formato nick!user@anfitrião[#realname]). Se canal for fornecido, lista apenas os utilizadores que estão no canal indicado. Se INVISIBLE for especificado, apenas os utilizadores com a flag +i serão listados."
+"Se padrão for fornecido, lista apenas os utilizadores que lhe correspondem (deve estar no formato nick!user@host[#realname]). Se canal for fornecido, lista apenas os utilizadores que estão no canal indicado. Se INVISIBLE for especificado, apenas os utilizadores com a flag +i serão listados."
 
 msgid "Lists any memos you currently have. With NEW, lists only new (unread) memos. Unread memos are marked with a \"*\" to the left of the memo number. You can also specify a list of numbers."
 msgstr "Lista quaisquer memos que tenhas atualmente. Com NEW, lista apenas memos novos (não lidos). Memos não lidos são marcados com um \"*\" à esquerda do número do memo. Também podes especificar uma lista de números."
@@ -3688,11 +3771,11 @@ msgstr "Lista quaisquer memos novos."
 msgid "Lists available bots"
 msgstr "Lista bots disponíveis"
 
-msgid "Lists bad word entries on #channel numbered 2 through 5 and 7 through 9."
-msgstr "Lista as entradas de palavrões em #canal numeradas de 2 a 5 e de 7 a 9."
+msgid "Lists bad word entries set on #channel numbered 2 through 5 and 7 through 9."
+msgstr "Lista as entradas de palavras impróprias definidas no #canal numeradas de 2 a 5 e de 7 a 9."
 
-msgid "Lists bad word entries on #channel that match *UwU*."
-msgstr "Lista as entradas de palavrões em #canal que correspondem a *UwU*."
+msgid "Lists bad word entries set on #channel that match *frack*."
+msgstr "Lista as entradas de palavras impróprias definidas no #canal que correspondem a *frack*."
 
 msgid "Lists currently loaded modules."
 msgstr "Lista os módulos atualmente carregados."
@@ -3805,7 +3888,7 @@ msgstr ""
 "\n"
 "O comando %sDEL remove o nick ou máscara fornecidos da lista AutoKick. No entanto, não remove quaisquer bans colocados por um AutoKick; esses devem ser removidos manualmente.\n"
 "\n"
-"O comando %sLIST exibe a lista AutoKick, ou opcionalmente apenas as entradas AutoKick que correspondem à máscara fornecida.\n"
+"O comando %sLIST mostra a lista AutoKick, ou opcionalmente apenas as entradas AutoKick que correspondem à máscara fornecida.\n"
 "\n"
 "O comando %sVIEW é uma versão mais detalhada do comando %sLIST.\n"
 "\n"
@@ -3829,7 +3912,7 @@ msgid ""
 "\n"
 "The ADD command adds the given word to the bad words list. If SINGLE is specified, a kick will be done only if a user says the entire word. If START is specified, a kick will be done if a user says a word that starts with word. If END is specified, a kick will be done if a user says a word that ends with word. If you don't specify anything, a kick will be issued every time word is said by a user. This will be shown in the LIST output as ANY.\n"
 "\n"
-"The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
+"The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.\n"
 "\n"
 "The LIST command displays the bad words list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
@@ -3837,11 +3920,11 @@ msgid ""
 msgstr ""
 "Mantém a lista de palavrões para um canal. A lista de palavrões determina quais as palavras que serão kickadas quando o kicker de palavrões está ativado. Para mais informações, escreve %sKICK%s.\n"
 "\n"
-"O comando ADD adiciona a palavra fornecida à lista de palavrões. Se SINGLE for especificado, um kick será feito apenas se um utilizador disser a palavra inteira. Se START for especificado, um kick será feito se um utilizador disser uma palavra que começa com palavra. Se END for especificado, um kick será feito se um utilizador disser uma palavra que termina com palavra. Se não especificares nada, um kick será emitido sempre que palavra for dita por um utilizador. Isto será mostrado na saída do LIST como ANY.\n"
+"O comando ADD adiciona a palavra fornecida à lista de palavrões. Se for especificado SINGLE, um kick será feito apenas se um utilizador disser a palavra inteira. Se for especificado START, um kick será feito se um utilizador disser uma palavra que começa com palavra. Se for especificado END, um kick será feito se um utilizador disser uma palavra que termina com palavra. Se não especificares nada, um kick será emitido sempre que palavra or dita por um utilizador. Isto será mostrado na saída do LIST como ANY.\n"
 "\n"
-"O comando DEL remove a palavra fornecida da lista de palavrões. Se for fornecida uma lista de números de entrada, essas entradas são removidas. (Vê o exemplo para LIST abaixo.)\n"
+"O comando DEL remove a palavra fornecida da lista de palavrões. Se for fornecida uma lista de números de entrada, essas entradas são removidas.\n"
 "\n"
-"O comando LIST exibe a lista de palavrões. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
+"O comando LIST mostra a lista de palavrões. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
 "\n"
 "O comando CLEAR limpa todas as entradas da lista de palavrões."
 
@@ -3859,12 +3942,6 @@ msgstr "Faz o bot dizer o texto especificado no canal especificado"
 
 msgid "Makes the bot say the specified text on the specified channel."
 msgstr "Faz o bot dizer o texto especificado no canal especificado."
-
-msgid "Makes the given message the greet of the nickname, that will be displayed when joining a channel that has GREET option enabled, provided that the user has the necessary access on it."
-msgstr "Faz da mensagem fornecida a saudação do nickname, que será exibida ao entrar num canal que tenha a opção GREET ativada, desde que o utilizador tenha o acesso necessário no mesmo."
-
-msgid "Makes the given message the greet of your nickname, that will be displayed when joining a channel that has GREET option enabled, provided that you have the necessary access on it."
-msgstr "Faz da mensagem fornecida a saudação do teu nickname, que será exibida ao entrares num canal que tenha a opção GREET ativada, desde que tenhas o acesso necessário no mesmo."
 
 msgid "Manage DNS zones for this network"
 msgstr "Gerir zonas DNS para esta rede"
@@ -3901,7 +3978,7 @@ msgid "Mask"
 msgstr "Máscara"
 
 msgid "Mask must be in the form user@host."
-msgstr "A máscara deve estar na forma user@anfitrião."
+msgstr "A máscara deve estar na forma user@host."
 
 msgid "Masks and unregistered users may not be on access lists."
 msgstr "Máscaras e utilizadores não registados não podem estar em listas de acesso."
@@ -3998,7 +4075,7 @@ msgid "Modes cleared on %s and the channel destroyed."
 msgstr "Modos limpos em %s e o canal destruído."
 
 msgid "Modifies or displays the certificate list for your nick. If you connect to IRC and provide a client certificate with a matching fingerprint in the cert list, you will be automatically identified to services. Services Operators may provide a nick to modify other users' certificate lists."
-msgstr "Modifica ou exibe a lista de certificados para o teu nick. Se te conectares ao IRC e forneceres um certificado de cliente com uma impressão digital correspondente na lista de certificados, serás automaticamente identificado nos serviços. Operadores de Serviços podem fornecer um nick para modificar as listas de certificados de outros utilizadores."
+msgstr "Modifica ou mostra a lista de certificados para o teu nick. Se te conectares ao IRC e forneceres um certificado de cliente com uma impressão digital correspondente na lista de certificados, serás automaticamente identificado nos serviços. Operadores de Serviços podem fornecer um nick para modificar as listas de certificados de outros utilizadores."
 
 #, c-format
 msgid "Modify the list of %s users"
@@ -4354,12 +4431,12 @@ msgstr ""
 "\n"
 "O comando %sDEL remove um vhost oferecido.\n"
 "\n"
-"O comando %sLIST exibe os vhosts oferecidos, ou opcionalmente apenas os vhosts oferecidos que correspondem à máscara fornecida.\n"
+"O comando %sLIST mostra os vhosts oferecidos, ou opcionalmente apenas os vhosts oferecidos que correspondem à máscara fornecida.\n"
 "\n"
 "O comando %sVIEW é uma versão mais detalhada do comando %sLIST."
 
 msgid "Offered vhost"
-msgstr "Vanfitrião oferecido"
+msgstr "Vhost oferecido"
 
 msgid "Online from"
 msgstr "Online desde"
@@ -4461,7 +4538,7 @@ msgid "Please contact an Operator to get a vhost assigned to this nick."
 msgstr "Por favor, contacta um Operador para obter um vhost atribuído a este nick."
 
 msgid "Please try again with a more obscure password. Passwords should not be something that could be easily guessed (e.g. your real name or your nick) and cannot contain a space character."
-msgstr "Por favor, tenta novamente com uma palavra-passe mais obscura. As palavras-passe não devem ser algo que possa ser facilmente adivinhado (por exemplo, o teu nome real ou o teu nick) e não podem conter espaços."
+msgstr "Por favor, tenta novamente com uma palavra-passe mais obscura. As palavras-passe não devem ser algo que possa ser facilmente adivinhado (por exemplo, o teu realname ou o teu nick) e não podem conter espaços."
 
 msgid "Please use a valid server name when juping."
 msgstr "Por favor, usa um nome de servidor válido ao fazer jupe."
@@ -4582,7 +4659,7 @@ msgid "Protection is now on for %s."
 msgstr "A proteção está agora ativada para %s."
 
 msgid "Puts an AKILL for every nick on the specified channel. It uses the entire real ident@host for every nick, and then enforces the AKILL."
-msgstr "Coloca um AKILL para cada nick no canal especificado. Usa o ident@anfitrião real completo para cada nick e depois aplica o AKILL."
+msgstr "Coloca um AKILL para cada nick no canal especificado. Usa o ident@host real completo para cada nick e depois aplica o AKILL."
 
 msgid "REGONLY enforced by "
 msgstr "REGONLY aplicado por "
@@ -4687,7 +4764,7 @@ msgstr ""
 "\n"
 "Orientações para escolher palavras-passe:\n"
 "\n"
-"As palavras-passe não devem ser facilmente adivinháveis. Por exemplo, usar o teu nome real como palavra-passe é má ideia. Usar o teu nickname como palavra-passe é uma ideia muito pior ;) e, de facto, o %s não o permitirá. Além disso, palavras-passe curtas são vulneráveis a pesquisas de tentativa e erro, por isso deves escolher uma palavra-passe com pelo menos %u caracteres. Finalmente, o caractere de espaço não pode ser usado em palavras-passe."
+"As palavras-passe não devem ser facilmente adivinháveis. Por exemplo, usar o teu realname como palavra-passe é má ideia. Usar o teu nickname como palavra-passe é uma ideia muito pior ;) e, de facto, o %s não o permitirá. Além disso, palavras-passe curtas são vulneráveis a pesquisas de tentativa e erro, por isso deves escolher uma palavra-passe com pelo menos %u caracteres. Finalmente, o caractere de espaço não pode ser usado em palavras-passe."
 
 msgid "Registration is currently disabled."
 msgstr "O registo está atualmente desativado."
@@ -4751,15 +4828,24 @@ msgstr "Remove os modos de status de um nick selecionado num canal. Se nick fo
 msgid "Removes all entries that were added in the last 30 minutes."
 msgstr "Remove todas as entradas que foram adicionadas nos últimos 30 minutos."
 
+msgid "Removes the greet message of zebra."
+msgstr "Remove a mensagem de saudação de zebra."
+
 msgid "Removes the specified fingerprint from the certificate list of nickname."
-msgstr "Remove a impressão_digital especificada da lista de certificados de nickname."
+msgstr "Remove a impressão digital especificada da lista de certificados de nickname."
 
 msgid "Removes the specified fingerprint from your certificate list."
-msgstr "Remove a impressão_digital especificada da tua lista de certificados."
+msgstr "Remove a impressão digital especificada da tua lista de certificados."
+
+msgid "Removes your greet message."
+msgstr "Remove a tua mensagem de saudação."
 
 #, c-format
 msgid "Removing %s because %s covers it."
 msgstr "A remover %s porque %s o cobre."
+
+msgid "Renames an existing bot called Elda to Chii."
+msgstr "Renomeia um bot existente chamado Elda para Chii."
 
 msgid "Repeat kicker"
 msgstr "Kicker de repetições"
@@ -4912,6 +4998,9 @@ msgstr "Envia um memo e solicita confirmação de leitura"
 msgid "Sends a memo to the channel when someone uses the chanserv/xop command on #anope."
 msgstr "Envia um memo para o canal quando alguém usa o comando chanserv/xop no #anope."
 
+msgid "Sends a message to #chat saying hello all."
+msgstr "Envia uma mensagem para #chat a dizer olá a todos."
+
 msgid "Sends a message to channel operators and above when someone uses the chanserv/access command on #anope."
 msgstr "Envia uma mensagem aos operadores de canal e superiores quando alguém usa o comando chanserv/access no #anope."
 
@@ -4923,6 +5012,9 @@ msgstr "Envia a todos os utilizadores registados um memo contendo texto-memo."
 
 msgid "Sends all services staff a memo containing memo-text."
 msgstr "Envia a toda a equipa dos serviços um memo contendo texto-memo."
+
+msgid "Sends an action message to #chat saying is eating pizza."
+msgstr "Envia uma mensagem de ação para #chat a dizer está a comer pizza."
 
 msgid "Sends the named nick or channel a memo containing memo-text. When sending to a nickname, the recipient will receive a notice that they have a new memo. The target nickname/channel must be registered."
 msgstr "Envia ao nick ou canal indicado um memo contendo texto-memo. Ao enviar para um nickname, o destinatário receberá um aviso de que tem um novo memo. O nickname/canal de destino tem de estar registado."
@@ -5150,6 +5242,9 @@ msgstr "Definir várias opções globais dos serviços"
 msgid "Set your nickname password"
 msgstr "Definir a palavra-passe do teu nickname"
 
+msgid "Sets bot bans on #wibble to expire after 15 minutes."
+msgstr "Define os bans do bot em #wibble para expirar após 15 minutos."
+
 #, c-format
 msgid ""
 "Sets the AMSG kicker on or off. When enabled, the bot will kick users who send the same message to multiple channels where %s bots are.\n"
@@ -5188,9 +5283,9 @@ msgstr ""
 "\n"
 "Tipo de ban é um número entre 0 e 3 que significa:\n"
 "\n"
-"0: ban na forma *!user@anfitrião\n"
-"1: ban na forma *!*user@anfitrião\n"
-"2: ban na forma *!*@anfitrião\n"
+"0: ban na forma *!user@host\n"
+"1: ban na forma *!*user@host\n"
+"2: ban na forma *!*@host\n"
 "3: ban na forma *!*user@*.dominio"
 
 msgid ""
@@ -5284,12 +5379,12 @@ msgid ""
 "\n"
 "* NOTE, this will not update the vhost for any nicks added to the account after this command was used."
 msgstr ""
-"Define o vhost para todos os nicks na mesma conta que a do nick indicado. Se o teu IRCD suporta vidents, então usar SETALL <nick> <ident>@<máscara de anfitrião> definirá idents para os utilizadores, bem como vhosts.\n"
+"Define o vhost para todos os nicks na mesma conta que a do nick indicado. Se o teu IRCD suporta vidents, então usar SETALL <nick> <ident>@<hostname> definirá idents para os utilizadores, bem como vhosts.\n"
 "\n"
 "* NOTA, isto não atualizará o vhost para quaisquer nicks adicionados à conta depois de este comando ser usado."
 
 msgid "Sets the vhost for the given nick to that of the given hostmask. If your IRCD supports vidents, then using SET <nick> <ident>@<hostmask> set idents for users as well as vhosts."
-msgstr "Define o vhost para o nick indicado para o da máscara de anfitrião fornecida. Se o teu IRCD suporta vidents, então usar SET <nick> <ident>@<máscara de anfitrião> definirá idents para os utilizadores, bem como vhosts."
+msgstr "Define o vhost para o nick indicado para o da hostname fornecida. Se o teu IRCD suporta vidents, então usar SET <nick> <ident>@<hostname> definirá idents para os utilizadores, bem como vhosts."
 
 msgid "Sets various global services options. Option names currently defined are:"
 msgstr "Define várias opções globais dos serviços. Os nomes de opção atualmente definidos são:"
@@ -5362,6 +5457,12 @@ msgstr "Mostrar o estado dos serviços e da rede"
 #, c-format
 msgid "Showed %zu/%zu matches for %s."
 msgstr "Mostradas %zu/%zu correspondências para %s."
+
+msgid "Shows information about the ChanServ bot."
+msgstr "Mostra informações sobre o bot ChanServ."
+
+msgid "Shows information about the bot assigned to #example and its kickers and options."
+msgstr "Mostra informações sobre o bot atribuído a #exemplo e os seus kickers e opções."
 
 msgid "Shows the current server configuration."
 msgstr "Mostra a configuração atual do servidor."
@@ -5635,7 +5736,7 @@ msgstr ""
 "\n"
 "O comando %sDEL remove o nick fornecido da lista %s. Se for fornecida uma lista de números de entrada, essas entradas são removidas. (Vê o exemplo para LIST abaixo.)\n"
 "\n"
-"O comando %sLIST exibe a lista %s. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
+"O comando %sLIST mostra a lista %s. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
 "\n"
 "O comando %sCLEAR limpa todas as entradas da lista %s."
 
@@ -5651,9 +5752,9 @@ msgid ""
 msgstr ""
 "O comando %sDEL remove a máscara fornecida da lista AKILL se estiver presente. Se for fornecida uma lista de números de entrada, essas entradas são removidas. (Vê o exemplo para LIST abaixo.)\n"
 "\n"
-"O comando %sLIST exibe a lista AKILL. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
+"O comando %sLIST mostra a lista AKILL. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
 "\n"
-"%sVIEW é uma versão mais detalhada de %sLIST e mostrará quem adicionou um AKILL, a data em que foi adicionado e quando expira, bem como a máscara user@anfitrião/ip e o motivo.\n"
+"%sVIEW é uma versão mais detalhada de %sLIST e mostrará quem adicionou um AKILL, a data em que foi adicionado e quando expira, bem como a máscara user@host/ip e o motivo.\n"
 "\n"
 "%sCLEAR limpa todas as entradas da lista AKILL."
 
@@ -5661,19 +5762,19 @@ msgstr ""
 msgid ""
 "The %sDEL command removes the given nick from the access list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.) You may remove yourself from an access list, even if you do not have access to modify that list otherwise.\n"
 "\n"
-"The %sLIST command displays the access list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
+"The %sLIST command displays the access list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown. The ALL option allows listing entries from other access systems as well as levels.\n"
 "\n"
 "The %sVIEW command displays the access list similar to %sLIST but shows the creator and last used time.\n"
 "\n"
 "The %sCLEAR command clears all entries of the access list."
 msgstr ""
-"O comando %sDEL remove o nick fornecido da lista de acesso. Se for fornecida uma lista de números de entrada, essas entradas são removidas. (Vê o exemplo para LIST abaixo.) Podes remover-te de uma lista de acesso, mesmo que não tenhas acesso para modificar essa lista de outra forma.\n"
+"Ocomando %sDEL remove o nick fornecido da lista de acesso. Se for fornecida uma lista de números de entrada, essas entradas são removidas. (Vê o exemplo para LIST abaixo.) Podes remover-te de uma lista de acesso, mesmo que não tenhas acesso para modificar essa lista de outra forma.\n"
 "\n"
-"O comando %sLIST exibe a lista de acesso. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
+"O comando %sLIST mostra a lista de acesso. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são mostradas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas. A opção ALL permite listar entradas de outros sistemas de acesso, bem como níveis.\n"
 "\n"
-"O comando %sVIEW exibe a lista de acesso de forma semelhante a %sLIST, mas mostra o criador e a hora do último uso.\n"
+"O comando %sVIEW mostra a lista de acesso de forma semelhante a %sLIST mas mostra o criador e a hora do último uso.\n"
 "\n"
-"O comando %sCLEAR limpa todas as entradas da lista de acesso."
+"O comando %sCLEAR impa todas as entradas da lista de acesso."
 
 msgid ""
 "The SNLINEDEL command removes the given mask from the SNLINE list if it is present. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
@@ -5686,7 +5787,7 @@ msgid ""
 msgstr ""
 "O comando SNLINEDEL remove a máscara fornecida da lista SNLINE se estiver presente. Se for fornecida uma lista de números de entrada, essas entradas são removidas. (Vê o exemplo para LIST abaixo.)\n"
 "\n"
-"O comando SNLINELIST exibe a lista SNLINE. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
+"O comando SNLINELIST mostra a lista SNLINE. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
 "\n"
 "SNLINEVIEW é uma versão mais detalhada de SNLINELIST e mostrará quem adicionou um SNLINE, a data em que foi adicionado e quando expira, bem como a máscara de realname e o motivo.\n"
 "\n"
@@ -5703,7 +5804,7 @@ msgid ""
 msgstr ""
 "O comando SQLINEDEL remove a máscara fornecida da lista SQLINE se estiver presente. Se for fornecida uma lista de números de entrada, essas entradas são removidas. (Vê o exemplo para LIST abaixo.)\n"
 "\n"
-"O comando SQLINELIST exibe a lista SQLINE. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
+"O comando SQLINELIST mostra a lista SQLINE. Se for fornecida uma máscara com caracteres curinga, apenas as entradas que correspondem à máscara são exibidas. Se for fornecida uma lista de números de entrada, apenas essas entradas são mostradas.\n"
 "\n"
 "SQLINEVIEW é uma versão mais detalhada de SQLINELIST e mostrará quem adicionou um SQLINE, a data em que foi adicionado e quando expira, bem como a máscara e o motivo.\n"
 "\n"
@@ -5803,7 +5904,7 @@ msgstr "A máscara fornecida também pode ser um canal, que usará a lista de ac
 
 #, c-format
 msgid "The host %s currently has %d sessions with a limit of %d because it matches entry: %s."
-msgstr "O anfitrião %s tem atualmente %d sessões com um limite de %d porque corresponde à entrada: %s."
+msgstr "O host %s tem atualmente %d sessões com um limite de %d porque corresponde à entrada: %s."
 
 #, c-format
 msgid "The last memo you sent to %s (sent on %s) has been read."
@@ -5823,11 +5924,11 @@ msgstr "A última mensagem de quit de %s será agora mostrada nas exibições 
 
 #, c-format
 msgid "The last seen user@host mask of %s will now be hidden from %s INFO displays."
-msgstr "A última máscara user@anfitrião vista de %s será agora escondida das exibições de INFO do %s."
+msgstr "A última máscara user@host vista de %s será agora escondida das exibições de INFO do %s."
 
 #, c-format
 msgid "The last seen user@host mask of %s will now be shown in %s INFO displays."
-msgstr "A última máscara user@anfitrião vista de %s será agora mostrada nas exibições de INFO do %s."
+msgstr "A última máscara user@host vista de %s será agora mostrada nas exibições de INFO do %s."
 
 #, c-format
 msgid "The limit on %s is not valid."
@@ -6268,6 +6369,9 @@ msgstr "Remove a atribuição de um bot a um canal"
 msgid "Unassigns a bot from a channel. When you use this command, the bot won't join the channel anymore. However, bot configuration for the channel is kept, so you will always be able to reassign a bot later without having to reconfigure it entirely."
 msgstr "Remove a atribuição de um bot a um canal. Quando usas este comando, o bot deixará de entrar no canal. No entanto, a configuração do bot para o canal é mantida, para que possas sempre reatribuir um bot mais tarde sem teres de o reconfigurar totalmente."
 
+msgid "Unassigns a previously assigned bot from #opers."
+msgstr "Remove a atribuição de um bot previamente atribuído a #opers."
+
 msgid "Unconfirmed"
 msgstr "Não confirmado"
 
@@ -6399,42 +6503,42 @@ msgid "Users list:"
 msgstr "Lista de utilizadores:"
 
 msgid "VHost"
-msgstr "VAnfitrião"
+msgstr "VHost"
 
 #, c-format
 msgid "VHost %s has been requested by %s."
-msgstr "VAnfitrião %s foi solicitado por %s."
+msgstr "VHost %s foi solicitado por %s."
 
 #, c-format
 msgid "VHost for %s removed."
-msgstr "VAnfitrião para %s removido."
+msgstr "VHost para %s removido."
 
 #, c-format
 msgid "VHost for %s set to %s."
-msgstr "VAnfitrião para %s definido para %s."
+msgstr "VHost para %s definido para %s."
 
 #, c-format
 msgid "VHost for %s has been activated."
-msgstr "VAnfitrião para %s foi ativado."
+msgstr "VHost para %s foi ativado."
 
 #, c-format
 msgid "VHost for %s has been rejected."
-msgstr "VAnfitrião para %s foi rejeitado."
+msgstr "VHost para %s foi rejeitado."
 
 #, c-format
 msgid "VHost for %s has been validated using DNS."
-msgstr "VAnfitrião para %s foi validado usando DNS."
+msgstr "VHost para %s foi validado usando DNS."
 
 #, c-format
 msgid "VHost for account %s set to %s."
-msgstr "VAnfitrião para a conta %s definido para %s."
+msgstr "VHost para a conta %s definido para %s."
 
 #, c-format
 msgid "VHosts for account %s have been removed."
-msgstr "VAnfitriãos para a conta %s foram removidos."
+msgstr "VHosts para a conta %s foram removidos."
 
 msgid "VIEW host"
-msgstr "VIEW anfitrião"
+msgstr "VIEW host"
 
 msgid "VIEW nickname"
 msgstr "VIEW nickname"
@@ -6471,7 +6575,7 @@ msgid "View and change configuration file settings"
 msgstr "Ver e alterar definições do ficheiro de configuração"
 
 msgid "View the list of host sessions"
-msgstr "Ver a lista de sessões de anfitrião"
+msgstr "Ver a lista de sessões de host"
 
 msgid "Voices protection"
 msgstr "Proteção de voices"
@@ -6490,11 +6594,11 @@ msgid ""
 "\n"
 "With a nickname parameter, displays the same information for the given nickname. This is limited to Services Operators."
 msgstr ""
-"Sem parâmetro, exibe informações sobre o número de memos que tens, quantos deles não foram lidos e quantos memos no total podes receber.\n"
+"Sem parâmetro, mostra informações sobre o número de memos que tens, quantos deles não foram lidos e quantos memos no total podes receber.\n"
 "\n"
-"Com um parâmetro de canal, exibe a mesma informação para o canal indicado.\n"
+"Com um parâmetro de canal, mostra a mesma informação para o canal indicado.\n"
 "\n"
-"Com um parâmetro de nickname, exibe a mesma informação para o nickname indicado. Isto está limitado a Operadores de Serviços."
+"Com um parâmetro de nickname, mostra a mesma informação para o nickname indicado. Isto está limitado a Operadores de Serviços."
 
 msgid ""
 "Without a parameter, lists all nicknames that belong to your account.\n"
@@ -6535,17 +6639,17 @@ msgid ""
 msgstr ""
 "Sem qualquer opção, mostra o número atual de utilizadores online, o maior número de utilizadores online desde que os serviços foram iniciados e o tempo de atividade dos serviços.\n"
 "\n"
-"Com a opção AKILL, exibe o tamanho atual da lista AKILL e o tempo de expiração padrão atual.\n"
+"Com a opção AKILL, mostra o tamanho atual da lista AKILL e o tempo de expiração padrão atual.\n"
 "\n"
 "A opção RESET atualmente repõe a contagem máxima de utilizadores para o número de utilizadores atualmente presentes na rede.\n"
 "\n"
-"A opção PALAVRA-PASSE exibe os algoritmos de encriptação usados para palavras-passe de utilizador. \n"
+"A opção PALAVRA-PASSE mostra os algoritmos de encriptação usados para palavras-passe de utilizador. \n"
 "\n"
-"A opção UPLINK exibe informações sobre o servidor atual que o Anope usa como uplink para a rede.\n"
+"A opção UPLINK mostra informações sobre o servidor atual que o Anope usa como uplink para a rede.\n"
 "\n"
-"A opção HASH exibe informações sobre os mapas hash.\n"
+"A opção HASH mostra informações sobre os mapas hash.\n"
 "\n"
-"A opção ALL exibe todas as estatísticas acima."
+"A opção ALL mostra todas as estatísticas acima."
 
 msgid "Word"
 msgstr "Palavra"
@@ -7147,6 +7251,9 @@ msgstr "[{padrão | canal} [INVISIBLE]]"
 msgid "[{pattern | nick} [SECRET]]"
 msgstr "[{padrão | nick} [SECRET]]"
 
+msgid "alien I come in peace"
+msgstr "alien eu venho em paz"
+
 msgid "does not expire"
 msgstr "não expira"
 
@@ -7273,7 +7380,7 @@ msgid "{number}: [{id}] {mask} -- created by {creator} on {created}; {expires}
 msgstr "{number}: [{id}] {mask} -- criado por {creator} a {created}; {expires} ({reason})"
 
 msgid "{number}: sent by {sender} at {date/time}"
-msgstr "{number}: enviado por {sender} a {date/time}"
+msgstr "{number}: enviado por {sender} em {date/time}"
 
 msgid "{number}: {command} on {service}: {method}"
 msgstr "{number}: {command} em {service}: {method}"

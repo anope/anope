@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-01 16:00+0000\n"
-"PO-Revision-Date: 2026-03-01 17:00+0000\n"
+"POT-Creation-Date: 2026-03-18 13:30+0000\n"
+"PO-Revision-Date: 2026-03-18 13:30+0000\n"
 "Last-Translator: Cristian Anghel <kidprotect-cristian@yahoo.com>\n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -110,6 +110,10 @@ msgid "%s already exists on the EXCEPTION list."
 msgstr "%s există deja în lista de excepții."
 
 #, c-format
+msgid "%s can not be migrated to the %s access system because they have privileges that you do not."
+msgstr "%s nu poate fi migrat/ă către sistemul de acces %s deoarece are privilegii pe care dumneavoastră nu le aveți."
+
+#, c-format
 msgid "%s cannot be taken as times to ban."
 msgstr "%s nu pot fi considerate ca momente de blocare."
 
@@ -172,6 +176,10 @@ msgstr "%s a fost invitat(ă) în %s."
 #, c-format
 msgid "%s has been joined to %s."
 msgstr "%s a fost alăturat(ă) în %s."
+
+#, c-format
+msgid "%s has been migrated to the %s access system."
+msgstr "%s a fost migrat/ă către sistemul de acces %s."
 
 #, c-format
 msgid "%s has been parted from %s."
@@ -343,6 +351,18 @@ msgstr "%s va fi de acum ignorat(ă) pentru %s."
 msgid "%s will now permanently be ignored."
 msgstr "%s va fi de acum ignorat(ă) mereu."
 
+#, c-format
+msgid "%u entry can not be migrated to the %s access system because they have privileges that you do not."
+msgid_plural "%u entries can not be migrated to the %s access system because they have privileges that you do not."
+msgstr[0] "Intrarea %u nu poate fi migrată către sistemul de acces %s deoarece această intrare are privilegii pe care dumneavoastră nu le aveți."
+msgstr[1] "Intrările %u nu pot fi migrate către sistemul de acces %s deoarece aceste intrări au privilegii pe care dumneavoastră nu le aveți."
+
+#, c-format
+msgid "%u entry has been migrated to the %s access system."
+msgid_plural "%u entries have been migrated to the %s access system."
+msgstr[0] "Intrarea %u a fost migrată către sistemul de acces %s."
+msgstr[1] "Intrările %u au fost migrate către sistemul de acces %s."
+
 msgid "ADD nick user host real"
 msgstr "ADD pseudonim utilizator gazdă nume-real"
 
@@ -417,8 +437,8 @@ msgstr "{name} = {level}"
 msgid "{name} = {value}"
 msgstr "{name} = {value}"
 
-msgid "{name}: {description}"
-msgstr "{name}: {description}"
+msgid "{name}: defaults to {default} ({description})"
+msgstr "{name}: implicit la {default} ({description})"
 
 msgid "{nick} (account: {account})"
 msgstr "{nick} (cont: {account})"
@@ -534,11 +554,17 @@ msgstr "canal LIST [mască | număr-intrare | listă]"
 msgid "channel LIST [mask | list]"
 msgstr "canal LIST [mască | listă]"
 
-msgid "channel LIST [mask | +flags]"
-msgstr "canal LIST [mască | +stegulețe]"
+msgid "channel LIST [mask | list] [ALL]"
+msgstr "canal LIST [mască | listă] [ALL]"
+
+msgid "channel LIST [mask | +flags] [ALL]"
+msgstr "canal LIST [mască | +stegulețe] [ALL]"
 
 msgid "channel LOCK {ADD|DEL|SET|LIST} [what]"
 msgstr "canal LOCK {ADD|DEL|SET|LIST} [ce]"
+
+msgid "channel MIGRATE [mask]"
+msgstr "canal MIGRATE [mască]"
 
 msgid "channel PREPEND topic"
 msgstr "canal PREPEND subiect"
@@ -555,8 +581,8 @@ msgstr "canal SET tip nivel"
 msgid "channel VIEW [mask | entry-num | list]"
 msgstr "canal VIEW [mască | număr-intrare | listă]"
 
-msgid "channel VIEW [mask | list]"
-msgstr "canal VIEW [mască | listă]"
+msgid "channel VIEW [mask | list] [ALL]"
+msgstr "canal VIEW [mască | listă] [ALL]"
 
 #, c-format
 msgid "channel [%s]"
@@ -625,9 +651,6 @@ msgstr "email"
 msgid "memo-text"
 msgstr "text-misivă"
 
-msgid "message"
-msgstr "mesaj"
-
 msgid "modname"
 msgstr "nume-modul"
 
@@ -667,9 +690,6 @@ msgstr "pseudonim adresă"
 msgid "nickname email"
 msgstr "pseudonim email"
 
-msgid "nickname message"
-msgstr "pseudonim mesaj"
-
 msgid "nickname new-display"
 msgstr "pseudonim afișaj-nou"
 
@@ -685,6 +705,9 @@ msgstr "pseudonim [cod]"
 
 msgid "nickname [language]"
 msgstr "pseudonim [limbă]"
+
+msgid "nickname [message]"
+msgstr "pseudonim [mesaj]"
 
 msgid "nickname [password]"
 msgstr "pseudonim [parolă]"
@@ -781,9 +804,11 @@ msgstr " dar %s s-a dematerializat într-un mod misterios."
 msgid "\"Jupiter\" a server"
 msgstr "\"Jupiter\" un server"
 
-#, c-format
-msgid "%-8s %s"
-msgstr "%-8s %s"
+msgid "#chat hello all"
+msgstr "#chat salutare tuturor"
+
+msgid "#chat is eating pizza"
+msgstr "#chat mănâncă pizza"
 
 #, c-format
 msgid "%2d %-16s letters: %s, words: %s, lines: %s, smileys: %s, actions: %s"
@@ -1073,7 +1098,7 @@ msgid ""
 "\n"
 "The MODIFY command allows you to modify the access list. If the mask is not already on the access list it is added, then the changes are applied. If the mask has no more flags, then the mask is removed from the access list. Additionally, you may use +* or -* to add or remove all flags, respectively. You are only able to modify the access list if you have the proper permission on the channel, and even then you can only give other people access to the equivalent of what your access is.\n"
 "\n"
-"The LIST command allows you to list existing entries on the channel access list. If a mask is given, the mask is wildcard matched against all existing entries on the access list, and only those entries are returned. If a set of flags is given, only those on the access list with the specified flags are returned.\n"
+"The LIST command allows you to list existing entries on the channel access list. If a mask is given, the mask is wildcard matched against all existing entries on the access list, and only those entries are returned. If a set of flags is given, only those on the access list with the specified flags are returned. The ALL option allows listing entries from other access systems as well as flags.\n"
 "\n"
 "The CLEAR command clears the channel access list. This requires channel founder access.\n"
 "\n"
@@ -1083,7 +1108,7 @@ msgstr ""
 "\n"
 "Comanda MODIFY vă permite să modificați lista de accese. Dacă masca nu se află deja în lista de accese, aceasta este adăugată, apoi modificările sunt aplicate. Dacă masca nu mai are stegulețe, atunci masca este înlăturată din lista de accese. În plus, puteți utiliza +* sau -* pentru a adăuga, respectiv înlătura toate stegulețele. Puteți modifica lista de accese numai dacă aveți permisiunea corespunzătoare în canal însă chiar și atunci puteți oferi altor persoane acces doar la echivalentul accesului dumneavoastră.\n"
 "\n"
-"Comanda LIST vă permite să listați intrările existente din lista de accese în canal. Dacă este oferită o mască, aceasta este comparată cu toate intrările existente din lista de accese și numai acele intrări sunt returnate. Dacă este oferit un set de stegulețe, sunt returnate doar cele din lista de accese cu stegulețele specificate.\n"
+"Comanda LIST vă permite să listați intrările existente din lista de accese în canal. Dacă este oferită o mască, aceasta este comparată cu toate intrările existente din lista de accese și numai acele intrări sunt returnate. Dacă este oferit un set de stegulețe, sunt returnate doar cele din lista de accese cu stegulețele specificate. Opțiunea ALL permite listarea intrărilor din alte sisteme de acces, precum și a steagurilor.\n"
 "\n"
 "Comanda CLEAR golește lista de accese în canal. Această comandă necesită acces de fondator al canalului.\n"
 "\n"
@@ -1208,6 +1233,12 @@ msgstr "Limita de misive aparținând %s este %d și nu poate fi schimbată."
 #, c-format
 msgid "%s's memo limit is %d."
 msgstr "Limita de misive aparținând %s este %d."
+
+#, c-format
+msgid "%u access entry from other access systems not shown; use %sALL to view all access entries."
+msgid_plural "%u access entries from other access systems not shown; use %sALL to view all access entries."
+msgstr[0] "Intrarea de acces %u din alte sisteme de acces nu este afișată; utilizați %sALL pentru a vizualiza toate intrările de acces."
+msgstr[1] "Intrările de acces %u din alte sisteme de acces nu sunt afișate; utilizați %sALL pentru a vizualiza toate intrările de acces."
 
 #, c-format
 msgid "%u channel"
@@ -1426,6 +1457,15 @@ msgstr "Activează gazda virtuală care v-a fost atribuită pentru pseudoniumul 
 msgid "Activates your assigned vhost"
 msgstr "Activează gazda virtuală atribuită dumneavoastră"
 
+msgid "Add smeg to the bad word list of #channel. If a user says only this word in a message they will be kicked."
+msgstr "Adaugă smeg la lista de cuvinte nepotrivite în #channel. Dacă un utilizator scrie numai acest cuvânt într-un mesaj, utilizatorul va fi izgonit."
+
+msgid "Add smeg to the bad word list of #channel. If a user says this word anywhere in a message they will be kicked."
+msgstr "Adaugă smeg la lista de cuvinte nepotrivite în #channel. Dacă un utilizator scrie acest cuvânt oriunde într-un mesaj, utilizatorul va fi izgonit."
+
+msgid "Add smeg to the bad word list of #channel. If a user says this word at the start of a message they will be kicked."
+msgstr "Adaugă smeg la lista de cuvinte nepotrivite în #channel. Dacă un utilizator scrie acest cuvânt la începutul unui mesaj, utilizatorul va fi izgonit."
+
 msgid "Add a nick to an account"
 msgstr "Adaugă un pseudonim la un cont"
 
@@ -1482,6 +1522,9 @@ msgstr "În plus, dacă este activată fantezia, comenzile fanteziste pot fi exe
 
 msgid "Adds a mode lock on the moderated, no external messages, topic lock flag modes as well as a ban on *!*@*.example.com."
 msgstr "Adaugă o încuiere de mod pentru modurile moderat, fără mesaje externe, încuierea subiectului, precum și o blocare pentru *!*@*.exemplu.ro."
+
+msgid "Adds a new bot with the nickname Chii, username chobit, hostname persocom.test, and realname Chii Motosuwa."
+msgstr "Adaugă un nou bot cu pseudonimul Chii, numele de utilizator chobit, numele de gazdă persocom.test și numele real Chii Motosuwa."
 
 msgid "Adds the specified fingerprint to the certificate list of nickname."
 msgstr "Adaugă amprenta digitală specificată la lista de certificate a pseudonimului."
@@ -1652,7 +1695,7 @@ msgstr "Permite Operatorilor de Servicii să schimbe moduri pentru orice utiliza
 msgid ""
 "Allows Services Operators to create, modify, and delete bots that users will be able to use on their own channels.\n"
 "\n"
-"%sADD adds a bot with the given nickname, username, hostname and realname. Since no integrity checks are done for these settings, be really careful.\n"
+"%sADD adds a bot with the given nickname, username, hostname and realname.\n"
 "\n"
 "%sCHANGE allows you to change the nickname, username, hostname or realname of a bot without deleting it (and all the data associated with it).\n"
 "\n"
@@ -1662,7 +1705,7 @@ msgid ""
 msgstr ""
 "Permite Operatorilor de Servicii să creeze, să modifice și să înlăture boți pe care utilizatorii îi vor putea folosi în propriile canale.\n"
 "\n"
-"%sADD adaugă un bot cu datele specificate: pseudonimul, numele de utilizator, numele de gazdă și numele real. Întrucât nu se efectuează verificări ale integrității acestor setări, vă rugăm să fiți cu atenție.\n"
+"%sADD adaugă un bot cu datele specificate: pseudonimul, numele de utilizator, numele de gazdă și numele real.\n"
 "\n"
 "%sCHANGE vă permite să schimbați pseudonimul, numele utilizator, numele de gazdă și numele real ale unui bot fără a-l înlătura (dimpreună cu toate datele asociate acestuia).\n"
 "\n"
@@ -1867,6 +1910,9 @@ msgstr "Ca Operator de Servicii, puteți radia orice pseudonim."
 
 msgid "Assigns a bot to a channel"
 msgstr "Asociază un bot unui canal"
+
+msgid "Assigns the OperServ bot to #opers."
+msgstr "Asociază bot-ul OperServ în #opers."
 
 msgid "Assigns the specified bot to a channel. You can then configure the bot for the channel so it fits your needs."
 msgstr "Asociază botul specificat unui canal. Puteți apoi configura botul pentru canal, astfel încât să se potrivească nevoilor dumneavoastră."
@@ -2187,6 +2233,9 @@ msgstr "Schimbă modurile de utilizator"
 msgid "Changed usermodes of %s to %s."
 msgstr "Modurile de utilizator ale %s au fost schimbate în %s."
 
+msgid "Changes all of the information of the bot called Chii. The new nickname will be Mahoro, the new username will be saint, the new hostname will be vesper.test, and the new realname will be Mahoro Andou."
+msgstr "Schimbă toate informațiile bot-ului numit Chii. Noul pseudonim va fi Mahoro, noul nume de utilizator va fi saint, noul nume de gazdă va fi vesper.test, iar noul nume real va fi Mahoro Andou."
+
 msgid "Changes the display nickname used to refer to the account. The new displaynickname must already be associated with the account."
 msgstr "Schimbă pseudonimul de afișare folosit pentru a face referire la cont. Noul pseudonim de afișare trebuie să fie deja atribuit contului."
 
@@ -2195,6 +2244,12 @@ msgstr "Schimbă pseudonimul de afișare folosit pentru a face refire la contul 
 
 msgid "Changes the founder of a channel. The new nickname must be a registered one."
 msgstr "Schimbă fondatorul unui canal. Noul pseudonim trebuie să fie unul înregistrat."
+
+msgid "Changes the greet message of alien to I come in peace."
+msgstr "Schimbă mesajul de întâmpinare pentru extraterestru la Vin în semn de pace."
+
+msgid "Changes the greet message of the specified nickname. This message will be displayed when joining a channel that has GREET option enabled, provided that the user has the necessary access on it."
+msgstr "Schimbă mesajul de întâmpinare al pseudonimului specificat. Acest mesaj va fi afișat la alăturarea într-un canal ce are opțiunea GREET activată, cu condiția ca utilizatorul să aibă accesul necesar în acesta."
 
 #, c-format
 msgid "Changes the language services uses when sending messages to the given user (for example, when responding to a command they send). If language is not specified the default (%s) will be used. Otherwise, language should be chosen from the following list of supported languages:"
@@ -2224,6 +2279,12 @@ msgstr "Schimbă fusul orar pe care îl folosesc serviciile atunci când vă tri
 
 msgid "Changes when you will be notified about new memos (only for nicknames)"
 msgstr "Schimbă momentele când veți fi notificat(ă) despre noile misive (doar pentru pseudonime)"
+
+msgid "Changes your greet message to I come in peace."
+msgstr "Schimbă mesajul de întâmpinare al dumneavoastră la Vin în semn de pace."
+
+msgid "Changes your greet message. This message will be displayed when joining a channel that has GREET option enabled, provided that you have the necessary access on it."
+msgstr "Schimbă mesajul de întâmpinare al dumneavoastră. Acest mesaj va fi afișat atunci când vă alăturați într-un canal care are opțiunea GREET activată, cu condiția să aveți accesul necesar în acesta."
 
 #, c-format
 msgid "Changing your usermodes to %s"
@@ -2373,6 +2434,9 @@ msgstr "Verifică dacă _ultima_ misivă expediată pseudonimului a fost citit
 #, c-format
 msgid "Cleared info from %s."
 msgstr "Informațiile din %s au fost golite."
+
+msgid "Clears all bad word entries set on #channel."
+msgstr "Curăță toate intrările de cuvinte nepotrivite setate în #channel."
 
 msgid "Clears all extended bans that start with channel:."
 msgstr "Curăță toate blocările extinse care pornesc cu canalul:"
@@ -2556,16 +2620,8 @@ msgid "Current module list:"
 msgstr "Lista curentă de module este după cum urmează:"
 
 #, c-format
-msgid "Current number of AKILLs: %zu"
-msgstr "Număr curent de AKILL-uri: %zu"
-
-#, c-format
-msgid "Current number of SNLINEs: %zu"
-msgstr "Număr curent de SNLINE-uri: %zu"
-
-#, c-format
-msgid "Current number of SQLINEs: %zu"
-msgstr "Număr curent de SQLINE-uri: %zu"
+msgid "Current number of %ss: %zu"
+msgstr "Numărul curent de %s: %zu"
 
 #, c-format
 msgid "Current users: %zu (%zu ops)"
@@ -2635,77 +2691,16 @@ msgstr "Dezactivează gazda virtuală atribuită acum pseudonimului în uz. Cân
 msgid "Deactivates your assigned vhost"
 msgstr "Dezactivează gazda virtuală atribuită dumneavoastră"
 
-#, c-format
-msgid "Default AKILL expiry time: %d days"
-msgstr "Timpul implicit de expirare AKILL este: %d zile"
+msgid "Default"
+msgstr "Implicit"
 
 #, c-format
-msgid "Default AKILL expiry time: %d hours"
-msgstr "Timpul implicit de expirare AKILL este: %d ore"
+msgid "Default %s expiry time: %s"
+msgstr "Timpul implicit de expirare %s: %s"
 
 #, c-format
-msgid "Default AKILL expiry time: %d minutes"
-msgstr "Timpul implicit de expirare AKILL este: %d minute"
-
-msgid "Default AKILL expiry time: 1 day"
-msgstr "Timpul implicit de expirare AKILL este: 1 zi"
-
-msgid "Default AKILL expiry time: 1 hour"
-msgstr "Timpul implicit de expirare AKILL este: 1 oră"
-
-msgid "Default AKILL expiry time: 1 minute"
-msgstr "Timpul implicit de expirare AKILL este: 1 minut"
-
-msgid "Default AKILL expiry time: No expiration"
-msgstr "Timpul implicit de expirare AKILL este: fără expirare"
-
-#, c-format
-msgid "Default SNLINE expiry time: %d days"
-msgstr "Timpul implicit de expirare SNLINE este: %d zile"
-
-#, c-format
-msgid "Default SNLINE expiry time: %d hours"
-msgstr "Timpul implicit de expirare SNLINE este: %d ore"
-
-#, c-format
-msgid "Default SNLINE expiry time: %d minutes"
-msgstr "Timpul implicit de expirare SNLINE este: %d minute"
-
-msgid "Default SNLINE expiry time: 1 day"
-msgstr "Timpul implicit de expirare SNLINE este: 1 zi"
-
-msgid "Default SNLINE expiry time: 1 hour"
-msgstr "Timpul implicit de expirare SNLINE este: 1 oră"
-
-msgid "Default SNLINE expiry time: 1 minute"
-msgstr "Timpul implicit de expirare SNLINE este: 1 minut"
-
-msgid "Default SNLINE expiry time: No expiration"
-msgstr "Timpul implicit de expirare SNLINE este: fără expirare"
-
-#, c-format
-msgid "Default SQLINE expiry time: %d days"
-msgstr "Timpul implicit de expirare SQLINE este: %d zile"
-
-#, c-format
-msgid "Default SQLINE expiry time: %d hours"
-msgstr "Timpul implicit de expirare SQLINE este: %d ore"
-
-#, c-format
-msgid "Default SQLINE expiry time: %d minutes"
-msgstr "Timpul implicit de expirare SQLINE este: %d minute"
-
-msgid "Default SQLINE expiry time: 1 day"
-msgstr "Timpul implicit de expirare SQLINE este: 1 zi"
-
-msgid "Default SQLINE expiry time: 1 hour"
-msgstr "Timpul implicit de expirare SQLINE este: 1 oră"
-
-msgid "Default SQLINE expiry time: 1 minute"
-msgstr "Timpul implicit de expirare SQLINE este: 1 minut"
-
-msgid "Default SQLINE expiry time: No expiration"
-msgstr "Timpul implicit de expirare SQLINE este: fără expirare"
+msgid "Default %s expiry time: No expiration"
+msgstr "Timpul implicit de expirare %s: fără expirare"
 
 msgid "Define messages to be randomly shown to users at logon"
 msgstr "Definește mesajele care vor fi afișate aleatoriu utilizatorilor la identificare"
@@ -2812,8 +2807,17 @@ msgstr[1] "%zu intrări au fost înlăturate din lista de oferte pentru gazde."
 msgid "Deleted info from %s."
 msgstr "Informațiile din %s au fost șterse."
 
+msgid "Deletes heck from the bad word list of #channel."
+msgstr "Înlătură heck din lista de cuvinte nepotrivite aparținând #channel."
+
+msgid "Deletes a bot called Mahoro."
+msgstr "Înlătură un bot numit Mahoro."
+
 msgid "Deletes all of your memos."
 msgstr "Șterge toate misivele dumneavoastră."
+
+msgid "Deletes bad word entries set on #channel numbered 2 through 5 and 7 through 9."
+msgstr "Înlătură intrările de cuvinte nepotrivite setate în #channel numerotate de la 2 la 5 și de la 7 la 9."
 
 msgid "Deletes memos numbered 2 through 5 and 7 through 9."
 msgstr "Șterge misivele numerotate de la 2 la 5 și de la 7 la 9."
@@ -3361,6 +3365,9 @@ msgstr "Lista de oferte pentru gazde este goală."
 msgid "Hosts with at least %d sessions:"
 msgstr "Gazdele cu cel puțin %d sesiuni sunt după cum urmează:"
 
+msgid "I come in peace"
+msgstr "Vin în semn de pace"
+
 #, c-format
 msgid "I have not seen %s."
 msgstr "Nu am văzut pe %s."
@@ -3652,6 +3659,9 @@ msgstr ""
 "\n"
 "Rețineți că aceste opțiuni sunt limitate la Operatorii de Servicii."
 
+msgid "Lists all bad word entries set on #channel."
+msgstr "Listează intrările de cuvinte nepotrivite setate în #channel."
+
 msgid "Lists all channel records"
 msgstr "Listează toate canalele"
 
@@ -3759,11 +3769,11 @@ msgstr "Listează misivele noi."
 msgid "Lists available bots"
 msgstr "Listează boții disponibili"
 
-msgid "Lists bad word entries on #channel numbered 2 through 5 and 7 through 9."
-msgstr "Listează intrările de cuvinte nepotrivite în #channel numerotate de la 2 la 5 și de la 7 la 9."
+msgid "Lists bad word entries set on #channel numbered 2 through 5 and 7 through 9."
+msgstr "Listează intrările de cuvinte nepotrivite setate în #channel numerotate de la 2 la 5 și de la 7 la 9."
 
-msgid "Lists bad word entries on #channel that match *UwU*."
-msgstr "Listează intrările de cuvinte nepotrivite în #channel care corespund *UwU*."
+msgid "Lists bad word entries set on #channel that match *frack*."
+msgstr "Listează intrările de cuvinte nepotrivite setate în #channel care corespund *frack*."
 
 msgid "Lists currently loaded modules."
 msgstr "Listează modulele încărcate în prezent."
@@ -3900,7 +3910,7 @@ msgid ""
 "\n"
 "The ADD command adds the given word to the bad words list. If SINGLE is specified, a kick will be done only if a user says the entire word. If START is specified, a kick will be done if a user says a word that starts with word. If END is specified, a kick will be done if a user says a word that ends with word. If you don't specify anything, a kick will be issued every time word is said by a user. This will be shown in the LIST output as ANY.\n"
 "\n"
-"The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.)\n"
+"The DEL command removes the given word from the bad words list. If a list of entry numbers is given, those entries are deleted.\n"
 "\n"
 "The LIST command displays the bad words list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
 "\n"
@@ -3910,7 +3920,7 @@ msgstr ""
 "\n"
 "Comanda ADD adaugă cuvântul precizat la lista de cuvinte nepotrivite. Dacă se specifică SINGLE, se va executa o izgonire numai dacă utilizatorul scrie întregul cuvânt. Dacă se specifică START, o izgonire va fi executată dacă un utilizator scrie un cuvânt care începe cu cuvântul. Dacă se specifică END, se va executa o izgonire dacă un utilizator scrie un cuvânt care se termină cu cuvântul. Dacă nu specificați nimic, se va executa o izgonire de fiecare dată când un utilizator scrie cuvântul; aceasta va apărea în LIST ca ANY.\n"
 "\n"
-"Comanda DEL înlătură cuvântul precizat din lista de cuvinte nepotrivite. Dacă este furnizată o listă de numere de intrare, acele intrări sunt șterse.  (Vezi exemplul pentru LIST de mai jos.)\n"
+"Comanda DEL înlătură cuvântul precizat din lista de cuvinte nepotrivite. Dacă este furnizată o listă de numere de intrare, acele intrări sunt șterse.\n"
 "\n"
 "Comanda LIST afișează lista de cuvinte nepotrivite. Dacă este precizată o mască wildcard, vor fi afișate doar intrările care corespund măștii. Dacă este furnizată o listă de numere de intrare, sunt afișate doar acele intrări.\n"
 "\n"
@@ -3930,12 +3940,6 @@ msgstr "Face ca botul să scrie textul specificat în canalul specificat"
 
 msgid "Makes the bot say the specified text on the specified channel."
 msgstr "Face ca botul să scrie textul specificat în canalul specificat."
-
-msgid "Makes the given message the greet of the nickname, that will be displayed when joining a channel that has GREET option enabled, provided that the user has the necessary access on it."
-msgstr "Face ca mesajul specificat să fie întâmpinarea pseudonimului, care va fi afișată la alăturarea într-un canal ce are opțiunea GREET activată, cu condiția ca utilizatorul să aibă accesul necesar în acesta."
-
-msgid "Makes the given message the greet of your nickname, that will be displayed when joining a channel that has GREET option enabled, provided that you have the necessary access on it."
-msgstr "Face ca mesajul specificat să fie întâmpinarea pseudonimului dumneavoastră, care va fi afișată atunci când vă alăturați într-un canal care are opțiunea GREET activată, cu condiția să aveți accesul necesar în acesta."
 
 msgid "Manage DNS zones for this network"
 msgstr "Gestionează zonele DNS pentru această rețea"
@@ -4822,15 +4826,24 @@ msgstr "Înlătură modurile de stare ale pseudonimului selectat într-un canal.
 msgid "Removes all entries that were added in the last 30 minutes."
 msgstr "Înlătură toate intrările care au fost adăugate în ultimele 30 de minute."
 
+msgid "Removes the greet message of zebra."
+msgstr "Înlătură mesajul de întâmpinare pentru zebra."
+
 msgid "Removes the specified fingerprint from the certificate list of nickname."
 msgstr "Înlătură amprenta digitală specificată din lista de certificate a pseudonimului."
 
 msgid "Removes the specified fingerprint from your certificate list."
 msgstr "Înlătură amprenta digitală specificată din lista de certificate a dumneavoastră."
 
+msgid "Removes your greet message."
+msgstr "Înlătură mesajul de întâmpinare al dumneavoastră."
+
 #, c-format
 msgid "Removing %s because %s covers it."
 msgstr "Se înlătură %s deoarece %s îl acoperă."
+
+msgid "Renames an existing bot called Elda to Chii."
+msgstr "Redenumește un bot existent numit Elda în Chii."
 
 msgid "Repeat kicker"
 msgstr "Izgonire la repetări"
@@ -4983,6 +4996,9 @@ msgstr "Expediază o misivă și solicită o confirmare de citire"
 msgid "Sends a memo to the channel when someone uses the chanserv/xop command on #anope."
 msgstr "Expediază o misivă către canal atunci când cineva utilizează comanda chanserv/xop în #anope."
 
+msgid "Sends a message to #chat saying hello all."
+msgstr "Expediază un mesaj către #chat cu textul hello all."
+
 msgid "Sends a message to channel operators and above when someone uses the chanserv/access command on #anope."
 msgstr "Expediază o misivă către operatorii de canal și superiorilor atunci când cineva utilizează comanda chanserv/access în #anope."
 
@@ -4994,6 +5010,9 @@ msgstr "Expediază tuturor utilizatorilor înregistrați o misivă care conține
 
 msgid "Sends all services staff a memo containing memo-text."
 msgstr "Expediază întregului personal de Servicii o misivă care conține un mesaj-text."
+
+msgid "Sends an action message to #chat saying is eating pizza."
+msgstr "Trimite un mesaj de acțiune către #chat scriind mănâncă pizza."
 
 msgid "Sends the named nick or channel a memo containing memo-text. When sending to a nickname, the recipient will receive a notice that they have a new memo. The target nickname/channel must be registered."
 msgstr "Expediază pseudonimului sau canalului specificat o misivă care conține un mesaj-text. Când expediați mesaj către un pseudonim, destinatarul va primi o notificare că are un nou mesaj. Pseudonimul ori canalul destinație trebuie să fie înregistrate."
@@ -5221,6 +5240,9 @@ msgstr "Setează diverse opțiuni de servicii globale"
 msgid "Set your nickname password"
 msgstr "Setează parola pseudonimului dumneavoastră"
 
+msgid "Sets bot bans on #wibble to expire after 15 minutes."
+msgstr "Setează blocările din bot în #wibble să expire după 15 minute."
+
 #, c-format
 msgid ""
 "Sets the AMSG kicker on or off. When enabled, the bot will kick users who send the same message to multiple channels where %s bots are.\n"
@@ -5433,6 +5455,12 @@ msgstr "Afișează starea serviciilor și al rețelei"
 #, c-format
 msgid "Showed %zu/%zu matches for %s."
 msgstr "Au fost afișate %zu/%zu corespunderi pentru %s."
+
+msgid "Shows information about the ChanServ bot."
+msgstr "Afișează informațiile despre bot-ul ChanServ."
+
+msgid "Shows information about the bot assigned to #example and its kickers and options."
+msgstr "Afișează informații despre bot-ul asociat în #example cât și despre izgonirile și opțiunile sale."
 
 msgid "Shows the current server configuration."
 msgstr "Afișează configurația curentă a serverului."
@@ -5732,7 +5760,7 @@ msgstr ""
 msgid ""
 "The %sDEL command removes the given nick from the access list. If a list of entry numbers is given, those entries are deleted.  (See the example for LIST below.) You may remove yourself from an access list, even if you do not have access to modify that list otherwise.\n"
 "\n"
-"The %sLIST command displays the access list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown.\n"
+"The %sLIST command displays the access list. If a wildcard mask is given, only those entries matching the mask are displayed. If a list of entry numbers is given, only those entries are shown. The ALL option allows listing entries from other access systems as well as levels.\n"
 "\n"
 "The %sVIEW command displays the access list similar to %sLIST but shows the creator and last used time.\n"
 "\n"
@@ -5740,7 +5768,7 @@ msgid ""
 msgstr ""
 "Comanda %sDEL înlătură pseudonimul precizat din lista de accese. Dacă este furnizată o listă de numere de intrare, acele intrări sunt înlăturate. (Vedeți exemplul pentru LIST de mai jos.) Vă puteți înlătura dintr-o listă de acces, chiar dacă nu aveți acces pentru a modifica lista respectivă în alt mod.\n"
 "\n"
-"Comanda %sLIST afișează lista de accese. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări.\n"
+"Comanda %sLIST afișează lista de accese. Dacă este precizată o mască wildcard, sunt afișate doar intrările care corespund măștii. Dacă este specificată o listă de numere de intrare, sunt afișate doar acele intrări. Opțiunea ALL permite listarea intrărilor din alte sisteme de acces, precum și din alte niveluri.\n"
 "\n"
 "Comanda %sVIEW afișează lista de accese similară cu comanda %sLIST, dar arată în plus creatorul și timpul ultimei utilizări.\n"
 "\n"
@@ -6338,6 +6366,9 @@ msgstr "Disociază un bot dintr-un canal"
 
 msgid "Unassigns a bot from a channel. When you use this command, the bot won't join the channel anymore. However, bot configuration for the channel is kept, so you will always be able to reassign a bot later without having to reconfigure it entirely."
 msgstr "Disociază un bot dintr-un canal. Când utilizați această comandă, botul nu se va mai alătura canalului. Cu toate acestea, configurația botului pentru canal este păstrată, astfel încât veți putea întotdeauna să reasociați un bot mai târziu, fără a fi nevoie să-l reconfigurați în întregime."
+
+msgid "Unassigns a previously assigned bot from #opers."
+msgstr "Disociază un bot asociat anterior în #opers."
 
 msgid "Unconfirmed"
 msgstr "Neconfirmat"
@@ -7217,6 +7248,9 @@ msgstr "[{șablon | canal} [INVISIBLE]]"
 
 msgid "[{pattern | nick} [SECRET]]"
 msgstr "[{model | pseudonim} [SECRET]]"
+
+msgid "alien I come in peace"
+msgstr "extraterestru Vin în semn de pace"
 
 msgid "does not expire"
 msgstr "nu exipiră"

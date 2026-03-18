@@ -15,6 +15,8 @@ fi
 find ../ \
 	! -path '../docs/*' \
 	-a ! -path '../modules/third/*' \
+	-a ! -path '../run/*' \
+	-a ! -path '../vendor/*' \
 	-a \( -name '*.cpp' \
 		-o -name '*.h' \
 		-o -name '*.conf' \

@@ -38,7 +38,7 @@ for f in *.po
 do
 	echo "Merging $f"
 	msgmerge \
-		--no-location \
+		--add-location=file \
 		--no-wrap \
 		--sort-output \
 		--update \

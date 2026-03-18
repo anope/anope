@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-03-17 11:36+0100\n"
-"PO-Revision-Date: 2026-03-17 23:38+0100\n"
+"PO-Revision-Date: 2026-03-18 15:31+0100\n"
 "Last-Translator: PeGaSuS <25697531+TehPeGaSuS@users.noreply.github.com>\n"
 "Language-Team: Portuguese (Portugal)\n"
 "Language: pt_PT\n"
@@ -1458,13 +1458,13 @@ msgid "Activates your assigned vhost"
 msgstr "Ativa o teu vhost atribuído"
 
 msgid "Add smeg to the bad word list of #channel. If a user says only this word in a message they will be kicked."
-msgstr "Adiciona smeg à lista de palavrões do canal #canal. Se um utilizador escrever apenas esta palavra numa mensagem, será kickado."
+msgstr "Adiciona smeg à lista de palavrões do #canal. Se um utilizador escrever apenas esta palavra numa mensagem, será kickado."
 
 msgid "Add smeg to the bad word list of #channel. If a user says this word anywhere in a message they will be kicked."
-msgstr "Adiciona smeg à lista de palavrões do canal #canal. Se um utilizador disser esta palavra em qualquer parte de uma mensagem, será kickado."
+msgstr "Adiciona smeg à lista de palavrões do #canal. Se um utilizador disser esta palavra em qualquer parte de uma mensagem, será kickado."
 
 msgid "Add smeg to the bad word list of #channel. If a user says this word at the start of a message they will be kicked."
-msgstr "Adiciona smeg à lista de palavrões do canal #canal. Se um utilizador disser esta palavra no início de uma mensagem, será kickado."
+msgstr "Adiciona smeg à lista de palavrões do #canal. Se um utilizador disser esta palavra no início de uma mensagem, será kickado."
 
 msgid "Add a nick to an account"
 msgstr "Adicionar um nick a uma conta"
@@ -2436,7 +2436,7 @@ msgid "Cleared info from %s."
 msgstr "Informação removida de %s."
 
 msgid "Clears all bad word entries set on #channel."
-msgstr "Limpa todas as entradas de palavrões definidas no canal #canal."
+msgstr "Limpa todas as entradas de palavrões definidas no #canal."
 
 msgid "Clears all extended bans that start with channel:."
 msgstr "Remove todos os bans estendidos que começam com canal:."
@@ -2808,7 +2808,7 @@ msgid "Deleted info from %s."
 msgstr "Informação removida de %s."
 
 msgid "Deletes heck from the bad word list of #channel."
-msgstr "Remove heck da lista de palavrões do canal #canal."
+msgstr "Remove heck da lista de palavrões do #canal."
 
 msgid "Deletes a bot called Mahoro."
 msgstr "Remove um bot chamado Mahoro."
@@ -2817,7 +2817,7 @@ msgid "Deletes all of your memos."
 msgstr "Apaga todos os teus memos."
 
 msgid "Deletes bad word entries set on #channel numbered 2 through 5 and 7 through 9."
-msgstr "Elimina as entradas de palavrões do canal #canal numeradas de 2 a 5 e de 7 a 9."
+msgstr "Elimina as entradas de palavrões do #canal numeradas de 2 a 5 e de 7 a 9."
 
 msgid "Deletes memos numbered 2 through 5 and 7 through 9."
 msgstr "Apaga os memos numerados de 2 a 5 e de 7 a 9."
@@ -3662,7 +3662,7 @@ msgstr ""
 "Nota que estas opções estão limitadas a Operadores de Serviços."
 
 msgid "Lists all bad word entries set on #channel."
-msgstr "Lista todas as entradas de palavrões definidas no canal #canal."
+msgstr "Lista todas as entradas de palavrões definidas no #canal."
 
 msgid "Lists all channel records"
 msgstr "Lista todos os registos de canais"
@@ -3772,10 +3772,10 @@ msgid "Lists available bots"
 msgstr "Lista bots disponíveis"
 
 msgid "Lists bad word entries set on #channel numbered 2 through 5 and 7 through 9."
-msgstr "Lista as entradas de palavras impróprias definidas no canal #canal numeradas de 2 a 5 e de 7 a 9."
+msgstr "Lista as entradas de palavras impróprias definidas no #canal numeradas de 2 a 5 e de 7 a 9."
 
 msgid "Lists bad word entries set on #channel that match *frack*."
-msgstr "Lista as entradas de palavras impróprias definidas no canal #canal que correspondem a *frack*."
+msgstr "Lista as entradas de palavras impróprias definidas no #canal que correspondem a *frack*."
 
 msgid "Lists currently loaded modules."
 msgstr "Lista os módulos atualmente carregados."
@@ -6503,39 +6503,39 @@ msgid "Users list:"
 msgstr "Lista de utilizadores:"
 
 msgid "VHost"
-msgstr "VAnfitrião"
+msgstr "VHost"
 
 #, c-format
 msgid "VHost %s has been requested by %s."
-msgstr "VAnfitrião %s foi solicitado por %s."
+msgstr "VHost %s foi solicitado por %s."
 
 #, c-format
 msgid "VHost for %s removed."
-msgstr "VAnfitrião para %s removido."
+msgstr "VHost para %s removido."
 
 #, c-format
 msgid "VHost for %s set to %s."
-msgstr "VAnfitrião para %s definido para %s."
+msgstr "VHost para %s definido para %s."
 
 #, c-format
 msgid "VHost for %s has been activated."
-msgstr "VAnfitrião para %s foi ativado."
+msgstr "VHost para %s foi ativado."
 
 #, c-format
 msgid "VHost for %s has been rejected."
-msgstr "VAnfitrião para %s foi rejeitado."
+msgstr "VHost para %s foi rejeitado."
 
 #, c-format
 msgid "VHost for %s has been validated using DNS."
-msgstr "VAnfitrião para %s foi validado usando DNS."
+msgstr "VHost para %s foi validado usando DNS."
 
 #, c-format
 msgid "VHost for account %s set to %s."
-msgstr "VAnfitrião para a conta %s definido para %s."
+msgstr "VHost para a conta %s definido para %s."
 
 #, c-format
 msgid "VHosts for account %s have been removed."
-msgstr "VAnfitriãos para a conta %s foram removidos."
+msgstr "VHosts para a conta %s foram removidos."
 
 msgid "VIEW host"
 msgstr "VIEW host"

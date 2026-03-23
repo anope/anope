@@ -754,7 +754,7 @@ bool File::End() const
 Anope::string File::Read()
 {
 	Anope::string ret;
-	char buf[BUFSIZE];
+	char buf[1024];
 	while (fgets(buf, sizeof(buf), this->fp) != NULL)
 	{
 		char *nl = strchr(buf, '\n');

@@ -107,7 +107,7 @@ void TemplateFileServer::Serve(HTTP::Provider *server, const Anope::string &page
 	Anope::string buf;
 
 	int i;
-	char buffer[BUFSIZE];
+	char buffer[1024];
 	while ((i = read(fd, buffer, sizeof(buffer) - 1)) > 0)
 	{
 		buffer[i] = 0;

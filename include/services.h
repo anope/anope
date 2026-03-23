@@ -41,8 +41,6 @@
 #include "defs.h"
 #include "sysconf.h"
 
-#define BUFSIZE 1024
-
 #define _(x) x
 #define N_(x, y) x, y
 

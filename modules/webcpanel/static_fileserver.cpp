@@ -39,7 +39,7 @@ bool StaticFileServer::OnRequest(HTTP::Provider *server, const Anope::string &pa
 	reply.headers["Cache-Control"] = "public";
 
 	int i;
-	char buffer[BUFSIZE];
+	char buffer[1024];
 	while ((i = read(fd, buffer, sizeof(buffer))) > 0)
 		reply.Write(buffer, i);
 

@@ -37,7 +37,7 @@ public:
 		int err = regcomp(&this->regbuf, expr.c_str(), REG_EXTENDED | REG_NOSUB);
 		if (err)
 		{
-			char buf[BUFSIZE];
+			char buf[256];
 			regerror(err, &this->regbuf, buf, sizeof(buf));
 			regfree(&this->regbuf);
 			throw RegexException("Error in regex " + expr + ": " + buf);

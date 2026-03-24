@@ -17,6 +17,8 @@
 #include "socketengine.h"
 #include "textproc.h"
 
+#define NET_BUFSIZE 65535
+
 bool BufferedSocket::ProcessRead()
 {
 	char tbuffer[NET_BUFSIZE];

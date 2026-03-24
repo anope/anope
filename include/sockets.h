@@ -28,8 +28,6 @@
 # include <afunix.h>
 #endif
 
-#define NET_BUFSIZE 65535
-
 /** A sockaddr union used to combine IPv4 and IPv6 sockaddrs
  */
 union CoreExport sockaddrs

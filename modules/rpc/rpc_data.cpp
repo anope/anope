@@ -28,11 +28,11 @@ class SaveData final
 	: public Serialize::Data
 {
 public:
-	Anope::map<std::stringstream> data;
+	Anope::unordered_map<Anope::string> data;
 
-	std::iostream &operator[](const Anope::string &key) override
+	bool LoadInternal(const Anope::string &key, Anope::string &value) override
 	{
-		return data[key];
+		return false; // This module can only store data.
 	}
 
 	static void Serialize(const Extensible *e, const Serializable *s, RPC::Map &map)
@@ -41,31 +41,36 @@ public:
 		Extensible::ExtensibleSerialize(e, s, data);
 		for (const auto &[k, v] : data.data)
 		{
-			auto vs = v.str();
 			switch (data.GetType(k))
 			{
 				case Serialize::DataType::BOOL:
-					map.Reply(k, Anope::Convert<bool>(vs, false));
+					map.Reply(k, Anope::Convert<bool>(v, false));
 					break;
 				case Serialize::DataType::FLOAT:
-					map.Reply(k, Anope::Convert<double>(vs, 0.0));
+					map.Reply(k, Anope::Convert<double>(v, 0.0));
 					break;
 				case Serialize::DataType::INT:
-					map.Reply(k, Anope::Convert<int64_t>(vs, 0));
+					map.Reply(k, Anope::Convert<int64_t>(v, 0));
 					break;
 				case Serialize::DataType::TEXT:
 				{
-					if (vs.empty())
+					if (v.empty())
 						map.Reply(k, nullptr);
 					else
-						map.Reply(k, vs);
+						map.Reply(k, v);
 					break;
 				}
 				case Serialize::DataType::UINT:
-					map.Reply(k, Anope::Convert<uint64_t>(vs, 0));
+					map.Reply(k, Anope::Convert<uint64_t>(v, 0));
 					break;
 			}
 		}
+	}
+
+	bool StoreInternal(const Anope::string &key, const Anope::string &value) override
+	{
+		data[key] = value;
+		return true;
 	}
 };
 

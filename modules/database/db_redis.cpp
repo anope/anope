@@ -24,28 +24,30 @@ class Data final
 	: public Serialize::Data
 {
 public:
-	std::map<Anope::string, std::stringstream *> data;
+	Anope::unordered_map<Anope::string> data;
 
-	~Data() override
+	bool LoadInternal(const Anope::string &key, Anope::string &value) override
 	{
-		for (auto &[_, stream] : data)
-			delete stream;
+		auto it = this->data.find(key);
+		if (it == this->data.end())
+			return false;
+
+		value = it->second;
+		return true;
 	}
 
-	std::iostream &operator[](const Anope::string &key) override
+	bool StoreInternal(const Anope::string &key, const Anope::string &value) override
 	{
-		std::stringstream *&stream = data[key];
-		if (!stream)
-			stream = new std::stringstream();
-		return *stream;
+		this->data[key] = value;
+		return true;
 	}
 
 	size_t Hash() const override
 	{
 		size_t hash = 0;
 		for (const auto &[_, value] : this->data)
-			if (!value->str().empty())
-				hash ^= Anope::hash_cs()(value->str());
+			if (!value.empty())
+				hash ^= Anope::hash_cs()(value);
 		return hash;
 	}
 };
@@ -311,7 +313,7 @@ void ObjectLoader::OnResult(const Reply &r)
 		const Reply *key = r.multi_bulk[i],
 			*value = r.multi_bulk[i + 1];
 
-		data[key->bulk] << value->bulk;
+		data.StoreInternal(key->bulk, value->bulk);
 	}
 
 	Serializable *&obj = st->objects[this->id];
@@ -444,12 +446,12 @@ void Updater::OnResult(const Reply &r)
 	for (const auto &[key, value] : data.data)
 	{
 		args.push_back(key);
-		args.emplace_back(value->str());
+		args.emplace_back(value);
 
 		std::vector<Anope::string> args2;
 
 		args2.emplace_back("SADD");
-		args2.push_back("value:" + this->type + ":" + key + ":" + value->str());
+		args2.push_back("value:" + this->type + ":" + key + ":" + value);
 		args2.push_back(Anope::ToString(obj->object_id));
 
 		/* Add to value -> object id set */
@@ -544,7 +546,7 @@ void SubscriptionListener::OnResult(const Reply &r)
 		{
 			std::vector<Anope::string> args;
 			args.emplace_back("SREM");
-			args.push_back("value:" + type + ":" + k + ":" + value->str());
+			args.push_back("value:" + type + ":" + k + ":" + value);
 			args.push_back(id);
 
 			/* Delete value -> object id */
@@ -592,7 +594,7 @@ void ModifiedObject::OnResult(const Reply &r)
 		{
 			std::vector<Anope::string> args;
 			args.emplace_back("SREM");
-			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
+			args.push_back("value:" + st->GetName() + ":" + key + ":" + value);
 			args.push_back(Anope::ToString(this->id));
 
 			/* Delete value -> object id */
@@ -607,7 +609,7 @@ void ModifiedObject::OnResult(const Reply &r)
 		const Reply *key = r.multi_bulk[i],
 			*value = r.multi_bulk[i + 1];
 
-		data[key->bulk] << value->bulk;
+		data.StoreInternal(key->bulk, value->bulk);
 	}
 
 	obj = st->Unserialize(obj, data);
@@ -621,7 +623,7 @@ void ModifiedObject::OnResult(const Reply &r)
 		{
 			std::vector<Anope::string> args;
 			args.emplace_back("SADD");
-			args.push_back("value:" + st->GetName() + ":" + key + ":" + value->str());
+			args.push_back("value:" + st->GetName() + ":" + key + ":" + value);
 			args.push_back(Anope::ToString(obj->object_id));
 
 			/* Add to value -> object id set */

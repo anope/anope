@@ -117,7 +117,17 @@ protected:
 
 	Data() = default;
 
-	virtual std::iostream &operator[](const Anope::string &key) = 0;
+	/** Internal method for loading data from the database.
+	 * @param key The field to get the value of.
+	 * @param value The location to store the retrieved value.
+	 */
+	virtual bool LoadInternal(const Anope::string &key, Anope::string &value) = 0;
+
+	/** Internal method for storing data in the database.
+	 * @param key The field to set the value of.
+	 * @param value The value of the field.
+	 */
+	virtual bool StoreInternal(const Anope::string &key, const Anope::string &value) = 0;
 
 	/** Sets the data type of the specified field. This is called automatically from \ref Store.
 	 * @param key The field to specify the data type for.
@@ -168,7 +178,7 @@ public:
 		else if constexpr (std::is_integral_v<Type> && std::is_unsigned_v<Type>)
 			SetType(key, DataType::UINT);
 
-		this->operator[](key) << value;
+		StoreInternal(key, Anope::ToString(value));
 	}
 
 	/** Tries to load the value of a specific field.
@@ -178,7 +188,16 @@ public:
 	template <typename T = Anope::string>
 	bool TryLoad(const Anope::string& key, T &out)
 	{
-		return static_cast<bool>(this->operator[](key) >> out);
+		Anope::string out_str;
+		if (!LoadInternal(key, out_str))
+			return false;
+
+		auto out_opt = Anope::TryConvert<T>(out_str);
+		if (!out_opt)
+			return false;
+
+		out = out_opt.value();
+		return true;
 	}
 };
 

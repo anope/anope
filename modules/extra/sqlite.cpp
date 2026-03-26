@@ -311,7 +311,7 @@ Query SQLiteService::BuildInsert(const Anope::string &table, Serializable::Id id
 	for (const auto &known_col : this->active_schema[table])
 	{
 		if (known_col != "id" && known_col != "timestamp" && data.data.count(known_col) == 0)
-			data[known_col] << "";
+			data.data[known_col];
 	}
 
 	Anope::string query_text = "REPLACE INTO `" + table + "` (";
@@ -331,9 +331,7 @@ Query SQLiteService::BuildInsert(const Anope::string &table, Serializable::Id id
 	Query query(query_text);
 	for (auto &[field, value] : data.data)
 	{
-		Anope::string buf;
-		*value >> buf;
-
+		auto buf = value;
 		auto escape = true;
 		switch (data.GetType(field))
 		{

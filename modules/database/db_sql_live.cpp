@@ -220,7 +220,7 @@ public:
 				Data data;
 
 				for (const auto &[key, value] : row)
-					data[key] << value;
+					data.StoreInternal(key, value);
 
 				Serializable *s = NULL;
 				auto it = obj->objects.find(id);

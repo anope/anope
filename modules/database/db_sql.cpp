@@ -256,7 +256,7 @@ public:
 			Data data;
 
 			for (const auto &[key, value] : res.Row(j))
-				data[key] << value;
+				data.StoreInternal(key, value);
 
 			Serializable *obj = sb->Unserialize(NULL, data);
 			if (obj)

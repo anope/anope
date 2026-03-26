@@ -21,7 +21,6 @@ public:
 	std::fstream *fs;
 	Serializable::Id id = 0;
 	std::map<Anope::string, Anope::string> data;
-	std::stringstream ss;
 	bool read = false;
 
 	LoadData(std::fstream &fsref)
@@ -29,7 +28,7 @@ public:
 	{
 	}
 
-	std::iostream &operator[](const Anope::string &key) override
+	bool LoadInternal(const Anope::string &key, Anope::string &value) override
 	{
 		if (!read)
 		{
@@ -51,9 +50,13 @@ public:
 			read = true;
 		}
 
-		ss.clear();
-		this->ss << this->data[key];
-		return this->ss;
+		value = this->data[key];
+		return true;
+	}
+
+	bool StoreInternal(const Anope::string &key, const Anope::string &value) override
+	{
+		return false; // This module can only load data.
 	}
 
 	size_t Hash() const override

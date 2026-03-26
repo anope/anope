@@ -38,7 +38,7 @@ public:
 	Serializable::Id id = 0;
 
 	// Data in this database entry.
-	Anope::map<std::stringstream> data;
+	Anope::unordered_map<Anope::string> data;
 
 	// Used when writing data.
 	Data(Serialize::Type *s_type, Serializable *obj)
@@ -58,7 +58,7 @@ public:
 			if (yyjson_get_type(key) != YYJSON_TYPE_STR)
 				continue;
 
-			auto akey = yyjson_get_astr(key);
+			const auto akey = yyjson_get_astr(key);
 			if (akey.equals_ci("@id"))
 			{
 				this->id = yyjson_get_uint(value);
@@ -66,23 +66,28 @@ public:
 			}
 
 			if (yyjson_is_bool(value))
-				data[akey] << yyjson_get_bool(value);
+				data[akey] = Anope::ToString(yyjson_get_bool(value));
 			else if (yyjson_is_int(value))
-				data[akey] << yyjson_get_int(value);
+				data[akey] = Anope::ToString(yyjson_get_int(value));
 			else if (yyjson_is_null(value))
 				data[akey];
 			else if (yyjson_is_real(value))
-				data[akey] << yyjson_get_real(value);
+				data[akey] = Anope::ToString(yyjson_get_real(value));
 			else if (yyjson_is_str(value))
-				data[akey] << yyjson_get_astr(value);
+				data[akey] = Anope::ToString(yyjson_get_astr(value));
 			else if (yyjson_is_uint(value))
-				data[akey] << yyjson_get_uint(value);
+				data[akey] = Anope::ToString(yyjson_get_uint(value));
 		}
 	}
 
-	std::iostream &operator[](const Anope::string &key) override
+	bool LoadInternal(const Anope::string &key, Anope::string &value) override
 	{
-		return data[key];
+		auto it = this->data.find(key);
+		if (it == this->data.end())
+			return false;
+
+		value = it->second;
+		return true;
 	}
 
 	size_t Hash() const override
@@ -95,6 +100,12 @@ public:
 				hash ^= Anope::hash_cs()(valuestr);
 		}
 		return hash;
+	}
+
+	bool StoreInternal(const Anope::string &key, const Anope::string &value) override
+	{
+		this->data[key] = value;
+		return true;
 	}
 };
 
@@ -318,22 +329,23 @@ private:
 			switch (data.GetType(key))
 			{
 				case Serialize::DataType::BOOL:
-					v = yyjson_mut_bool(doc, Anope::Convert<bool>(value.str(), false));
+					v = yyjson_mut_bool(doc, Anope::Convert<bool>(value, false));
 					break;
 				case Serialize::DataType::FLOAT:
-					v = yyjson_mut_real(doc, Anope::Convert<double>(value.str(), 0.0));
+					v = yyjson_mut_real(doc, Anope::Convert<double>(value, 0.0));
 					break;
 				case Serialize::DataType::INT:
-					v = yyjson_mut_int(doc, Anope::Convert<int64_t>(value.str(), 0));
+					v = yyjson_mut_int(doc, Anope::Convert<int64_t>(value, 0));
 					break;
 				case Serialize::DataType::TEXT:
 				{
-					auto str = value.str();
-					v = str.empty() ? yyjson_mut_null(doc) : yyjson_mut_strncpy(doc, str.c_str(), str.length());
+					v = value.empty()
+						? yyjson_mut_null(doc)
+						: yyjson_mut_strncpy(doc, value.c_str(), value.length());
 					break;
 				}
 				case Serialize::DataType::UINT:
-					v = yyjson_mut_uint(doc, Anope::Convert<uint64_t>(value.str(), 0));
+					v = yyjson_mut_uint(doc, Anope::Convert<uint64_t>(value, 0));
 					break;
 			}
 

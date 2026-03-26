@@ -23,46 +23,33 @@ namespace SQL
 		: public Serialize::Data
 	{
 	public:
-		typedef std::map<Anope::string, std::stringstream *> Map;
-		Map data;
-
-		~Data()
-		{
-			Clear();
-		}
-
-		std::iostream &operator[](const Anope::string &key) override
-		{
-			std::stringstream *&ss = data[key];
-			if (!ss)
-				ss = new std::stringstream();
-			return *ss;
-		}
+		Anope::unordered_map<Anope::string> data;
 
 		size_t Hash() const override
 		{
 			size_t hash = 0;
 			for (const auto &[_, value] : this->data)
 			{
-				if (!value->str().empty())
-					hash ^= Anope::hash_cs()(value->str());
+				if (!value.empty())
+					hash ^= Anope::hash_cs()(value);
 			}
 			return hash;
 		}
 
-		std::map<Anope::string, std::iostream *> GetData() const
+		bool LoadInternal(const Anope::string &key, Anope::string &value) override
 		{
-			std::map<Anope::string, std::iostream *> d;
-			for (const auto &[key, value] : this->data)
-				d[key] = value;
-			return d;
+			auto it = this->data.find(key);
+			if (it == this->data.end())
+				return false;
+
+			value = it->second;
+			return true;
 		}
 
-		void Clear()
+		bool StoreInternal(const Anope::string &key, const Anope::string &value) override
 		{
-			for (const auto &[_, value] : this->data)
-				delete value;
-			this->data.clear();
+			this->data[key] = value;
+			return true;
 		}
 	};
 

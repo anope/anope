@@ -1455,10 +1455,10 @@ struct IRCDMessageServer final
 			Anope::string desc;
 			spacesepstream(params[2]).GetTokenRemainder(desc, 1);
 
-			new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, desc, UplinkSID);
+			new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], desc, UplinkSID, hops);
 		}
 		else
-			new Server(source.GetServer(), params[0], hops, params[2]);
+			new Server(source.GetServer(), params[0], params[2], hops);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}
@@ -1473,7 +1473,7 @@ struct IRCDMessageSID final
 	{
 		auto hops = Anope::Convert<unsigned>(params[1], 0);
 
-		new Server(source.GetServer(), params[0], hops, params[3], params[2]);
+		new Server(source.GetServer(), params[0], params[3], params[2], hops);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}

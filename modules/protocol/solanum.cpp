@@ -400,7 +400,7 @@ struct IRCDMessageServer final
 		// Servers other then our immediate uplink are introduced via SID
 		if (params[1] != "1")
 			return;
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], params[2], UplinkSID, 1);
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}
 };

@@ -57,11 +57,11 @@ private:
 	/* Uplink for this server */
 	Server *uplink;
 	/* Server is syncing */
-	bool syncing;
+	bool syncing = true;
 	/* The server is juped */
 	bool juped;
 	/* The server is about to quit */
-	bool quitting;
+	bool quitting = false;
 	/* Reason this server was quit */
 	Anope::string quit_reason;
 
@@ -69,12 +69,12 @@ public:
 	/** Constructor
 	 * @param uplink The uplink this server is from, is only NULL when creating Me
 	 * @param name The server name
-	 * @param hops Hops from services server
 	 * @param description Server rdescription
 	 * @param sid Server sid/numeric
+	 * @param hops Hops from services server
 	 * @param jupe If the server is juped
 	 */
-	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid = "", bool jupe = false);
+	Server(Server *uplink, const Anope::string &name, const Anope::string &description, const Anope::string &sid = "", unsigned hops = 0, bool jupe = false);
 
 private:
 	/** Destructor

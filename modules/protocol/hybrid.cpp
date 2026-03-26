@@ -510,7 +510,7 @@ struct IRCDMessageServer final
 		if (params.size() == 5)
 			UplinkSID = params[2];
 
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params.back(), UplinkSID);
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], params.back(), UplinkSID, 1);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}
@@ -526,7 +526,7 @@ struct IRCDMessageSID final
 	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
 	{
 		auto hops = Anope::Convert(params[1], 0);
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], hops, params.back(), params[2]);
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], params.back(), params[2], hops);
 
 		IRCD->SendPing(Me->GetName(), params[0]);
 	}

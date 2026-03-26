@@ -46,7 +46,7 @@ public:
 				IRCD->SendSquit(server, rbuf);
 				server->Delete(rbuf);
 			}
-			auto *juped_server = new Server(Me, jserver, 1, rbuf, sid, true);
+			auto *juped_server = new Server(Me, jserver, rbuf, sid, 1, true);
 			IRCD->SendServer(juped_server);
 
 			Log(LOG_ADMIN, source, this) << "on " << jserver << " (" << rbuf << ")";

@@ -287,7 +287,7 @@ struct IRCDMessageServer final
 		if (params[1] != "1")
 			return;
 
-		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], 1, params[2], UplinkSID);
+		new Server(source.GetServer() == NULL ? Me : source.GetServer(), params[0], params[2], UplinkSID, 1);
 	}
 };
 

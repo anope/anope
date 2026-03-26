@@ -542,13 +542,13 @@ struct IRCDMessageServer final
 		if (params.size() == 3)
 		{
 			// our uplink is introducing itself
-			new Server(Me, params[0], 1, params[2], "1");
+			new Server(Me, params[0], params[2], "1", 1);
 		}
 		else
 		{
 			// our uplink is introducing a new server
 			auto hops = Anope::Convert<unsigned>(params[1], 0);
-			new Server(source.GetServer(), params[0], hops, params[3], params[2]);
+			new Server(source.GetServer(), params[0], params[3], params[2], hops);
 		}
 		/*
 		 * ngIRCd does not send an EOB, so we send a PING immediately

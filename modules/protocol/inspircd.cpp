@@ -2348,7 +2348,7 @@ struct IRCDMessageServer final
 			 * 2: numeric
 			 * 3: desc
 			 */
-			new Server(Me, params[0], 0, params.back(), params[2]);
+			new Server(Me, params[0], params.back(), params[2]);
 		}
 		else if (source.GetServer())
 		{
@@ -2359,7 +2359,7 @@ struct IRCDMessageServer final
 			 * 2 to N-1: various key=value pairs.
 			 * N: desc
 			 */
-			new Server(source.GetServer(), params[0], 1, params.back(), params[1]);
+			new Server(source.GetServer(), params[0], params.back(), params[1]);
 		}
 	}
 };

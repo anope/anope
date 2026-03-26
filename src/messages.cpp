@@ -402,7 +402,8 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 			if (u->HasMode("OPER"))
 			{
 				IRCD->SendNumeric(RPL_STATSLINKINFO, source.GetSource(), "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				IRCD->SendNumeric(RPL_STATSLINKINFO, source.GetSource(), Config->Uplinks[Anope::CurrentUplink].host, UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, Anope::CurTime - Anope::StartTime);
+				IRCD->SendNumeric(RPL_STATSLINKINFO, source.GetSource(), Config->Uplinks[Anope::CurrentUplink].host, UplinkSock->WriteBufferLen(),
+					TotalWritten, UplinkSock->sent_msgs, UplinkSock->ReadBufferLen(), TotalRead, UplinkSock->recv_msgs, Anope::CurTime - Anope::StartTime);
 			}
 
 			IRCD->SendNumeric(RPL_STATSLINKINFO, source.GetSource(), params[0][0], "End of /STATS report.");

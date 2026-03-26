@@ -18,6 +18,7 @@
 #include "servers.h"
 #include "users.h"
 #include "regchannel.h"
+#include "uplink.h"
 
 void Anope::Process(const Anope::string &buffer)
 {
@@ -86,6 +87,7 @@ void Anope::ProcessInternal(MessageSource &src, const Anope::string &command, co
 	{
 		try
 		{
+			UplinkSock->recv_msgs++;
 			m->Run(src, params, tags);
 		}
 		catch (const ProtocolException &err)

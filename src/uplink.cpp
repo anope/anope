@@ -76,6 +76,7 @@ void Uplink::SendInternal(const Anope::map<Anope::string> &tags, const MessageSo
 	if (!IRCD->Format(message, tags, source, command, params))
 		return;
 
+	UplinkSock->sent_msgs++;
 	UplinkSock->Write(message);
 
 	Log(LOG_RAWIO) << "Sent " << message;
@@ -108,7 +109,6 @@ void Uplink::SendInternal(const Anope::map<Anope::string> &tags, const MessageSo
 
 UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[Anope::CurrentUplink].protocol), ConnectionSocket(), BufferedSocket()
 {
-	error = false;
 	UplinkSock = this;
 }
 

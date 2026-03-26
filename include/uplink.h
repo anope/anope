@@ -54,7 +54,9 @@ class UplinkSocket final
 	, public BufferedSocket
 {
 public:
-	bool error;
+	bool error = false;
+	size_t recv_msgs = 0;
+	size_t sent_msgs = 0;
 	UplinkSocket();
 	~UplinkSocket();
 	bool ProcessRead() override;

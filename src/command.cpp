@@ -232,7 +232,7 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 
 namespace
 {
-	void HandleUnknownCommand(CommandSource& source, const Anope::string &message)
+	void HandleUnknownCommand(CommandSource &source, const Anope::string &message)
 	{
 		// Try to find a similar command.
 		auto distance = Config->GetBlock("options").Get<size_t>("didyoumeandifference", "4");

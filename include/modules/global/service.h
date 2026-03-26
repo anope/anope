@@ -46,7 +46,7 @@ public:
 	/** Retrieves the size of the messages queue for the specified user.
 	 * @param nc The account to count queued messages for.
 	 */
-	inline size_t CountQueue(NickCore* nc) const
+	inline size_t CountQueue(NickCore *nc) const
 	{
 		auto *q = GetQueue(nc);
 		return q ? q->size() : 0;
@@ -55,7 +55,7 @@ public:
 	/** Retrieves the messages queue for the specified user.
 	 * @param nc The account to retrieve queued messages for.
 	 */
-	virtual const std::vector<Anope::string> *GetQueue(NickCore* nc) const = 0;
+	virtual const std::vector<Anope::string> *GetQueue(NickCore *nc) const = 0;
 
 	/** Queues a message to be sent later.
 	 * @param nc The account to queue the message for.

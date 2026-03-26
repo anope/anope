@@ -152,7 +152,7 @@ public:
 	 * @param def The default value if none is set.
 	 */
 	template <typename T = Anope::string>
-	T Load(const Anope::string& key, T def = T())
+	T Load(const Anope::string &key, T def = T())
 	{
 		T out;
 		if (!TryLoad(key, out))
@@ -186,7 +186,7 @@ public:
 	 * @param out The location to store the retrieved value.
 	 */
 	template <typename T = Anope::string>
-	bool TryLoad(const Anope::string& key, T &out)
+	bool TryLoad(const Anope::string &key, T &out)
 	{
 		Anope::string out_str;
 		if (!LoadInternal(key, out_str))

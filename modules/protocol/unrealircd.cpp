@@ -496,7 +496,7 @@ namespace UnrealExtBan
 		Anope::string xbname;
 
 	public:
-		Base(const Anope::string &mname, const Anope::string& uname, char uchar)
+		Base(const Anope::string &mname, const Anope::string &uname, char uchar)
 			: ChannelModeVirtual<ChannelModeList>(mname, "BAN")
 			, xbchar(uchar)
 			, xbname(uname)

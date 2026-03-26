@@ -57,7 +57,7 @@ class CommandOSStats final
 private:
 	ServiceReference<XLineManager> akills, snlines, sqlines;
 
-	static void ReportXLineStats(CommandSource& source, XLineManager* xlm, const char* type, const char* config)
+	static void ReportXLineStats(CommandSource &source, XLineManager *xlm, const char *type, const char *config)
 	{
 		source.Reply(_("Current number of %ss: \002%zu\002"), type, xlm->GetCount());
 

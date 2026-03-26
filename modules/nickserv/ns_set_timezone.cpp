@@ -230,7 +230,7 @@ public:
 		throw ModuleException("A compiler with C++20 support is required by this module");
 #else
 		// Build the zone list.
-		const auto& tzdb = std::chrono::get_tzdb();
+		const auto &tzdb = std::chrono::get_tzdb();
 		for (const auto &tz : tzdb.zones)
 			timezones.emplace_back(tz.name());
 		for (const auto &tz : tzdb.links)

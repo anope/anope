@@ -183,7 +183,7 @@ private:
 	size_t minparams;
 
 protected:
-	Event(Module *o, const Anope::string& e, size_t mp = 0)
+	Event(Module *o, const Anope::string &e, size_t mp = 0)
 		: Service(o, RPC_EVENT, e)
 		, minparams(mp)
 	{

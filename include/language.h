@@ -44,7 +44,7 @@ namespace Language
 	/** Sets the locale to the specified language.
 	 * @param lang The language to translate to.
 	 */
-	extern CoreExport void SetLocale(const char* lang);
+	extern CoreExport void SetLocale(const char *lang);
 
 	/** Sets the locale back to the default. */
 	extern CoreExport void ResetLocale();

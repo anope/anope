@@ -151,14 +151,14 @@ public:
 	const auto &GetServiceType() const { return type; }
 
 	/** Invalidates the reference and changes the name of the referenced service. */
-	void SetServiceName(const Anope::string& newname)
+	void SetServiceName(const Anope::string &newname)
 	{
 		this->invalid = true;
 		this->name = newname;
 	}
 
 	/** Invalidates the reference and changes the type of the referenced service. */
-	void SetServiceType(const Anope::string& newtype)
+	void SetServiceType(const Anope::string &newtype)
 	{
 		this->invalid = true;
 		this->type = newtype;

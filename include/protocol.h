@@ -307,7 +307,7 @@ public:
 	 */
 	virtual void SendOper(User *u);
 
-	virtual void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode) { }
+	virtual void SendClearModes(const MessageSource &user, Channel *c, User *u, const Anope::string &mode) { }
 
 	virtual bool IsNickValid(const Anope::string &);
 	virtual bool IsChannelValid(const Anope::string &);

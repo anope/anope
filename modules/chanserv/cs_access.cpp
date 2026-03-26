@@ -440,7 +440,7 @@ private:
 				ListFormatter &list;
 				ChannelInfo *ci;
 				bool show_all;
-				unsigned& foreign;
+				unsigned &foreign;
 
 			public:
 				AccessListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist, bool _show_all, unsigned &_foreign)

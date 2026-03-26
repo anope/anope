@@ -253,7 +253,7 @@ private:
 		}
 	}
 
-	void ApplyFlags(Extensible *ext, Anope::string &flags, char flag, const char* extname, bool extend = true)
+	void ApplyFlags(Extensible *ext, Anope::string &flags, char flag, const char *extname, bool extend = true)
 	{
 		auto pos = flags.find(flag);
 		auto has_flag = (pos != Anope::string::npos);

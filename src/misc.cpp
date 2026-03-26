@@ -272,7 +272,7 @@ void InfoFormatter::SendTo(CommandSource &source)
 		std::sort(this->options.begin(), this->options.end());
 
 		auto &optstr = (*this)[_("Options")];
-		for (const auto& option : this->options)
+		for (const auto &option : this->options)
 		{
 			if (!optstr.empty())
 				optstr += ", ";
@@ -436,7 +436,7 @@ bool LineWrapper::GetLine(Anope::string &out)
 
 	auto toggle_formatting = [this, &uncertain_formatting](const Anope::string &fmt)
 	{
-		auto it = std::find_if(formatting.begin(), formatting.end(), [&fmt](const auto& f) {
+		auto it = std::find_if(formatting.begin(), formatting.end(), [&fmt](const auto &f) {
 			return f[0] == fmt[0];
 		});
 		if (it == formatting.end())

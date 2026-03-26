@@ -208,11 +208,8 @@ void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 		static time_t last_time = 0;
 
 		if (last_time == Anope::CurTime)
-		{
-			Anope::QuitReason = "Kill loop detected. Is Anope U:Lined?";
-			Anope::Quitting = true;
-			return;
-		}
+			throw ProtocolException("Kill loop detected. Is Anope U:Lined?");
+
 		last_time = Anope::CurTime;
 
 		bi->OnKill();

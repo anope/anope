@@ -1768,11 +1768,7 @@ struct IRCDMessageSave final
 		if (targ->server == Me && (bi = dynamic_cast<BotInfo *>(targ)))
 		{
 			if (last_collide == Anope::CurTime)
-			{
-				Anope::QuitReason = "Nick collision fight on " + targ->nick;
-				Anope::Quitting = true;
-				return;
-			}
+				throw ProtocolException("Nick collision fight on " + targ->nick);
 
 			IRCD->SendKill(Me, targ->nick, "Nick collision");
 			IRCD->SendNickChange(targ, targ->nick);

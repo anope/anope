@@ -64,10 +64,7 @@ struct LogSettingTypeImpl final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		Anope::string sci;
-		data["ci"] >> sci;
-
-		ChannelInfo *ci = ChannelInfo::Find(sci);
+		auto *ci = ChannelInfo::Find(data.Load("ci"));
 		if (ci == NULL)
 			return NULL;
 
@@ -82,13 +79,13 @@ struct LogSettingTypeImpl final
 		}
 
 		ls->chan = ci->name;
-		data["service_name"] >> ls->service_name;
-		data["command_service"] >> ls->command_service;
-		data["command_name"] >> ls->command_name;
-		data["method"] >> ls->method;
-		data["extra"] >> ls->extra;
-		data["creator"] >> ls->creator;
-		data["created"] >> ls->created;
+		ls->service_name = data.Load("service_name");
+		ls->command_service = data.Load("command_service");
+		ls->command_name = data.Load("command_name");
+		ls->method = data.Load("method");
+		ls->extra = data.Load("extra");
+		ls->creator = data.Load("creator");
+		ls->created = data.Load<time_t>("created");
 
 		return ls;
 	}

@@ -142,21 +142,16 @@ void BotInfo::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 
 Serializable *BotInfo::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string nick, user, host, realname, flags;
-
-	data["nick"] >> nick;
-	data["user"] >> user;
-	data["host"] >> host;
-	data["realname"] >> realname;
+	const auto nick = data.Load("nick");
 
 	BotInfo *bi;
 	if (obj)
 		bi = anope_dynamic_static_cast<BotInfo *>(obj);
 	else if (!(bi = BotInfo::Find(nick, true)))
-		bi = new BotInfo(nick, user, host, realname);
+		bi = new BotInfo(nick, data.Load("user"), data.Load("host"), data.Load("realname"));
 
-	data["created"] >> bi->created;
-	data["oper_only"] >> bi->oper_only;
+	bi->created = data.Load<time_t>("created");
+	bi->oper_only = data.Load<bool>("oper_only");
 
 	Extensible::ExtensibleUnserialize(bi, bi, data);
 

@@ -29,6 +29,8 @@
 #include <unistd.h>
 #endif
 
+#include <iostream>
+
 static Anope::string GetTimeStamp()
 {
 	char tbuf[256];

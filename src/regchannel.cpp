@@ -139,47 +139,41 @@ void ChannelInfo::Type::Serialize(Serializable *obj, Serialize::Data &data) cons
 
 Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string sname, sfounder, ssuccessor, slevels, sbi;
-	uint64_t sfounderid = 0, ssuccessorid = 0;
-
-	data["name"] >> sname;
-	data["founder"] >> sfounder; // Deprecated 2.0 field
-	data["founderid"] >> sfounderid;
-	data["successor"] >> ssuccessor; // Deprecated 2.0 field
-	data["successorid"] >> ssuccessorid;
-	data["levels"] >> slevels;
-	data["bi"] >> sbi;
-
 	ChannelInfo *ci;
 	if (obj)
 		ci = anope_dynamic_static_cast<ChannelInfo *>(obj);
 	else
-		ci = new ChannelInfo(sname);
+		ci = new ChannelInfo(data.Load("name"));
 
-	ci->SetFounder(sfounderid ? NickCore::FindId(sfounderid) : NickCore::Find(sfounder));
-	ci->SetSuccessor(ssuccessorid ? NickCore::FindId(ssuccessorid) : NickCore::Find(ssuccessor));
+	const auto sfounderid = data.Load<uint64_t>("founderid");
+	ci->SetFounder(sfounderid ? NickCore::FindId(sfounderid) : NickCore::Find(data.Load("founder")));
 
-	data["description"] >> ci->desc;
-	data["registered"] >> ci->registered;
-	data["last_used"] >> ci->last_used;
-	data["last_topic"] >> ci->last_topic;
-	data["last_topic_setter"] >> ci->last_topic_setter;
-	data["last_topic_time"] >> ci->last_topic_time;
-	data["bantype"] >> ci->bantype;
+	const auto ssuccessorid = data.Load<uint64_t>("successorid");
+	ci->SetSuccessor(ssuccessorid ? NickCore::FindId(ssuccessorid) : NickCore::Find(data.Load("successor")));
+
+	ci->desc = data.Load("description");
+	ci->registered = data.Load<time_t>("registered", data.Load<time_t>("time_registered"));
+	ci->last_used = data.Load<time_t>("last_used");
+	ci->last_topic = data.Load("last_topic");
+	ci->last_topic_setter = data.Load("last_topic_setter");
+	ci->last_topic_time = data.Load<time_t>("last_topic_time");
+	ci->bantype = data.Load<int16_t>("bantype");
 	{
 		std::vector<Anope::string> v;
-		spacesepstream(slevels).GetTokens(v);
+		spacesepstream(data.Load("levels")).GetTokens(v);
 		for (unsigned i = 0; i + 1 < v.size(); i += 2)
 		{
 			// Begin 2.0 compatibility.
 			if (v[i] == "FANTASIA")
 				v[i] = "FANTASY";
 			// End 2.0 compatibility.
+
 			if (auto level = Anope::TryConvert<int16_t>(v[i + 1]))
 				ci->levels[v[i]] = level.value();
 		}
 	}
-	BotInfo *bi = BotInfo::Find(sbi, true);
+
+	auto *bi = BotInfo::Find(data.Load("bi"), true);
 	if (*ci->bi != bi)
 	{
 		if (bi)
@@ -187,11 +181,12 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 		else if (ci->bi)
 			ci->bi->UnAssign(NULL, ci);
 	}
-	data["banexpire"] >> ci->banexpire;
-	data["memomax"] >> ci->memos.memomax;
+
+	ci->banexpire = data.Load<time_t>("banexpire");
+	ci->memos.memomax = data.Load<int16_t>("memomax");
 	{
 		Anope::string buf;
-		data["memoignores"] >> buf;
+		buf = data.Load("memoignores");
 		spacesepstream sep(buf);
 		ci->memos.ignores.clear();
 		while (sep.GetToken(buf))
@@ -201,53 +196,30 @@ Serializable *ChannelInfo::Type::Unserialize(Serializable *obj, Serialize::Data 
 	Extensible::ExtensibleUnserialize(ci, ci, data);
 
 	// Begin 1.9 compatibility.
-	bool b;
-	b = false;
-	data["extensible:PRIVATE"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:PRIVATE"))
 		ci->Extend<bool>("CS_PRIVATE");
-	b = false;
-	data["extensible:NO_EXPIRE"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:NO_EXPIRE"))
 		ci->Extend<bool>("CS_NO_EXPIRE");
-	b = false;
-	data["extensible:FANTASY"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:FANTASY"))
 		ci->Extend<bool>("BS_FANTASY");
-	b = false;
-	data["extensible:GREET"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:GREET"))
 		ci->Extend<bool>("BS_GREET");
-	b = false;
-	data["extensible:PEACE"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:PEACE"))
 		ci->Extend<bool>("PEACE");
-	b = false;
-	data["extensible:SECUREFOUNDER"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:SECUREFOUNDER"))
 		ci->Extend<bool>("SECUREFOUNDER");
-	b = false;
-	data["extensible:RESTRICTED"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:RESTRICTED"))
 		ci->Extend<bool>("RESTRICTED");
-	b = false;
-	data["extensible:KEEPTOPIC"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:KEEPTOPIC"))
 		ci->Extend<bool>("KEEPTOPIC");
-	b = false;
-	data["extensible:SIGNKICK"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:SIGNKICK"))
 		ci->Extend<bool>("SIGNKICK");
-	b = false;
-	data["extensible:SIGNKICK_LEVEL"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:SIGNKICK_LEVEL"))
 		ci->Extend<bool>("SIGNKICK_LEVEL");
 	// End 1.9 compatibility.
 
 	// Begin 2.0 compatibility.
-	if (ci->registered == Anope::CurTime)
-		data["time_registered"] >> ci->registered;
-	if (ci->registered == 0)
+	if (!ci->registered)
 		ci->registered = ci->last_used ? ci->last_used : Anope::CurTime; // Probably corrupt database.
 	// End 2.0 compatibility.
 

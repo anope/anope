@@ -219,9 +219,8 @@ public:
 			cl->certs.clear();
 
 			// Add the new cert list
-			Anope::string buf;
-			data["cert"] >> buf;
-			for (spacesepstream sep(buf); sep.GetToken(buf); )
+			spacesepstream sep(data.Load("cert"));
+			for (Anope::string buf; sep.GetToken(buf); )
 			{
 				auto *cert = new NSCertInfo(e);
 				cert->fingerprint = buf;
@@ -255,10 +254,7 @@ public:
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		uint64_t account = 0;
-		data["account"] >> account;
-
-		auto *nc = NickCore::FindId(account);
+		auto *nc = NickCore::FindId(data.Load<uint64_t>("account"));
 		if (!nc)
 			return nullptr; // Missing user.
 
@@ -268,10 +264,10 @@ public:
 		else
 			cert = new NSCertInfo(nc);
 
-		data["created"] >> cert->created;
-		data["creator"] >> cert->creator;
-		data["description"] >> cert->description;
-		data["fingerprint"] >> cert->fingerprint;
+		cert->created = data.Load<time_t>("created");
+		cert->creator = data.Load("creator");
+		cert->description = data.Load("description");
+		cert->fingerprint = data.Load("fingerprint");
 
 		if (!obj)
 		{

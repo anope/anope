@@ -85,31 +85,24 @@ EntryMsgImpl::~EntryMsgImpl()
 
 Serializable *EntryMsgTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string sci, screator, smessage;
-	time_t swhen;
-
-	data["ci"] >> sci;
-	data["creator"] >> screator;
-	data["message"] >> smessage;
-
-	ChannelInfo *ci = ChannelInfo::Find(sci);
+	auto *ci = ChannelInfo::Find(data.Load("ci"));
 	if (!ci)
 		return NULL;
 
+	const auto screator = data.Load("creator");
+	const auto smessage = data.Load("message");
+	const auto swhen = data.Load<time_t>("when");
 	if (obj)
 	{
 		auto *msg = anope_dynamic_static_cast<EntryMsgImpl *>(obj);
 		msg->chan = ci->name;
-		data["creator"] >> msg->creator;
-		data["message"] >> msg->message;
-		data["when"] >> msg->when;
+		msg->creator = screator;
+		msg->message = smessage;
+		msg->when = swhen;
 		return msg;
 	}
 
 	auto *messages = ci->Require<ChanServ::EntryMessageList>(CHANSERV_ENTRY_MESSAGE_EXT);
-
-	data["when"] >> swhen;
-
 	auto *m = new EntryMsgImpl(ci, screator, smessage, swhen);
 	(*messages)->push_back(m);
 	return m;

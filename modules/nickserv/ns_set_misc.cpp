@@ -79,23 +79,20 @@ struct NSMiscDataType final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		Anope::string snc, sname, sdata;
-
-		data["nc"] >> snc;
-		data["name"] >> sname;
-		data["data"] >> sdata;
-
-		NickCore *nc = NickCore::Find(snc);
+		auto *nc = NickCore::Find(data.Load("nc"));
 		if (nc == NULL)
 			return NULL;
+
+		const auto sname = data.Load("name");
+		const auto sdata = data.Load("data");
 
 		NSMiscData *d = NULL;
 		if (obj)
 		{
 			d = anope_dynamic_static_cast<NSMiscData *>(obj);
 			d->object = nc->display;
-			data["name"] >> d->name;
-			data["data"] >> d->data;
+			d->name = sname;
+			d->data =  sdata;
 		}
 		else
 		{

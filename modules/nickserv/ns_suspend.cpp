@@ -43,25 +43,23 @@ struct NSSuspendInfoType final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		Anope::string snick;
-		data["nick"] >> snick;
-
 		NSSuspendInfo *si;
 		if (obj)
 			si = anope_dynamic_static_cast<NSSuspendInfo *>(obj);
 		else
 		{
-			NickAlias *na = NickAlias::Find(snick);
+			auto *na = NickAlias::Find(data.Load("nick"));
 			if (!na)
 				return NULL;
+
 			si = na->nc->Extend<NSSuspendInfo>("NS_SUSPENDED");
-			data["nick"] >> si->what;
+			si->what = na->nick;
 		}
 
-		data["by"] >> si->by;
-		data["reason"] >> si->reason;
-		data["time"] >> si->when;
-		data["expires"] >> si->expires;
+		si->by = data.Load("by");
+		si->reason = data.Load("reason");
+		si->when = data.Load<time_t>("time");
+		si->expires = data.Load<time_t>("expires");
 		return si;
 	}
 };

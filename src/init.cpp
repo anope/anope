@@ -31,6 +31,8 @@
 #include <pwd.h>
 #include <sys/types.h>
 #endif
+
+#include <iostream>
 #include <thread>
 
 Anope::string Anope::ConfigDir = DEFAULT_CONF_DIR;

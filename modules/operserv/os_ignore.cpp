@@ -66,10 +66,10 @@ Serializable *IgnoreDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data
 		OperServ::ignore_service->AddIgnore(ign);
 	}
 
-	data["mask"] >> ign->mask;
-	data["creator"] >> ign->creator;
-	data["reason"] >> ign->reason;
-	data["time"] >> ign->time;
+	ign->mask = data.Load("mask");
+	ign->creator = data.Load("creator");
+	ign->reason = data.Load("reason");
+	ign->time = data.Load<time_t>("time");
 
 	return ign;
 }

@@ -82,9 +82,9 @@ void NickCore::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 	data.Store("pass", nc->pass);
 	data.Store("email", nc->email);
 	data.Store("language", nc->language);
-	data.Store("lastmail", nc->lastmail);
-	data.Store("registered", nc->registered);
-	data.Store("memomax", nc->memos.memomax);
+	data.Store<time_t>("lastmail", nc->lastmail);
+	data.Store<time_t>("registered", nc->registered);
+	data.Store<int16_t>("memomax", nc->memos.memomax);
 
 	std::ostringstream oss;
 	for (const auto &ignore : nc->memos.ignores)
@@ -97,96 +97,60 @@ void NickCore::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 Serializable *NickCore::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
 	NickCore *nc;
-
-	Anope::string sdisplay;
-	data["display"] >> sdisplay;
-
-	uint64_t sid = 0;
-	data["uniqueid"] >> sid;
-
 	if (obj)
 		nc = anope_dynamic_static_cast<NickCore *>(obj);
 	else
-		nc = new NickCore(sdisplay, sid);
+		nc = new NickCore(data.Load("display"), data.Load<uint64_t>("uniqueid"));
 
-	data["pass"] >> nc->pass;
-	data["email"] >> nc->email;
-	data["language"] >> nc->language;
-	data["lastmail"] >> nc->lastmail;
-	data["registered"] >> nc->registered;
-	data["memomax"] >> nc->memos.memomax;
+	nc->pass = data.Load("pass");
+	nc->email = data.Load("email");
+	nc->language = data.Load("language");
+	nc->lastmail = data.Load<time_t>("lastmail");
+	nc->registered = data.Load<time_t>("registered", data.Load<time_t>("time_registered"));
+	nc->memos.memomax = data.Load<int16_t>("memomax");
 	{
-		Anope::string buf;
-		data["memoignores"] >> buf;
-		spacesepstream sep(buf);
 		nc->memos.ignores.clear();
-		while (sep.GetToken(buf))
+		spacesepstream sep(data.Load("memoignores"));
+		for (Anope::string buf; sep.GetToken(buf); )
 			nc->memos.ignores.insert(buf);
 	}
 
 	Extensible::ExtensibleUnserialize(nc, nc, data);
 
 	// Begin 1.9 compatibility.
-	bool b;
-	b = false;
-	data["extensible:PRIVATE"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:PRIVATE"))
 		nc->Extend<bool>("NS_PRIVATE");
-	b = false;
-	data["extensible:AUTOOP"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:AUTOOP"))
 		nc->Extend<bool>("AUTOOP");
-	b = false;
-	data["extensible:HIDE_EMAIL"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:HIDE_EMAIL"))
 		nc->Extend<bool>("HIDE_EMAIL");
-	b = false;
-	data["extensible:HIDE_QUIT"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:HIDE_QUIT"))
 		nc->Extend<bool>("HIDE_QUIT");
-	b = false;
-	data["extensible:MEMO_RECEIVE"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:MEMO_RECEIVE"))
 		nc->Extend<bool>("MEMO_RECEIVE");
-	b = false;
-	data["extensible:MEMO_SIGNON"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:MEMO_SIGNON"))
 		nc->Extend<bool>("MEMO_SIGNON");
-	b = false;
-	data["extensible:KILLPROTECT"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:KILLPROTECT"))
 		nc->Extend<bool>("PROTECT");
 	// End 1.9 compatibility
 
-
 	// Begin 2.0 compatibility.
-	b = false;
-	data["KILLPROTECT"] >> b;
-	if (b)
+	if (data.Load<bool>("KILLPROTECT"))
 	{
 		nc->Extend<bool>("PROTECT");
 		nc->Extend("PROTECT_AFTER", Config->GetModule("nickserv").Get<time_t>("kill", "60s"));
 	}
-	b = false;
-	data["KILL_QUICK"] >> b;
-	if (b)
+	if (data.Load<bool>("KILL_QUICK"))
 	{
 		nc->Extend<bool>("PROTECT");
 		nc->Extend("PROTECT_AFTER", Config->GetModule("nickserv").Get<time_t>("killquick", "20s"));
 	}
-	b = false;
-	data["KILL_IMMED"] >> b;
-	if (b)
+	if (data.Load<bool>("KILL_IMMED"))
 	{
 		nc->Extend<bool>("PROTECT");
 		nc->Extend("PROTECT_AFTER", 0);
 	}
 	// End 2.0 compatibility.
-
-	// Begin 2.1 compatibility.
-	if (nc->registered == Anope::CurTime)
-		data["time_registered"] >> nc->registered;
-	// End 2.1 compatibility.
 
 	return nc;
 }

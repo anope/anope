@@ -1139,10 +1139,10 @@ class CSSet final
 				return;
 
 			auto *ci = anope_dynamic_static_cast<ChannelInfo *>(s);
-			Anope::string modes;
-			data["last_modes"] >> modes;
 			ci->last_modes.clear();
-			for (spacesepstream sep(modes); sep.GetToken(modes);)
+
+			spacesepstream sep(data.Load("last_modes"));
+			for (Anope::string modes; sep.GetToken(modes);)
 			{
 				if (modes[0] == '+')
 				{

@@ -66,12 +66,13 @@ struct ExceptionType final
 			ex = anope_dynamic_static_cast<OperServ::Exception *>(obj);
 		else
 			ex = new OperServ::Exception();
-		data["mask"] >> ex->mask;
-		data["limit"] >> ex->limit;
-		data["who"] >> ex->who;
-		data["reason"] >> ex->reason;
-		data["time"] >> ex->time;
-		data["expires"] >> ex->expires;
+
+		ex->mask = data.Load("mask");
+		ex->limit = data.Load<unsigned>("limit");
+		ex->who = data.Load("who");
+		ex->reason = data.Load("reason");
+		ex->time = data.Load<time_t>("time");
+		ex->expires = data.Load<time_t>("expires");
 
 		if (!obj)
 			OperServ::session_service->AddException(ex);

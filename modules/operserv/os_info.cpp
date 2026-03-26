@@ -89,8 +89,7 @@ OperInfoImpl::~OperInfoImpl()
 
 Serializable *OperInfoTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string starget;
-	data["target"] >> starget;
+	const auto starget = data.Load("target");
 
 	Extensible *e = OperInfos::Find(starget);
 	if (!e)
@@ -105,9 +104,9 @@ Serializable *OperInfoTypeImpl::Unserialize(Serializable *obj, Serialize::Data &
 		o = new OperInfoImpl();
 		o->target = starget;
 	}
-	data["info"] >> o->info;
-	data["adder"] >> o->adder;
-	data["created"] >> o->created;
+	o->info = data.Load("info");
+	o->adder = data.Load("adder");
+	o->created = data.Load<time_t>("created");
 
 	if (!obj)
 		(*oi)->push_back(o);

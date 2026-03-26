@@ -88,30 +88,32 @@ struct KickerDataImpl final
 			auto *ci = anope_dynamic_static_cast<ChannelInfo *>(e);
 			auto *kd = ci->Require<BotServ::KickerData>(BOTSERV_KICKER_DATA_EXT);
 
-			data["kickerdata:amsgs"] >> kd->amsgs;
-			data["kickerdata:badwords"] >> kd->badwords;
-			data["kickerdata:bolds"] >> kd->bolds;
-			data["kickerdata:caps"] >> kd->caps;
-			data["kickerdata:colors"] >> kd->colors;
-			data["kickerdata:flood"] >> kd->flood;
-			data["kickerdata:italics"] >> kd->italics;
-			data["kickerdata:repeat"] >> kd->repeat;
-			data["kickerdata:reverses"] >> kd->reverses;
-			data["kickerdata:underlines"] >> kd->underlines;
+			kd->amsgs = data.Load<bool>("kickerdata:amsgs");
+			kd->badwords = data.Load<bool>("kickerdata:badwords");
+			kd->bolds = data.Load<bool>("kickerdata:bolds");
+			kd->caps = data.Load<bool>("kickerdata:caps");
+			kd->colors = data.Load<bool>("kickerdata:colors");
+			kd->flood = data.Load<bool>("kickerdata:flood");
+			kd->italics = data.Load<bool>("kickerdata:italics");
+			kd->repeat = data.Load<bool>("kickerdata:repeat");
+			kd->reverses = data.Load<bool>("kickerdata:reverses");
+			kd->underlines = data.Load<bool>("kickerdata:underlines");
 
-			data["capsmin"] >> kd->capsmin;
-			data["capspercent"] >> kd->capspercent;
-			data["floodlines"] >> kd->floodlines;
-			data["floodsecs"] >> kd->floodsecs;
-			data["repeattimes"] >> kd->repeattimes;
-			data["dontkickops"] >> kd->dontkickops;
-			data["dontkickvoices"] >> kd->dontkickvoices;
+			kd->capsmin = data.Load<int16_t>("capsmin");
+			kd->capspercent = data.Load<int16_t>("capspercent");
+			kd->floodlines = data.Load<int16_t>("floodlines");
+			kd->floodsecs = data.Load<int16_t>("floodsecs");
+			kd->repeattimes = data.Load<int16_t>("repeattimes");
+			kd->dontkickops = data.Load<bool>("dontkickops");
+			kd->dontkickvoices = data.Load<bool>("dontkickvoices");
 
-			Anope::string ttb, tok;
-			data["ttb"] >> ttb;
-			spacesepstream sep(ttb);
-			for (int i = 0; sep.GetToken(tok) && i < BotServ::TTB_SIZE; ++i)
+			spacesepstream sep(data.Load("ttb"));
+			for (size_t i = 0; i < BotServ::TTB_SIZE; ++i)
 			{
+				Anope::string tok;
+				if (!sep.GetToken(tok))
+					break;
+
 				if (auto n = Anope::TryConvert<int16_t>(tok))
 					kd->ttb[i] = n.value();
 			}

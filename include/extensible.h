@@ -185,7 +185,7 @@ public:
 	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 	{
 		T t;
-		if (data[this->name] >> t)
+		if (data.TryLoad(this->name, t))
 			this->Set(e, t);
 		else
 			this->Unset(e);
@@ -205,9 +205,7 @@ public:
 
 	void ExtensibleUnserialize(Extensible *e, Serializable *s, Serialize::Data &data) override
 	{
-		bool b = false;
-		data[this->name] >> b;
-		if (b)
+		if (data.Load<bool>(this->name))
 			this->Set(e);
 		else
 			this->Unset(e);

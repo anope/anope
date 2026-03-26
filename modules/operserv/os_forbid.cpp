@@ -113,14 +113,12 @@ Serializable *ForbidDataTypeImpl::Unserialize(Serializable *obj, Serialize::Data
 	else
 		fb = new ForbidDataImpl();
 
-	data["mask"] >> fb->mask;
-	data["creator"] >> fb->creator;
-	data["reason"] >> fb->reason;
-	data["created"] >> fb->created;
-	data["expires"] >> fb->expires;
-	Anope::string t;
-	data["type"] >> t;
-	fb->type = StringToType(t);
+	fb->mask = data.Load("mask");
+	fb->creator = data.Load("creator");
+	fb->reason = data.Load("reason");
+	fb->created = data.Load<time_t>("created");
+	fb->expires = data.Load<time_t>("expires");
+	fb->type = StringToType(data.Load("type"));
 
 	if (fb->type == OperServ::FT_SIZE)
 		return NULL;

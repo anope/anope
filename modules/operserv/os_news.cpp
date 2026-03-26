@@ -130,12 +130,10 @@ struct NewsItemType final
 		else
 			ni = new OperServ::NewsItem();
 
-		Anope::string t;
-		data["type"] >> t;
-		ni->type = StringToType(t);
-		data["text"] >> ni->text;
-		data["who"] >> ni->who;
-		data["time"] >> ni->time;
+		ni->type = StringToType(data.Load("type"));
+		ni->text = data.Load("text");
+		ni->who = data.Load("who");
+		ni->time = data.Load<time_t>("time");
 
 		if (!obj)
 			OperServ::news_service->AddNewsItem(ni);

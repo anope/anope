@@ -172,26 +172,18 @@ BadWordImpl::~BadWordImpl()
 
 Serializable *BadWordTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string sci, sword;
-
-	data["ci"] >> sci;
-	data["word"] >> sword;
-
-	ChannelInfo *ci = ChannelInfo::Find(sci);
+	auto *ci = ChannelInfo::Find(data.Load("ci"));
 	if (!ci)
 		return NULL;
-
-	Anope::string n;
-	data["type"] >> n;
 
 	BadWordImpl *bw;
 	if (obj)
 		bw = anope_dynamic_static_cast<BadWordImpl *>(obj);
 	else
 		bw = new BadWordImpl();
-	bw->chan = sci;
-	bw->word = sword;
-	bw->type = StringToType(n);
+	bw->chan = ci->name;
+	bw->word = data.Load("word");
+	bw->type = StringToType(data.Load("type"));
 
 	auto *bws = ci->Require<BadWordsImpl>(BOTSERV_BAD_WORDS_EXT);
 	if (!obj)

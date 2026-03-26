@@ -32,15 +32,11 @@ struct OSOperType
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		Anope::string stype, sname;
-
-		data["type"] >> stype;
-		data["name"] >> sname;
-
-		OperType *ot = OperType::Find(stype);
+		auto *ot = OperType::Find(data.Load("type"));
 		if (ot == NULL)
 			return NULL;
-		NickCore *nc = NickCore::Find(sname);
+
+		auto *nc = NickCore::Find(data.Load("name"));
 		if (nc == NULL)
 			return NULL;
 
@@ -49,6 +45,7 @@ struct OSOperType
 			myo = anope_dynamic_static_cast<OperServ::Oper *>(obj);
 		else
 			myo = new OperServ::Oper(nc->display, ot);
+
 		nc->o = myo;
 		Log(LOG_NORMAL, "operserv/oper") << "Tied oper " << nc->display << " to type " << ot->GetName();
 		return myo;

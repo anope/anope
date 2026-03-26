@@ -167,8 +167,8 @@ void NickAlias::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 	data.Store("last_quit", na->last_quit);
 	data.Store("last_userhost", na->last_userhost);
 	data.Store("last_userhost_real", na->last_userhost_real);
-	data.Store("registered", na->registered);
-	data.Store("last_seen", na->last_seen);
+	data.Store<time_t>("registered", na->registered);
+	data.Store<time_t>("last_seen", na->last_seen);
 	data.Store("ncid", na->nc->GetId());
 
 	if (na->HasVHost())
@@ -184,14 +184,9 @@ void NickAlias::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 
 Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string snc, snick;
-	uint64_t sncid = 0;
+	const auto sncid = data.Load<uint64_t>("ncid");
 
-	data["nc"] >> snc; // Deprecated 2.0 field
-	data["ncid"] >> sncid;
-	data["nick"] >> snick;
-
-	auto *core = sncid ? NickCore::FindId(sncid) : NickCore::Find(snc);
+	auto *core = sncid ? NickCore::FindId(sncid) : NickCore::Find(data.Load("nc"));
 	if (core == NULL)
 		return NULL;
 
@@ -199,7 +194,7 @@ Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &d
 	if (obj)
 		na = anope_dynamic_static_cast<NickAlias *>(obj);
 	else
-		na = new NickAlias(snick, core);
+		na = new NickAlias(data.Load("nick"), core);
 
 	if (na->nc != core)
 	{
@@ -216,40 +211,23 @@ Serializable *NickAlias::Type::Unserialize(Serializable *obj, Serialize::Data &d
 		core->aliases->push_back(na);
 	}
 
-	data["last_quit"] >> na->last_quit;
-	data["last_userhost"] >> na->last_userhost;
-	data["last_userhost_real"] >> na->last_userhost_real;
-	data["registered"] >> na->registered;
-	data["last_seen"] >> na->last_seen;
+	na->last_quit = data.Load("last_quit");
+	na->last_userhost = data.Load("last_userhost", data.Load("last_usermask"));
+	na->last_userhost_real = data.Load("last_userhost_real", data.Load("last_realhost"));
+	na->registered = data.Load<time_t>("registered", data.Load<time_t>("time_registered"));
+	na->last_seen = data.Load<time_t>("last_seen");
 
-	Anope::string vhost_ident, vhost_host, vhost_creator;
-	time_t vhost_time;
-
-	data["vhost_ident"] >> vhost_ident;
-	data["vhost_host"] >> vhost_host;
-	data["vhost_creator"] >> vhost_creator;
-	data["vhost_time"] >> vhost_time;
-
-	na->SetVHost(vhost_ident, vhost_host, vhost_creator, vhost_time);
+	na->SetVHost(data.Load("vhost_ident"), data.Load("vhost_host"), data.Load("vhost_creator"),
+		data.Load<time_t>("vhost_time"));
 
 	Extensible::ExtensibleUnserialize(na, na, data);
 
 	// Begin 1.9 compatibility.
-	bool b;
-	b = false;
-	data["extensible:NO_EXPIRE"] >> b;
-	if (b)
+	if (data.Load<bool>("extensible:NO_EXPIRE"))
 		na->Extend<bool>("NS_NO_EXPIRE");
 	// End 1.9 compatibility.
 
 	// Begin 2.0 compatibility.
-	if (na->last_userhost.empty())
-		data["last_usermask"] >> na->last_userhost;
-	if (na->last_userhost_real.empty())
-		data["last_realhost"] >> na->last_userhost_real;
-
-	if (na->registered == Anope::CurTime)
-		data["time_registered"] >> na->registered;
 	if (na->registered < na->nc->registered)
 		na->nc->registered = na->registered;
 	// End 2.0 compatibility.

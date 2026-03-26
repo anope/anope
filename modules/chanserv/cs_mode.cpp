@@ -270,11 +270,7 @@ void ModeLockTypeImpl::Serialize(Serializable *obj, Serialize::Data &data) const
 
 Serializable *ModeLockTypeImpl::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string sci;
-
-	data["ci"] >> sci;
-
-	ChannelInfo *ci = ChannelInfo::Find(sci);
+	auto *ci = ChannelInfo::Find(data.Load("ci"));
 	if (!ci)
 		return NULL;
 
@@ -287,11 +283,11 @@ Serializable *ModeLockTypeImpl::Unserialize(Serializable *obj, Serialize::Data &
 		ml->ci = ci->name;
 	}
 
-	data["set"] >> ml->set;
-	data["created"] >> ml->created;
-	data["setter"] >> ml->setter;
-	data["name"] >> ml->name;
-	data["param"] >> ml->param;
+	ml->set = data.Load<bool>("set");
+	ml->created = data.Load<time_t>("created");
+	ml->setter = data.Load("setter");
+	ml->name = data.Load("name");
+	ml->param = data.Load("param");
 
 	if (!obj)
 		ci->Require<ModeLocksImpl>(CHANSERV_MODE_LOCK_EXT)->mlocks->push_back(ml);

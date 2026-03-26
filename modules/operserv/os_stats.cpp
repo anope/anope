@@ -43,8 +43,8 @@ struct StatsType final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		data["maxusercnt"] >> MaxUserCount;
-		data["maxusertime"] >> MaxUserTime;
+		MaxUserCount = data.Load<size_t>("maxusercnt");
+		MaxUserTime = data.Load<time_t>("maxusertime");
 		return Stats::me;
 	}
 };

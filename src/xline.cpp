@@ -187,11 +187,7 @@ void XLine::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 
 Serializable *XLine::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string smanager;
-
-	data["manager"] >> smanager;
-
-	ServiceReference<XLineManager> xlm("XLineManager", smanager);
+	ServiceReference<XLineManager> xlm("XLineManager", data.Load("manager"));
 	if (!xlm)
 		return NULL;
 
@@ -199,10 +195,10 @@ Serializable *XLine::Type::Unserialize(Serializable *obj, Serialize::Data &data)
 	if (obj)
 	{
 		xl = anope_dynamic_static_cast<XLine *>(obj);
-		data["mask"] >> xl->mask;
-		data["by"] >> xl->by;
-		data["reason"] >> xl->reason;
-		data["uid"] >> xl->id;
+		xl->mask = data.Load("mask");
+		xl->by = data.Load("by");
+		xl->reason = data.Load("reason");
+		xl->id = data.Load("uid");
 
 		if (xlm != xl->manager)
 		{
@@ -212,20 +208,12 @@ Serializable *XLine::Type::Unserialize(Serializable *obj, Serialize::Data &data)
 	}
 	else
 	{
-		Anope::string smask, sby, sreason, suid;
-		time_t expires;
-
-		data["mask"] >> smask;
-		data["by"] >> sby;
-		data["reason"] >> sreason;
-		data["uid"] >> suid;
-		data["expires"] >> expires;
-
-		xl = new XLine(smask, sby, expires, sreason, suid);
+		xl = new XLine(data.Load("mask"), data.Load("by"), data.Load<time_t>("expires"),
+			data.Load("reason"), data.Load("uid"));
 		xlm->AddXLine(xl);
 	}
 
-	data["created"] >> xl->created;
+	xl->created = data.Load<time_t>("created");
 	xl->manager = xlm;
 
 	return xl;

@@ -111,9 +111,7 @@ struct SeenInfoType final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		Anope::string snick;
-
-		data["nick"] >> snick;
+		const auto snick = data.Load("nick");
 
 		SeenInfo *s;
 		if (obj)
@@ -127,14 +125,12 @@ struct SeenInfoType final
 		}
 
 		s->nick = snick;
-		data["vhost"] >> s->vhost;
-		Anope::string n;
-		data["type"] >> n;
-		s->type = StringToType(n);
-		data["nick2"] >> s->nick2;
-		data["channel"] >> s->channel;
-		data["message"] >> s->message;
-		data["last"] >> s->last;
+		s->vhost = data.Load("vhost");
+		s->type = StringToType(data.Load("type"));
+		s->nick2 = data.Load("nick2");
+		s->channel = data.Load("channel");
+		s->message = data.Load("message");
+		s->last = data.Load<time_t>("last");
 
 		if (!obj)
 			database[s->nick] = s;

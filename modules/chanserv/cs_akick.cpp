@@ -143,46 +143,34 @@ struct AutoKickType final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		Anope::string sci, snc;
-		uint64_t sncid = 0;
-
-		data["ci"] >> sci;
-		data["nc"] >> snc; // Deprecated 2.0 field
-		data["ncid"] >> sncid;
-
-		ChannelInfo *ci = ChannelInfo::Find(sci);
+		auto *ci = ChannelInfo::Find(data.Load("ci"));
 		if (!ci)
 			return NULL;
 
+		const auto sncid = data.Load<uint64_t>("ncid");
+		auto *nc = sncid ? NickCore::FindId(sncid) : NickCore::Find(data.Load("nc"));
+
+		const auto screator = data.Load("creator");
+		const auto smask = data.Load("mask");
+		const auto sreason = data.Load("reason");
+		const auto saddtime = data.Load<time_t>("addtime");
+		const auto slastused = data.Load<time_t>("last_used");
+
 		ChanServ::AutoKick *ak;
-		auto *nc = sncid ? NickCore::FindId(sncid) : NickCore::Find(snc);
 		if (obj)
 		{
 			ak = anope_dynamic_static_cast<ChanServ::AutoKick *>(obj);
-			data["creator"] >> ak->creator;
-			data["reason"] >> ak->reason;
+			ak->creator = screator;
+			ak->reason = sreason;
 			ak->nc = nc;
-			data["mask"] >> ak->mask;
-			data["addtime"] >> ak->addtime;
-			data["last_used"] >> ak->last_used;
+			ak->mask = smask;
+			ak->addtime = saddtime;
+			ak->last_used = slastused;
 		}
+		else if (nc)
+			ak = ChanServ::akick_service->AddAKick(ci, screator, nc, sreason, saddtime, slastused);
 		else
-		{
-			time_t addtime, lastused;
-			data["addtime"] >> addtime;
-			data["last_used"] >> lastused;
-
-			Anope::string screator, sreason, smask;
-
-			data["creator"] >> screator;
-			data["reason"] >> sreason;
-			data["mask"] >> smask;
-
-			if (nc)
-				ak = ChanServ::akick_service->AddAKick(ci, screator, nc, sreason, addtime, lastused);
-			else
-				ak = ChanServ::akick_service->AddAKick(ci, screator, smask, sreason, addtime, lastused);
-		}
+			ak = ChanServ::akick_service->AddAKick(ci, screator, smask, sreason, saddtime, slastused);
 
 		return ak;
 	}

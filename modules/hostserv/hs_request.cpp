@@ -75,10 +75,7 @@ struct HostRequestTypeImpl final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		Anope::string snick;
-		data["nick"] >> snick;
-
-		NickAlias *na = NickAlias::Find(snick);
+		auto *na = NickAlias::Find(data.Load("nick"));
 		if (na == NULL)
 			return NULL;
 
@@ -90,11 +87,11 @@ struct HostRequestTypeImpl final
 		if (req)
 		{
 			req->nick = na->nick;
-			data["ident"] >> req->ident;
-			data["host"] >> req->host;
-			data["time"] >> req->time;
-			data["validation_token"] >> req->validation_token;
-			data["last_validation"] >> req->last_validation;
+			req->ident = data.Load("ident");
+			req->host = data.Load("host");
+			req->time = data.Load<time_t>("time");
+			req->validation_token = data.Load("validation_token");
+			req->last_validation = data.Load<time_t>("last_validation");
 		}
 
 		return req;

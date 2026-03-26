@@ -77,23 +77,20 @@ struct CSMiscDataType
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		Anope::string sci, sname, sdata;
-
-		data["ci"] >> sci;
-		data["name"] >> sname;
-		data["data"] >> sdata;
-
-		ChannelInfo *ci = ChannelInfo::Find(sci);
+		auto *ci = ChannelInfo::Find(data.Load("ci"));
 		if (ci == NULL)
 			return NULL;
+
+		const auto sname = data.Load("name");
+		const auto sdata = data.Load("data");
 
 		CSMiscData *d = NULL;
 		if (obj)
 		{
 			d = anope_dynamic_static_cast<CSMiscData *>(obj);
 			d->object = ci->name;
-			data["name"] >> d->name;
-			data["data"] >> d->data;
+			d->name = sname;
+			d->data = sdata;
 		}
 		else
 		{

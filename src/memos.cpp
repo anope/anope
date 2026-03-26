@@ -56,9 +56,7 @@ void Memo::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 
 Serializable *Memo::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string owner;
-
-	data["owner"] >> owner;
+	const auto owner = data.Load("owner");
 
 	bool ischan;
 	MemoInfo *mi = MemoInfo::GetMemoInfo(owner, ischan);
@@ -75,11 +73,11 @@ Serializable *Memo::Type::Unserialize(Serializable *obj, Serialize::Data &data) 
 	}
 
 	m->owner = owner;
-	data["time"] >> m->time;
-	data["sender"] >> m->sender;
-	data["text"] >> m->text;
-	data["unread"] >> m->unread;
-	data["receipt"] >> m->receipt;
+	m->time = data.Load<time_t>("time");
+	m->sender = data.Load("sender");
+	m->text = data.Load("text");
+	m->unread = data.Load<bool>("unread");
+	m->receipt = data.Load<bool>("receipt");
 
 	if (obj == NULL)
 		mi->memos->push_back(m);

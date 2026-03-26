@@ -42,25 +42,22 @@ struct CSSuspendInfoType final
 
 	Serializable *Unserialize(Serializable *obj, Serialize::Data &data) const override
 	{
-		Anope::string schan;
-		data["chan"] >> schan;
-
 		CSSuspendInfo *si;
 		if (obj)
 			si = anope_dynamic_static_cast<CSSuspendInfo *>(obj);
 		else
 		{
-			ChannelInfo *ci = ChannelInfo::Find(schan);
+			auto *ci = ChannelInfo::Find(data.Load("chan"));
 			if (!ci)
 				return NULL;
 			si = ci->Extend<CSSuspendInfo>("CS_SUSPENDED");
-			data["chan"] >> si->what;
+			si->what = ci->name;
 		}
 
-		data["by"] >> si->by;
-		data["reason"] >> si->reason;
-		data["time"] >> si->when;
-		data["expires"] >> si->expires;
+		si->by = data.Load("by");
+		si->reason = data.Load("reason");
+		si->when = data.Load<time_t>("time");
+		si->expires = data.Load<time_t>("expires");
 		return si;
 	}
 };

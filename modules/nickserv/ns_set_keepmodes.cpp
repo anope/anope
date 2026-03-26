@@ -156,10 +156,10 @@ private:
 				return;
 
 			auto *nc = anope_dynamic_static_cast<NickCore *>(s);
-			Anope::string modes;
-			data["last_modes"] >> modes;
 			nc->last_modes.clear();
-			for (spacesepstream sep(modes); sep.GetToken(modes);)
+
+			spacesepstream sep(data.Load("last_modes"));
+			for (Anope::string modes; sep.GetToken(modes);)
 			{
 				if (modes[0] == '+')
 				{

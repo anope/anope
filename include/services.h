@@ -27,7 +27,7 @@
 #include <exception>
 #include <fstream>
 #include <functional>
-#include <iostream>
+#include <istream>
 #include <list>
 #include <map>
 #include <set>

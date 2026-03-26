@@ -184,13 +184,8 @@ void ChanAccess::Type::Serialize(Serializable *obj, Serialize::Data &data) const
 
 Serializable *ChanAccess::Type::Unserialize(Serializable *obj, Serialize::Data &data) const
 {
-	Anope::string provider, chan;
-
-	data["provider"] >> provider;
-	data["ci"] >> chan;
-
-	ServiceReference<AccessProvider> aprovider("AccessProvider", provider);
-	ChannelInfo *ci = ChannelInfo::Find(chan);
+	ServiceReference<AccessProvider> aprovider("AccessProvider", data.Load("provider"));
+	auto *ci = ChannelInfo::Find(data.Load("ci"));
 	if (!aprovider || !ci)
 		return NULL;
 
@@ -200,17 +195,14 @@ Serializable *ChanAccess::Type::Unserialize(Serializable *obj, Serialize::Data &
 	else
 		access = aprovider->Create();
 	access->ci = ci;
-	Anope::string m;
-	data["mask"] >> m;
-	access->SetMask(m, ci);
-	data["creator"] >> access->creator;
-	data["description"] >> access->description;
-	data["last_seen"] >> access->last_seen;
-	data["created"] >> access->created;
 
-	Anope::string adata;
-	data["data"] >> adata;
-	access->AccessUnserialize(adata);
+	access->SetMask(data.Load("mask"), ci);
+	access->creator = data.Load("creator");
+	access->description = data.Load("description");
+	access->last_seen = data.Load<time_t>("last_seen");
+	access->created = data.Load<time_t>("created");
+
+	access->AccessUnserialize(data.Load("data"));
 
 	if (!obj)
 		ci->AddAccess(access);

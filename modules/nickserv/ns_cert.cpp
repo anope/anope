@@ -648,6 +648,7 @@ private:
 	NSCertListImpl::ExtensibleItem certs;
 	CertServiceImpl cs;
 	NSCertInfoType cert_type;
+	SerializableExtensibleItem<bool> autologin;
 
 	bool CanLogin(User *u, NickCore *nc)
 	{
@@ -677,6 +678,7 @@ public:
 		, commandnssasetautologin(this)
 		, certs(this, NICKSERV_CERT_EXT)
 		, cs(this)
+		, autologin(this, "AUTOLOGIN")
 	{
 		if (!IRCD || !IRCD->CanCertFP)
 			throw ModuleException("Your IRCd does not support ssl client certificates");

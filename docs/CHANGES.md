@@ -1,5 +1,31 @@
 # Anope Change Log
 
+## Anope 2.1.23 (unreleased)
+
+### Changes
+
+* Added examples to several BotServ commands.
+
+* Added missing fields to the `RPL_STATSLINKINFO` output.
+
+* Added support for migrating access entries between systems (currently only `chanserv/flags` is supported).
+
+* Added the default levels to the `chanserv/levels` DESC help.
+
+* Changed access listing commands to only show their own access entries unless `ALL` is specified.
+
+* Fixed a non-translatable string which has been marked as translatable.
+
+* Fixed the missing AUTOLOGIN extension.
+
+* Fixed translating the help output when the flexible layout is used.
+
+* Improved the accuracy of the X-line expiry time in `operserv/stats`.
+
+* Updated the Portuguese translation.
+
+* Updated the Romanian translation.
+
 ## Anope 2.1.22 (2026-03-01)
 
 ### Breaking Changes

@@ -1327,6 +1327,21 @@ struct IRCDMessageFIdent : IRCDMessage
 	}
 };
 
+struct IRCDMessageFName
+	: IRCDMessage
+{
+	IRCDMessageFName(Module *creator)
+		: IRCDMessage(creator, "FNAME", 1)
+	{
+		SetFlag(IRCDMESSAGE_REQUIRE_USER);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params) anope_override
+	{
+		source.GetUser()->SetRealname(params[0]);
+	}
+};
+
 struct IRCDMessageKick : IRCDMessage
 {
 	IRCDMessageKick(Module *creator) : IRCDMessage(creator, "KICK", 3) { SetFlag(IRCDMESSAGE_SOFT_LIMIT); }
@@ -1909,6 +1924,7 @@ class ProtoInspIRCd3 : public Module
 	IRCDMessageEndburst message_endburst;
 	IRCDMessageFHost message_fhost;
 	IRCDMessageFIdent message_fident;
+	IRCDMessageFName message_fname;
 	IRCDMessageFJoin message_fjoin;
 	IRCDMessageFMode message_fmode;
 	IRCDMessageFTopic message_ftopic;
@@ -1939,8 +1955,8 @@ class ProtoInspIRCd3 : public Module
 		message_error(this), message_invite(this), message_kill(this), message_motd(this), message_notice(this),
 		message_part(this), message_privmsg(this), message_quit(this), message_stats(this), message_time(this),
 		message_away(this), message_capab(this), message_encap(this), message_endburst(this), message_fhost(this),
-		message_fident(this), message_fjoin(this), message_fmode(this), message_ftopic(this), message_idle(this),
-		message_ijoin(this), message_kick(this), message_metadata(this, use_server_side_topiclock, use_server_side_mlock, ircd_proto.maxlist),
+		message_fident(this), message_fname(this), message_fjoin(this), message_fmode(this), message_ftopic(this),
+		message_idle(this), message_ijoin(this), message_kick(this), message_metadata(this, use_server_side_topiclock, use_server_side_mlock, ircd_proto.maxlist),
 		message_mode(this), message_nick(this), message_opertype(this), message_ping(this), message_rsquit(this),
 		message_save(this), message_server(this), message_squit(this), message_uid(this)
 	{

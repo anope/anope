@@ -1709,6 +1709,21 @@ struct IRCDMessageFIdent final
 	}
 };
 
+struct IRCDMessageFName final
+	: IRCDMessage
+{
+	IRCDMessageFName(Module *creator)
+		: IRCDMessage(creator, "FNAME", 1)
+	{
+		SetFlag(FLAG_REQUIRE_USER);
+	}
+
+	void Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags) override
+	{
+		source.GetUser()->SetRealname(params[0]);
+	}
+};
+
 struct IRCDMessageKick final
 	: IRCDMessage
 {
@@ -2466,6 +2481,7 @@ class ProtoInspIRCd final
 	IRCDMessageEndburst message_endburst;
 	IRCDMessageFHost message_fhost;
 	IRCDMessageFIdent message_fident;
+	IRCDMessageFName message_fname;
 	IRCDMessageFJoin message_fjoin;
 	IRCDMessageFMode message_fmode;
 	IRCDMessageFTopic message_ftopic;
@@ -2517,6 +2533,7 @@ public:
 		, message_endburst(this)
 		, message_fhost(this)
 		, message_fident(this)
+		, message_fname(this)
 		, message_fjoin(this)
 		, message_fmode(this)
 		, message_ftopic(this)

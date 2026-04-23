@@ -31,11 +31,11 @@ NickCore::NickCore(const Anope::string &coredisplay, uint64_t coreid)
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
 
-	if (!NickCoreList->insert_or_assign(this->display, this).second)
+	if (!this->InsertUnique(*NickCoreList, this->display))
 		Log(LOG_DEBUG) << "Duplicate account " << this->display << " in NickCore table";
 
 	// Upgrading users may not have an account identifier.
-	if (this->uniqueid && !NickCoreIdList->insert_or_assign(this->uniqueid, this).second)
+	if (this->uniqueid && !this->InsertUnique(*NickCoreIdList, this->uniqueid))
 		Log(LOG_DEBUG) << "Duplicate account id " << this->uniqueid << " in NickCore table";
 
 	FOREACH_MOD(OnNickCoreCreate, (this));

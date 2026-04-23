@@ -37,7 +37,7 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
 	if (this->nick.equals_ci(nickcore->display))
 		nickcore->na = this;
 
-	if (!NickAliasList->insert_or_assign(this->nick, this).second)
+	if (!this->InsertUnique(*NickAliasList, this->nick))
 		Log(LOG_DEBUG) << "Duplicate nick " << this->nick << " in NickAlias table";
 
 	if (this->nc->o == NULL)

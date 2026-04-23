@@ -120,6 +120,12 @@ public:
 		{
 			if (this->sql)
 			{
+				if (!obj->ShouldCommit())
+				{
+					OnSerializableDestruct(obj);
+					continue; // Non-committable object.
+				}
+
 				Serialize::Type *s_type = obj->GetSerializableType();
 				if (!s_type)
 					continue;

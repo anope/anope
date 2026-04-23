@@ -412,6 +412,9 @@ public:
 		// Step 2: store the new data.
 		for (auto *item : Serializable::GetItems())
 		{
+			if (!item->ShouldCommit())
+				continue; // Non-committable object.
+
 			auto *s_type = item->GetSerializableType();
 			if (!s_type)
 				continue; // Provider has been unloaded.

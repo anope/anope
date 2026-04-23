@@ -74,12 +74,28 @@ private:
 	size_t last_commit = 0;
 	/* The last time this object was committed to the database */
 	time_t last_commit_time = 0;
+	/** Whether this object should be committed to the database. */
+	bool should_commit = false;
 
 protected:
 	Serializable(const Anope::string &serialize_type);
 	Serializable(const Serializable &);
 
 	Serializable &operator=(const Serializable &);
+
+	template<typename Container,
+		typename Key = typename Container::key_type,
+		typename Value = typename Container::mapped_type>
+	bool InsertUnique(Container &container, const Key &key)
+	{
+		auto res = container.emplace(key, static_cast<Value>(this));
+		if (res.second)
+			return true;
+
+		res.first->second->should_commit = false;
+		res.first->second = static_cast<Value>(this);
+		return false;
+	}
 
 public:
 	using Id = uint64_t;
@@ -91,6 +107,9 @@ public:
 	/** Marks the object as potentially being updated "soon".
 	 */
 	void QueueUpdate();
+
+	/** Determines whether the object should be committed to the database. */
+	bool ShouldCommit() const { return this->should_commit; }
 
 	bool IsCached(Serialize::Data &);
 	void UpdateCache(Serialize::Data &);

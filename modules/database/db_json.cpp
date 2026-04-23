@@ -413,11 +413,17 @@ public:
 		for (auto *item : Serializable::GetItems())
 		{
 			if (!item->ShouldCommit())
+			{
+				Log(LOG_DEBUG) << "Not committing dead " << item->GetSerializableName() << " object: " << item;
 				continue; // Non-committable object.
+			}
 
 			auto *s_type = item->GetSerializableType();
 			if (!s_type)
+			{
+				Log(LOG_DEBUG) << "Not committing orphaned " << item->GetSerializableName() << " object: " << item;
 				continue; // Provider has been unloaded.
+			}
 
 			// This should always be found because we create it in the previous step.
 			auto it = databases.find(s_type->GetOwner());

@@ -121,6 +121,7 @@ public:
 	 * @return The serializable object type
 	 */
 	Serialize::Type *GetSerializableType() const { return this->s_type; }
+	const auto &GetSerializableName() const { return this->s_name; }
 
 	static const std::list<Serializable *> &GetItems();
 };

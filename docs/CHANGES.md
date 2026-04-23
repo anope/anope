@@ -1,5 +1,21 @@
 # Anope Change Log
 
+## Anope 2.1.24 (unreleased)
+
+### Breaking Changes
+
+* If a database contains duplicate corrupt entries from a prior write failure the oldest ones will now be purged from the database. This is a destructive action so make sure you take a manual backup of your database before upgrading.
+
+* Removed support for storing the Anope database in Redis. The Redis code was extremely bitrotted, had not been tested in years, and to our knowledge has almost no (if any) users. It is recommended that db_redis users migrate to db_json or db_sql.
+
+### Changes
+
+* Fixed a rare crash in the ns_cert module.
+
+* Fixed the ns_cert module erasing certificate entries if using an old database.
+
+* Fixed users having the wrong real name in log messages on InspIRCd if it has been previously changed with `CHGNAME` or `SETNAME`.
+
 ## Anope 2.1.23 (2026-04-01)
 
 ### Changes

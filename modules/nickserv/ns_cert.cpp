@@ -207,6 +207,10 @@ public:
 			if (s->GetSerializableType()->GetName() != NICKCORE_TYPE)
 				return;
 
+			const auto certstr = data.Load("cert");
+			if (certstr.empty())
+				return; // Nothing to do.
+
 			auto *nc = anope_dynamic_static_cast<NickCore *>(e);
 			auto *cl = this->Require(nc);
 
@@ -219,7 +223,7 @@ public:
 			cl->certs.clear();
 
 			// Add the new cert list
-			spacesepstream sep(data.Load("cert"));
+			spacesepstream sep(certstr);
 			for (Anope::string buf; sep.GetToken(buf); )
 			{
 				auto *cert = new NSCertInfo(e);

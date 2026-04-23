@@ -98,7 +98,12 @@ CAN_QUICK="no"
 ###########################################################################
 
 while [ $# -ge 1 ] ; do
-	if [ $1 = "--help" ] ; then
+	OPTION=$1
+	while [ "${OPTION#-}" != "$OPTION" ]; do
+		OPTION="${OPTION#-}"
+	done
+
+	if [ "$OPTION" = "--help" ] ; then
 		echo "Config utility for Anope"
 		echo "------------------------"
 		echo "Syntax: ./Config [options]"
@@ -106,15 +111,15 @@ while [ $# -ge 1 ] ; do
 		echo "-nointro     Skip intro (disclaimer, etc)"
 		echo "-quick       Skip questions, go straight to cmake"
 		exit 0
-	elif [ $1 = "-devel" ] ; then
+	elif [ "$OPTION" = "devel" ] ; then
 		DEBUG="yes"
 		DEVEL="yes"
 		INSTDIR="$SOURCE_DIR/run"
-	elif [ $1 = "-nocache" ] ; then
+	elif [ "$OPTION" = "nocache" ] ; then
 		IGNORE_CACHE="1"
-	elif [ $1 = "-nointro" ] ; then
+	elif [ "$OPTION" = "nointro" ] ; then
 		NO_INTRO="1"
-	elif [ $1 = "-quick" -o $1 = "-q" ] ; then
+	elif [ "$OPTION" = "quick" -o "$OPTION" = "q" ] ; then
 		Load_Cache
 		if [ "$CAN_QUICK" = "yes" ] ; then
 			Run_Build_System

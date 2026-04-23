@@ -184,8 +184,8 @@ public:
 		FOREACH_MOD(OnNickClearCert, (this->nc));
 		for (const auto *cert : certs)
 		{
-			delete cert;
 			certmap.erase(cert->fingerprint);
+			delete cert;
 		}
 		this->certs.clear();
 	}
@@ -213,8 +213,8 @@ public:
 			// Delete the old cert list.
 			for (const auto *cert : cl->certs)
 			{
-				delete cert;
 				certmap.erase(cert->fingerprint);
+				delete cert;
 			}
 			cl->certs.clear();
 

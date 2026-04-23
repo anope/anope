@@ -88,9 +88,6 @@ public:
 	/* Unique ID (per type, not globally) for this object */
 	Id object_id = 0;
 
-	/* Only used by redis, to ignore updates */
-	unsigned short redis_ignore = 0;
-
 	/** Marks the object as potentially being updated "soon".
 	 */
 	void QueueUpdate();

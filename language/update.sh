@@ -21,7 +21,7 @@ find ../ \
 		-o -name '*.h' \
 		-o -name '*.conf' \
 	\) \
-	-exec \
+	-print0 | sort -z | xargs -0 -I {} \
 		xgettext \
 			--language=C++ \
 			--sort-output \
@@ -32,7 +32,7 @@ find ../ \
 			--keyword \
 			--keyword=_ \
 			--keyword=N_:1,2 \
-			{} +
+			{}
 
 for f in *.po
 do

@@ -8,7 +8,11 @@
 
 * Removed support for storing the Anope database in Redis. The Redis code was extremely bitrotted, had not been tested in years, and to our knowledge has almost no (if any) users. It is recommended that db_redis users migrate to db_json or db_sql.
 
+* SQL tables now use versioned prefixes by default. For the SQL database backends the default is `anope21_` and for ChanStats the default is `chanstats21_`. If you do not have a prefix explicitly set in your config you will need to add one it. Alternatively, you may also want to consider exporting to db_json and re-importing to update your SQL schema for the recent database layout changes.
+
 ### Changes
+
+* Changed the Config script to allow multiple dashes in front of options, i.e. `-quick` and `--quick` are now equivalent.
 
 * Fixed a rare crash in the ns_cert module.
 

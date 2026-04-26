@@ -29,43 +29,37 @@ Load_Cache () {
 }
 
 Run_Build_System () {
-	WITH_INST=""
-	WITH_RUN=""
-	WITH_PERM=""
-	EXTRA_INCLUDE=""
-	EXTRA_LIBS=""
+	BUILD_DIR="${SOURCE_DIR}/build"
+	CMAKE_COMMAND="${CMAKE:-cmake} -B ${BUILD_DIR} -S ${SOURCE_DIR}"
 
 	if [ "$INSTDIR" != "" ] ; then
-		WITH_INST="-DINSTDIR=$INSTDIR"
+		CMAKE_COMMAND="${CMAKE_COMMAND} -D INSTDIR=$INSTDIR"
 	fi
 
 	if [ "$RUNGROUP" != "" ] ; then
-		WITH_RUN="-DRUNGROUP=$RUNGROUP"
+		CMAKE_COMMAND="${CMAKE_COMMAND} -D RUNGROUP=$RUNGROUP"
 	fi
 
 	if [ "$UMASK" != "" ] ; then
-		WITH_PERM="-DDEFUMASK=$UMASK"
+		CMAKE_COMMAND="${CMAKE_COMMAND} -D DEFUMASK=$UMASK"
 	fi
 
 	if [ "$DEBUG" = "yes" ] ; then
-		BUILD_TYPE="-DCMAKE_BUILD_TYPE=Debug"
+		CMAKE_COMMAND="${CMAKE_COMMAND} -D CMAKE_BUILD_TYPE=Debug"
 	else
-		BUILD_TYPE="-DCMAKE_BUILD_TYPE=Release"
+		CMAKE_COMMAND="${CMAKE_COMMAND} -D CMAKE_BUILD_TYPE=Release"
 	fi
 
 	if [ "$EXTRA_INCLUDE_DIRS" != "" ] ; then
-		EXTRA_INCLUDE="-DEXTRA_INCLUDE=$EXTRA_INCLUDE_DIRS"
+		CMAKE_COMMAND="${CMAKE_COMMAND} -D EXTRA_INCLUDE=$EXTRA_INCLUDE_DIRS"
 	fi
 
 	if [ "$EXTRA_LIB_DIRS" != "" ] ; then
-		EXTRA_LIBS="-DEXTRA_LIBS=$EXTRA_LIB_DIRS"
+		CMAKE_COMMAND="${CMAKE_COMMAND} -D EXTRA_LIBS=$EXTRA_LIB_DIRS"
 	fi
 
-	BUILD_PATHS="-B ${SOURCE_DIR}/build ${SOURCE_DIR}"
-
-	CMAKE="cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $EXTRA_INCLUDE $EXTRA_LIBS $EXTRA_CONFIG_ARGS $BUILD_PATHS"
-	echo $CMAKE
-	$CMAKE
+	echo $CMAKE_COMMAND
+	$CMAKE_COMMAND
 
 	if [ $? -ne 0 ]; then
 		echo "You should fix these issues and then run ./Config -quick to rerun CMake."
@@ -73,11 +67,7 @@ Run_Build_System () {
 	fi
 
 	echo ""
-	if [ "$PWD" = "${SOURCE_DIR}/build" ]; then
-		echo "Now run make to build Anope."
-	else
-		echo "Now cd build, then run make to build Anope."
-	fi
+	echo "Now run 'make -C ${BUILD_DIR#"$PWD/"} install' to build and install Anope."
 }
 
 ###########################################################################

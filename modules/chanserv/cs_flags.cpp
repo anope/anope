@@ -599,7 +599,7 @@ public:
 			Privilege *p = PrivilegeManager::FindPrivilege(priv);
 			if (p == NULL)
 				continue;
-			source.Reply("  %c - %s", flag, Language::Translate(source.nc, p->desc.c_str()));
+			source.Reply("  %c - %s", flag, source.Translate(p->desc.c_str()));
 		}
 
 		return true;

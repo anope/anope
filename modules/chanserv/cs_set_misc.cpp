@@ -222,7 +222,7 @@ public:
 		{
 			this->SendSyntax(source);
 			source.Reply(" ");
-			source.Reply("%s", Language::Translate(source.nc, it->second.description.c_str()));
+			source.Reply("%s", source.Translate(it->second.description.c_str()));
 			return true;
 		}
 		return false;
@@ -237,8 +237,8 @@ public:
 
 		this->ClearSyntax();
 		this->SetSyntax(Anope::Format(
-			Language::Translate(source.nc, _("\037channel\037 [\037%s\037]")),
-			Language::Translate(source.nc, value)
+			source.Translate(_("\037channel\037 [\037%s\037]")),
+			source.Translate(value)
 		));
 
 		Command::SendSyntax(source);

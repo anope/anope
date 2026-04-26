@@ -1151,8 +1151,8 @@ public:
 		if (!ci)
 			return;
 
-		Anope::string enabled = Language::Translate(source.nc, _("Enabled"));
-		Anope::string disabled = Language::Translate(source.nc, _("Disabled"));
+		Anope::string enabled = source.Translate(_("Enabled"));
+		Anope::string disabled = source.Translate(_("Disabled"));
 		auto *kd = kickerdata.Get(ci);
 
 		if (kd && kd->badwords)

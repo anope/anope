@@ -669,7 +669,7 @@ public:
 		{
 			if (!show_all)
 				return;
-			mask = Anope::Format(Language::Translate(source.GetAccount(), _("%s [Invalid]")), mask.c_str());
+			mask = Anope::Format(source.Translate(_("%s [Invalid]")), mask.c_str());
 		}
 
 		ListFormatter::ListEntry entry;
@@ -835,7 +835,7 @@ private:
 					{
 						if (!show_all)
 							continue;
-						mask = Anope::Format(Language::Translate(source.GetAccount(), _("%s [Invalid]")), mask.c_str());
+						mask = Anope::Format(source.Translate(_("%s [Invalid]")), mask.c_str());
 					}
 
 					ListFormatter::ListEntry entry;

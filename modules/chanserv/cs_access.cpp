@@ -26,10 +26,10 @@ static inline void reset_levels(ChannelInfo *ci)
 static Anope::string LevelToString(CommandSource &source, int16_t level)
 {
 	if (level == ACCESS_INVALID)
-		return Language::Translate(source.GetAccount(), _("(disabled)"));
+		return source.Translate(_("(disabled)"));
 
 	if (level == ACCESS_FOUNDER)
-		return Language::Translate(source.GetAccount(), _("(founder only)"));
+		return source.Translate(_("(founder only)"));
 
 	return Anope::ToString(level);
 }
@@ -893,7 +893,7 @@ public:
 				ListFormatter::ListEntry entry;
 				entry["Name"] = p.name;
 				entry["Default"] = LevelToString(source, defaultLevels[p.name]);
-				entry["Description"] = Language::Translate(source.nc, p.desc.c_str());
+				entry["Description"] = source.Translate(p.desc.c_str());
 				list.AddEntry(entry);
 			}
 

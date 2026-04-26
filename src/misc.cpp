@@ -340,8 +340,8 @@ void ExampleWrapper::SendTo(CommandSource &source)
 			header = false;
 		}
 
-		const auto *trans_example = Language::Translate(source.nc, entry.example.c_str());
-		const auto *trans_description = Language::Translate(source.nc, entry.description.c_str());
+		const auto *trans_example = source.Translate(entry.example);
+		const auto *trans_description = source.Translate(entry.description);
 		if (flexible)
 		{
 			source.Reply("\002%s%s%s\002: %s", source.command.c_str(), *trans_example ? " " : "",
@@ -381,7 +381,7 @@ void HelpWrapper::SendTo(CommandSource &source)
 
 	for (const auto &[entry_name, entry_desc] :  entries)
 	{
-		const auto *trans_desc = Language::Translate(source.nc, entry_desc.c_str());
+		const auto *trans_desc = source.Translate(entry_desc);
 		if (flexible)
 		{
 			source.Reply("\002%s\002: %s", entry_name.c_str(), trans_desc);

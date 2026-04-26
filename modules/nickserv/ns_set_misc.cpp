@@ -253,7 +253,7 @@ public:
 
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply("%s", Language::Translate(source.nc, desc.c_str()));
+		source.Reply("%s", source.Translate(desc.c_str()));
 		return true;
 	}
 
@@ -265,7 +265,7 @@ public:
 			value = it->second.syntax.c_str();
 
 		this->ClearSyntax();
-		this->SetSyntax(Anope::Format("[\037%s\037]", Language::Translate(source.nc, value)));
+		this->SetSyntax(Anope::Format("[\037%s\037]", source.Translate(value)));
 
 		Command::SendSyntax(source);
 	}
@@ -294,8 +294,8 @@ public:
 
 		this->ClearSyntax();
 		this->SetSyntax(Anope::Format(
-			Language::Translate(source.nc, _("\037nickname\037 [\037%s\037]")),
-			Language::Translate(source.nc, value)
+			source.Translate(_("\037nickname\037 [\037%s\037]")),
+			source.Translate(value)
 		));
 
 		Command::SendSyntax(source);

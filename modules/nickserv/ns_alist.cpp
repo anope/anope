@@ -63,11 +63,11 @@ public:
 			Anope::string privstr;
 			if (ci->GetFounder() == nc)
 			{
-				privstr = Language::Translate(source.GetAccount(), _("Founder"));
+				privstr = source.Translate(_("Founder"));
 			}
 			else if (ci->GetSuccessor() == nc)
 			{
-				privstr += Language::Translate(source.GetAccount(), _("Successor"));
+				privstr += source.Translate(_("Successor"));
 			}
 
 			AccessGroup access = ci->AccessFor(nc, false);

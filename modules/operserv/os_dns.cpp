@@ -253,7 +253,7 @@ class CommandOSDNS final
 
 			ListFormatter::ListEntry entry;
 			entry["Server"] = s->GetName();
-			entry["Limit"] = s->GetLimit() ? Anope::ToString(s->GetLimit()) : Language::Translate(source.GetAccount(), _("None"));
+			entry["Limit"] = s->GetLimit() ? Anope::ToString(s->GetLimit()) : source.Translate(_("None"));
 
 			Anope::string ip_str;
 			for (const auto &ip : s->GetIPs())
@@ -264,14 +264,14 @@ class CommandOSDNS final
 			entry["IP"] = ip_str;
 
 			if (s->Active())
-				entry["State"] = Language::Translate(source.GetAccount(), _("Pooled/Active"));
+				entry["State"] = source.Translate(_("Pooled/Active"));
 			else if (s->Pooled())
-				entry["State"] = Language::Translate(source.GetAccount(), _("Pooled/Not Active"));
+				entry["State"] = source.Translate(_("Pooled/Not Active"));
 			else
-				entry["State"] = Language::Translate(source.GetAccount(), _("Unpooled"));
+				entry["State"] = source.Translate(_("Unpooled"));
 
 			if (!srv)
-				entry["State"] += Anope::string(" ") + Language::Translate(source.GetAccount(), _("(Split)"));
+				entry["State"] += Anope::string(" ") + source.Translate(_("(Split)"));
 
 			lf.AddEntry(entry);
 		}

@@ -90,6 +90,11 @@ public:
 	void Reply(int count, const char *singular, const char *plural, ...) ATTR_FORMAT(4, 5);
 	void Reply(const Anope::string &message);
 
+	const char *Translate(const char *message);
+	const char *Translate(const Anope::string &message);
+	const char *Translate(int count, const char *single, const char *plural);
+	const char *Translate(int count, const Anope::string &single, const Anope::string &plural);
+
 	bool HasCommand(const Anope::string &cmd);
 	bool HasPriv(const Anope::string &cmd);
 	bool IsServicesOper();

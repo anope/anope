@@ -945,9 +945,9 @@ public:
 		if (!m.second.empty())
 		{
 			if (m.first)
-				return Anope::Format(Language::Translate(source.GetAccount(), _("Gives you or the specified nick %s status on a channel")), m.second.c_str());
+				return Anope::Format(source.Translate(_("Gives you or the specified nick %s status on a channel")), m.second.c_str());
 			else
-				return Anope::Format(Language::Translate(source.GetAccount(), _("Removes %s status from you or the specified nick on a channel")), m.second.c_str());
+				return Anope::Format(source.Translate(_("Removes %s status from you or the specified nick on a channel")), m.second.c_str());
 		}
 		else
 			return "";

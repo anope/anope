@@ -91,7 +91,7 @@ public:
 
 			InfoFormatter info(source.nc);
 
-			info[_("Account")] = Anope::Format(Language::Translate(source.nc, _("%s (ID: %zu)")), na->nc->display.c_str(), na->nc->GetId());
+			info[_("Account")] = Anope::Format(source.Translate(_("%s (ID: %zu)")), na->nc->display.c_str(), na->nc->GetId());
 			info[_("Account registered")] = Anope::strftime(na->nc->registered, source.GetAccount());
 			info[_("Nick registered")] = Anope::strftime(na->registered, source.GetAccount());
 

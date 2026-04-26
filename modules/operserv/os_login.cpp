@@ -77,7 +77,7 @@ public:
 
 	Anope::string GetDesc(CommandSource &source) const override
 	{
-		return Anope::Format(Language::Translate(source.GetAccount(), _("Login to %s")), source.service->nick.c_str());
+		return Anope::Format(source.Translate(_("Login to %s")), source.service->nick.c_str());
 	}
 };
 
@@ -123,7 +123,7 @@ public:
 
 	Anope::string GetDesc(CommandSource &source) const override
 	{
-		return Anope::Format(Language::Translate(source.GetAccount(), _("Logout from %s")), source.service->nick.c_str());
+		return Anope::Format(source.Translate(_("Logout from %s")), source.service->nick.c_str());
 	}
 };
 

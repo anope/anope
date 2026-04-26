@@ -110,9 +110,9 @@ public:
 
 					auto &status = entry["Status"];
 					if (na->nc->HasExt("NS_SUSPENDED"))
-						status = Language::Translate(source.GetAccount(), _("Suspended"));
+						status = source.Translate(_("Suspended"));
 					else if (na->nc->HasExt("UNCONFIRMED"))
-						status = Language::Translate(source.GetAccount(), _("Unconfirmed"));
+						status = source.Translate(_("Unconfirmed"));
 					list.AddEntry(entry);
 				}
 				++count;

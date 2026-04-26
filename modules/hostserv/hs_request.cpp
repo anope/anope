@@ -401,7 +401,7 @@ public:
 				else
 					message = _("Your requested vhost has been rejected.");
 
-				MemoServ::service->Send(source.service->nick, nick, Language::Translate(source.GetAccount(), message.c_str()), true);
+				MemoServ::service->Send(source.service->nick, nick, source.Translate(message.c_str()), true);
 			}
 
 			source.Reply(_("VHost for %s has been rejected."), nick.c_str());

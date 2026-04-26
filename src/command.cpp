@@ -112,7 +112,7 @@ bool CommandSource::IsOper()
 
 void CommandSource::Reply(const char *message, ...)
 {
-	const char *translated_message = Language::Translate(this->nc, message);
+	const char *translated_message = Translate(message);
 
 	Anope::string buf;
 	ANOPE_FORMAT(message, translated_message, buf);
@@ -121,7 +121,7 @@ void CommandSource::Reply(const char *message, ...)
 
 void CommandSource::Reply(int count, const char *single, const char *plural, ...)
 {
-	const char *translated_message = Language::Translate(this->nc, count, single, plural);
+	const char *translated_message = Translate(count, single, plural);
 
 	Anope::string buf;
 	ANOPE_FORMAT(plural, translated_message, buf);
@@ -130,8 +130,28 @@ void CommandSource::Reply(int count, const char *single, const char *plural, ...
 
 void CommandSource::Reply(const Anope::string &message)
 {
-	const char *translated_message = Language::Translate(this->nc, message.c_str());
+	const char *translated_message = Translate(message.c_str());
 	this->reply->SendMessage(*this, translated_message);
+}
+
+const char *CommandSource::Translate(const char *message)
+{
+	return Language::Translate(GetAccount(), message);
+}
+
+const char *CommandSource::Translate(const Anope::string &message)
+{
+	return Language::Translate(GetAccount(), message.c_str());
+}
+
+const char *CommandSource::Translate(int count, const Anope::string &single, const Anope::string &plural)
+{
+	return Language::Translate(GetAccount(), count, single.c_str(), plural.c_str());
+}
+
+const char *CommandSource::Translate(int count, const char *single, const char *plural)
+{
+	return Language::Translate(GetAccount(), count, single, plural);
 }
 
 Command::Command(Module *o, const Anope::string &sname, size_t minparams, size_t maxparams) : Service(o, "Command", sname), max_params(maxparams), min_params(minparams), module(o)
@@ -160,7 +180,7 @@ void Command::SendSyntax(CommandSource &source)
 	const auto *monospace = !flexible && sourcenc && sourcenc->HasExt("NS_MONOSPACE") ? "\021" : "";
 
 	auto first = true;
-	Anope::string prefix = Language::Translate(source.GetAccount(), _("Syntax"));
+	Anope::string prefix = source.Translate(_("Syntax"));
 	Anope::string padding(prefix.utf8length(), ' ');
 	for (const auto &[syntax, predicate] : this->syntax)
 	{
@@ -171,14 +191,12 @@ void Command::SendSyntax(CommandSource &source)
 		{
 			first = false;
 			source.Reply("%s%s: \002%s %s\002", monospace, prefix.c_str(),
-				source.command.nobreak().c_str(),
-				Language::Translate(source.GetAccount(), syntax.c_str()));
+				source.command.nobreak().c_str(), source.Translate(syntax));
 		}
 		else
 		{
 			source.Reply("%s%s  \002%s %s\002", monospace, padding.c_str(),
-				source.command.nobreak().c_str(),
-				Language::Translate(source.GetAccount(), syntax.c_str()));
+				source.command.nobreak().c_str(), source.Translate(syntax));
 		}
 	}
 

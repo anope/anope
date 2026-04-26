@@ -509,7 +509,7 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		const auto &block = conf.GetModule(this);
-		prefix = block.Get<const Anope::string>("prefix", "anope_");
+		prefix = block.Get<const Anope::string>("prefix", "chanstats21_");
 		SmileysHappy = block.Get<const Anope::string>("SmileysHappy");
 		SmileysSad = block.Get<const Anope::string>("SmileysSad");
 		SmileysOther = block.Get<const Anope::string>("SmileysOther");

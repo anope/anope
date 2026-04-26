@@ -86,7 +86,7 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		const auto &block = conf.GetModule("chanstats");
-		prefix = block.Get<const Anope::string>("prefix", "anope_");
+		prefix = block.Get<const Anope::string>("prefix", "chanstats21_");
 		this->sql.SetServiceName(block.Get<const Anope::string>("engine"));
 	}
 

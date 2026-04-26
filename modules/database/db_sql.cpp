@@ -174,7 +174,7 @@ public:
 	{
 		const auto &block = conf.GetModule(this);
 		this->sql.SetServiceName(block.Get<const Anope::string>("engine"));
-		this->prefix = block.Get<const Anope::string>("prefix", "anope_db_");
+		this->prefix = block.Get<const Anope::string>("prefix", "anope21_");
 		this->import = block.Get<bool>("import");
 	}
 

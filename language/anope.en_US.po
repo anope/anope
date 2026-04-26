@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-26 18:23+0100\n"
-"PO-Revision-Date: 2026-03-19 00:00+0000\n"
+"POT-Creation-Date: 2026-04-26 18:25+0100\n"
+"PO-Revision-Date: 2026-04-26 18:25+0100\n"
 "Last-Translator: Sadie Powell <sadie@witchery.services>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -2435,7 +2435,8 @@ msgid "Available timezones in the %s region:"
 msgstr ""
 
 #: ../modules/chanserv/cs_enforce.cpp
-msgid "BANS enforced by "
+#, c-format
+msgid "BANS enforced by %s"
 msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
@@ -4317,7 +4318,8 @@ msgid "Kill a user"
 msgstr ""
 
 #: ../modules/chanserv/cs_enforce.cpp
-msgid "LIMIT enforced by "
+#, c-format
+msgid "LIMIT enforced by %s"
 msgstr ""
 
 #: ../modules/chanserv/cs_enforce.cpp
@@ -5718,11 +5720,13 @@ msgid "Puts an AKILL for every nick on the specified channel. It uses the entire
 msgstr ""
 
 #: ../modules/chanserv/cs_enforce.cpp
-msgid "REGONLY enforced by "
+#, c-format
+msgid "REGONLY enforced by %s"
 msgstr ""
 
 #: ../modules/chanserv/cs_enforce.cpp
-msgid "RESTRICTED enforced by "
+#, c-format
+msgid "RESTRICTED enforced by %s"
 msgstr ""
 
 #: ../modules/operserv/os_noop.cpp
@@ -6049,7 +6053,8 @@ msgid "SSL only enforced on %s."
 msgstr ""
 
 #: ../modules/chanserv/cs_enforce.cpp
-msgid "SSLONLY enforced by "
+#, c-format
+msgid "SSLONLY enforced by %s"
 msgstr ""
 
 #: ../modules/operserv/os_shutdown.cpp

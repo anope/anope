@@ -75,7 +75,7 @@ private:
 	/* The last time this object was committed to the database */
 	time_t last_commit_time = 0;
 	/** Whether this object should be committed to the database. */
-	bool should_commit = false;
+	bool should_commit = true;
 
 protected:
 	Serializable(const Anope::string &serialize_type);

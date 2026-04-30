@@ -22,10 +22,10 @@
 #include "xline.h"
 #include "access.h"
 
-using namespace Serialize;
+std::vector<Anope::string> Serialize::Type::TypeOrder;
 
-std::vector<Anope::string> Type::TypeOrder;
-std::map<Anope::string, Type *> Serialize::Type::Types;
+std::map<Anope::string, Serialize::Type *> Serialize::Type::Types;
+
 std::list<Serializable *> *Serializable::SerializableItems;
 
 void Serialize::RegisterTypes()
@@ -62,7 +62,7 @@ void Serialize::CheckTypes()
 
 Serializable::Serializable(const Anope::string &serialize_type)
 	: s_name(serialize_type)
-	, s_type(Type::Find(serialize_type))
+	, s_type(Serialize::Type::Find(serialize_type))
 {
 	if (SerializableItems == NULL)
 		SerializableItems = new std::list<Serializable *>();
@@ -145,7 +145,7 @@ void Serialize::Data::SetType(const Anope::string &key, Serialize::DataType dt)
 	this->types[key] = dt;
 }
 
-Type::Type(const Anope::string &n, Module *o)
+Serialize::Type::Type(const Anope::string &n, Module *o)
 	: name(n)
 	, owner(o)
 {
@@ -166,7 +166,7 @@ Type::Type(const Anope::string &n, Module *o)
 	}
 }
 
-Type::~Type()
+Serialize::Type::~Type()
 {
 	auto it = std::find(TypeOrder.begin(), TypeOrder.end(), this->name);
 	if (it != TypeOrder.end())
@@ -187,7 +187,7 @@ Type::~Type()
 	}
 }
 
-void Type::Create()
+void Serialize::Type::Create()
 {
 	if (created)
 		return;
@@ -196,17 +196,17 @@ void Type::Create()
 	created = true;
 }
 
-void Type::Check()
+void Serialize::Type::Check()
 {
 	FOREACH_MOD(OnSerializeTypeCheck, (this));
 }
 
-void Type::UpdateTimestamp()
+void Serialize::Type::UpdateTimestamp()
 {
 	this->timestamp = Anope::CurTime;
 }
 
-Type *Serialize::Type::Find(const Anope::string &name)
+Serialize::Type *Serialize::Type::Find(const Anope::string &name)
 {
 	auto it = Types.find(name);
 	if (it != Types.end())

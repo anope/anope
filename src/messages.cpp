@@ -24,14 +24,12 @@
 #include "channels.h"
 #include "numeric.h"
 
-using namespace Message;
-
-void Away::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Away::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	source.GetUser()->SetAway(params.empty() ? "" : params[0]);
 }
 
-void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Capab::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	if (params.size() == 1)
 	{
@@ -47,26 +45,26 @@ void Capab::Run(MessageSource &source, const std::vector<Anope::string> &params,
 	}
 }
 
-void Error::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Error::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	Anope::QuitReason = "Received an error from the uplink: " + params.back();
 	Anope::Quitting = true;
 	Log(LOG_TERMINAL) << Anope::QuitReason;
 }
 
-Ignore::Ignore(Module *creator, const Anope::string &mname)
+Message::Ignore::Ignore(Module *creator, const Anope::string &mname)
 	: IRCDMessage(creator, mname, 0)
 {
 	SetFlag(FLAG_SOFT_LIMIT);
 }
 
-void Ignore::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Ignore::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	Log(LOG_DEBUG_3) << "Intentionally ignoring " << name << " message";
 }
 
 
-void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Invite::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	User *targ = User::Find(params[0]);
 	Channel *c = Channel::Find(params[1]);
@@ -77,7 +75,7 @@ void Invite::Run(MessageSource &source, const std::vector<Anope::string> &params
 	FOREACH_MOD(OnInvite, (source.GetUser(), c, targ));
 }
 
-void Join::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Join::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	User *user = source.GetUser();
 	const Anope::string &channels = params[0];
@@ -111,7 +109,7 @@ void Join::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	}
 }
 
-void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, const Anope::string &modes, const std::vector<Anope::string> &modeparams, const std::list<SJoinUser> &users)
+void Message::Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, const Anope::string &modes, const std::vector<Anope::string> &modeparams, const std::list<SJoinUser> &users)
 {
 	bool created;
 	Channel *c = Channel::FindOrCreate(chan, created, ts ? ts : Anope::CurTime);
@@ -177,7 +175,7 @@ void Join::SJoin(MessageSource &source, const Anope::string &chan, time_t ts, co
 	}
 }
 
-void Kick::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Kick::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	const Anope::string &channel = params[0];
 	const Anope::string &users = params[1];
@@ -194,7 +192,7 @@ void Kick::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 		c->KickInternal(source, user, reason);
 }
 
-void Kill::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Kill::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	User *u = User::Find(params[0]);
 	BotInfo *bi;
@@ -237,7 +235,7 @@ void Message::Mode::Run(MessageSource &source, const std::vector<Anope::string> 
 }
 
 /* XXX We should cache the file somewhere not open/read/close it on every request */
-void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	Server *s = Server::Find(params[0]);
 	if (s != Me)
@@ -257,7 +255,7 @@ void MOTD::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	IRCD->SendNumeric(RPL_ENDOFMOTD, source.GetSource(), "End of /MOTD command.");
 }
 
-void Notice::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Notice::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	Anope::string message = params[1];
 
@@ -273,7 +271,7 @@ void Notice::Run(MessageSource &source, const std::vector<Anope::string> &params
 	}
 }
 
-void Part::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Part::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	User *u = source.GetUser();
 	const Anope::string &reason = params.size() > 1 ? params[1] : "";
@@ -295,12 +293,12 @@ void Part::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	}
 }
 
-void Ping::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Ping::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	IRCD->SendPong(params.size() > 1 ? params[1] : Me->GetSID(), params[0]);
 }
 
-void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	const Anope::string &receiver = params[0];
 	Anope::string message = params[1];
@@ -358,7 +356,7 @@ void Privmsg::Run(MessageSource &source, const std::vector<Anope::string> &param
 	return;
 }
 
-void Quit::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Quit::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	const Anope::string &reason = params[0];
 	User *user = source.GetUser();
@@ -368,7 +366,7 @@ void Quit::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	user->Quit(reason);
 }
 
-void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	Server *s = Server::Find(params[0]);
 
@@ -389,7 +387,7 @@ void SQuit::Run(MessageSource &source, const std::vector<Anope::string> &params,
 	s->Delete(s->GetName() + " " + s->GetUplink()->GetName());
 }
 
-void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Stats::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	User *u = source.GetUser();
 
@@ -439,7 +437,7 @@ void Stats::Run(MessageSource &source, const std::vector<Anope::string> &params,
 	return;
 }
 
-void Time::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Time::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	const auto *tm = localtime(&Anope::CurTime);
 	char timebuf[64];
@@ -448,7 +446,7 @@ void Time::Run(MessageSource &source, const std::vector<Anope::string> &params, 
 	IRCD->SendNumeric(RPL_TIME, source.GetSource(), Me->GetName(), timestr);
 }
 
-void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Topic::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	Channel *c = Channel::Find(params[0]);
 	if (c)
@@ -457,14 +455,14 @@ void Topic::Run(MessageSource &source, const std::vector<Anope::string> &params,
 	return;
 }
 
-void Version::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Version::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
 	IRCD->SendNumeric(RPL_VERSION, source.GetSource(), "Anope-" + Anope::Version(), Me->GetName(), Anope::Format("%s -(%s) -- %s",
 		IRCD->GetProtocolName().c_str(), enc ? enc->name.c_str() : "(none)", Anope::VersionBuildString().c_str()));
 }
 
-void Whois::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
+void Message::Whois::Run(MessageSource &source, const std::vector<Anope::string> &params, const Anope::map<Anope::string> &tags)
 {
 	User *u = User::Find(params[0]);
 

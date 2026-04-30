@@ -26,7 +26,6 @@
 using Configuration::File;
 using Configuration::Conf;
 using Configuration::Block;
-using Configuration::Uplink;
 
 File ServicesConf("anope.conf", false); // Configuration file name
 Conf *Config = NULL;
@@ -625,7 +624,7 @@ void Conf::Post(Conf *old)
 	}
 }
 
-Anope::string Uplink::str() const
+Anope::string Configuration::Uplink::str() const
 {
 	switch (protocol)
 	{

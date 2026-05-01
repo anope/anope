@@ -12,9 +12,15 @@
 
 ### Changes
 
+* Added some helper methods to `CommandSource` to allow quickly translting messages.
+
 * Changed the Config script to allow multiple dashes in front of options, i.e. `-quick` and `--quick` are now equivalent.
 
+* Converted some language strings to use format strings instead of concatenation.
+
 * Fixed a rare crash in the ns_cert module.
+
+* Fixed building Anope as a unity build.
 
 * Fixed the ns_cert module erasing certificate entries if using an old database.
 

@@ -31,23 +31,17 @@ private:
 	 */
 	time_t secs;
 
-	/** True if this is a repeating timer
-	 */
-	bool repeat;
-
 public:
 	/** Constructor, initializes the triggering time
 	 * @param time_from_now The number of seconds from now to trigger the timer
-	 * @param repeating Repeat this timer every time_from_now if this is true
 	 */
-	Timer(time_t time_from_now, bool repeating = false);
+	Timer(time_t time_from_now);
 
 	/** Constructor, initializes the triggering time
 	 * @param creator The creator of the timer
 	 * @param time_from_now The number of seconds from now to trigger the timer
-	 * @param repeating Repeat this timer every time_from_now if this is true
 	 */
-	Timer(Module *creator, time_t time_from_now, bool repeating = false);
+	Timer(Module *creator, time_t time_from_now);
 
 	/** Destructor, removes the timer from the list
 	 */
@@ -62,11 +56,6 @@ public:
 	 * @return The trigger time
 	 */
 	time_t GetTimer() const;
-
-	/** Returns true if the timer is set to repeat
-	 * @return Returns true if the timer is set to repeat
-	 */
-	bool GetRepeat() const;
 
 	/** Set the interval between ticks
 	 * @paramt t The new interval
@@ -86,7 +75,7 @@ public:
 	/** Called when the timer ticks
 	 * This should be overridden with something useful
 	 */
-	virtual void Tick() = 0;
+	virtual bool Tick() = 0;
 };
 
 /** This class manages sets of Timers, and triggers them at their defined times.

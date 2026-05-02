@@ -194,12 +194,13 @@ namespace DNS
 		/** Used to time out the query, xalls OnError and lets the TimerManager
 		 * delete this request.
 		 */
-		void Tick() override
+		bool Tick() override
 		{
 			Log(LOG_DEBUG_2) << "Resolver: timeout for query " << this->name;
 			Query rr(*this);
 			rr.error = ERROR_TIMEDOUT;
 			this->OnError(&rr);
+			return false;
 		}
 	};
 

@@ -218,11 +218,11 @@ class ModuleProxyScan final
 	{
 	public:
 		ConnectionTimeout(Module *c, time_t timeout)
-			: Timer(c, timeout, true)
+			: Timer(c, timeout)
 		{
 		}
 
-		void Tick() override
+		bool Tick() override
 		{
 			for (auto it = ProxyConnect::proxies.begin(), it_end = ProxyConnect::proxies.end(); it != it_end;)
 			{
@@ -232,6 +232,7 @@ class ModuleProxyScan final
 				if (p->created + this->GetSecs() < Anope::CurTime)
 					delete p;
 			}
+			return true;
 		}
 	} connectionTimeout;
 

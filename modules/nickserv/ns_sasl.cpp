@@ -29,7 +29,7 @@ public:
 
 	SASLService(Module *o)
 		: SASL::Service(o)
-		, Timer(o, 60, true)
+		, Timer(o, 60)
 	{
 	}
 
@@ -221,7 +221,7 @@ public:
 		this->SendMessage(session, "M", buf.empty() ? "" : buf.substr(1));
 	}
 
-	void Tick() override
+	bool Tick() override
 	{
 		for (auto it = badpasswords.begin(); it != badpasswords.end(); )
 		{
@@ -240,6 +240,7 @@ public:
 				sessions.erase(uid);
 			}
 		}
+		return true;
 	}
 };
 

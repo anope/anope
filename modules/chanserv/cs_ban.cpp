@@ -53,7 +53,7 @@ public:
 			&& bmask == this->mask;
 	}
 
-	void Tick() override
+	bool Tick() override
 	{
 		// We need to do this to prevent the remove-on-unban logic from double
 		// deleting the timer.
@@ -62,6 +62,8 @@ public:
 		Channel *c = Channel::Find(this->channel);
 		if (c)
 			c->RemoveMode(NULL, mode, this->mask);
+
+		return false;
 	}
 };
 

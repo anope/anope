@@ -1030,11 +1030,11 @@ class BanDataPurger final
 {
 public:
 	BanDataPurger(Module *o)
-		: Timer(o, 300, true)
+		: Timer(o, 300)
 	{
 	}
 
-	void Tick() override
+	bool Tick() override
 	{
 		Log(LOG_DEBUG) << "bs_main: Running bandata purger";
 
@@ -1048,6 +1048,7 @@ public:
 					c->Shrink<BanData>("bandata");
 			}
 		}
+		return true;
 	}
 };
 

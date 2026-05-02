@@ -61,16 +61,17 @@ public:
 		return na;
 	}
 
-	void Tick() override
+	bool Tick() override
 	{
 		if (!u || !na || !NickServ::service)
-			return;
+			return false;
 
 		/* If they identified or don't exist anymore, don't kill them. */
 		if (u->Account() == na->nc || u->timestamp > ts)
-			return;
+			return false;
 
 		NickServ::service->Collide(u, na);
+		return false;
 	}
 };
 
@@ -90,10 +91,11 @@ public:
 		n->Extend<bool>("HELD");
 	}
 
-	void Tick() override
+	bool Tick() override
 	{
 		if (na)
 			na->Shrink<bool>("HELD");
+		return false;
 	}
 };
 
@@ -133,8 +135,9 @@ public:
 		NickServReleases.erase(this->nick);
 	}
 
-	void Tick() override
+	bool Tick() override
 	{
+		return false;
 	}
 };
 

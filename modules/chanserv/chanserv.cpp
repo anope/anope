@@ -82,10 +82,10 @@ public:
 			/** Called when the delay is up
 			 * @param The current time
 			 */
-			void Tick() override
+			bool Tick() override
 			{
 				if (!c)
-					return;
+					return false; // Dead channel.
 
 				/* In the event we don't part */
 				c->RemoveMode(NULL, "SECRET");
@@ -101,6 +101,8 @@ public:
 				/* If someone has rejoined this channel in the meantime, don't part the bot */
 				else if (c->users.size() <= 1)
 					c->ci->bi->Part(c);
+
+				return false;
 			}
 		};
 

@@ -92,11 +92,12 @@ public:
 		{
 		}
 
-		void Tick() override
+		bool Tick() override
 		{
 			Channel *c = Channel::Find(chname);
 			if (c)
 				c->RemoveMode(NULL, "BAN", mask);
+			return false;
 		}
 	};
 

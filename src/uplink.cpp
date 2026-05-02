@@ -29,7 +29,7 @@ public:
 	{
 	}
 
-	void Tick() override
+	bool Tick() override
 	{
 		try
 		{
@@ -39,6 +39,7 @@ public:
 		{
 			Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (Anope::CurrentUplink + 1) << " (" << Config->Uplinks[Anope::CurrentUplink].str() << "): " << ex.GetReason();
 		}
+		return false;
 	}
 };
 

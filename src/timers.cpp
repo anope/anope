@@ -17,20 +17,18 @@
 
 std::multimap<time_t, Timer *> TimerManager::Timers;
 
-Timer::Timer(time_t time_from_now, bool repeating)
+Timer::Timer(time_t time_from_now)
 	: trigger(Anope::CurTime + std::abs(time_from_now))
 	, secs(time_from_now)
-	, repeat(repeating)
 {
 	if (time_from_now)
 		TimerManager::AddTimer(this);
 }
 
-Timer::Timer(Module *creator, time_t time_from_now, bool repeating)
+Timer::Timer(Module *creator, time_t time_from_now)
 	: owner(creator)
 	, trigger(Anope::CurTime + std::abs(time_from_now))
 	, secs(time_from_now)
-	, repeat(repeating)
 {
 	if (time_from_now)
 		TimerManager::AddTimer(this);
@@ -51,11 +49,6 @@ void Timer::SetTimer(time_t t)
 time_t Timer::GetTimer() const
 {
 	return trigger;
-}
-
-bool Timer::GetRepeat() const
-{
-	return repeat;
 }
 
 void Timer::SetSecs(time_t t)
@@ -104,9 +97,7 @@ void TimerManager::TickTimers()
 		if (t->GetTimer() > Anope::CurTime)
 			break;
 
-		t->Tick();
-
-		if (t->GetRepeat())
+		if (t->Tick())
 			t->SetTimer(Anope::CurTime + t->GetSecs());
 		else
 			delete t;

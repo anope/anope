@@ -125,7 +125,7 @@ public:
 		timeout = NULL;
 	}
 
-	void Tick() override
+	bool Tick() override
 	{
 		if (DConfig.defaultlevel != level)
 		{
@@ -146,6 +146,7 @@ public:
 
 			runDefCon();
 		}
+		return false;
 	}
 };
 

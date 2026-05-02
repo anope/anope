@@ -534,8 +534,9 @@ public:
 		}
 
 		/* Times out after a few seconds */
-		void Tick() override
+		bool Tick() override
 		{
+			return false;
 		}
 
 		void Reply(Packet *p) override
@@ -718,7 +719,7 @@ public:
 
 	MyManager(Module *creator)
 		: Manager(creator)
-		, Timer(300, true)
+		, Timer(300)
 		, serial(Anope::CurTime)
 		, cur_id(Anope::RandomNumber())
 	{
@@ -1011,7 +1012,7 @@ public:
 		return serial;
 	}
 
-	void Tick() override
+	bool Tick() override
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Purging DNS cache";
 
@@ -1025,6 +1026,7 @@ public:
 			if (req.created + static_cast<time_t>(req.ttl) < Anope::CurTime)
 				this->cache.erase(it);
 		}
+		return true;
 	}
 
 private:

@@ -28,6 +28,8 @@ private:
 	Anope::string mode;
 
 public:
+	bool ticked = false;
+
 	TempBan(time_t seconds, Channel *c, const Anope::string &banmask, const Anope::string &mod)
 		: Timer(me, seconds)
 		, channel(c->name)
@@ -53,6 +55,10 @@ public:
 
 	void Tick() override
 	{
+		// We need to do this to prevent the remove-on-unban logic from double
+		// deleting the timer.
+		ticked = true;
+
 		Channel *c = Channel::Find(this->channel);
 		if (c)
 			c->RemoveMode(NULL, mode, this->mask);
@@ -290,7 +296,7 @@ public:
 	{
 		for (const auto *tempban : tempbans)
 		{
-			if (tempban->Matches(c, cmode, param))
+			if (!tempban->ticked && tempban->Matches(c, cmode, param))
 			{
 				delete tempban;
 				break;

@@ -18,11 +18,8 @@
 std::multimap<time_t, Timer *> TimerManager::Timers;
 
 Timer::Timer(time_t time_from_now)
-	: trigger(Anope::CurTime + std::abs(time_from_now))
-	, secs(time_from_now)
+	: Timer(nullptr, time_from_now)
 {
-	if (time_from_now)
-		TimerManager::AddTimer(this);
 }
 
 Timer::Timer(Module *creator, time_t time_from_now)

@@ -3,7 +3,7 @@ and other useful contributions to Anope. These people, ordered by the number of
 contributions they have made, are:
 
   * Adam <adam@anope.org>
-  * Sadie Powell <sadie@witchery.services>
+  * Sadie Powell <sadie@sadiepowell.dev>
   * Robin Burchell <w00t@inspircd.org>
   * Naram Qashat <cyberbotx@anope.org>
   * Pieter Bootsma <geniusdex@anope.org>
@@ -20,8 +20,8 @@ contributions they have made, are:
   * Adam Kramer <ribosome@anope.org>
   * Attila Molnar <attilamolnar@hush.com>
   * Michael Wobst <wobst.michael@web.de>
-  * Matt Schatz <genius3000@g3k.solutions>
   * PeGaSuS <droider.pc@gmail.com>
+  * Matt Schatz <genius3000@g3k.solutions>
   * Mark Summers <mark@goopler.net>
   * Daniel Vassdal <shutter@canternet.org>
   * MatthewM <mcm@they-got.us>
@@ -49,6 +49,7 @@ contributions they have made, are:
   * Robert Scheck <robert@fedoraproject.org>
   * Dennis Friis <peavey@inspircd.org>
   * Filippo Cortigiani <simos@simosnap.org>
+  * KidProtect
   * Michał Zegan <webczat_200@poczta.onet.pl>
   * AlphaTech <alphat3ch@icloud.com>
   * Austin Ellis <siniStar@IRC4Fun.net>
@@ -71,7 +72,6 @@ contributions they have made, are:
   * Jason Foster <retsofaj@gmail.com>
   * Jeremy <jeremy@ssnet.ca>
   * Josh Soref
-  * KidProtect
   * KindOne <ineedalifetoday@live.com>
   * linuxdaemon
   * Mantas Mikulėnas <grawity@gmail.com>

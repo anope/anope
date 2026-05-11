@@ -6,77 +6,90 @@ on:
     types:
       - published
   schedule:
-    - cron: '0 0 * * 0'
+    - cron: 0 0 * * 0
   workflow_dispatch:
 jobs:
   build:
     if: "!contains(github.event.head_commit.message, '[skip windows ci]')"
     runs-on: windows-2025
     env:
+      BUILD_PATH: ${{ github.workspace }}\build
       BUILD_TYPE: ${{ github.event_name == 'release' && 'Release' || 'Debug' }}
+      CONAN_FILE: ${{ github.workspace }}\src\win32\conanfile.txt
       CONAN_HOME: ${{ github.workspace }}\build\conan
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install NSIS
+      - name: Setup MSVC
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+
+      - name: Setup NSIS
         uses: negrutiu/nsis-install@v3
         with:
           distro: official
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v3
-
       - name: Setup Conan
         uses: turtlebrowser/get-conan@v1.2
 
-      - name: Create Conan profile
+      - name: Create Conan configuration
         run: |-
           conan profile detect
           (Get-Content ${{ env.CONAN_HOME }}\profiles\default).replace('build_type=Release', 'build_type=${{ env.BUILD_TYPE }}') | Set-Content ${{ env.CONAN_HOME }}\profiles\default
           (Get-Content ${{ env.CONAN_HOME }}\profiles\default).replace('compiler.cppstd=14', 'compiler.cppstd=17') | Set-Content ${{ env.CONAN_HOME }}\profiles\default
+
           Write-Output 'core.sources:download_urls=["origin", "https://c3i.jfrog.io/artifactory/conan-center-backup-sources/"]' | Out-File -Append ${{ env.CONAN_HOME }}\global.conf
+          Write-Output 'tools.cmake.cmaketoolchain:generator=Ninja' | Out-File -Append ${{ env.CONAN_HOME }}\global.conf
+          Write-Output 'user.openssl:windows_use_jom=True' | Out-File -Append ${{ env.CONAN_HOME }}\global.conf
 
       - name: Try to restore libraries from the cache
+        if: github.event_name != 'release'
         uses: actions/cache/restore@v5
         id: library-cache
         with:
-          key: conan-${{ env.BUILD_TYPE }}-${{ hashFiles('src\win32\conanfile.txt') }}
-          path: ${{ env.CONAN_HOME }}\p
+          key: Conan VS${{ env.VisualStudioVersion }} ${{ env.BUILD_TYPE }} ${{ hashFiles(env.CONAN_FILE) }}
+          path: ${{ env.CONAN_HOME }}/p
 
       - name: Install libraries
-        run: |
-          (Get-Content ${{ github.workspace }}\src\win32\conanfile.txt).replace('##', '') | Set-Content ${{ github.workspace }}\src\win32\conanfile.txt
-          conan install ${{ github.workspace }}\src\win32 --build missing --deployer runtime_deploy --deployer-folder ${{ github.workspace }}\build\extradll --output-folder .
+        working-directory: ${{ env.BUILD_PATH }}
+        run: |-
+          (Get-Content ${{ env.CONAN_FILE }}).replace('##', '') | Set-Content ${{ env.CONAN_FILE }}
+          conan install ${{ env.CONAN_FILE }} --build missing --deployer runtime_deploy --deployer-folder extradll --output-folder .
+          conan cache clean "*"
 
       - name: Save libraries to the cache
-        if: ${{ steps.library-cache.outputs.cache-hit != 'true' }}
+        if: steps.library-cache.outputs.cache-hit != 'true' && github.event_name != 'release'
         uses: actions/cache/save@v5
         with:
           key: ${{ steps.library-cache.outputs.cache-primary-key }}
           path: ${{ env.CONAN_HOME }}\p
 
       - name: Run CMake
-        shell: cmd # work around a conan-io/conan-center-index bug #21823
-        working-directory: ${{ github.workspace }}\build
-        run: |
-          call ${{ github.workspace }}\conanbuild.bat
-          cmake -A x64 -D "CMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}" -D CMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -G "Visual Studio 17 2022" ..
+        working-directory: ${{ env.BUILD_PATH }}
+        run: |-
+          cmake -D "CMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}" `
+                -D "CMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake" `
+                -G "Ninja Multi-Config" `
+                -S "${{ github.workspace }}" `
+                -Wdeprecated `
+                -Wdev
 
-      - name: Build Anope
-        working-directory: ${{ github.workspace }}\build
-        run: |
-          msbuild PACKAGE.vcxproj /M:5 /P:Configuration=${{ env.BUILD_TYPE }} /P:Platform=x64 /VERBOSITY:MINIMAL
+      - name: Build installer
+        working-directory: ${{ env.BUILD_PATH }}
+        run: |-
+          ninja -f "build-${{ env.BUILD_TYPE }}.ninja" ${{ runner.debug == '1' && '-v' || '' }} package
 
       - name: Upload installer
-        if: "${{ github.event_name == 'release' }}"
-        working-directory: ${{ github.workspace }}\build
+        if: github.event_name == 'release'
+        working-directory: ${{ env.BUILD_PATH }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ github.event.release.tag_name }} $(Get-ChildItem anope-*.exe)
 
       - name: Upload artifact
-        if: "${{ github.event_name != 'release' }}"
+        if: github.event_name != 'release'
         uses: actions/upload-artifact@v7
         with:
           name: windows-installer

@@ -91,7 +91,8 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	auto pbuf = Anope::ExpandData("runtime/" + modname + DLL_EXT ".XXXXXX");
 	if (!fs::copy_file(modpath.str(), pbuf.str(), fs::copy_options::overwrite_existing, ec) || ec)
 	{
-		Log(LOG_TERMINAL) << "Error while loading " << modname << ": " << ec.message();
+		Log(LOG_TERMINAL) << "Error while copying " << modname << " from " << modpath
+			<< " to " << pbuf << ": " << ec.message();
 		return MOD_ERR_FILE_IO;
 	}
 #else

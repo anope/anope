@@ -88,7 +88,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 #ifdef _WIN32
 	/* Generate the filename for the temporary copy of the module */
-	auto pbuf = Anope::ExpandData("runtime/" + modname + DLL_EXT ".XXXXXX");
+	auto pbuf = Anope::ExpandData("runtime/" + modname + "." + Anope::ToString(Anope::CurTime) + DLL_EXT);
 	if (!fs::copy_file(modpath.str(), pbuf.str(), fs::copy_options::overwrite_existing, ec) || ec)
 	{
 		Log(LOG_TERMINAL) << "Error while copying " << modname << " from " << modpath

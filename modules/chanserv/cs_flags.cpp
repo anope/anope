@@ -428,7 +428,7 @@ class CommandCSFlags final
 			std::set<char> newflags;
 			for (auto &[priv, flag] : defaultFlags)
 			{
-				if (access->HasPriv(priv))
+				if (!access->HasPriv(priv))
 					continue; // Source doesn't have this flag.
 
 				// Check that the source has access to set this entry.

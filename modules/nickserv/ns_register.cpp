@@ -275,18 +275,28 @@ public:
 			return;
 		}
 
-		auto *passcode = nc->GetExt<Anope::string>("passcode");
-		if (!passcode)
+		if (!nc->HasExt("UNCONFIRMED"))
 		{
 			source.Reply(_("There is no registration confirmation pending for %s."),
 				na->nick.c_str());
 			return;
 		}
-		if (!code.empty() && !code.equals_cs(*passcode))
+
+		if (!code.empty())
 		{
-			source.Reply(_("The registration confirmation code you specified for %s is incorrect."),
-				na->nick.c_str());
-			return;
+			auto *passcode = nc->GetExt<Anope::string>("passcode");
+			if (passcode && !code.equals_cs(*passcode))
+			{
+				source.Reply(_("The registration confirmation code you specified for %s is incorrect."),
+					na->nick.c_str());
+				return;
+			}
+			else if (!passcode)
+			{
+				source.Reply(_("The registration of %s can only be confirmed by an administrator."),
+					na->nick.c_str());
+				return;
+			}
 		}
 
 		nc->Shrink<Anope::string>("passcode");

@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-26 18:25+0100\n"
-"PO-Revision-Date: 2026-04-26 18:25+0100\n"
+"POT-Creation-Date: 2026-05-14 09:44+0100\n"
+"PO-Revision-Date: 2026-05-14 09:44+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -7232,6 +7232,11 @@ msgstr ""
 #: ../modules/nickserv/ns_register.cpp
 #, c-format
 msgid "The registration confirmation code you specified for %s is incorrect."
+msgstr ""
+
+#: ../modules/nickserv/ns_register.cpp
+#, c-format
+msgid "The registration of %s can only be confirmed by an administrator."
 msgstr ""
 
 #: ../modules/nickserv/ns_info.cpp

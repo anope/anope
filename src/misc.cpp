@@ -686,7 +686,9 @@ Anope::string Anope::strftime(time_t t, const NickCore *nc, bool short_output)
 	}
 
 	char buf[256];
-	strftime(buf, sizeof(buf), "%c", (nc ? localtime(&t) : gmtime(&t)));
+	const auto *ts = nc ? localtime(&t) : gmtime(&t);
+	if (!ts || !strftime(buf, sizeof(buf), "%c", ts))
+		snprintf(buf, sizeof(buf), "(invalid timestamp)");
 
 	if (nc)
 	{

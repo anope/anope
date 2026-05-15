@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-15 08:42+0100\n"
-"PO-Revision-Date: 2026-05-15 08:42+0100\n"
+"POT-Creation-Date: 2026-05-15 09:05+0100\n"
+"PO-Revision-Date: 2026-05-15 09:05+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -129,9 +129,14 @@ msgstr ""
 msgid "%s already exists on the EXCEPTION list."
 msgstr ""
 
-#: ../include/language.h
+#: ../modules/chanserv/cs_flags.cpp
 #, c-format
-msgid "%s can not be migrated to the %s access system because they have privileges that you do not or they have no migratable privileges."
+msgid "%s can not be migrated to the %s access system because they have no migratable privileges."
+msgstr ""
+
+#: ../modules/chanserv/cs_flags.cpp
+#, c-format
+msgid "%s can not be migrated to the %s access system because they have privileges that you do not."
 msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
@@ -215,7 +220,7 @@ msgstr ""
 msgid "%s has been joined to %s."
 msgstr ""
 
-#: ../include/language.h
+#: ../modules/chanserv/cs_flags.cpp
 #, c-format
 msgid "%s has been migrated to the %s access system."
 msgstr ""
@@ -428,14 +433,21 @@ msgstr ""
 msgid "%s will now permanently be ignored."
 msgstr ""
 
-#: ../include/language.h
+#: ../modules/chanserv/cs_flags.cpp
 #, c-format
-msgid "%u entry can not be migrated to the %s access system because they have privileges that you do not."
-msgid_plural "%u entries can not be migrated to the %s access system because they have privileges that you do not or they have no migratable privileges."
+msgid "%u entry can not be migrated to the %s access system because they have no migratable privileges."
+msgid_plural "%u entries can not be migrated to the %s access system because they have no migratable privileges."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../include/language.h
+#: ../modules/chanserv/cs_flags.cpp
+#, c-format
+msgid "%u entry can not be migrated to the %s access system because they have privileges that you do not."
+msgid_plural "%u entries can not be migrated to the %s access system because they have privileges that you do not."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../modules/chanserv/cs_flags.cpp
 #, c-format
 msgid "%u entry has been migrated to the %s access system."
 msgid_plural "%u entries have been migrated to the %s access system."

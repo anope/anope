@@ -14,6 +14,13 @@
 
 #include "module.h"
 
+#define FLAGS_MIGRATED_1        _("\002%s\002 has been migrated to the %s access system.")
+#define FLAGS_MIGRATED_N       N_("\002%u\002 entry has been migrated to the %s access system.", "\002%u\002 entries have been migrated to the %s access system.")
+#define FLAGS_NOT_MIGRATABLE_1  _("\002%s\002 can not be migrated to the %s access system because they have no migratable privileges.")
+#define FLAGS_NOT_MIGRATABLE_N N_("\002%u\002 entry can not be migrated to the %s access system because they have no migratable privileges.", "\002%u\002 entries can not be migrated to the %s access system because they have no migratable privileges.")
+#define FLAGS_NOT_MIGRATED_1    _("\002%s\002 can not be migrated to the %s access system because they have privileges that you do not.")
+#define FLAGS_NOT_MIGRATED_N   N_("\002%u\002 entry can not be migrated to the %s access system because they have privileges that you do not.", "\002%u\002 entries can not be migrated to the %s access system because they have privileges that you do not.")
+
 static std::map<Anope::string, char> defaultFlags;
 static Anope::map<Anope::string> migrationRequires;
 
@@ -414,8 +421,8 @@ class CommandCSFlags final
 		auto override = false;
 		const auto source_access = source.AccessFor(ci);
 
-		unsigned migrated = 0, notmigrated = 0;
-		Anope::string migratedmask, notmigratedmask;
+		unsigned migrated = 0, notmigratable = 0, notmigrated = 0;
+		Anope::string migratedmask, notmigratablemask, notmigratedmask;
 		const auto &entry = params.size() > 2 ? params[2] : "*";
 		for (auto idx = ci->GetAccessCount(); idx > 0; --idx)
 		{
@@ -458,8 +465,8 @@ class CommandCSFlags final
 
 			if (newflags.empty())
 			{
-				notmigrated++;
-				notmigratedmask = access->Mask();
+				notmigratable++;
+				notmigratablemask = access->Mask();
 				Log(LOG_DEBUG) << access->Mask() << " has " << access->AccessSerialize() << " that can not be migrated to flags";
 				continue; // No privs that are migratable
 			}
@@ -485,18 +492,23 @@ class CommandCSFlags final
 		if (migrated == 1)
 		{
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to migrate " << migratedmask;
-			source.Reply(CHAN_ACCESS_MIGRATED_1, migratedmask.c_str(), source.command.nobreak().c_str());
+			source.Reply(FLAGS_MIGRATED_1, migratedmask.c_str(), source.command.nobreak().c_str());
 		}
 		else if (migrated > 1)
 		{
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to migrate " << migrated << " access entries";
-			source.Reply(migrated, CHAN_ACCESS_MIGRATED_N, migrated, source.command.nobreak().c_str());
+			source.Reply(migrated, FLAGS_MIGRATED_N, migrated, source.command.nobreak().c_str());
 		}
 
+		if (notmigratable == 1)
+			source.Reply(FLAGS_NOT_MIGRATABLE_1, notmigratablemask.c_str(), source.command.nobreak().c_str());
+		else if (notmigratable > 1)
+			source.Reply(notmigratable, FLAGS_NOT_MIGRATABLE_N, notmigratable, source.command.nobreak().c_str());
+
 		if (notmigrated == 1)
-			source.Reply(CHAN_ACCESS_NOT_MIGRATED_1, notmigratedmask.c_str(), source.command.nobreak().c_str());
+			source.Reply(FLAGS_NOT_MIGRATED_1, notmigratedmask.c_str(), source.command.nobreak().c_str());
 		else if (notmigrated > 1)
-			source.Reply(migrated, CHAN_ACCESS_NOT_MIGRATED_N, notmigrated, source.command.nobreak().c_str());
+			source.Reply(notmigrated, FLAGS_NOT_MIGRATED_N, notmigrated, source.command.nobreak().c_str());
 	}
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)

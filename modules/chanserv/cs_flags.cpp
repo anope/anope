@@ -476,10 +476,11 @@ class CommandCSFlags final
 
 			auto *newaccess = anope_dynamic_static_cast<FlagsChanAccess *>(FlagsAccessProvider::ap->Create());
 			newaccess->SetMask(access->Mask(), ci);
+			newaccess->created = access->created;
 			newaccess->creator = access->creator;
 			newaccess->description = access->description;
-			newaccess->created = access->created;
 			newaccess->flags = newflags;
+			newaccess->last_seen = access->last_seen;
 
 			ci->EraseAccess(idx - 1);
 			FOREACH_MOD(OnAccessDel, (ci, source, access, true));

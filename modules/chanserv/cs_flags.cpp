@@ -15,6 +15,7 @@
 #include "module.h"
 
 static std::map<Anope::string, char> defaultFlags;
+static Anope::map<Anope::string> migrationRequires;
 
 class FlagsChanAccess final
 	: public ChanAccess
@@ -438,13 +439,29 @@ class CommandCSFlags final
 					{
 						notmigrated++;
 						notmigratedmask = access->Mask();
+						Log(LOG_DEBUG) << source.GetNick() << " does not have the access to migrate " << access->Mask() << " to flags";
 						continue; // No privs
 					}
 
 					override = true;
 				}
 
+				auto req = migrationRequires.find(priv);
+				if (req != migrationRequires.end() && !access->HasPriv(req->second))
+				{
+					Log(LOG_DEBUG) << access->Mask() << " has " << priv << " but not " << req->second << " so it will be lost on migration to flags";
+					continue; // Required flag missing.
+				}
+
 				newflags.insert(flag);
+			}
+
+			if (newflags.empty())
+			{
+				notmigrated++;
+				notmigratedmask = access->Mask();
+				Log(LOG_DEBUG) << access->Mask() << " has " << access->AccessSerialize() << " that can not be migrated to flags";
+				continue; // No privs that are migratable
 			}
 
 			migrated++;
@@ -637,6 +654,10 @@ public:
 			const Anope::string &value = priv.Get<const Anope::string>("flag");
 			if (value.empty())
 				continue;
+
+			const auto &migration_requires = priv.Get<const Anope::string>("flag_migration_requires");
+			if (!migration_requires.empty())
+				migrationRequires[p->name] = migration_requires;
 
 			defaultFlags[p->name] = value[0];
 		}

@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-14 09:44+0100\n"
-"PO-Revision-Date: 2026-05-14 09:44+0100\n"
+"POT-Creation-Date: 2026-05-15 08:42+0100\n"
+"PO-Revision-Date: 2026-05-15 08:42+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -131,7 +131,7 @@ msgstr ""
 
 #: ../include/language.h
 #, c-format
-msgid "%s can not be migrated to the %s access system because they have privileges that you do not."
+msgid "%s can not be migrated to the %s access system because they have privileges that you do not or they have no migratable privileges."
 msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
@@ -431,7 +431,7 @@ msgstr ""
 #: ../include/language.h
 #, c-format
 msgid "%u entry can not be migrated to the %s access system because they have privileges that you do not."
-msgid_plural "%u entries can not be migrated to the %s access system because they have privileges that you do not."
+msgid_plural "%u entries can not be migrated to the %s access system because they have privileges that you do not or they have no migratable privileges."
 msgstr[0] ""
 msgstr[1] ""
 

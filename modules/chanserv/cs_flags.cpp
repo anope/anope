@@ -419,7 +419,6 @@ class CommandCSFlags final
 	void DoMigrate(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		auto override = false;
-		const auto source_access = source.AccessFor(ci);
 
 		unsigned migrated = 0, notmigratable = 0, notmigrated = 0;
 		Anope::string migratedmask, notmigratablemask, notmigratedmask;
@@ -440,6 +439,7 @@ class CommandCSFlags final
 					continue; // Source doesn't have this flag.
 
 				// Check that the source has access to set this entry.
+				const auto source_access = source.AccessFor(ci);
 				if (!override && !source_access.HasPriv(priv) && !source_access.founder)
 				{
 					if (!source.HasPriv("chanserv/access/modify"))

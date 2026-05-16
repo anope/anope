@@ -1,6 +1,22 @@
 # Anope Change Log
 
-## Anope 2.1.24 (unreleased)
+## Anope 2.1.25 (unreleased)
+
+### Changes
+
+* Fixed a crash when a temporary ban expires.
+
+* Fixed a potential crash caused by unusual timestamps being passed to `Anope::strftime`.
+
+* Fixed confirming accounts when `{ns_register}:registration` is set to "admin".
+
+* Fixed migrating access entries from xop to flags granting new privileges in cases where multiple privileges share the same flag.
+
+* Fixed migrating access entries sometimes giving the wrong flags.
+
+* Fixed not being able to update the description of a flags access entry.
+
+## Anope 2.1.24 (2026-04-01)
 
 ### Breaking Changes
 

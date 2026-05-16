@@ -311,8 +311,8 @@ class CommandCSFlags final
 			return;
 		auto *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
 		access->SetMask(mask, ci);
-			access->creator = source.GetNick();
-		access->description = current ? current->description : description;
+		access->creator = source.GetNick();
+		access->description = current && description.empty() ? current->description : description;
 		access->last_seen = current ? current->last_seen : 0;
 		access->created = Anope::CurTime;
 		access->flags = current_flags;

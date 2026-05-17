@@ -66,7 +66,7 @@ public:
 		}
 
 		time_t nickregdelay = Config->GetModule(this->owner).Get<time_t>("nickregdelay");
-		time_t reg_delay = Config->GetModule("nickserv").Get<time_t>("regdelay");
+		time_t reg_delay = Config->GetModule("nickserv").Get<time_t>("regdelay", "15m");
 		if (u && !u->HasMode("OPER") && nickregdelay && Anope::CurTime - u->timestamp < nickregdelay)
 		{
 			auto waitperiod = (u->timestamp + nickregdelay) -  Anope::CurTime;

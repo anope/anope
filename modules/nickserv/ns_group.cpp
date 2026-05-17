@@ -145,8 +145,9 @@ public:
 		}
 
 		NickAlias *target, *na = NickAlias::Find(source.GetNick());
-		time_t reg_delay = Config->GetModule("nickserv").Get<time_t>("regdelay");
-		auto maxaliases = Config->GetModule(this->owner).Get<unsigned>("maxaliases");
+		auto &modconf = Config->GetModule(this->owner);
+		time_t reg_delay = modconf.Get<time_t>("delay", Config->GetModule("nickserv").Get<time_t>("regdelay", "5m"));
+		auto maxaliases = modconf.Get<unsigned>("maxaliases");
 		if (!(target = NickAlias::Find(nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (user && Anope::CurTime < user->lastnickreg + reg_delay)

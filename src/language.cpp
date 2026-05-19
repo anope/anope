@@ -54,7 +54,7 @@ void Language::InitLanguages()
 		Languages.push_back(language);
 	}
 #else
-	Log() << "Unable to initialize languages, gettext is not installed";
+	Log() << "Unable to initialize languages, gettext and/or libintl were not installed at build time";
 #endif
 }
 

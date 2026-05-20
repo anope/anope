@@ -35,5 +35,6 @@ I have ensured that:
 
 - [ ] The code I am submitting is my own work and/or I have permission from the author to share it.
 - [ ] Generative AI (Copilot, ChatGPT, etc) was not used to create any part of this pull request.
-- [ ] I have documented any features added by this pull request.
+- [ ] If the pull request contains a security fix I have followed the reporting rules mentioned in [the security policy](https://github.com/anope/anope/security/policy) (delete if not applicable).
+- [ ] I have documented any features added by this pull request (delete if not applicable).
 - [ ] This pull request does not introduce any incompatible API changes (stable branches only, delete if not applicable).

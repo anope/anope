@@ -24,7 +24,6 @@ find ../ \
 	-print0 | sort -z | xargs -0 -I {} \
 		xgettext \
 			--language=C++ \
-			--sort-output \
 			--default-domain=Anope \
 			--join-existing \
 			--output=anope.pot \

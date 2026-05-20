@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-20 19:12+0200\n"
-"PO-Revision-Date: 2026-05-20 19:31+0200\n"
+"PO-Revision-Date: 2026-05-20 21:34+0200\n"
 "Last-Translator: PeGaSuS <25697531+TehPeGaSuS@users.noreply.github.com>\n"
 "Language-Team: Portuguese (Portugal)\n"
 "Language: pt_PT\n"
@@ -7608,7 +7608,7 @@ msgstr "O código de confirmação de registo que especificaste para %s está in
 #: ../modules/nickserv/ns_register.cpp
 #, c-format
 msgid "The registration of %s can only be confirmed by an administrator."
-msgstr ""
+msgstr "O registo de %s só pode ser confirmado por um administrador."
 
 #: ../modules/nickserv/ns_info.cpp
 #, c-format

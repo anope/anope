@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-20 19:12+0200\n"
-"PO-Revision-Date: 2026-05-20 19:17+0200\n"
+"PO-Revision-Date: 2026-05-20 19:31+0200\n"
 "Last-Translator: PeGaSuS <25697531+TehPeGaSuS@users.noreply.github.com>\n"
 "Language-Team: Portuguese (Portugal)\n"
 "Language: pt_PT\n"
@@ -130,9 +130,9 @@ msgid "%s already exists on the EXCEPTION list."
 msgstr "%s já existe na lista EXCEPTION."
 
 #: ../modules/chanserv/cs_flags.cpp
-#, fuzzy, c-format
+#, c-format
 msgid "%s can not be migrated to the %s access system because they have no migratable privileges."
-msgstr "%s pode ser migrado para o sistema de acesso %s porque possui privilégios que o tu não possuis."
+msgstr "%s pode ser migrado para o sistema de acesso %s porque não possui privilégios migráveis."
 
 #: ../modules/chanserv/cs_flags.cpp
 #, c-format

@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-20 17:40+0100\n"
-"PO-Revision-Date: 2026-05-20 17:41+0100\n"
+"POT-Creation-Date: 2026-05-21 11:52+0100\n"
+"PO-Revision-Date: 2026-05-21 11:52+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -25,7 +25,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.9\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: ../modules/operserv/os_forbid.cpp
 #, c-format
@@ -2487,10 +2487,7 @@ msgid "Bans a given nick or mask on a channel"
 msgstr ""
 
 #: ../modules/chanserv/cs_ban.cpp
-msgid ""
-"Bans a given nick or mask on a channel. An optional expiry may be given to cause services to remove the ban after a set amount of time.\n"
-"\n"
-"By default, limited to AOPs or those with level 5 access and above on the channel. Channel founders may ban masks."
+msgid "Bans a given nick or mask on a channel. An optional expiry may be given to cause services to remove the ban after a set amount of time. Channel founders may ban masks."
 msgstr ""
 
 #: ../modules/chanserv/cs_enforce.cpp
@@ -2681,6 +2678,11 @@ msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
 msgid "Bot won't kick for repeats anymore."
+msgstr ""
+
+#: ../src/access.cpp
+#, c-format
+msgid "By default, the %s command is limited to:"
 msgstr ""
 
 #: ../modules/operserv/os_info.cpp
@@ -4013,6 +4015,10 @@ msgid "Fixed layout"
 msgstr ""
 
 #: ../modules/chanserv/cs_flags.cpp
+msgid "Flag"
+msgstr ""
+
+#: ../modules/chanserv/cs_flags.cpp
 msgid "Flags"
 msgstr ""
 
@@ -4319,10 +4325,7 @@ msgid "Kicks a specified nick from a channel"
 msgstr ""
 
 #: ../modules/chanserv/cs_kick.cpp
-msgid ""
-"Kicks a specified nick from a channel.\n"
-"\n"
-"By default, limited to AOPs or those with level 5 access and above on the channel. Channel founders can also specify masks."
+msgid "Kicks a specified nick from a channel. Channel founders can also specify masks."
 msgstr ""
 
 #: ../modules/operserv/os_kill.cpp
@@ -6908,18 +6911,12 @@ msgstr ""
 
 #: ../modules/chanserv/cs_invite.cpp
 #, c-format
-msgid ""
-"Tells %s to invite you or an optionally specified nick into the given channel.\n"
-"\n"
-"By default, limited to AOPs or those with level 5 access and above on the channel."
+msgid "Tells %s to invite you or an optionally specified nick into the given channel."
 msgstr ""
 
 #: ../modules/chanserv/cs_unban.cpp
 #, c-format
-msgid ""
-"Tells %s to remove all bans preventing you or the given user from entering the given channel. If no channel is given, all bans affecting you in channels you have access in are removed.\n"
-"\n"
-"By default, limited to AOPs or those with level 5 access and above on the channel."
+msgid "Tells %s to remove all bans preventing you or the given user from entering the given channel. If no channel is given, all bans affecting you in channels you have access in are removed."
 msgstr ""
 
 #: ../modules/operserv/os_jupe.cpp
@@ -8005,6 +8002,10 @@ msgstr ""
 
 #: ../modules/botserv/bs_badwords.cpp
 msgid "Word"
+msgstr ""
+
+#: ../modules/chanserv/cs_xop.cpp
+msgid "XOP"
 msgstr ""
 
 #: ../modules/nickserv/ns_group.cpp

@@ -272,11 +272,12 @@ public:
 		source.Reply(_(
 			"Bans a given nick or mask on a channel. An optional expiry may "
 			"be given to cause services to remove the ban after a set amount "
-			"of time."
-			"\n\n"
-			"By default, limited to AOPs or those with level 5 access "
-			"and above on the channel. Channel founders may ban masks."
+			"of time. Channel founders may ban masks."
 		));
+
+		source.Reply(" ");
+		AccessProvider::SendAccess(source, "BAN");
+
 		return true;
 	}
 };

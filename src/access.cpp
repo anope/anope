@@ -94,6 +94,27 @@ const std::list<AccessProvider *>& AccessProvider::GetProviders()
 	return Providers;
 }
 
+void AccessProvider::SendAccess(CommandSource &source, const Anope::string& pname)
+{
+	auto *p = PrivilegeManager::FindPrivilege(pname);
+	if (!p)
+		return; // Privilege missing.
+
+	Anope::map<Anope::string> access;
+	for (auto *service : Service::GetServices("AccessProvider"))
+	{
+		auto *accessprovider = static_cast<AccessProvider *>(service);
+		accessprovider->GetAccess(source, p, access);
+	}
+
+	if (access.empty())
+		return; // No access systems???
+
+	source.Reply(_("By default, the \002%s\002 command is limited to:"), source.command.c_str());
+	for (const auto& [system, privilege] : access)
+		source.Reply("  \002%s\002: %s", source.Translate(system), privilege.c_str());
+}
+
 ChanAccess::ChanAccess(AccessProvider *p)
 	: Serializable(CHANACCESS_TYPE)
 	, provider(p)

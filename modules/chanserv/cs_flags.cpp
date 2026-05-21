@@ -84,6 +84,13 @@ public:
 	{
 		return new FlagsChanAccess(this);
 	}
+
+	void GetAccess(CommandSource& source, const Privilege *p, Anope::map<Anope::string> &access) override
+	{
+		auto it = defaultFlags.find(p->name);
+		if (it != defaultFlags.end())
+			access[_("Flag")] = Anope::ToString(it->second);
+	}
 };
 FlagsAccessProvider *FlagsAccessProvider::ap;
 

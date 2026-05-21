@@ -128,11 +128,12 @@ public:
 				"user from entering the given channel. If no channel is "
 				"given, all bans affecting you in channels you have access "
 				"in are removed."
-				"\n\n"
-				"By default, limited to AOPs or those with level 5 access and above "
-				"on the channel."
 			),
 			source.service->nick.c_str());
+
+		source.Reply(" ");
+		AccessProvider::SendAccess(source, "UNBAN");
+
 		return true;
 	}
 };

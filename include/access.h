@@ -67,6 +67,9 @@ public:
 	 */
 	virtual ChanAccess *Create() = 0;
 
+	virtual void GetAccess(CommandSource& source, const Privilege *p, Anope::map<Anope::string> &access) = 0;
+	static void SendAccess(CommandSource &source, const Anope::string &pname);
+
 private:
 	static std::list<AccessProvider *> Providers;
 public:

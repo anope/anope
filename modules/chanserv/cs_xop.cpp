@@ -100,6 +100,19 @@ public:
 	{
 		return new XOPChanAccess(this);
 	}
+
+	void GetAccess(CommandSource& source, const Privilege *p, Anope::map<Anope::string> &access) override
+	{
+		for (const auto& xop : order)
+		{
+			const auto &privs = permissions[xop];
+			if (std::find(privs.begin(), privs.end(), p->name) != privs.end())
+			{
+				access[_("XOP")] = xop;
+				return;
+			}
+		}
+	}
 };
 
 class CommandCSXOP final

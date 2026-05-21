@@ -92,6 +92,13 @@ public:
 	{
 		return new AccessChanAccess(this);
 	}
+
+	void GetAccess(CommandSource& source, const Privilege *p, Anope::map<Anope::string> &access) override
+	{
+		auto it = defaultLevels.find(p->name);
+		if (it != defaultLevels.end())
+			access[_("Level")] = LevelToString(source, it->second);
+	}
 };
 AccessAccessProvider *AccessAccessProvider::me;
 

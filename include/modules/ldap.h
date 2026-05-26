@@ -166,6 +166,16 @@ class LDAPProvider : public Service
 	 * @param attributes The attributes to modify
 	 */
 	virtual void Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) = 0;
+
+	/** Escapes a LDAP string for use in a DN.
+	 * @param str The string to escape.
+	 */
+	virtual Anope::string EscapeDN(const Anope::string &str) const = 0;
+
+	/** Escapes a LDAP string for use in a search filter.
+	 * @param str The string to escape.
+	 */
+	virtual Anope::string EscapeSF(const Anope::string &str) const = 0;
 };
 
 #endif // ANOPE_LDAP_H

@@ -92,8 +92,8 @@ public:
 				if (ii->admin_bind)
 				{
 					auto sf = Anope::Template(search_filter, {
-						{ "account",      ii->req->GetAccount() },
-						{ "object_class", object_class          },
+						{ "account",      ii->lprov->EscapeSF(ii->req->GetAccount()) },
+						{ "object_class", object_class                               },
 					});
 					try
 					{
@@ -310,7 +310,7 @@ public:
 		attributes[3].name = this->password_attribute;
 		attributes[3].values.push_back(pass);
 
-		Anope::string new_dn = username_attribute + "=" + na->nick + "," + basedn;
+		Anope::string new_dn = username_attribute + "=" + this->ldap->EscapeDN(na->nick) + "," + basedn;
 		this->ldap->Add(&this->orinterface, new_dn, attributes);
 	}
 

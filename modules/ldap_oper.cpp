@@ -125,13 +125,13 @@ public:
 			if (!this->binddn.empty())
 			{
 				auto bdn = Anope::Template(this->binddn, {
-					{ "account", u->Account()->display },
+					{ "account", this->ldap->EscapeDN(u->Account()->display) },
 				});
 				this->ldap->Bind(NULL, bdn, this->password.c_str());
 			}
 
 			auto af = Anope::Template(this->filter, {
-				{ "account", u->Account()->display },
+				{ "account", this->ldap->EscapeSF(u->Account()->display) },
 			});
 			this->ldap->Search(new IdentifyInterface(this, u), this->basedn, af);
 		}

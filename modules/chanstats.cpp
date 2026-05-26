@@ -353,14 +353,16 @@ class MChanstats final
 						"(nick_, '', 'total'), (nick_, '', 'monthly'),"
 						"(nick_, '', 'weekly'), (nick_, '', 'daily');"
 				"END IF;"
+				"SET @echan = chan_;"
+				"SET @enick = nick_;"
 				"SET @update_query = CONCAT('UPDATE `" + prefix + "chanstats` SET line=line+', line_, ',"
 				"letters=letters+', letters_, ' , words=words+', words_, ', actions=actions+', actions_, ', "
 				"smileys_happy=smileys_happy+', sm_h_, ', smileys_sad=smileys_sad+', sm_s_, ', "
 				"smileys_other=smileys_other+', sm_o_, ', kicks=kicks+', kicks_, ', kicked=kicked+', kicked_, ', "
 				"modes=modes+', modes_, ', topics=topics+', topics_, ', ', time_ , '=', time_, '+', line_ ,' "
-				"WHERE (nick='''' OR nick=''', nick_, ''') AND (chan='''' OR chan=''', chan_, ''')');"
+				"WHERE (nick='''' OR nick=?) AND (chan='''' OR chan=?)');"
 				"PREPARE update_query FROM @update_query;"
-				"EXECUTE update_query;"
+				"EXECUTE update_query using @enick, @echan;"
 				"DEALLOCATE PREPARE update_query;"
 			"END";
 		this->RunQuery(query);

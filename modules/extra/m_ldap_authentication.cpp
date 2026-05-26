@@ -84,7 +84,9 @@ class IdentifyInterface : public LDAPInterface
 			{
 				if (ii->admin_bind)
 				{
-					Anope::string sf = search_filter.replace_all_cs("%account", ii->req->GetAccount()).replace_all_cs("%object_class", object_class);
+					Anope::string sf = search_filter
+						.replace_all_cs("%account", ii->lprov->EscapeSF(ii->req->GetAccount()))
+						.replace_all_cs("%object_class", object_class);
 					try
 					{
 						Log(LOG_DEBUG) << "m_ldap_authentication: searching for " << sf;
@@ -296,7 +298,7 @@ class ModuleLDAPAuthentication : public Module
 		attributes[3].name = this->password_attribute;
 		attributes[3].values.push_back(pass);
 
-		Anope::string new_dn = username_attribute + "=" + na->nick + "," + basedn;
+		Anope::string new_dn = username_attribute + "=" + this->ldap->EscapeDN(na->nick) + "," + basedn;
 		this->ldap->Add(&this->orinterface, new_dn, attributes);
 	}
 

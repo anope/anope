@@ -115,8 +115,12 @@ class LDAPOper : public Module
 				throw LDAPException("Could not search LDAP for opertype settings, invalid configuration.");
 
 			if (!this->binddn.empty())
-				this->ldap->Bind(NULL, this->binddn.replace_all_cs("%a", u->Account()->display), this->password.c_str());
-			this->ldap->Search(new IdentifyInterface(this, u), this->basedn, this->filter.replace_all_cs("%a", u->Account()->display));
+			{
+				Anope::string bdn = this->binddn.replace_all_cs("%a", this->ldap->EscapeDN(u->Account()->display));
+				this->ldap->Bind(NULL, bdn, this->password.c_str());
+			}
+			Anope::string af = this->filter.replace_all_cs("%a", this->ldap->EscapeSF(u->Account()->display));
+			this->ldap->Search(new IdentifyInterface(this, u), this->basedn, af);
 		}
 		catch (const LDAPException &ex)
 		{

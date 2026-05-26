@@ -1,6 +1,10 @@
 Anope Version 2.0.19-git
 ------------------------
-No significant changes.
+Fixed an escaped value that wasn't escaped enough in chanstats.
+Fixed not having a handler for the FNAME message on InspIRCd.
+Fixed os_stats reporting the SGLine expiry time as the SQLine expiry time.
+Fixed the DNs and search filters not being escaped correctly in the ldap_authentication and ldap_oper modules.
+Modernised the advice in docs/LANGUAGE regarding the installation of language packs.
 
 Anope Version 2.0.19
 --------------------

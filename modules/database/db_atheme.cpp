@@ -1564,7 +1564,7 @@ private:
 			return true;
 		}
 
-		auto *xl = new XLine(nick, setby, settime + duration, reason);
+		auto *xl = new XLine(nick, setby, duration ? settime + duration : 0, reason);
 		xl->id = id;
 		sqlinemgr->AddXLine(xl);
 		return true;
@@ -1626,7 +1626,7 @@ private:
 			return true;
 		}
 
-		auto *xl = new XLine(real, setby, settime + duration, reason);
+		auto *xl = new XLine(real, setby, duration ? settime + duration : 0, reason);
 		xl->id = id;
 		snlinemgr->AddXLine(xl);
 		return true;

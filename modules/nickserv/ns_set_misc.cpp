@@ -330,7 +330,6 @@ public:
 	{
 		command_data.clear();
 		priority_ordered_items.clear();
-		time_t default_priority = 0;
 		const auto count = conf.CountBlock("command");
 		for (int i = 0; i < count; ++i)
 		{
@@ -360,10 +359,10 @@ public:
 			data.syntax = block.Get<const Anope::string>("misc_syntax");
 			data.title = block.Get<const Anope::string>("misc_title");
 			data.priority = block.Get<time_t>("misc_priority", "0");
-			// If no priority is specified, go by order in the file
+			// If no priority is specified, go by order processed
 			if (!data.priority)
 			{
-				data.priority = (default_priority += 1000);
+				data.priority = i * 1000;
 			}
 			data.swhois = block.Get<bool>("misc_swhois");
 			priority_ordered_items.emplace_back(data.priority, item);

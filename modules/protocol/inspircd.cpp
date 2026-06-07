@@ -587,7 +587,7 @@ public:
 			Uplink::Send(source, "SVSPART", u->GetUID(), chan);
 	}
 
-	void SendSWhois(const MessageSource &source, User *target, const Anope::string &tag, const Anope::string &message) override
+	void SendSWhois(const MessageSource &source, User *target, const Anope::string &tag, time_t priority, const Anope::string &message) override
 	{
 		if (!IRCD->CanSendMultipleSWhois)
 		{
@@ -598,7 +598,7 @@ public:
 		{
 			// New style SWHOIS.
 			Uplink::Send("METADATA", target->GetUID(), "specialwhois", Anope::Format("+ @%s s %ld :%s",
-				tag.c_str(), Anope::CurTime, message.c_str()));
+				tag.c_str(), priority ? priority : Anope::CurTime, message.c_str()));
 		}
 	}
 

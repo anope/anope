@@ -279,7 +279,7 @@ public:
 	virtual void SendSVSHold(const Anope::string &, time_t) { }
 	virtual void SendSVSHoldDel(const Anope::string &) { }
 
-	virtual void SendSWhois(const MessageSource &source, User *target, const Anope::string &tag, const Anope::string &message) { };
+	virtual void SendSWhois(const MessageSource &source, User *target, const Anope::string &tag, time_t priority, const Anope::string &message) { };
 	virtual void SendSWhoisDel(const MessageSource &source, User *target, const Anope::string &tag, const Anope::string &message) { }
 
 	/** Introduces a server to the uplink

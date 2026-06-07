@@ -26,6 +26,7 @@ struct CommandData final
 	Anope::string pattern;
 	Anope::string syntax;
 	Anope::string title;
+	time_t priority;
 	bool swhois = false;
 };
 
@@ -34,6 +35,7 @@ static Anope::map<CommandData> command_data;
 
 struct NSMiscData;
 static Anope::map<ExtensibleItem<NSMiscData> *> items;
+static std::vector<std::pair<time_t, ExtensibleItem<NSMiscData> *> > priority_ordered_items;
 
 static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name)
 {
@@ -132,7 +134,7 @@ static void CheckSWhois(User* u, const Anope::string &name, ExtensibleItem<NSMis
 	auto *nc = u->Account();
 	auto *data = nc ? ext->Get(nc) : nullptr;
 	if (data)
-		IRCD->SendSWhois(nickserv, u, name, Anope::Format("%s: %s", GetTitle(ext), data->data.c_str()));
+		IRCD->SendSWhois(nickserv, u, name, it->second.priority, Anope::Format("%s: %s", GetTitle(ext), data->data.c_str()));
 	else
 		IRCD->SendSWhoisDel(nickserv, u, name, "");
 }
@@ -327,7 +329,9 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		command_data.clear();
-		for (int i = 0; i < conf.CountBlock("command"); ++i)
+		const auto count = conf.CountBlock("command");
+		priority_ordered_items.resize(count);
+		for (int i = 0; i < count; ++i)
 		{
 			const auto &block = conf.GetBlock("command", i);
 			const Anope::string &cmd = block.Get<const Anope::string>("command");
@@ -341,7 +345,7 @@ public:
 
 			// Force creation of the extension item.
 			const auto extname = GetAttribute(cname);
-			GetItem(extname);
+			auto item = GetItem(extname);
 
 			auto &data = command_data[extname];
 			if (cmd == "nickserv/saset/misc")
@@ -354,8 +358,16 @@ public:
 			data.pattern = block.Get<const Anope::string>("misc_pattern");
 			data.syntax = block.Get<const Anope::string>("misc_syntax");
 			data.title = block.Get<const Anope::string>("misc_title");
+			data.priority = block.Get<time_t>("misc_priority", "0");
+			// If no priority is specified, go by order in the file
+			if (!data.priority)
+			{
+				data.priority = block.GetLineNum() + 1000;
+			}
 			data.swhois = block.Get<bool>("misc_swhois");
+			priority_ordered_items[i] = {data.priority, item};
 		}
+		std::sort(priority_ordered_items.begin(), priority_ordered_items.end());
 	}
 
 	void OnUserLogin(User *u) override
@@ -374,7 +386,7 @@ public:
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool) override
 	{
-		for (const auto &[_, e] : items)
+		for (const auto &[_, e] : priority_ordered_items)
 		{
 			NSMiscData *data = e->Get(na->nc);
 

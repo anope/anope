@@ -26,7 +26,7 @@ struct CommandData final
 	Anope::string pattern;
 	Anope::string syntax;
 	Anope::string title;
-	time_t priority;
+	time_t priority = 0;
 	bool swhois = false;
 };
 

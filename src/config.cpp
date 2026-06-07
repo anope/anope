@@ -38,11 +38,6 @@ const Anope::string &Configuration::Block::GetName() const
 	return name;
 }
 
-int Configuration::Block::GetLineNum() const
-{
-	return linenum;
-}
-
 int Configuration::Block::CountBlock(const Anope::string &bname) const
 {
 	return blocks.count(bname);

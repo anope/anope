@@ -329,8 +329,9 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		command_data.clear();
+		priority_ordered_items.clear();
+		time_t default_priority = 0;
 		const auto count = conf.CountBlock("command");
-		priority_ordered_items.resize(count);
 		for (int i = 0; i < count; ++i)
 		{
 			const auto &block = conf.GetBlock("command", i);
@@ -362,10 +363,10 @@ public:
 			// If no priority is specified, go by order in the file
 			if (!data.priority)
 			{
-				data.priority = block.GetLineNum() + 1000;
+				data.priority = (default_priority += 1000);
 			}
 			data.swhois = block.Get<bool>("misc_swhois");
-			priority_ordered_items[i] = {data.priority, item};
+			priority_ordered_items.emplace_back(data.priority, item);
 		}
 		std::sort(priority_ordered_items.begin(), priority_ordered_items.end());
 	}

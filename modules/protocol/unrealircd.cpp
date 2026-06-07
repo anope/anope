@@ -346,7 +346,7 @@ private:
 		Uplink::Send("SENDUMODE", 'o', "From " + source.GetName() + ": " + buf);
 	}
 
-	void SendSWhois(const MessageSource &source, User *target, const Anope::string &tag, time_t, const Anope::string &message) override
+	void SendSWhois(const MessageSource &source, User *target, const Anope::string &tag, time_t priority, const Anope::string &message) override
 	{
 		const auto utag = tag.empty() ? source.GetName() : tag;
 		Uplink::Send(source, "SWHOIS", target->GetUID(), "+", utag, 0, message);

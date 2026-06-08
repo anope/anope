@@ -26,13 +26,13 @@ namespace Configuration
 		friend class Configuration::Conf;
 
 	public:
-		typedef Anope::map<Anope::string> item_map;
-		typedef Anope::multimap<Block> block_map;
+		typedef Anope::map<Anope::string> ItemMap;
+		typedef Anope::multimap<Block> BlockMap;
 
 	private:
 		Anope::string name;
-		item_map items;
-		block_map blocks;
+		ItemMap items;
+		BlockMap blocks;
 		int linenum;
 
 		/* Represents a missing tag. */
@@ -51,7 +51,7 @@ namespace Configuration
 		}
 
 		bool Set(const Anope::string &tag, const Anope::string &value);
-		const item_map &GetItems() const;
+		const ItemMap &GetItems() const;
 	};
 
 	template<> CoreExport const Anope::string Block::Get(const Anope::string &tag, const Anope::string &def) const;

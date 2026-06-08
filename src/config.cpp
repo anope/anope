@@ -45,7 +45,7 @@ int Configuration::Block::CountBlock(const Anope::string &bname) const
 
 const Configuration::Block &Configuration::Block::GetBlock(const Anope::string &bname, int num) const
 {
-	std::pair<block_map::const_iterator, block_map::const_iterator> it = blocks.equal_range(bname);
+	auto it = blocks.equal_range(bname);
 
 	for (int i = 0; it.first != it.second; ++it.first, ++i)
 		if (i == num)
@@ -55,7 +55,7 @@ const Configuration::Block &Configuration::Block::GetBlock(const Anope::string &
 
 Configuration::Block *Configuration::Block::GetMutableBlock(const Anope::string &bname, int num)
 {
-	std::pair<block_map::iterator, block_map::iterator> it = blocks.equal_range(bname);
+	auto it = blocks.equal_range(bname);
 
 	for (int i = 0; it.first != it.second; ++it.first, ++i)
 		if (i == num)
@@ -69,7 +69,7 @@ bool Configuration::Block::Set(const Anope::string &tag, const Anope::string &va
 	return true;
 }
 
-const Configuration::Block::item_map &Configuration::Block::GetItems() const
+const Configuration::Block::ItemMap &Configuration::Block::GetItems() const
 {
 	return items;
 }
@@ -655,7 +655,7 @@ Configuration::Block &Configuration::Conf::GetModule(const Anope::string &mname)
 	auto *&block = modules[mname];
 
 	/* Search for the block */
-	for (std::pair<block_map::iterator, block_map::iterator> iters = blocks.equal_range("module"); iters.first != iters.second; ++iters.first)
+	for (auto iters = blocks.equal_range("module"); iters.first != iters.second; ++iters.first)
 	{
 		auto &b = iters.first->second;
 
@@ -688,7 +688,7 @@ const Configuration::Block &Configuration::Conf::GetCommand(CommandSource &sourc
 {
 	const Anope::string &block_name = source.c ? "fantasy" : "command";
 
-	for (std::pair<block_map::iterator, block_map::iterator> iters = blocks.equal_range(block_name); iters.first != iters.second; ++iters.first)
+	for (auto iters = blocks.equal_range(block_name); iters.first != iters.second; ++iters.first)
 	{
 		auto &b = iters.first->second;
 

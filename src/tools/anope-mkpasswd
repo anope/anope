@@ -51,7 +51,8 @@ def do_argon2(variant, password):
     return ph.hash(password)
 
 def do_bcrypt(password):
-    salt = bcrypt.gensalt(16)
+    rounds = int(os.getenv("BCRYPT_ROUNDS", 10))
+    salt = bcrypt.gensalt(rounds)
     return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
 def do_hmac(digest, password):

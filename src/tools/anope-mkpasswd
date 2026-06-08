@@ -47,7 +47,14 @@ algorithm = sys.argv[1]
 password  = sys.argv[2] if len(sys.argv) >= 3 else getpass.getpass()
 
 def do_argon2(variant, password):
-    ph = argon2.PasswordHasher(type=variant)
+    ph = argon2.PasswordHasher(
+        time_cost=int(os.getenv("ARGON2_TIME_COST", 3)),
+        memory_cost=int(os.getenv("ARGON2_TIME_COST", 131_072)),
+        parallelism=int(os.getenv("ARGON2_PARALLELISM", 1)),
+        hash_len=int(os.getenv("ARGON2_SALT_LENGTH", 32)),
+        salt_len=int(os.getenv("ARGON2_HASH_LENGTH", 32)),
+        type=variant,
+    )
     return ph.hash(password)
 
 def do_bcrypt(password):

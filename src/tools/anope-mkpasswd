@@ -120,5 +120,8 @@ if config:
             token = "{password_hash}"
             token_hash = "{algorithm}"
         """).lstrip())
+else:
+    print(f"The {algorithm} algorithm can not be used in an oper or a jsonrpc/xmlrpc token.")
+    print()
 
 print(f"Make sure you have the {module} module loaded!");

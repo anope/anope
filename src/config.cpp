@@ -43,6 +43,11 @@ int Configuration::Block::CountBlock(const Anope::string &bname) const
 	return blocks.count(bname);
 }
 
+Configuration::Block::BlockList Configuration::Block::GetBlocks(const Anope::string &bname) const
+{
+	return Anope::equal_range(blocks, bname);
+}
+
 const Configuration::Block &Configuration::Block::GetBlock(const Anope::string &bname, int num) const
 {
 	auto it = blocks.equal_range(bname);
@@ -125,10 +130,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 
 	this->LoadConf(ServicesConf);
 
-	for (int i = 0; i < this->CountBlock("include"); ++i)
+	for (const auto &[_,  include] : this->GetBlocks("include"))
 	{
-		const auto &include = this->GetBlock("include", i);
-
 		const Anope::string &type = include.Get<const Anope::string>("type"),
 					&file = include.Get<const Anope::string>("name");
 
@@ -205,10 +208,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 	this->TimeoutCheck = options.Get<time_t>("timeoutcheck");
 	this->NickChars = networkinfo.Get<Anope::string>("nick_chars");
 
-	for (int i = 0; i < this->CountBlock("uplink"); ++i)
+	for (const auto &[_,  uplink] : this->GetBlocks("uplink"))
 	{
-		const auto &uplink = this->GetBlock("uplink", i);
-
 		int protocol;
 		const Anope::string &protocolstr = uplink.Get<const Anope::string>("protocol", "ipv4");
 		if (protocolstr == "ipv4")
@@ -238,10 +239,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 		this->Uplinks.emplace_back(host, port, password, protocol);
 	}
 
-	for (int i = 0; i < this->CountBlock("module"); ++i)
+	for (const auto &[_,  module] : this->GetBlocks("module"))
 	{
-		const auto &module = this->GetBlock("module", i);
-
 		const Anope::string &modname = module.Get<const Anope::string>("name");
 
 		ValidateNotEmptyOrSpaces("module", "name", modname);
@@ -249,10 +248,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 		this->ModulesAutoLoad.push_back(modname);
 	}
 
-	for (int i = 0; i < this->CountBlock("opertype"); ++i)
+	for (const auto &[_,  opertype] : this->GetBlocks("opertype"))
 	{
-		const auto &opertype = this->GetBlock("opertype", i);
-
 		const Anope::string &oname = opertype.Get<const Anope::string>("name"),
 				&modes = opertype.Get<const Anope::string>("modes"),
 				&inherits = opertype.Get<const Anope::string>("inherits"),
@@ -292,10 +289,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 		this->MyOperTypes.push_back(ot);
 	}
 
-	for (int i = 0; i < this->CountBlock("oper"); ++i)
+	for (const auto &[_,  oper] : this->GetBlocks("oper"))
 	{
-		const auto &oper = this->GetBlock("oper", i);
-
 		const Anope::string &nname = oper.Get<const Anope::string>("name"),
 					&type = oper.Get<const Anope::string>("type"),
 					&password = oper.Get<const Anope::string>("password"),
@@ -330,10 +325,9 @@ Configuration::Conf::Conf() : Configuration::Block("")
 
 	for (const auto &[_, bi] : *BotListByNick)
 		bi->conf = false;
-	for (int i = 0; i < this->CountBlock("service"); ++i)
-	{
-		const auto &service = this->GetBlock("service", i);
 
+	for (const auto &[_,  service] : this->GetBlocks("service"))
+	{
 		const Anope::string &nick = service.Get<const Anope::string>("nick"),
 					&user = service.Get<const Anope::string>("user", nick.lower()),
 					&host = service.Get<const Anope::string>("host", servername),
@@ -421,10 +415,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 		}
 	}
 
-	for (int i = 0; i < this->CountBlock("log"); ++i)
+	for (const auto &[_,  log] : this->GetBlocks("log"))
 	{
-		const auto &log = this->GetBlock("log", i);
-
 		int logage = log.Get<int>("logage");
 		bool rawio = log.Get<bool>("rawio");
 		bool debug = log.Get<bool>("debug");
@@ -447,10 +439,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 
 	for (const auto &[_, bi] : *BotListByNick)
 		bi->commands.clear();
-	for (int i = 0; i < this->CountBlock("command"); ++i)
+	for (const auto &[_,  command] : this->GetBlocks("command"))
 	{
-		const auto &command = this->GetBlock("command", i);
-
 		const Anope::string &service = command.Get<const Anope::string>("service"),
 					&nname = command.Get<const Anope::string>("name"),
 					&cmd = command.Get<const Anope::string>("command"),
@@ -472,10 +462,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 	}
 
 	PrivilegeManager::ClearPrivileges();
-	for (int i = 0; i < this->CountBlock("privilege"); ++i)
+	for (const auto &[_,  privilege] : this->GetBlocks("privilege"))
 	{
-		const auto &privilege = this->GetBlock("privilege", i);
-
 		const Anope::string &nname = privilege.Get<const Anope::string>("name"),
 					&desc = privilege.Get<const Anope::string>("desc");
 		int rank = privilege.Get<int>("rank");
@@ -483,10 +471,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 		PrivilegeManager::AddPrivilege(Privilege(nname, desc, rank));
 	}
 
-	for (int i = 0; i < this->CountBlock("fantasy"); ++i)
+	for (const auto &[_,  fantasy] : this->GetBlocks("fantasy"))
 	{
-		const auto &fantasy = this->GetBlock("fantasy", i);
-
 		const Anope::string &nname = fantasy.Get<const Anope::string>("name"),
 					&service = fantasy.Get<const Anope::string>("command"),
 					&permission = fantasy.Get<const Anope::string>("permission"),
@@ -504,10 +490,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 		c.require_privilege = fantasy.Get<bool>("require_privilege", "yes");
 	}
 
-	for (int i = 0; i < this->CountBlock("command_group"); ++i)
+	for (const auto &[_,  command_group] : this->GetBlocks("command_group"))
 	{
-		const auto &command_group = this->GetBlock("command_group", i);
-
 		const Anope::string &nname = command_group.Get<const Anope::string>("name"),
 					&description = command_group.Get<const Anope::string>("description");
 
@@ -1020,9 +1004,8 @@ Anope::string Configuration::Conf::ReplaceVars(const Anope::string &str, const C
 		}
 
 		auto found = false;
-		for (int i = 0; i < this->CountBlock("define"); ++i)
+		for (const auto &[_,  define] : this->GetBlocks("define"))
 		{
-			const auto &define = this->GetBlock("define", i);
 			const auto defname = define.Get<const Anope::string>("name");
 			if (defname == var)
 			{

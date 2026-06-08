@@ -963,10 +963,8 @@ public:
 	{
 		defaultLevels.clear();
 
-		for (int i = 0; i < conf.CountBlock("privilege"); ++i)
+		for (const auto &[_,  priv] : conf.GetBlocks("privilege"))
 		{
-			const auto &priv = conf.GetBlock("privilege", i);
-
 			const Anope::string &pname = priv.Get<const Anope::string>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);

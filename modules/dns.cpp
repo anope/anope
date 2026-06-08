@@ -1095,9 +1095,8 @@ public:
 		refresh = block.Get<int>("refresh", "3600");
 
 		std::vector<std::pair<Anope::string, short> > notify;
-		for (int i = 0; i < block.CountBlock("notify"); ++i)
+		for (const auto &[_, n] : block.GetBlocks("notify"))
 		{
-			const auto &n = block.GetBlock("notify", i);
 			auto nip = n.Get<Anope::string>("ip");
 			auto nport = n.Get<short>("port");
 

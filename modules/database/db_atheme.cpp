@@ -1584,9 +1584,8 @@ public:
 		const auto &modconf = conf.GetModule(this);
 
 		csmiscdata.clear();
-		for (auto idx = 0; idx < modconf.CountBlock("cs_set_misc"); ++idx)
+		for (const auto &[_,  data] : modconf.GetBlocks("cs_set_misc"))
 		{
-			const auto &data = modconf.GetBlock("cs_set_misc", idx);
 			const auto &anope = data.Get<const Anope::string>("anope");
 			const auto &atheme = data.Get<const Anope::string>("atheme");
 			if (!anope.empty() && !atheme.empty())
@@ -1594,9 +1593,8 @@ public:
 		}
 
 		nsmiscdata.clear();
-		for (auto idx = 0; idx < modconf.CountBlock("ns_set_misc"); ++idx)
+		for (const auto &[_,  data] : modconf.GetBlocks("ns_set_misc"))
 		{
-			const auto &data = modconf.GetBlock("ns_set_misc", idx);
 			const auto &anope = data.Get<const Anope::string>("anope");
 			const auto &atheme = data.Get<const Anope::string>("atheme");
 			if (!anope.empty() && !atheme.empty())
@@ -1604,9 +1602,8 @@ public:
 		}
 
 		flags.clear();
-		for (int i = 0; i < Config->CountBlock("privilege"); ++i)
+		for (const auto &[_,  priv] : conf.GetBlocks("privilege"))
 		{
-			const auto &priv = Config->GetBlock("privilege", i);
 			const Anope::string &name = priv.Get<const Anope::string>("name");
 			const Anope::string &value = priv.Get<const Anope::string>("flag");
 			if (!name.empty() && !value.empty())

@@ -654,10 +654,8 @@ public:
 			}
 		}
 
-		for (int i = 0; i < conf.CountBlock("ldap"); ++i)
+		for (const auto &[_,  ldap] : conf.GetBlocks("ldap"))
 		{
-			const auto &ldap = conf.GetBlock("ldap", i);
-
 			const Anope::string &connname = ldap.Get<const Anope::string>("name", "ldap/main");
 
 			if (this->LDAPServices.find(connname) == this->LDAPServices.end())

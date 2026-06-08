@@ -331,10 +331,8 @@ public:
 		const auto &block = conf.GetModule(this);
 		defaults.clear();
 
-		for (int i = 0; i < block.CountBlock("default"); ++i)
+		for (const auto &[_,  def] : block.GetBlocks("default"))
 		{
-			const auto &def = block.GetBlock("default", i);
-
 			LogDefault ld;
 
 			ld.service = def.Get<const Anope::string>("service");

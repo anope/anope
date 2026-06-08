@@ -537,8 +537,8 @@ bool Anope::Init(int ac, char **av)
 
 	/* load modules */
 	Log() << "Loading modules...";
-	for (int i = 0; i < Config->CountBlock("module"); ++i)
-		ModuleManager::LoadModule(Config->GetBlock("module", i).Get<const Anope::string>("name"), NULL);
+	for (const auto &[_,  block] : Config->GetBlocks("module"))
+		ModuleManager::LoadModule(block.Get<const Anope::string>("name"), NULL);
 
 #ifndef _WIN32
 	/* If we're root, issue a warning now */

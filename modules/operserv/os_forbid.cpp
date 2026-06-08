@@ -529,10 +529,8 @@ public:
 		fileforbids.clear();
 
 		const auto &modconf = conf.GetModule(this);
-		for (auto i = 0; i < modconf.CountBlock("file"); ++i)
+		for (const auto &[_,  fileblock] : modconf.GetBlocks("file"))
 		{
-			const auto &fileblock = modconf.GetBlock("file", i);
-
 			const auto reasonstr = fileblock.Get<const Anope::string>("reason");
 
 			const auto typestr = fileblock.Get<const Anope::string>("type");

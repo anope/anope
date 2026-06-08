@@ -688,9 +688,8 @@ public:
 		order.clear();
 		permissions.clear();
 
-		for (int i = 0; i < conf.CountBlock("privilege"); ++i)
+		for (const auto &[_,  block] : conf.GetBlocks("privilege"))
 		{
-			const auto &block = conf.GetBlock("privilege", i);
 			const Anope::string &pname = block.Get<const Anope::string>("name");
 
 			Privilege *p = PrivilegeManager::FindPrivilege(pname);
@@ -704,9 +703,8 @@ public:
 			permissions[xop].push_back(pname);
 		}
 
-		for (int i = 0; i < conf.CountBlock("command"); ++i)
+		for (const auto &[_,  block] : conf.GetBlocks("command"))
 		{
-			const auto &block = conf.GetBlock("command", i);
 			const Anope::string &cname = block.Get<const Anope::string>("name"),
 				&cserv = block.Get<const Anope::string>("command");
 			if (cname.empty() || cserv != "chanserv/xop")

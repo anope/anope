@@ -126,9 +126,8 @@ public:
 		this->add_to_akill = block.Get<bool>("add_to_akill", "yes");
 
 		this->blacklists.clear();
-		for (int i = 0; i < block.CountBlock("blacklist"); ++i)
+		for (const auto &[_, bl] : block.GetBlocks("blacklist"))
 		{
-			const auto &bl = block.GetBlock("blacklist", i);
 			Blacklist blacklist;
 
 			blacklist.name = bl.Get<Anope::string>("name");
@@ -137,9 +136,8 @@ public:
 			blacklist.bantime = bl.Get<time_t>("time", "4h");
 			blacklist.reason = bl.Get<Anope::string>("reason");
 
-			for (int j = 0; j < bl.CountBlock("reply"); ++j)
+			for (const auto &[_, reply] : block.GetBlocks("reply"))
 			{
-				const auto &reply = bl.GetBlock("reply", j);
 				Blacklist::Reply r;
 
 				r.code = reply.Get<int>("code");
@@ -153,9 +151,8 @@ public:
 		}
 
 		this->exempts.clear();
-		for (int i = 0; i < block.CountBlock("exempt"); ++i)
+		for (const auto &[_, bl] : block.GetBlocks("exempt"))
 		{
-			const auto &bl = block.GetBlock("exempt", i);
 			this->exempts.insert(bl.Get<Anope::string>("ip"));
 		}
 	}

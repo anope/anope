@@ -999,10 +999,8 @@ public:
 	{
 		modes.clear();
 
-		for (int i = 0; i < conf.CountBlock("command"); ++i)
+		for (const auto &[_,  block] : conf.GetBlocks("command"))
 		{
-			const auto &block = conf.GetBlock("command", i);
-
 			const Anope::string &cname = block.Get<const Anope::string>("name"),
 					&cmd = block.Get<const Anope::string>("command");
 

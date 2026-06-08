@@ -18,6 +18,7 @@
 #include "regchannel.h"
 #include "users.h"
 #include "opertype.h"
+#include "miscutils.h"
 
 namespace Configuration
 {
@@ -28,6 +29,7 @@ namespace Configuration
 	public:
 		typedef Anope::map<Anope::string> ItemMap;
 		typedef Anope::multimap<Block> BlockMap;
+		typedef Anope::iterator_range<BlockMap::const_iterator> BlockList;
 
 	private:
 		Anope::string name;
@@ -42,6 +44,7 @@ namespace Configuration
 		Block(const Anope::string &);
 		const Anope::string &GetName() const;
 		int CountBlock(const Anope::string &name) const;
+		BlockList GetBlocks(const Anope::string &name) const;
 		const Block &GetBlock(const Anope::string &name, int num = 0) const;
 		Block *GetMutableBlock(const Anope::string &name, int num = 0);
 

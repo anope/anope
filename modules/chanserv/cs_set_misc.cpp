@@ -268,9 +268,9 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		command_data.clear();
-		for (int i = 0; i < conf.CountBlock("command"); ++i)
+
+		for (const auto &[_,  block] : conf.GetBlocks("command"))
 		{
-			const auto &block = conf.GetBlock("command", i);
 			if (block.Get<const Anope::string>("command") != "chanserv/set/misc")
 				continue;
 

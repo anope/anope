@@ -313,10 +313,9 @@ public:
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
 
 		jsonrpcinterface.tokens.clear();
-		for (int i = 0; i < modconf.CountBlock("token"); ++i)
-		{
-			const auto &block = modconf.GetBlock("token", i);
 
+		for (const auto &[_,  block] : modconf.GetBlocks("token"))
+		{
 			RPC::Token token;
 			token.token = block.Get<const Anope::string>("token");
 			if (!token.token.empty())

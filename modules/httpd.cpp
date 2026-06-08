@@ -372,11 +372,8 @@ public:
 		const auto &conf = config.GetModule(this);
 		std::set<Anope::string> existing;
 
-		for (int i = 0; i < conf.CountBlock("httpd"); ++i)
+		for (const auto &[_, block] : conf.GetBlocks("httpd"))
 		{
-			const auto &block = conf.GetBlock("httpd", i);
-
-
 			const Anope::string &hname = block.Get<const Anope::string>("name", "httpd/main");
 			existing.insert(hname);
 

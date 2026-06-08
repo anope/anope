@@ -309,9 +309,9 @@ public:
 		}
 
 		this->proxyscans.clear();
-		for (int i = 0; i < config.CountBlock("proxyscan"); ++i)
+
+		for (const auto &[_, block] : config.GetBlocks("proxyscan"))
 		{
-			const auto &block = config.GetBlock("proxyscan", i);
 			ProxyCheck p;
 			Anope::string token;
 

@@ -330,9 +330,9 @@ public:
 		command_data.clear();
 		items_by_priority.clear();
 
-		for (int i = 0; i < conf.CountBlock("command"); ++i)
+		time_t default_priority = 0;
+		for (const auto &[_,  block] : conf.GetBlocks("command"))
 		{
-			const auto &block = conf.GetBlock("command", i);
 			const Anope::string &cmd = block.Get<const Anope::string>("command");
 			if (cmd != "nickserv/set/misc" && cmd != "nickserv/saset/misc")
 				continue;
@@ -353,6 +353,8 @@ public:
 				continue;
 			}
 
+			default_priority += 1000;
+
 			data.set_description = desc;
 			data.pattern = block.Get<const Anope::string>("misc_pattern");
 			data.syntax = block.Get<const Anope::string>("misc_syntax");
@@ -361,7 +363,7 @@ public:
 			if (data.priority <= 0)
 			{
 				// If no priority is specified, go by order processed
-				data.priority = i * 1000;
+				data.priority = default_priority;
 			}
 			data.swhois = block.Get<bool>("misc_swhois");
 			items_by_priority.emplace_back(data.priority, item);

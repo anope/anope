@@ -145,9 +145,8 @@ public:
 			}
 		}
 
-		for (int i = 0; i < config.CountBlock("sqlite"); ++i)
+		for (const auto &[_,  block] : config.GetBlocks("sqlite"))
 		{
-			const auto &block = config.GetBlock("sqlite", i);
 			Anope::string connname = block.Get<const Anope::string>("name", "sqlite/main");
 
 			if (this->SQLiteServices.find(connname) == this->SQLiteServices.end())

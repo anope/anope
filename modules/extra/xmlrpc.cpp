@@ -331,10 +331,8 @@ public:
 			throw ConfigException("Unable to find http reference, is httpd loaded?");
 
 		xmlrpcinterface.tokens.clear();
-		for (int i = 0; i < modconf.CountBlock("token"); ++i)
+		for (const auto &[_,  block] : modconf.GetBlocks("token"))
 		{
-			const auto &block = modconf.GetBlock("token", i);
-
 			RPC::Token token;
 			token.token = block.Get<const Anope::string>("token");
 			if (!token.token.empty())

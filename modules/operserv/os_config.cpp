@@ -84,9 +84,8 @@ public:
 			lflist.AddColumn(_("Module Name")).AddColumn(_("Name")).AddColumn(_("Value"));
 			lflist.SetFlexible(_("\002{}{module_name}}:{name}\002 = {value}"));
 
-			for (int i = 0; i < Config->CountBlock("module"); ++i)
+			for (const auto &[_,  block] : Config->GetBlocks("module"))
 			{
-				const auto &block = Config->GetBlock("module", i);
 				const auto &items = block.GetItems();
 
 				if (items.size() <= 1)

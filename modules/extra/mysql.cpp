@@ -298,9 +298,8 @@ public:
 			}
 		}
 
-		for (int i = 0; i < config.CountBlock("mysql"); ++i)
+		for (const auto &[_,  block] : config.GetBlocks("mysql"))
 		{
-			const auto &block = config.GetBlock("mysql", i);
 			const Anope::string &connname = block.Get<const Anope::string>("name", "mysql/main");
 
 			if (this->MySQLServices.find(connname) == this->MySQLServices.end())

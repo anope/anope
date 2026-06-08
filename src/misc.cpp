@@ -965,7 +965,7 @@ Anope::string Anope::VersionBuildString()
 	flags += "G";
 #endif
 #if REPRODUCIBLE_BUILD
-	flags += "R"
+	flags += "R";
 #endif
 #ifdef _WIN32
 	flags += "W";

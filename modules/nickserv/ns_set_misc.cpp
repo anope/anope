@@ -32,10 +32,9 @@ struct CommandData final
 
 static Anope::map<CommandData> command_data;
 
-
 struct NSMiscData;
 static Anope::map<ExtensibleItem<NSMiscData> *> items;
-static std::vector<std::pair<time_t, ExtensibleItem<NSMiscData> *> > priority_ordered_items;
+static std::vector<std::pair<time_t, ExtensibleItem<NSMiscData> *>> items_by_priority;
 
 static ExtensibleItem<NSMiscData> *GetItem(const Anope::string &name)
 {
@@ -329,7 +328,7 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		command_data.clear();
-		priority_ordered_items.clear();
+		items_by_priority.clear();
 		const auto count = conf.CountBlock("command");
 		for (int i = 0; i < count; ++i)
 		{
@@ -359,15 +358,15 @@ public:
 			data.syntax = block.Get<const Anope::string>("misc_syntax");
 			data.title = block.Get<const Anope::string>("misc_title");
 			data.priority = block.Get<time_t>("misc_priority", "0");
-			// If no priority is specified, go by order processed
-			if (!data.priority)
+			if (data.priority <= 0)
 			{
+				// If no priority is specified, go by order processed
 				data.priority = i * 1000;
 			}
 			data.swhois = block.Get<bool>("misc_swhois");
-			priority_ordered_items.emplace_back(data.priority, item);
+			items_by_priority.emplace_back(data.priority, item);
 		}
-		std::sort(priority_ordered_items.begin(), priority_ordered_items.end());
+		std::sort(items_by_priority.begin(), items_by_priority.end());
 	}
 
 	void OnUserLogin(User *u) override
@@ -386,7 +385,7 @@ public:
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool) override
 	{
-		for (const auto &[_, e] : priority_ordered_items)
+		for (const auto &[_, e] : items_by_priority)
 		{
 			NSMiscData *data = e->Get(na->nc);
 

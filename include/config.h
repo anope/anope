@@ -35,7 +35,7 @@ namespace Configuration
 		Anope::string name;
 		ItemMap items;
 		BlockMap blocks;
-		int linenum;
+		unsigned linenum;
 
 		/* Represents a missing tag. */
 		static Block EmptyBlock;
@@ -43,10 +43,10 @@ namespace Configuration
 	public:
 		Block(const Anope::string &);
 		const Anope::string &GetName() const;
-		int CountBlock(const Anope::string &name) const;
+		size_t CountBlock(const Anope::string &name) const;
 		BlockList GetBlocks(const Anope::string &name) const;
-		const Block &GetBlock(const Anope::string &name, int num = 0) const;
-		Block *GetMutableBlock(const Anope::string &name, int num = 0);
+		const Block &GetBlock(const Anope::string &name, size_t num = 0) const;
+		Block *GetMutableBlock(const Anope::string &name, size_t num = 0);
 
 		template<typename T> T Get(const Anope::string &tag, const Anope::string &def = "") const
 		{
@@ -88,7 +88,7 @@ namespace Configuration
 	{
 	private:
 		/** Replaces defined variables within a string. */
-		Anope::string ReplaceVars(const Anope::string &str, const File &file, int linenumber);
+		Anope::string ReplaceVars(const Anope::string &str, const File &file, unsigned linenumber);
 
 	public:
 		/* options:readtimeout */

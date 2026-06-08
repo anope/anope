@@ -634,7 +634,7 @@ public:
 		{
 			const Anope::string &cname = it->first;
 			LDAPService *s = it->second;
-			int i;
+			size_t i;
 
 			++it;
 

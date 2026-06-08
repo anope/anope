@@ -38,7 +38,7 @@ const Anope::string &Configuration::Block::GetName() const
 	return name;
 }
 
-int Configuration::Block::CountBlock(const Anope::string &bname) const
+size_t Configuration::Block::CountBlock(const Anope::string &bname) const
 {
 	return blocks.count(bname);
 }
@@ -48,23 +48,27 @@ Configuration::Block::BlockList Configuration::Block::GetBlocks(const Anope::str
 	return Anope::equal_range(blocks, bname);
 }
 
-const Configuration::Block &Configuration::Block::GetBlock(const Anope::string &bname, int num) const
+const Configuration::Block &Configuration::Block::GetBlock(const Anope::string &bname, size_t num) const
 {
 	auto it = blocks.equal_range(bname);
 
-	for (int i = 0; it.first != it.second; ++it.first, ++i)
+	for (size_t i = 0; it.first != it.second; ++it.first, ++i)
+	{
 		if (i == num)
 			return it.first->second;
+	}
 	return EmptyBlock;
 }
 
-Configuration::Block *Configuration::Block::GetMutableBlock(const Anope::string &bname, int num)
+Configuration::Block *Configuration::Block::GetMutableBlock(const Anope::string &bname, size_t num)
 {
 	auto it = blocks.equal_range(bname);
 
-	for (int i = 0; it.first != it.second; ++it.first, ++i)
+	for (size_t i = 0; it.first != it.second; ++it.first, ++i)
+	{
 		if (i == num)
 			return &it.first->second;
+	}
 	return NULL;
 }
 
@@ -766,7 +770,7 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 
 	Anope::string itemname, wordbuffer;
 	std::stack<Configuration::Block *> block_stack;
-	int linenumber = 0;
+	unsigned linenumber = 0;
 	bool in_word = false, in_quote = false, in_comment = false;
 
 	Log(LOG_DEBUG) << "Start to read conf " << file.GetPath();
@@ -968,7 +972,7 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 	}
 }
 
-Anope::string Configuration::Conf::ReplaceVars(const Anope::string &str, const Configuration::File &file, int linenumber)
+Anope::string Configuration::Conf::ReplaceVars(const Anope::string &str, const Configuration::File &file, unsigned linenumber)
 {
 	Anope::string ret;
 	for (auto it = str.begin(); it != str.end(); )

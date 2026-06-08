@@ -281,7 +281,7 @@ public:
 		{
 			const Anope::string &cname = it->first;
 			MySQLService *s = it->second;
-			int i;
+			size_t i;
 
 			++it;
 

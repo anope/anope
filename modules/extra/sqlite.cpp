@@ -129,7 +129,7 @@ public:
 		{
 			const Anope::string &cname = it->first;
 			SQLiteService *s = it->second;
-			int i, num;
+			size_t i, num;
 			++it;
 
 			for (i = 0, num = config.CountBlock("sqlite"); i < num; ++i)

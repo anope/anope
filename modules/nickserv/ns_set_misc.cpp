@@ -329,8 +329,8 @@ public:
 	{
 		command_data.clear();
 		items_by_priority.clear();
-		const auto count = conf.CountBlock("command");
-		for (int i = 0; i < count; ++i)
+
+		for (int i = 0; i < conf.CountBlock("command"); ++i)
 		{
 			const auto &block = conf.GetBlock("command", i);
 			const Anope::string &cmd = block.Get<const Anope::string>("command");

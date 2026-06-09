@@ -75,10 +75,10 @@ public:
 	}
 
 	// Retrieves the remaining data in the row.
-	Anope::string GetRemaining()
+	Anope::string GetRemaining(bool allow_empty = false)
 	{
 		auto remaining = stream.GetRemaining();
-		if (remaining.empty())
+		if (remaining.empty() && !allow_empty)
 			error++;
 		return remaining;
 	}
@@ -159,15 +159,15 @@ struct ChannelData final
 {
 	Anope::unordered_map<ChanServ::AutoKick *> akicks;
 	Anope::string bot;
+	FounderSuccessorCandidate founder_candidate;
 	Anope::string info_adder;
 	Anope::string info_message;
 	time_t info_ts = 0;
 	std::vector<ModeLockData> mlocks;
+	FounderSuccessorCandidate successor_candidate;
 	Anope::string suspend_by;
 	Anope::string suspend_reason;
 	time_t suspend_ts = 0;
-	FounderSuccessorCandidate founder_candidate;
-	FounderSuccessorCandidate successor_candidate;
 };
 
 struct UserData final
@@ -274,7 +274,7 @@ private:
 		{ "XL",         &DBAtheme::HandleXL        },
 	};
 
-	static void removeAll(Anope::string& in, const Anope::string& unwanted)
+	static void RemoveAll(Anope::string& in, const Anope::string& unwanted)
 	{
 			auto it = std::remove_if(in.begin(), in.end(), [&](char c){
 					return unwanted.find_first_of(c) != unwanted.npos;
@@ -282,7 +282,7 @@ private:
 			in.erase(it, in.end());
 	}
 
-	static bool removeFirstOccurance(Anope::string& in, char c)
+	static bool RemoveFirstOccurance(Anope::string& in, char c)
 	{
 		auto pos = in.find(c);
 		if (pos != Anope::string::npos)
@@ -295,7 +295,7 @@ private:
 
 	bool ApplyAccess(Anope::string &in, char flag, Anope::string &out, std::initializer_list<const char*> privs)
 	{
-		const bool flagFound = removeFirstOccurance(in, flag);
+		const bool flagFound = RemoveFirstOccurance(in, flag);
 		if (flagFound)
 		{
 			for (const auto *priv : privs)
@@ -720,7 +720,7 @@ private:
 		}
 
 		// Atheme allows multiple founders and picks a successor based on rank if one is not explicitly assigned.
-		removeAll(flags, "FSR"); 
+		RemoveAll(flags, "FSR");
 
 		FounderSuccessorCandidate current_candidate(nc, originalflags, modifiedtime);
 
@@ -964,7 +964,7 @@ private:
 		ci->last_used = used;
 
 		// No equivalent: elnv
-		removeFirstOccurance(flags, 'v'); // verbose, com
+		RemoveFirstOccurance(flags, 'v'); // verbose, com
 		ApplyFlags(ci, flags, 'h', "CS_NO_EXPIRE");
 		ApplyFlags(ci, flags, 'k', "KEEPTOPIC");
 		ApplyFlags(ci, flags, 'o', "NOAUTOOP");
@@ -1236,17 +1236,7 @@ private:
 		// MDU <display> <key> <value>
 		auto display = row.Get();
 		auto key = row.Get();
-		auto value = row.GetRemaining();
-
-		if (!row)
-		{
-			if (key == "private:lastquit:message")
-			{
-				Log(this) << "Ignoring empty last quit message for MDU: " << display;
-				return true;
-			}
-			return row.LogError(this);
-		}
+		auto value = row.GetRemaining(true);
 
 		auto *nc = NickCore::Find(display);
 		if (!nc)
@@ -1523,7 +1513,7 @@ private:
 		ApplyPassword(nc, flags, pass);
 
 		// No equivalent: bglmNQrS
-		removeFirstOccurance(flags, 'b'); // nick b flag is ephemeral, ignore
+		RemoveFirstOccurance(flags, 'b'); // nick b flag is ephemeral, ignore
 		ApplyFlags(nc, flags, 'E', "PROTECT");
 		ApplyFlags(nc, flags, 'e', "MEMO_MAIL");
 		ApplyFlags(nc, flags, 'n', "NEVEROP");

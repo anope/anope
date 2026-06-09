@@ -734,7 +734,7 @@ public:
 	bool IsTagValid(const Anope::string &tname, const Anope::string &tvalue) override
 	{
 		// InspIRCd accepts arbitrary message tags.
-		return true;
+		return Me->IsSynced();
 	}
 };
 

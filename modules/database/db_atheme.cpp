@@ -1811,8 +1811,9 @@ public:
 				auto *channels = nc->Require<AJoinList>(NICKSERV_AJOIN_LIST_EXT);
 				if (channels)
 				{
-					for (const auto& [channel, key] : data->ajoins)
+					for (const auto& ajoin : data->ajoins)
 					{
+						auto &channel = ajoin.first, &key = ajoin.second;
 						if (!key.empty())
 						{
 							Channel *c = Channel::Find(channel);

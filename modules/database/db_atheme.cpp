@@ -122,6 +122,39 @@ struct ModeLockData final
 	}
 };
 
+struct FounderSuccessorCandidate
+{
+	// Flags ranked from founder down, for founder/successor candidates
+	static const Anope::string FLAG_PRIORITY;
+
+	NickCore* nc;
+	size_t priority;
+	time_t mtime;
+
+	FounderSuccessorCandidate()
+		: nc(nullptr)
+		, priority(99) // arbitrary; for log readability
+		, mtime(std::numeric_limits<std::time_t>::max())
+	{
+	}
+
+	FounderSuccessorCandidate(NickCore *c, const Anope::string &flags, time_t m)
+		: nc(c)
+		, priority(FLAG_PRIORITY.find_first_of(flags))
+		, mtime(m)
+	{
+	}
+
+	bool operator<(const FounderSuccessorCandidate& other)
+	{
+		return std::tie(priority, mtime) < std::tie(other.priority, other.mtime);
+	}
+
+	FounderSuccessorCandidate& operator=(const FounderSuccessorCandidate& other) = default;
+};
+
+const Anope::string FounderSuccessorCandidate::FLAG_PRIORITY = "FSRsaOoHh";
+
 struct ChannelData final
 {
 	Anope::unordered_map<ChanServ::AutoKick *> akicks;
@@ -133,11 +166,13 @@ struct ChannelData final
 	Anope::string suspend_by;
 	Anope::string suspend_reason;
 	time_t suspend_ts = 0;
+	FounderSuccessorCandidate founder_candidate;
+	FounderSuccessorCandidate successor_candidate;
 };
 
 struct UserData final
 {
-	Anope::string ajoins;
+	Anope::map<Anope::string> ajoins;
 	Anope::string info_adder;
 	Anope::string info_message;
 	time_t info_ts = 0;
@@ -175,8 +210,6 @@ private:
 	ServiceReference<XLineManager> sqlinemgr;
 	Anope::map<Anope::string> csmiscdata;
 	Anope::map<Anope::string> nsmiscdata;
-	Anope::string csignoreflags;
-	Anope::string nsignoreflags;
 
 	Anope::map<std::function<bool(DBAtheme*,AthemeRow&)>> rowhandlers = {
 		{ "AC",         &DBAtheme::HandleIgnore    },
@@ -241,6 +274,14 @@ private:
 		{ "XL",         &DBAtheme::HandleXL        },
 	};
 
+	static void removeAll(Anope::string& in, const Anope::string& unwanted)
+	{
+			auto it = std::remove_if(in.begin(), in.end(), [&](char c){
+					return unwanted.find_first_of(c) != unwanted.npos;
+			});
+			in.erase(it, in.end());
+	}
+
 	static bool removeFirstOccurance(Anope::string& in, char c)
 	{
 		auto pos = in.find(c);
@@ -250,14 +291,6 @@ private:
 			return true;
 		}
 		return false;
-	}
-
-	static void removeAll(Anope::string& in, const Anope::string& unwanted)
-	{
-		auto it = std::remove_if(in.begin(), in.end(), [&](char c){
-			return unwanted.find_first_of(c) != unwanted.npos;
-		});
-		in.erase(it, in.end());
 	}
 
 	bool ApplyAccess(Anope::string &in, char flag, Anope::string &out, std::initializer_list<const char*> privs)
@@ -633,6 +666,8 @@ private:
 			return false;
 		}
 
+		auto *data = chandata.Require(ci);
+
 		auto *nc = NickCore::Find(mask);
 		if (flags.find('b') != Anope::string::npos)
 		{
@@ -642,7 +677,6 @@ private:
 				return true;
 			}
 
-			auto *data = chandata.Require(ci);
 			if (nc)
 				data->akicks[mask] = ChanServ::akick_service->AddAKick(ci, setter, nc, "", modifiedtime, modifiedtime);
 			else
@@ -673,14 +707,6 @@ private:
 		ApplyAccess(flags, 't', accessflags, { "TOPIC" });
 		ApplyAccess(flags, 'V', accessflags, { "AUTOVOICE" });
 		ApplyAccess(flags, 'v', accessflags, { "VOICE", "VOICEME" });
-		if (ApplyAccess(flags, 'F', accessflags, { "FOUNDER" }))
-		{
-			// Atheme allows multiple coequal founders. Anope takes a Highlander approach. First one found wins.
-			if (nc && !ci->GetFounder())
-			{
-				ci->SetFounder(nc);
-			}
-		}
 		if (!accessflags.empty())
 		{
 			auto *access = accessprov->Create();
@@ -692,20 +718,33 @@ private:
 			access->AccessUnserialize(accessflags);
 			ci->AddAccess(access);
 		}
-		// 'S' flag is the successor, but it's not always used. 'R' flag roughly corresponds otherwise.
-		if (removeFirstOccurance(flags, 'S') && ci->GetFounder() != nc)
+
+		// Atheme allows multiple founders and picks a successor based on rank if one is not explicitly assigned.
+		removeAll(flags, "FSR"); 
+
+		FounderSuccessorCandidate current_candidate(nc, originalflags, modifiedtime);
+
+		if (nc && current_candidate < data->successor_candidate)
 		{
-			if (NickCore* oldSuccessor = ci->GetSuccessor())
+			if (current_candidate < data->founder_candidate)
 			{
-				Log(this) << "Changing successor for " << ci->name << " from " << oldSuccessor->display
-					<< " to " << nc->display << " based on +S flag";
+				Log(LOG_DEBUG_2) << ci->name << ": Demoting founder candidate ("
+					<< ( data->founder_candidate.nc ? data->founder_candidate.nc->display : "DEFAULT" )
+					<< ", " << data->founder_candidate.priority
+					<< ") to successor; replacing with (" << current_candidate.nc->display
+					<< ", " << current_candidate.priority << ")";
+				data->successor_candidate = data->founder_candidate;
+				data->founder_candidate = current_candidate;
 			}
-			ci->SetSuccessor(nc);
-		}
-		if (removeFirstOccurance(flags, 'R') && ci->GetFounder() != nc && ! ci->GetSuccessor() )
-		{
-			Log(this) << "Setting successor for " << ci->name << " to " << nc->display << " based on +R flag";
-			ci->SetSuccessor(nc);
+			else
+			{
+				Log(LOG_DEBUG_2) << ci->name << ": Replacing successor candidate ("
+					<< ( data->successor_candidate.nc ? data->successor_candidate.nc->display : "DEFAULT" )
+					<< ", " << data->successor_candidate.priority
+					<< ") with (" << current_candidate.nc->display
+					<< ", " << current_candidate.priority << ")";
+				data->successor_candidate = current_candidate;
+			}
 		}
 
 		if (flags != "+")
@@ -925,7 +964,7 @@ private:
 		ci->last_used = used;
 
 		// No equivalent: elnv
-		removeAll(flags, csignoreflags);
+		removeFirstOccurance(flags, 'v'); // verbose, com
 		ApplyFlags(ci, flags, 'h', "CS_NO_EXPIRE");
 		ApplyFlags(ci, flags, 'k', "KEEPTOPIC");
 		ApplyFlags(ci, flags, 'o', "NOAUTOOP");
@@ -1218,7 +1257,17 @@ private:
 
 		auto *data = userdata.Require(nc);
 		if (key == "private:autojoin")
-			data->ajoins = value;
+		{
+			commasepstream autojoins(value, true);
+			for (Anope::string autojoin; autojoins.GetToken(autojoin); )
+			{
+				spacesepstream entry(autojoin);
+				Anope::string cname, ckey;
+				if (entry.GetToken(cname))
+					entry.GetToken(ckey);
+				data->ajoins[cname] = ckey;
+			}
+		}
 		else if (key == "private:doenforce")
 			data->protect = true;
 		else if (key == "private:enforcetime")
@@ -1474,7 +1523,7 @@ private:
 		ApplyPassword(nc, flags, pass);
 
 		// No equivalent: bglmNQrS
-		removeAll(flags, nsignoreflags);
+		removeFirstOccurance(flags, 'b'); // nick b flag is ephemeral, ignore
 		ApplyFlags(nc, flags, 'E', "PROTECT");
 		ApplyFlags(nc, flags, 'e', "MEMO_MAIL");
 		ApplyFlags(nc, flags, 'n', "NEVEROP");
@@ -1648,9 +1697,6 @@ public:
 	{
 		const auto &modconf = conf.GetModule(this);
 
-		nsignoreflags = modconf.Get<const Anope::string>("ns_ignore_flags", "");
-		csignoreflags = modconf.Get<const Anope::string>("cs_ignore_flags", "");
-
 		csmiscdata.clear();
 		for (auto idx = 0; idx < modconf.CountBlock("cs_set_misc"); ++idx)
 		{
@@ -1765,16 +1811,10 @@ public:
 				auto *channels = nc->Require<AJoinList>(NICKSERV_AJOIN_LIST_EXT);
 				if (channels)
 				{
-					commasepstream entries(data->ajoins);
-					Anope::string entry;
-					while (entries.GetToken(entry))
+					for (const auto& [channel, key] : data->ajoins)
 					{
-						spacesepstream atheme_ajoin_entry(entry);
-						Anope::string channel, key;
-						bool has_key = atheme_ajoin_entry.GetToken(channel);
-						if (has_key)
+						if (!key.empty())
 						{
-							atheme_ajoin_entry.GetToken(key);
 							Channel *c = Channel::Find(channel);
 							Anope::string k;
 							if (c && c->GetParam("KEY", k) && key != k)
@@ -1787,7 +1827,7 @@ public:
 
 						if (!IRCD->IsChannelValid(channel))
 						{
-							Log(this) << "Invalid ajoin channel" << channel << " for " << nc->display;
+							Log(this) << "Invalid ajoin channel " << channel << " for " << nc->display;
 						}
 						else
 						{

@@ -83,13 +83,17 @@ void Uplink::SendInternal(const Anope::map<Anope::string> &tags, const MessageSo
 	Log(LOG_RAWIO) << "Sent " << message;
 	if (Anope::ProtocolDebug)
 	{
-		if (tags.empty())
-			Log() << "\tNo tags";
-		else
+		auto sent_tag = false;
+		for (const auto &[tname, tvalue] : tags)
 		{
-			for (const auto &[tname, tvalue] : tags)
+			if (IRCD->IsTagValid(tname, tvalue))
+			{
 				Log() << "\tTag " << tname << ": " << tvalue;
+				sent_tag = true;
+			}
 		}
+		if (!sent_tag)
+			Log() << "\tNo tags";
 
 		if (source.GetSource().empty())
 			Log() << "\tNo source";

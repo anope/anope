@@ -299,11 +299,7 @@ public:
 			{
 				Anope::map<Anope::string> tags;
 				if (timestamp)
-				{
-					char timebuf[32];
-					strftime(timebuf, sizeof(timebuf), "%Y-%m-%dT%H:%M:%S.000Z", gmtime(&message->when));
-					tags["time"] = timebuf;
-				}
+					tags["time"] = Anope::FormatISO8601(message->when, 0);
 
 				if (u->ShouldPrivmsg())
 					IRCD->SendContextPrivmsg(c->ci->WhoSends(), u, c, message->message, tags);

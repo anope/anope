@@ -79,6 +79,12 @@ namespace Anope
 	 */
 	extern CoreExport Anope::string FormatCTCP(const Anope::string &name, const Anope::string &body = "");
 
+	/** Formats a date/time as an IS0 8601 timestamp.
+	 * @param ts UNIX timestamp to format.
+	 * @param ms Number of milliseconds to format.
+	 */
+	extern CoreExport Anope::string FormatISO8601(time_t ts, unsigned long long ms);
+
 	/** Parses a CTCP message received from a client.
 	 * @param text The raw message to parse.
 	 * @param name The location to store the name of the CTCP.

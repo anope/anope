@@ -1178,6 +1178,24 @@ Anope::string Anope::FormatCTCP(const Anope::string &name, const Anope::string &
 	return Anope::Format("\1%s %s\1", name.c_str(), value.c_str());
 }
 
+Anope::string Anope::FormatISO8601(time_t ts, unsigned long long ms)
+{
+	static time_t last_ts = -1;
+	static unsigned long long last_ms = -1;
+	static Anope::string timestamp;
+	if (ts != last_ts || ms != last_ms)
+	{
+		last_ts = ts;
+		last_ms = ms;
+		char timebuf[32];
+		const auto *tm = gmtime(&ts);
+		strftime(timebuf, sizeof(timebuf), "%Y-%m-%dT%H:%M:%S", tm);
+		timestamp = Anope::Format("%s.%03lldZ", timebuf, ms);
+	}
+	return timestamp;
+}
+
+
 bool Anope::ParseCTCP(const Anope::string &text, Anope::string &name, Anope::string &body)
 {
 	// According to draft-oakley-irc-ctcp-02 a valid CTCP must begin with SOH and

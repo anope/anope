@@ -124,7 +124,7 @@ struct ModeLockData final
 
 struct FounderSuccessorCandidate
 {
-	// Flags ranked from founder down, for founder/successor candidates
+	// Flags ranked from founder down, for successor candidate ranking
 	static const Anope::string FLAG_PRIORITY;
 
 	NickCore* nc;
@@ -720,16 +720,17 @@ private:
 		}
 
 		// Atheme allows multiple founders and picks a successor based on rank if one is not explicitly assigned.
-		RemoveAll(flags, "FSR");
+		bool is_founder_candidate = RemoveFirstOccurance(flags, 'F');
+		RemoveAll(flags, "SR");
 
 		FounderSuccessorCandidate current_candidate(nc, originalflags, modifiedtime);
 
 		if (nc && current_candidate < data->successor_candidate)
 		{
-			if (current_candidate < data->founder_candidate)
+			if (is_founder_candidate && current_candidate < data->founder_candidate)
 			{
-				Log(LOG_DEBUG_2) << ci->name << ": Demoting founder candidate ("
-					<< ( data->founder_candidate.nc ? data->founder_candidate.nc->display : "DEFAULT" )
+				Log(LOG_DEBUG) << ci->name << ": Demoting founder candidate ("
+					<< ( data->founder_candidate.nc ? data->founder_candidate.nc->display : "NONE" )
 					<< ", " << data->founder_candidate.priority
 					<< ") to successor; replacing with (" << current_candidate.nc->display
 					<< ", " << current_candidate.priority << ")";
@@ -738,8 +739,8 @@ private:
 			}
 			else
 			{
-				Log(LOG_DEBUG_2) << ci->name << ": Replacing successor candidate ("
-					<< ( data->successor_candidate.nc ? data->successor_candidate.nc->display : "DEFAULT" )
+				Log(LOG_DEBUG) << ci->name << ": Replacing successor candidate ("
+					<< ( data->successor_candidate.nc ? data->successor_candidate.nc->display : "NONE" )
 					<< ", " << data->successor_candidate.priority
 					<< ") with (" << current_candidate.nc->display
 					<< ", " << current_candidate.priority << ")";
@@ -1810,7 +1811,7 @@ public:
 							Anope::string k;
 							if (c && c->GetParam("KEY", k) && key != k)
 							{
-								Log(this) << "Skipping ajoin with incorrect key for channel " << channel 
+								Log(this) << "Skipping ajoin with incorrect key for channel " << channel
 									<< ", user " << nc->display;
 								continue;
 							}

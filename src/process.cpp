@@ -100,6 +100,13 @@ void Anope::ProcessInternal(MessageSource &src, const Anope::string &command, co
 	}
 }
 
+void IRCDProto::PopulateTags(Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params)
+{
+	auto it = tags.find("time"); // https://ircv3.net/specs/extensions/server-time
+	if (it == tags.end())
+		tags["time"] = Anope::FormatISO8601(Anope::CurTime, Anope::CurTimeNs / 1'000'000);
+}
+
 bool IRCDProto::Parse(const Anope::string &buffer, Anope::map<Anope::string> &tags, Anope::string &source, Anope::string &command, std::vector<Anope::string> &params)
 {
 	MessageTokenizer tokens(buffer);

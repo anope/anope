@@ -58,6 +58,14 @@ public:
 	 */
 	virtual bool Parse(const Anope::string &message, Anope::map<Anope::string> &tags, Anope::string &source, Anope::string &command, std::vector<Anope::string> &params);
 
+	/* Populates the tags that should be sent on all messages.
+	 * @param tags The location to store tags.
+	 * @param source Source of the message.
+	 * @param command Command name.
+	 * @param params Any extra parameters.
+	 */
+	virtual void PopulateTags(Anope::map<Anope::string> &tags, const MessageSource &source, const Anope::string &command, const std::vector<Anope::string> &params);
+
 	/* Formats an outgoing message so it can be sent to the IRC server.
 	 * @param message The location to store the formatted message.
 	 * @param tags IRCv3 message tags.

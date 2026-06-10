@@ -73,8 +73,11 @@ void Uplink::SendInternal(const Anope::map<Anope::string> &tags, const MessageSo
 		return;
 	}
 
+	Anope::map<Anope::string> fulltags(tags);
+	IRCD->PopulateTags(fulltags, source, command, params);
+
 	Anope::string message;
-	if (!IRCD->Format(message, tags, source, command, params))
+	if (!IRCD->Format(message, fulltags, source, command, params))
 		return;
 
 	UplinkSock->sent_msgs++;
@@ -84,7 +87,7 @@ void Uplink::SendInternal(const Anope::map<Anope::string> &tags, const MessageSo
 	if (Anope::ProtocolDebug)
 	{
 		auto sent_tag = false;
-		for (const auto &[tname, tvalue] : tags)
+		for (const auto &[tname, tvalue] : fulltags)
 		{
 			if (IRCD->IsTagValid(tname, tvalue))
 			{

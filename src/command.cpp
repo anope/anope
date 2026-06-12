@@ -402,5 +402,5 @@ bool Command::FindFromService(const Anope::string &command_service, BotInfo *&bo
 		}
 	}
 
-	return name.empty();
+	return !name.empty();
 }

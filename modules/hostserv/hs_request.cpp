@@ -183,8 +183,13 @@ public:
 class CommandHSRequest final
 	: public Command
 {
+private:
+	SerializableExtensibleItem<time_t> &requestcooldown;
+
 public:
-	CommandHSRequest(Module *creator) : Command(creator, "hostserv/request", 1, 1)
+	CommandHSRequest(Module *creator, SerializableExtensibleItem<time_t> &ext)
+		: Command(creator, "hostserv/request", 1, 1)
+		, requestcooldown(ext)
 	{
 		this->SetDesc(_("Request a vhost for your nick"));
 		this->SetSyntax(_("vhost"));
@@ -263,12 +268,25 @@ public:
 			return;
 		}
 
-		time_t send_delay = Config->GetModule("memoserv").Get<time_t>("senddelay");
-		if (Config->GetModule(this->owner).Get<bool>("memooper") && send_delay > 0 && u && u->lastmemosend + send_delay > Anope::CurTime)
+		time_t waituntil = 0;
 		{
-			auto waitperiod = (u->lastmemosend + send_delay) -  Anope::CurTime;
+			// Check whether the user is on a request cooldown.
+			const auto *last_req = requestcooldown.Get(na);
+			if (last_req)
+				waituntil = *last_req;
+		}
+		if (Config->GetModule(this->owner).Get<bool>("memooper"))
+		{
+			// Check whether the user can send a memo to opers yet.
+			const auto send_delay = Config->GetModule("memoserv").Get<time_t>("senddelay");
+			if (send_delay > 0 && u && u->lastmemosend)
+				waituntil = std::max(waituntil, u->lastmemosend + send_delay);
+		}
+
+		if (waituntil && waituntil > Anope::CurTime)
+		{
+			const auto waitperiod = waituntil - Anope::CurTime;
 			source.Reply(_("Please wait %s before requesting a new vhost."), Anope::Duration(waitperiod, source.GetAccount()).c_str());
-			u->lastmemosend = Anope::CurTime;
 			return;
 		}
 
@@ -319,8 +337,15 @@ public:
 class CommandHSActivate final
 	: public Command
 {
+private:
+	SerializableExtensibleItem<time_t> &requestcooldown;
+
 public:
-	CommandHSActivate(Module *creator) : Command(creator, "hostserv/activate", 1, 1)
+	time_t cooldown;
+
+	CommandHSActivate(Module *creator, SerializableExtensibleItem<time_t> &ext)
+		: Command(creator, "hostserv/activate", 1, 1)
+		, requestcooldown(ext)
 	{
 		this->SetDesc(_("Approve the requested vhost of a user"));
 		this->SetSyntax(_("\037nick\037"));
@@ -348,6 +373,8 @@ public:
 
 			source.Reply(_("VHost for %s has been activated."), na->nick.c_str());
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
+
+			requestcooldown.Set(na, Anope::CurTime + cooldown);
 			na->Shrink<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT);
 		}
 		else
@@ -369,8 +396,15 @@ public:
 class CommandHSReject final
 	: public Command
 {
+private:
+	SerializableExtensibleItem<time_t> &requestcooldown;
+
 public:
-	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2)
+	time_t cooldown;
+
+	CommandHSReject(Module *creator, SerializableExtensibleItem<time_t> &ext)
+		: Command(creator, "hostserv/reject", 1, 2)
+		, requestcooldown(ext)
 	{
 		this->SetDesc(_("Reject the requested vhost of a user"));
 		this->SetSyntax(_("\037nick\037 [\037reason\037]"));
@@ -391,6 +425,7 @@ public:
 		auto *req = HostRequestImpl::Get(na);
 		if (req)
 		{
+			requestcooldown.Set(na, Anope::CurTime + cooldown);
 			na->Shrink<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT);
 
 			if (Config->GetModule(this->owner).Get<bool>("memouser") && MemoServ::service)
@@ -553,8 +588,10 @@ public:
 class HSRequest final
 	: public Module
 {
+private:
+	SerializableExtensibleItem<time_t> requestcooldown;
 	CommandHSRequest commandhsrequest;
-	CommandHSActivate commandhsactive;
+	CommandHSActivate commandhsactivate;
 	CommandHSReject commandhsreject;
 	CommandHSWaiting commandhswaiting;
 	CommandHSValidate commandhsvalidate;
@@ -564,9 +601,10 @@ class HSRequest final
 public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, VENDOR)
-		, commandhsrequest(this)
-		, commandhsactive(this)
-		, commandhsreject(this)
+		, requestcooldown(this, "HS_REQUEST_COOLDOWN")
+		, commandhsrequest(this, requestcooldown)
+		, commandhsactivate(this, requestcooldown)
+		, commandhsreject(this, requestcooldown)
 		, commandhswaiting(this)
 		, commandhsvalidate(this)
 		, hostrequest(this, HOSTSERV_HOST_REQUEST_EXT)
@@ -578,6 +616,8 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		const auto &block = conf.GetModule(this);
+		commandhsactivate.cooldown = block.Get<time_t>("activationcooldown", "24h");
+		commandhsreject.cooldown = block.Get<time_t>("rejectioncooldown", "24h");
 		commandhsvalidate.cooldown = block.Get<time_t>("validationcooldown", "5m");
 		validation_record = block.Get<const Anope::string>("validationrecord", "anope-dns-validation");
 	}

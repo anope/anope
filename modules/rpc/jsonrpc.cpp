@@ -12,11 +12,17 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only
 
+/// BEGIN CMAKE
+/// target_link_libraries(${SO} PRIVATE "vendored_yyjson")
+/// END CMAKE
+
+#include <cmath>
+
 #include "module.h"
 #include "modules/rpc.h"
 #include "modules/httpd.h"
 
-#include "yyjson/yyjson.c"
+#include "yyjson/yyjson.h"
 
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;

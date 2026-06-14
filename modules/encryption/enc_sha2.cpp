@@ -12,10 +12,14 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only
 
+/// BEGIN CMAKE
+/// target_link_libraries(${SO} PRIVATE "vendored_sha2")
+/// END CMAKE
+
 #include <climits>
 #include <random>
 
-#include "sha2/sha2.c"
+#include "sha2/sha2.h"
 
 #include "module.h"
 #include "modules/encryption.h"

@@ -12,10 +12,14 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only
 
+/// BEGIN CMAKE
+/// target_link_libraries(${SO} PRIVATE "vendored_sha1")
+/// END CMAKE
+
 #include "module.h"
 #include "modules/encryption.h"
 
-#include "sha1/sha1.c"
+#include "sha1/sha1.h"
 
 class SHA1Context final
 	: public Encryption::Context

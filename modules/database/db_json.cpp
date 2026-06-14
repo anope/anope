@@ -12,10 +12,14 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only
 
+/// BEGIN CMAKE
+/// target_link_libraries(${SO} PRIVATE "vendored_yyjson")
+/// END CMAKE
+
 #include <filesystem>
 namespace fs = std::filesystem;
 
-#include "yyjson/yyjson.c"
+#include "yyjson/yyjson.h"
 
 #include "module.h"
 

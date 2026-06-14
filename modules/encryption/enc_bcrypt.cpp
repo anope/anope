@@ -12,10 +12,14 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only
 
+/// BEGIN CMAKE
+/// target_link_libraries(${SO} PRIVATE "vendored_bcrypt")
+/// END CMAKE
+
 #include <climits>
 #include <random>
 
-#include "bcrypt/crypt_blowfish.c"
+#include "bcrypt/crypt_blowfish.h"
 
 #include "module.h"
 #include "modules/encryption.h"

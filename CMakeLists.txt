@@ -1,8 +1,8 @@
 # This usage of CMake requires at least version 3.20
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-# Set the project as C++ primarily
-project(Anope CXX)
+# Set the project as C++ primarily with C for the vendored libraries
+project(Anope CXX C)
 
 # Force the locale to C for later uses of things like gcc so the messages come up in English, not the user's default language
 set(ENV{LC_ALL} C)
@@ -294,6 +294,7 @@ endif()
 add_subdirectory(data)
 add_subdirectory(docs)
 add_subdirectory(language)
+add_subdirectory(vendor)
 add_subdirectory(src)
 add_subdirectory(modules)
 add_subdirectory(include)

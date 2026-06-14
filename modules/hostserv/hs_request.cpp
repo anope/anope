@@ -27,6 +27,29 @@ namespace
 	Anope::string validation_record;
 }
 
+struct SharedData final
+{
+	// How long after a requested vhost is activated does a user have to wait before they can request a new vhost.
+	time_t activationcooldown = 0;
+
+	// How long after a requested vhost is rejected does a user have to wait before they can request a new vhost.
+	time_t rejectioncooldown = 0;
+
+	// How long should users have to wait between attempts at DNS validation.
+	time_t validationcooldown = 0;
+
+	// Extensible that stores the time a user had a vhost activated/rejected.
+	SerializableExtensibleItem<time_t> requestcooldown;
+
+	// The name of the DNS record used for validation.
+	Anope::string validationrecord;
+
+	SharedData(Module *mod)
+		: requestcooldown(mod, "HS_REQUEST_COOLDOWN")
+	{
+	}
+};
+
 struct HostRequestImpl final
 	: HostServ::HostRequest
 	, Serializable
@@ -105,6 +128,7 @@ private:
 	Command *command;
 	Reference<NickAlias> nickalias;
 	CommandSource source;
+	SharedData &data;
 
 	void HandleError(HostRequestImpl *hr)
 	{
@@ -119,11 +143,12 @@ private:
 	}
 
 public:
-	DNSHostResolver(Command *cmd, HostServ::HostRequest *hr, NickAlias *na, const CommandSource &src)
+	DNSHostResolver(Command *cmd, HostServ::HostRequest *hr, NickAlias *na, const CommandSource &src, SharedData &sd)
 		: Request(dnsmanager, cmd->module, hr->host, DNS::QUERY_TXT, false)
 		, command(cmd)
 		, nickalias(na)
 		, source(src)
+		, data(sd)
 	{
 		hr->last_validation = Anope::CurTime;
 		Log(LOG_DEBUG) << "Checking " << hr->host << " for " << hr->validation_token;
@@ -171,6 +196,8 @@ public:
 
 			source.Reply(_("VHost for %s has been validated using DNS."), na->nick.c_str());
 			Log(LOG_COMMAND, source, command) << "for " << na->nick << " for vhost " << hr->Mask();
+
+			data.requestcooldown.Set(na, Anope::CurTime + data.activationcooldown);
 			na->Shrink<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT);
 
 			return; // We're done.
@@ -184,12 +211,12 @@ class CommandHSRequest final
 	: public Command
 {
 private:
-	SerializableExtensibleItem<time_t> &requestcooldown;
+	SharedData &data;
 
 public:
-	CommandHSRequest(Module *creator, SerializableExtensibleItem<time_t> &ext)
+	CommandHSRequest(Module *creator, SharedData &sd)
 		: Command(creator, "hostserv/request", 1, 1)
-		, requestcooldown(ext)
+		, data(sd)
 	{
 		this->SetDesc(_("Request a vhost for your nick"));
 		this->SetSyntax(_("vhost"));
@@ -271,7 +298,7 @@ public:
 		time_t waituntil = 0;
 		{
 			// Check whether the user is on a request cooldown.
-			const auto *last_req = requestcooldown.Get(na);
+			const auto *last_req = data.requestcooldown.Get(na);
 			if (last_req)
 				waituntil = *last_req;
 		}
@@ -338,14 +365,12 @@ class CommandHSActivate final
 	: public Command
 {
 private:
-	SerializableExtensibleItem<time_t> &requestcooldown;
+	SharedData &data;
 
 public:
-	time_t cooldown;
-
-	CommandHSActivate(Module *creator, SerializableExtensibleItem<time_t> &ext)
+	CommandHSActivate(Module *creator, SharedData &sd)
 		: Command(creator, "hostserv/activate", 1, 1)
-		, requestcooldown(ext)
+		, data(sd)
 	{
 		this->SetDesc(_("Approve the requested vhost of a user"));
 		this->SetSyntax(_("\037nick\037"));
@@ -374,7 +399,7 @@ public:
 			source.Reply(_("VHost for %s has been activated."), na->nick.c_str());
 			Log(LOG_COMMAND, source, this) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
 
-			requestcooldown.Set(na, Anope::CurTime + cooldown);
+			data.requestcooldown.Set(na, Anope::CurTime + data.activationcooldown);
 			na->Shrink<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT);
 		}
 		else
@@ -397,14 +422,12 @@ class CommandHSReject final
 	: public Command
 {
 private:
-	SerializableExtensibleItem<time_t> &requestcooldown;
+	SharedData &data;
 
 public:
-	time_t cooldown;
-
-	CommandHSReject(Module *creator, SerializableExtensibleItem<time_t> &ext)
+	CommandHSReject(Module *creator, SharedData &sd)
 		: Command(creator, "hostserv/reject", 1, 2)
-		, requestcooldown(ext)
+		, data(sd)
 	{
 		this->SetDesc(_("Reject the requested vhost of a user"));
 		this->SetSyntax(_("\037nick\037 [\037reason\037]"));
@@ -425,7 +448,7 @@ public:
 		auto *req = HostRequestImpl::Get(na);
 		if (req)
 		{
-			requestcooldown.Set(na, Anope::CurTime + cooldown);
+			data.requestcooldown.Set(na, Anope::CurTime + data.rejectioncooldown);
 			na->Shrink<HostRequestImpl>(HOSTSERV_HOST_REQUEST_EXT);
 
 			if (Config->GetModule(this->owner).Get<bool>("memouser") && MemoServ::service)
@@ -516,11 +539,13 @@ public:
 class CommandHSValidate final
 	: public Command
 {
-public:
-	time_t cooldown;
+private:
+	SharedData &data;
 
-	CommandHSValidate(Module *creator)
+public:
+	CommandHSValidate(Module *creator, SharedData &sd)
 		: Command(creator, "hostserv/validate", 0)
+		, data(sd)
 	{
 		this->SetDesc(_("Validates a previously requested vhost using DNS"));
 	}
@@ -547,7 +572,7 @@ public:
 			return;
 		}
 
-		auto next_validation = req->last_validation + cooldown;
+		auto next_validation = req->last_validation + data.validationcooldown;
 		if (req->last_validation && next_validation > Anope::CurTime)
 		{
 			source.Reply(_("You must wait for %s before trying DNS validation again."),
@@ -561,7 +586,7 @@ public:
 			if (!dnsmanager)
 				throw SocketException("DNS is not available");
 
-			res = new DNSHostResolver(this, req, na, source);
+			res = new DNSHostResolver(this, req, na, source, data);
 			dnsmanager->Process(res);
 		}
 		catch (const SocketException &ex)
@@ -589,7 +614,7 @@ class HSRequest final
 	: public Module
 {
 private:
-	SerializableExtensibleItem<time_t> requestcooldown;
+	SharedData data;
 	CommandHSRequest commandhsrequest;
 	CommandHSActivate commandhsactivate;
 	CommandHSReject commandhsreject;
@@ -601,12 +626,12 @@ private:
 public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator)
 		: Module(modname, creator, VENDOR)
-		, requestcooldown(this, "HS_REQUEST_COOLDOWN")
-		, commandhsrequest(this, requestcooldown)
-		, commandhsactivate(this, requestcooldown)
-		, commandhsreject(this, requestcooldown)
+		, data(this)
+		, commandhsrequest(this, data)
+		, commandhsactivate(this, data)
+		, commandhsreject(this, data)
 		, commandhswaiting(this)
-		, commandhsvalidate(this)
+		, commandhsvalidate(this, data)
 		, hostrequest(this, HOSTSERV_HOST_REQUEST_EXT)
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
@@ -616,9 +641,9 @@ public:
 	void OnReload(Configuration::Conf &conf) override
 	{
 		const auto &block = conf.GetModule(this);
-		commandhsactivate.cooldown = block.Get<time_t>("activationcooldown", "24h");
-		commandhsreject.cooldown = block.Get<time_t>("rejectioncooldown", "24h");
-		commandhsvalidate.cooldown = block.Get<time_t>("validationcooldown", "5m");
+		data.activationcooldown = block.Get<time_t>("activationcooldown", "24h");
+		data.rejectioncooldown = block.Get<time_t>("rejectioncooldown", "24h");
+		data.validationcooldown = block.Get<time_t>("validationcooldown", "5m");
 		validation_record = block.Get<const Anope::string>("validationrecord", "anope-dns-validation");
 	}
 };

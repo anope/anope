@@ -19,7 +19,10 @@
 #include "module.h"
 #include "modules/encryption.h"
 
+extern "C"
+{
 #include "md5/md5.h"
+}
 
 class MD5Context final
 	: public Encryption::Context

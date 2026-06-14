@@ -19,7 +19,10 @@
 #include <climits>
 #include <random>
 
+extern "C"
+{
 #include "bcrypt/crypt_blowfish.h"
+}
 
 #include "module.h"
 #include "modules/encryption.h"

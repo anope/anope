@@ -25,6 +25,7 @@ include(CheckFunctionExists)
 include(CheckTypeSize)
 include(CheckLibraryExists)
 include(CheckCXXCompilerFlag)
+include(CheckPIESupported)
 
 if(NOT WIN32)
   include(FindPkgConfig)
@@ -39,6 +40,10 @@ endif()
 if(EXTRA_LIBS)
   link_directories(${EXTRA_LIBS})
 endif()
+
+# Enable -fPIC for all targets.
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+check_pie_supported()
 
 # Find gettext
 find_package(Gettext)

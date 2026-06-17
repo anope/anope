@@ -952,9 +952,9 @@ Anope::string Anope::VersionShort()
 Anope::string Anope::VersionBuildString()
 {
 #if REPRODUCIBLE_BUILD
-	Anope::string s = "build #" + Anope::ToString(BUILD);
+	auto s = Anope::Format("build #%u", BUILD);
 #else
-	Anope::string s = "build #" + Anope::ToString(BUILD) + ", compiled " + Anope::compiled;
+	auto s = Anope::Format("build #%u, compiled %s", BUILD, BUILD_DATE);
 #endif
 	Anope::string flags;
 

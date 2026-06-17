@@ -362,10 +362,6 @@ namespace Anope
 	template<typename T>
 	using unordered_map = std::unordered_map<string, T, hash_ci, compare>;
 
-#if !REPRODUCIBLE_BUILD
-	static const char *const compiled = __TIME__ " " __DATE__;
-#endif
-
 	/** The time Anope started.
 	 */
 	extern CoreExport time_t StartTime;

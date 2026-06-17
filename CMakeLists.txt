@@ -149,28 +149,37 @@ elseif(NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/anope-${VERSION_MAJOR}-${VERSION_MINOR}")
 endif()
 
+function(configure_path VARIABLE DEFAULT)
+  if(NOT DEFINED ${VARIABLE})
+      set(${VARIABLE} ${DEFAULT} CACHE PATH "Location of the ${DEFAULT} directory")
+  endif()
+
+  if(WIN32)
+    set(ABSOLUTE_${VARIABLE} ${${VARIABLE}})
+  else()
+    cmake_path(
+      APPEND CMAKE_INSTALL_PREFIX "${${VARIABLE}}"
+      OUTPUT_VARIABLE ABSOLUTE_${VARIABLE}
+    )
+    cmake_path(NORMAL_PATH ABSOLUTE_${VARIABLE})
+  endif()
+  set(ABSOLUTE_${VARIABLE} ${ABSOLUTE_${VARIABLE}} CACHE INTERNAL "" FORCE)
+
+  install(
+    DIRECTORY
+    DESTINATION ${${VARIABLE}}
+  )
+endfunction()
+
+
 # Set default paths for various directories if not already defined
-if(NOT BIN_DIR)
-  set(BIN_DIR "bin")
-endif()
-if(NOT DATA_DIR)
-  set(DATA_DIR "data")
-endif()
-if(NOT DOC_DIR)
-  set(DOC_DIR "doc")
-endif()
-if(NOT CONF_DIR)
-  set(CONF_DIR "conf")
-endif()
-if(NOT MODULE_DIR)
-  set(MODULE_DIR "modules")
-endif()
-if(NOT LOCALE_DIR)
-  set(LOCALE_DIR "locale")
-endif()
-if(NOT LOG_DIR)
-  set(LOG_DIR "logs")
-endif()
+configure_path(BIN_DIR "bin")
+configure_path(DATA_DIR "data")
+configure_path(DOC_DIR "doc")
+configure_path(CONF_DIR "conf")
+configure_path(MODULE_DIR "modules")
+configure_path(LOCALE_DIR "locale")
+configure_path(LOG_DIR "logs")
 
 # Version number processing
 # Find all lines in src/version.sh that start with VERSION_
@@ -223,12 +232,9 @@ set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
 cmake_path(GET SERVICES_BINARY FILENAME SERVICES_BINARY)
 
 # At install time, create the following additional directories
-file(REAL_PATH ${DATA_DIR} ABSOLUTE_DATA_DIR BASE_DIRECTORY ${CMAKE_INSTALL_PREFIX})
-file(REAL_PATH ${LOG_DIR} ABSOLUTE_LOG_DIR BASE_DIRECTORY ${CMAKE_INSTALL_PREFIX})
-install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${ABSOLUTE_DATA_DIR}/backups\")")
-install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${ABSOLUTE_LOG_DIR}\")")
+install(DIRECTORY DESTINATION "${DATA_DIR}/backups")
 if(WIN32)
-  install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${ABSOLUTE_DATA_DIR}/runtime\")")
+  install(DIRECTORY DESTINATION "${DATA_DIR}/runtime")
 endif()
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the below directories, as well as the group of the data directory
 if(NOT WIN32 AND RUNGROUP)
@@ -243,7 +249,6 @@ if(WIN32)
   )
 endif()
 
-file(REAL_PATH ${MODULE_DIR} ABSOLUTE_MODULE_DIR BASE_DIRECTORY ${CMAKE_INSTALL_PREFIX})
 install(CODE "file(REMOVE_RECURSE \"$ENV{DESTDIR}${ABSOLUTE_MODULE_DIR}\")")
 
 # Only process the CPack section if we have CPack

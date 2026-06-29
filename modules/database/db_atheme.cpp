@@ -282,7 +282,7 @@ private:
 			in.erase(it, in.end());
 	}
 
-	static bool RemoveFirstOccurance(Anope::string& in, char c)
+	static bool RemoveFirstOccurrence(Anope::string& in, char c)
 	{
 		auto pos = in.find(c);
 		if (pos != Anope::string::npos)
@@ -295,8 +295,8 @@ private:
 
 	bool ApplyAccess(Anope::string &in, char flag, Anope::string &out, std::initializer_list<const char*> privs)
 	{
-		const bool flagFound = RemoveFirstOccurance(in, flag);
-		if (flagFound)
+		const bool flag_found = RemoveFirstOccurrence(in, flag);
+		if (flag_found)
 		{
 			for (const auto *priv : privs)
 			{
@@ -307,7 +307,7 @@ private:
 				}
 			}
 		}
-		return flagFound;
+		return flag_found;
 	}
 
 	void ApplyFlags(Extensible *ext, Anope::string &flags, char flag, const char *extname, bool extend = true)
@@ -720,7 +720,7 @@ private:
 		}
 
 		// Atheme allows multiple founders and picks a successor based on rank if one is not explicitly assigned.
-		bool is_founder_candidate = RemoveFirstOccurance(flags, 'F');
+		bool is_founder_candidate = RemoveFirstOccurrence(flags, 'F');
 		RemoveAll(flags, "SR");
 
 		FounderSuccessorCandidate current_candidate(nc, originalflags, modifiedtime);
@@ -965,7 +965,7 @@ private:
 		ci->last_used = used;
 
 		// No equivalent: elnv
-		RemoveFirstOccurance(flags, 'v'); // verbose, com
+		RemoveFirstOccurrence(flags, 'v'); // verbose, com
 		ApplyFlags(ci, flags, 'h', "CS_NO_EXPIRE");
 		ApplyFlags(ci, flags, 'k', "KEEPTOPIC");
 		ApplyFlags(ci, flags, 'o', "NOAUTOOP");
@@ -1514,7 +1514,7 @@ private:
 		ApplyPassword(nc, flags, pass);
 
 		// No equivalent: bglmNQrS
-		RemoveFirstOccurance(flags, 'b'); // nick b flag is ephemeral, ignore
+		RemoveFirstOccurrence(flags, 'b'); // nick b flag is ephemeral, ignore
 		ApplyFlags(nc, flags, 'E', "PROTECT");
 		ApplyFlags(nc, flags, 'e', "MEMO_MAIL");
 		ApplyFlags(nc, flags, 'n', "NEVEROP");

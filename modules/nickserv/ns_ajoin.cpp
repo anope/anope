@@ -13,34 +13,15 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
 #include "module.h"
+#include "modules/nickserv/ajoin.h"
 
-struct AJoinEntry;
-
-struct AJoinList final
-	: Serialize::Checker<std::vector<AJoinEntry *> >
+struct AJoinListImpl final : public AJoinList
 {
-	AJoinList(Extensible *) : Serialize::Checker<std::vector<AJoinEntry *> >("AJoinEntry") { }
-	~AJoinList();
-};
-
-struct AJoinEntry final
-	: Serializable
-{
-	Serialize::Reference<NickCore> owner;
-	Anope::string channel;
-	Anope::string key;
-
-	AJoinEntry(Extensible *) : Serializable("AJoinEntry") { }
-
-	~AJoinEntry() override
+	AJoinListImpl(Extensible * e) : AJoinList(e) { }
+	~AJoinListImpl()
 	{
-		auto *channels = owner->GetExt<AJoinList>("ajoinlist");
-		if (channels)
-		{
-			auto it = std::find((*channels)->begin(), (*channels)->end(), this);
-			if (it != (*channels)->end())
-				(*channels)->erase(it);
-		}
+		for (const auto *ajoin : *(*this))
+			delete ajoin;
 	}
 };
 
@@ -92,12 +73,6 @@ struct AJoinEntryType final
 		return aj;
 	}
 };
-
-AJoinList::~AJoinList()
-{
-	for (const auto *ajoin : *(*this))
-		delete ajoin;
-}
 
 class CommandNSAJoin final
 	: public Command
@@ -321,7 +296,7 @@ class NSAJoin final
 	: public Module
 {
 	CommandNSAJoin commandnsajoin;
-	ExtensibleItem<AJoinList> ajoinlist;
+	ExtensibleItem<AJoinListImpl> ajoinlist;
 	AJoinEntryType ajoinentry_type;
 
 public:

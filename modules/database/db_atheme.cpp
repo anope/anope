@@ -12,6 +12,7 @@
 //
 // SPDX-License-Identifier: GPL-2.0-only
 
+#include <algorithm>
 
 #include "module.h"
 #include "modules/botserv/badwords.h"
@@ -21,6 +22,7 @@
 #include "modules/chanserv/mode.h"
 #include "modules/hostserv/request.h"
 #include "modules/info.h"
+#include "modules/nickserv/ajoin.h"
 #include "modules/nickserv/cert.h"
 #include "modules/operserv/forbid.h"
 #include "modules/operserv/news.h"
@@ -73,10 +75,10 @@ public:
 	}
 
 	// Retrieves the remaining data in the row.
-	Anope::string GetRemaining()
+	Anope::string GetRemaining(bool allow_empty = false)
 	{
 		auto remaining = stream.GetRemaining();
-		if (remaining.empty())
+		if (remaining.empty() && !allow_empty)
 			error++;
 		return remaining;
 	}
@@ -120,14 +122,49 @@ struct ModeLockData final
 	}
 };
 
+struct FounderSuccessorCandidate
+{
+	// Flags ranked from founder down, for successor candidate ranking
+	static const Anope::string FLAG_PRIORITY;
+
+	NickCore* nc;
+	size_t priority;
+	time_t mtime;
+
+	FounderSuccessorCandidate()
+		: nc(nullptr)
+		, priority(99) // arbitrary; for log readability
+		, mtime(std::numeric_limits<std::time_t>::max())
+	{
+	}
+
+	FounderSuccessorCandidate(NickCore *c, const Anope::string &flags, time_t m)
+		: nc(c)
+		, priority(FLAG_PRIORITY.find_first_of(flags))
+		, mtime(m)
+	{
+	}
+
+	bool operator<(const FounderSuccessorCandidate& other)
+	{
+		return std::tie(priority, mtime) < std::tie(other.priority, other.mtime);
+	}
+
+	FounderSuccessorCandidate& operator=(const FounderSuccessorCandidate& other) = default;
+};
+
+const Anope::string FounderSuccessorCandidate::FLAG_PRIORITY = "FSRsaOoHh";
+
 struct ChannelData final
 {
 	Anope::unordered_map<ChanServ::AutoKick *> akicks;
 	Anope::string bot;
+	FounderSuccessorCandidate founder_candidate;
 	Anope::string info_adder;
 	Anope::string info_message;
 	time_t info_ts = 0;
 	std::vector<ModeLockData> mlocks;
+	FounderSuccessorCandidate successor_candidate;
 	Anope::string suspend_by;
 	Anope::string suspend_reason;
 	time_t suspend_ts = 0;
@@ -135,6 +172,7 @@ struct ChannelData final
 
 struct UserData final
 {
+	Anope::map<Anope::string> ajoins;
 	Anope::string info_adder;
 	Anope::string info_message;
 	time_t info_ts = 0;
@@ -236,21 +274,40 @@ private:
 		{ "XL",         &DBAtheme::HandleXL        },
 	};
 
-	void ApplyAccess(Anope::string &in, char flag, Anope::string &out, std::initializer_list<const char*> privs)
+	static void RemoveAll(Anope::string& in, const Anope::string& unwanted)
 	{
-		for (const auto *priv : privs)
+			auto it = std::remove_if(in.begin(), in.end(), [&](char c){
+					return unwanted.find_first_of(c) != unwanted.npos;
+			});
+			in.erase(it, in.end());
+	}
+
+	static bool RemoveFirstOccurrence(Anope::string& in, char c)
+	{
+		auto pos = in.find(c);
+		if (pos != Anope::string::npos)
 		{
-			auto pos = in.find(flag);
-			if (pos != Anope::string::npos)
+			in.erase(pos, 1);
+			return true;
+		}
+		return false;
+	}
+
+	bool ApplyAccess(Anope::string &in, char flag, Anope::string &out, std::initializer_list<const char*> privs)
+	{
+		const bool flag_found = RemoveFirstOccurrence(in, flag);
+		if (flag_found)
+		{
+			for (const auto *priv : privs)
 			{
 				auto privchar = flags.find(priv);
 				if (privchar != flags.end())
 				{
 					out.push_back(privchar->second);
-					in.erase(pos, 1);
 				}
 			}
 		}
+		return flag_found;
 	}
 
 	void ApplyFlags(Extensible *ext, Anope::string &flags, char flag, const char *extname, bool extend = true)
@@ -609,16 +666,17 @@ private:
 			return false;
 		}
 
+		auto *data = chandata.Require(ci);
+
 		auto *nc = NickCore::Find(mask);
 		if (flags.find('b') != Anope::string::npos)
 		{
-			if (ChanServ::akick_service)
+			if (!ChanServ::akick_service)
 			{
 				Log(this) << "Unable to import channel akick for " << ci->name << " as cs_akick is not loaded";
 				return true;
 			}
 
-			auto *data = chandata.Require(ci);
 			if (nc)
 				data->akicks[mask] = ChanServ::akick_service->AddAKick(ci, setter, nc, "", modifiedtime, modifiedtime);
 			else
@@ -638,7 +696,6 @@ private:
 		ApplyAccess(flags, 'a', accessflags, { "AUTOPROTECT", "PROTECT", "PROTECTME" });
 		ApplyAccess(flags, 'e', accessflags, { "GETKEY", "NOKICK", "UNBANME" });
 		ApplyAccess(flags, 'f', accessflags, { "ACCESS_CHANGE" });
-		ApplyAccess(flags, 'F', accessflags, { "FOUNDER" });
 		ApplyAccess(flags, 'H', accessflags, { "AUTOHALFOP" });
 		ApplyAccess(flags, 'h', accessflags, { "HALFOP", "HALFOPME" });
 		ApplyAccess(flags, 'i', accessflags, { "INVITE" });
@@ -660,6 +717,35 @@ private:
 			access->created = modifiedtime;
 			access->AccessUnserialize(accessflags);
 			ci->AddAccess(access);
+		}
+
+		// Atheme allows multiple founders and picks a successor based on rank if one is not explicitly assigned.
+		bool is_founder_candidate = RemoveFirstOccurrence(flags, 'F');
+		RemoveAll(flags, "SR");
+
+		FounderSuccessorCandidate current_candidate(nc, originalflags, modifiedtime);
+
+		if (nc && current_candidate < data->successor_candidate)
+		{
+			if (is_founder_candidate && current_candidate < data->founder_candidate)
+			{
+				Log(LOG_DEBUG) << ci->name << ": Demoting founder candidate ("
+					<< ( data->founder_candidate.nc ? data->founder_candidate.nc->display : "NONE" )
+					<< ", " << data->founder_candidate.priority
+					<< ") to successor; replacing with (" << current_candidate.nc->display
+					<< ", " << current_candidate.priority << ")";
+				data->successor_candidate = data->founder_candidate;
+				data->founder_candidate = current_candidate;
+			}
+			else
+			{
+				Log(LOG_DEBUG) << ci->name << ": Replacing successor candidate ("
+					<< ( data->successor_candidate.nc ? data->successor_candidate.nc->display : "NONE" )
+					<< ", " << data->successor_candidate.priority
+					<< ") with (" << current_candidate.nc->display
+					<< ", " << current_candidate.priority << ")";
+				data->successor_candidate = current_candidate;
+			}
 		}
 
 		if (flags != "+")
@@ -788,7 +874,7 @@ private:
 			return true;
 		}
 
-		auto *xl = new XLine(user + "@" + host, setby, settime + duration, reason);
+		auto *xl = new XLine(user + "@" + host, setby, duration ? settime + duration : 0, reason);
 		xl->id = id;
 		sglinemgr->AddXLine(xl);
 		return true;
@@ -879,6 +965,7 @@ private:
 		ci->last_used = used;
 
 		// No equivalent: elnv
+		RemoveFirstOccurrence(flags, 'v'); // verbose, com
 		ApplyFlags(ci, flags, 'h', "CS_NO_EXPIRE");
 		ApplyFlags(ci, flags, 'k', "KEEPTOPIC");
 		ApplyFlags(ci, flags, 'o', "NOAUTOOP");
@@ -984,6 +1071,10 @@ private:
 			auto akick = data->akicks.find(mask);
 			if (akick != data->akicks.end())
 				akick->second->reason = value;
+		}
+		else if (key == "expires")
+		{
+			Log(this) << "Unable to set access expiration for " << mask << " on " << ci->name << ": unimplemented";
 		}
 		else
 			Log(this) << "Unknown channel access metadata for " << mask << " on " << ci->name << ": " << key << " = " << value;
@@ -1146,10 +1237,7 @@ private:
 		// MDU <display> <key> <value>
 		auto display = row.Get();
 		auto key = row.Get();
-		auto value = row.GetRemaining();
-
-		if (!row)
-			return row.LogError(this);
+		auto value = row.GetRemaining(true);
 
 		auto *nc = NickCore::Find(display);
 		if (!nc)
@@ -1160,7 +1248,17 @@ private:
 
 		auto *data = userdata.Require(nc);
 		if (key == "private:autojoin")
-			return true; // TODO
+		{
+			commasepstream autojoins(value, true);
+			for (Anope::string autojoin; autojoins.GetToken(autojoin); )
+			{
+				spacesepstream entry(autojoin);
+				Anope::string cname, ckey;
+				if (entry.GetToken(cname))
+					entry.GetToken(ckey);
+				data->ajoins[cname] = ckey;
+			}
+		}
 		else if (key == "private:doenforce")
 			data->protect = true;
 		else if (key == "private:enforcetime")
@@ -1189,6 +1287,12 @@ private:
 			data->info_adder = value;
 		else if (key == "private:mark:timestamp")
 			data->info_ts = Anope::Convert<time_t>(value, 0);
+		else if (key == "private:sendpass:sender")
+			return HandleIgnoreMetadata(nc->display, key, value);
+		else if (key == "private:sendpass:timestamp")
+			return HandleIgnoreMetadata(nc->display, key, value);
+		else if (key == "private:setpass:key")
+			return HandleIgnoreMetadata(nc->display, key, value);
 		else if (key == "private:swhois")
 			return HandleIgnoreMetadata(nc->display, key, value);
 		else if (key == "private:usercloak")
@@ -1410,6 +1514,7 @@ private:
 		ApplyPassword(nc, flags, pass);
 
 		// No equivalent: bglmNQrS
+		RemoveFirstOccurrence(flags, 'b'); // nick b flag is ephemeral, ignore
 		ApplyFlags(nc, flags, 'E', "PROTECT");
 		ApplyFlags(nc, flags, 'e', "MEMO_MAIL");
 		ApplyFlags(nc, flags, 'n', "NEVEROP");
@@ -1499,7 +1604,7 @@ private:
 			return true;
 		}
 
-		auto *xl = new XLine(nick, setby, settime + duration, reason);
+		auto *xl = new XLine(nick, setby, duration ? settime + duration : 0, reason);
 		xl->id = id;
 		sqlinemgr->AddXLine(xl);
 		return true;
@@ -1561,7 +1666,7 @@ private:
 			return true;
 		}
 
-		auto *xl = new XLine(real, setby, settime + duration, reason);
+		auto *xl = new XLine(real, setby, duration ? settime + duration : 0, reason);
 		xl->id = id;
 		snlinemgr->AddXLine(xl);
 		return true;
@@ -1688,6 +1793,55 @@ public:
 			auto *data = userdata.Get(nc);
 			if (!data)
 				continue;
+
+			if (!data->ajoins.empty())
+			{
+				auto *channels = nc->Require<AJoinList>(NICKSERV_AJOIN_LIST_EXT);
+				if (channels)
+				{
+					for (const auto& ajoin : data->ajoins)
+					{
+						auto &channel = ajoin.first, &key = ajoin.second;
+						if (!key.empty())
+						{
+							Channel *c = Channel::Find(channel);
+							Anope::string k;
+							if (c && c->GetParam("KEY", k) && key != k)
+							{
+								Log(this) << "Skipping ajoin with incorrect key for channel " << channel
+									<< ", user " << nc->display;
+								continue;
+							}
+						}
+
+						if (!IRCD->IsChannelValid(channel))
+						{
+							Log(this) << "Invalid ajoin channel " << channel << " for " << nc->display;
+						}
+						else
+						{
+							const auto it = std::find_if((*channels)->cbegin(), (*channels)->cend(), [&](const AJoinEntry* a){
+								return a->channel == channel;
+							});
+
+							if (it != (*channels)->cend())
+							{
+								Log(this) << "Skipping duplicate ajoin channel" << channel << " for " << nc->display;
+								continue;
+							}
+							auto* entry = new AJoinEntry(nc);
+							entry->owner = nc;
+							entry->channel = channel;
+							entry->key = key;
+							(*channels)->push_back(entry); // ignore ajoinmax for non-disruptive migration
+						}
+					}
+				}
+				else
+				{
+					Log(this) << "Unable to convert autojoins for " << nc->display << " as ns_ajoin is not loaded";
+				}
+			}
 
 			if (!data->info_message.empty())
 			{

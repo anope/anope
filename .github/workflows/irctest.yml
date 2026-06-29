@@ -1,0 +1,223 @@
+name: irctest
+
+# Last checked: 2026-06-29
+env:
+  INSPIRCD_REF: v4.11.0  # 2026-06-06
+  IRCTEST_REF: ff6ef19d96cacd79ea8033dda2cf660fe5cdba52  # 2026-06-20
+  SOLANUM_REF: a17cc145a7de564e49b84807d335289f30b12d00  # 2026-06-23
+  UNREALIRCD_REF: 1250b7f014dbbe1dae13138dbef6e52c6dcd5557  # 2026-05-15 (6.2.5)
+
+on:
+  pull_request:
+  push:
+  schedule:
+  - cron: 0 0 * * 0
+  workflow_dispatch:
+
+jobs:
+  check-skip:
+    if: "!contains(github.event.head_commit.message, '[skip irctest ci]')"
+    runs-on: ubuntu-latest
+    steps:
+    - run: true  # Avoids skip check duplication.
+
+  build-anope:
+    needs:
+    - check-skip
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    - name: Build
+      run: |-
+        sudo apt-get install build-essential cmake --assume-yes
+        cmake \
+            -B "${{ github.workspace }}/build" \
+            -D "CMAKE_UNITY_BUILD=ON" \
+            -D "CMAKE_UNITY_BUILD_BATCH_SIZE=0" \
+            -D "INSTDIR=$HOME/software/anope" \
+            -G "Ninja" \
+            -S "${{ github.workspace }}"
+        ninja -C "${{ github.workspace }}/build" install
+
+    - name: Make artifact
+      run: |-
+        tar \
+          --auto-compress \
+          --create \
+          --file installed-anope.tar.gz \
+          $HOME/software/anope
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: installed-anope
+        path: installed-anope.tar.gz
+        retention-days: 1
+
+  build-inspircd:
+    needs:
+    - check-skip
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ env.INSPIRCD_REF }}
+        repository: inspircd/inspircd
+
+    - name: Build
+      run: |-
+        sudo apt-get install build-essential --assume-yes
+        ./configure \
+          --development \
+          --disable-auto-extras \
+          --prefix $HOME/software/inspircd
+        export CXXFLAGS="-DINSPIRCD_UNLIMITED_MAINLOOP"
+        make -j$(($(getconf _NPROCESSORS_ONLN) + 1)) install
+
+    - name: Make artifact
+      run: |-
+        tar \
+          --auto-compress \
+          --create \
+          --file installed-inspircd.tar.gz \
+          $HOME/software/inspircd
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: installed-inspircd
+        path: installed-inspircd.tar.gz
+        retention-days: 1
+
+  build-solanum:
+    needs:
+    - check-skip
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ env.SOLANUM_REF }}
+        repository: solanum-ircd/solanum
+
+    - name: Build
+      run: |-
+        sudo apt-get install build-essential libltdl-dev --assume-yes
+        ./autogen.sh
+        ./configure \
+          --enable-fhs-paths \
+          --prefix $HOME/software/solanum
+        make -j$(($(getconf _NPROCESSORS_ONLN) + 1)) install
+
+    - name: Make artifact
+      run: |-
+        tar \
+          --auto-compress \
+          --create \
+          --file installed-solanum.tar.gz \
+          $HOME/software/solanum
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: installed-solanum
+        path: installed-solanum.tar.gz
+        retention-days: 1
+
+  build-unrealircd:
+    needs:
+    - check-skip
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ env.UNREALIRCD_REF }}
+        repository: unrealircd/unrealircd
+
+    - name: Build
+      run: |-
+        sudo apt-get install build-essential libssl-dev --assume-yes
+        wget --output-document src/modules/third/metadata2.c https://raw.githubusercontent.com/progval/unrealircd-contrib/metadata2/files/metadata2.c
+        echo "BASEPATH=$HOME/software/unrealircd" >> config.settings
+        echo "GEOIP=none" >> config.settings
+        yes "" | ./Config
+        make -j$(($(getconf _NPROCESSORS_ONLN) + 1)) install
+
+    - name: Make artifact
+      run: |-
+        tar \
+          --auto-compress \
+          --create \
+          --file installed-unrealircd.tar.gz \
+          $HOME/software/unrealircd
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: installed-unrealircd
+        path: installed-unrealircd.tar.gz
+        retention-days: 1
+
+  test:
+    runs-on: ubuntu-latest
+    needs:
+    - build-anope
+    - build-inspircd
+    - build-solanum
+    - build-unrealircd
+    steps:
+    - name: Download Anope artifact
+      uses: actions/download-artifact@v8
+      with:
+        name: installed-anope
+
+    - name: Download server artifact
+      uses: actions/download-artifact@v8
+      with:
+        name: installed-${{ matrix.server }}
+
+    - name: Unpack artifacts
+      run: |-
+        for ARCHIVE in installed-anope installed-${{ matrix.server }}
+        do
+          tar \
+            --directory / \
+            --extract \
+            --file ${ARCHIVE}.tar.gz
+        done
+        for SOFTWARE in $HOME/software/*
+        do
+          echo "Adding ${SOFTWARE} to the PATH"
+          export PATH=$SOFTWARE/bin:$SOFTWARE/sbin:$PATH
+        done
+        echo PATH=$PATH >> $GITHUB_ENV
+
+    - name: Checkout irctest
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ env.IRCTEST_REF }}
+        repository: progval/irctest
+
+    - name: Install irctest dependencies
+      run: |-
+        sudo apt-get install faketime
+        pip3 install --requirement requirements.txt pytest-xdist pytest-timeout
+
+    - name: Run irctest
+      env:
+        IRCTEST_DEBUG_LOGS: ${{ runner.debug }}
+        PYTEST_ARGS: --color=yes --verbose
+      run: |-
+        make ${{ matrix.server}}-anope
+
+    strategy:
+      fail-fast: false
+      matrix:
+        server:
+        - inspircd
+        - solanum
+        - unrealircd

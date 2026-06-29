@@ -14,6 +14,7 @@ foreach(LIBRARY IN LISTS LIBRARIES)
 			set_target_properties(${LIBRARY_TARGET} PROPERTIES
 				FOLDER "VendoredLibraries"
 				PREFIX ""
+				UNITY_BUILD OFF
 			)
 		endif()
 	endif()

@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Build
       run: |-
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: ${{ env.INSPIRCD_REF }}
         repository: inspircd/inspircd
@@ -98,7 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: ${{ env.SOLANUM_REF }}
         repository: solanum-ircd/solanum
@@ -133,7 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: ${{ env.UNREALIRCD_REF }}
         repository: unrealircd/unrealircd
@@ -197,7 +197,7 @@ jobs:
         echo PATH=$PATH >> $GITHUB_ENV
 
     - name: Checkout irctest
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: ${{ env.IRCTEST_REF }}
         repository: progval/irctest

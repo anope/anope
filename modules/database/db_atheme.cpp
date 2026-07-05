@@ -1786,6 +1786,16 @@ public:
 				si.when = data->suspend_ts;
 				ci->Extend("CS_SUSPENDED", si);
 			}
+
+			if (data->founder_candidate.nc)
+			{
+				ci->SetFounder(data->founder_candidate.nc);
+			}
+
+			if (data->successor_candidate.nc)
+			{
+				ci->SetSuccessor(data->successor_candidate.nc);
+			}
 		}
 
 		for (const auto &[_, nc] : *NickCoreList)

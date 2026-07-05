@@ -156,7 +156,12 @@ public:
 		if (server)
 			this->ServerGlobal(sender, server, false, line);
 		else
-			this->ServerGlobal(sender, Servers::GetUplink(), true, line);
+		{
+			auto uplink = Servers::GetUplink();
+			if (!uplink)
+				return false;
+			this->ServerGlobal(sender, uplink, true, line);
+		}
 		return true;
 	}
 

@@ -164,12 +164,12 @@ public:
 		if (newit != this->certs.end())
 		{
 			// The cert we're upgrading to already exists.
-			delete *newit;
-			this->certs.erase(newit);
+			delete *oldit;
+			this->certs.erase(oldit);
 			return;
 		}
 
-		auto *cert = *newit;
+		auto *cert = *oldit;
 		cert->fingerprint = newentry;
 		certmap[newentry] = cert;
 		FOREACH_MOD(OnNickAddCert, (this->nc, cert));

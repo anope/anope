@@ -158,14 +158,29 @@ struct IRCDMessageEncap final
 			User *u = source.GetUser();
 
 			NickCore *nc = NickCore::Find(params[2]);
-			if (!nc)
-				return;
-			u->Login(nc);
+			if (nc)
+			{
+				u->Login(nc);
+			}
+			else
+			{
+				// Handle corner cases around database rollbacks/inconsistency and users
+				// whose display nick recently expired, causing an alias to become the
+				// display nick.
+				auto *na = NickAlias::Find(params[2]);
+				if (na)
+				{
+					nc = na->nc;
+					Log() << "User " << u->nick << " is logged in as alias '" << na->nick << "', logging them in as the display nick '" << nc->na->nick << "'.";
+					u->Identify(na);
+				}
+			}
+
 
 			/* Sometimes a user connects, we send them the usual "this nickname is registered" mess (if
 			 * their server isn't syncing) and then we receive this.. so tell them about it.
 			 */
-			if (u->server->IsSynced())
+			if (nc && u->server->IsSynced())
 				u->SendMessage(Config->GetClient("NickServ"), _("You have been logged in as \002%s\002."), nc->display.c_str());
 		}
 	}

@@ -228,9 +228,22 @@ struct IRCDMessageEncap final
 		{
 			User *u = User::Find(params[2]);
 			NickCore *nc = NickCore::Find(params[3]);
-			if (u && nc)
+			if (u)
 			{
-				u->Login(nc);
+				if (nc)
+					u->Login(nc);
+				else
+				{
+					// Handle corner cases around database rollbacks/inconsistency and users
+					// whose display nick recently expired, causing an alias to become the
+					// display nick.
+					auto *na = NickAlias::Find(params[2]);
+					if (na)
+					{
+						Log() << "User " << u->nick << " is logged in as alias '" << na->nick << "', logging them in as the display nick '" << na->nc->na->nick << "'.";
+						u->Identify(na);
+					}
+				}
 			}
 		}
 

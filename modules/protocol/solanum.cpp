@@ -320,10 +320,23 @@ struct IRCDMessageEncap final
 			User *u = source.GetUser();
 			NickCore *nc = NickCore::Find(params[2]);
 
-			if (!u || !nc)
+			if (!u)
 				return;
 
-			u->Login(nc);
+			if (nc)
+				u->Login(nc);
+			else
+			{
+				// Handle corner cases around database rollbacks/inconsistency and users
+				// whose display nick recently expired, causing an alias to become the
+				// display nick.
+				auto *na = NickAlias::Find(params[2]);
+				if (na)
+				{
+					Log() << "User " << u->nick << " is logged in as alias '" << na->nick << "', logging them in as the display nick '" << na->nc->na->nick << "'.";
+					u->Identify(na);
+				}
+			}
 		}
 		// Received: :42XAAAAAE ENCAP * CERTFP :3f122a9cc7811dbad3566bf2cec3009007c0868f
 		else if (params[1] == "CERTFP")

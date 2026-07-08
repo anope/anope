@@ -1788,14 +1788,10 @@ public:
 			}
 
 			if (data->founder_candidate.nc)
-			{
 				ci->SetFounder(data->founder_candidate.nc);
-			}
 
 			if (data->successor_candidate.nc)
-			{
 				ci->SetSuccessor(data->successor_candidate.nc);
-			}
 		}
 
 		for (const auto &[_, nc] : *NickCoreList)

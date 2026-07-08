@@ -47,10 +47,8 @@ DEALINGS IN THE SOFTWARE.
 #else // C++ 98/03
     #define UTF_CPP_OVERRIDE
     #define UTF_CPP_NOEXCEPT throw()
-    // Simulate static_assert:
-    template <bool Condition> struct StaticAssert {static void utf8_static_assert() {char static_assert_impl[Condition ? 1 : 0]; } };
-    template <> struct StaticAssert<true> {static void utf8_static_assert() {}};
-    #define UTF_CPP_STATIC_ASSERT(condition) StaticAssert<condition>::utf8_static_assert();
+    // Not worth simulating static_assert:
+    #define UTF_CPP_STATIC_ASSERT(condition) (void)(condition);
 #endif // C++ 11 or later
 
 
@@ -307,9 +305,110 @@ namespace internal
 
     template <typename octet_iterator>
     inline utf_error validate_next(octet_iterator& it, octet_iterator end) {
-        utfchar32_t ignored;
-        return utf8::internal::validate_next(it, end, ignored);
-    }
+        if (it == end)
+            return NOT_ENOUGH_ROOM;
+
+        octet_iterator original_it = it;
+        const utfchar8_t lead = utf8::internal::mask8(*it);
+
+        if (lead < 0x80) {
+            ++it;
+            return UTF8_OK;
+        } else if ((lead & 0xE0) == 0xC0) {
+            // two-byte sequence
+            if (lead == 0xC0 || lead == 0xC1) {
+                it = original_it;
+                return OVERLONG_SEQUENCE;
+            }
+            if (++it == end) {
+                it = original_it;
+                return NOT_ENOUGH_ROOM;
+            }
+            const utfchar8_t trail1 = utf8::internal::mask8(*it);
+            if ((trail1 & 0xC0) != 0x80) {
+                it = original_it;
+                return INCOMPLETE_SEQUENCE;
+            }
+            ++it;
+            return UTF8_OK;
+        } else if ((lead & 0xF0) == 0xE0) {
+            // three-byte sequence
+            if (++it == end) {
+                it = original_it;
+                return NOT_ENOUGH_ROOM;
+            }
+            const utfchar8_t trail1 = utf8::internal::mask8(*it);
+            if ((trail1 & 0xC0) != 0x80) {
+                it = original_it;
+                return INCOMPLETE_SEQUENCE;
+            }
+            if (++it == end) {
+                it = original_it;
+                return NOT_ENOUGH_ROOM;
+            }
+            const utfchar8_t trail2 = utf8::internal::mask8(*it);
+            if ((trail2 & 0xC0) != 0x80) {
+                it = original_it;
+                return INCOMPLETE_SEQUENCE;
+            }
+            if (lead == 0xE0 && trail1 < 0xA0) {
+                it = original_it;
+                return OVERLONG_SEQUENCE;
+            }
+            if (lead == 0xED && trail1 > 0x9F) {
+                it = original_it;
+                return INVALID_CODE_POINT;
+            }
+            ++it;
+            return UTF8_OK;
+        } else if ((lead & 0xF8) == 0xF0) {
+            // four-byte sequence
+            if (++it == end) {
+                it = original_it;
+                return NOT_ENOUGH_ROOM;
+            }
+            const utfchar8_t trail1 = utf8::internal::mask8(*it);
+            if ((trail1 & 0xC0) != 0x80) {
+                it = original_it;
+                return INCOMPLETE_SEQUENCE;
+            }
+            if (++it == end) {
+                it = original_it;
+                return NOT_ENOUGH_ROOM;
+            }
+            const utfchar8_t trail2 = utf8::internal::mask8(*it);
+            if ((trail2 & 0xC0) != 0x80) {
+                it = original_it;
+                return INCOMPLETE_SEQUENCE;
+            }
+            if (++it == end) {
+                it = original_it;
+                return NOT_ENOUGH_ROOM;
+            }
+            const utfchar8_t trail3 = utf8::internal::mask8(*it);
+            if ((trail3 & 0xC0) != 0x80) {
+                it = original_it;
+                return INCOMPLETE_SEQUENCE;
+            }
+            if (lead == 0xF0 && trail1 < 0x90) {
+                it = original_it;
+                return OVERLONG_SEQUENCE;
+            }
+            if (lead == 0xF4 && trail1 > 0x8F) {
+                it = original_it;
+                return INVALID_CODE_POINT;
+            }
+            if (lead >= 0xF5) {
+                it = original_it;
+                return INVALID_CODE_POINT;
+            }
+            ++it;
+            return UTF8_OK;
+        } else {
+            it = original_it;
+            return INVALID_LEAD;
+        }
+   }
 
     template <typename word_iterator>
     utf_error validate_next16(word_iterator& it, word_iterator end, utfchar32_t& code_point)

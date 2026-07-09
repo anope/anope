@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 18:57+0100\n"
-"PO-Revision-Date: 2026-07-09 18:57+0100\n"
+"POT-Creation-Date: 2026-07-09 21:01+0100\n"
+"PO-Revision-Date: 2026-07-09 21:02+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1018,6 +1018,13 @@ msgstr ""
 #: ../modules/operserv/os_kill.cpp
 msgid "user [reason]"
 msgstr ""
+
+#: ../modules/nickserv/ns_set_timezone.cpp
+#, c-format
+msgid "    %s (%zu timezone)"
+msgid_plural "    %s (%zu timezones)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../modules/operserv/os_oper.cpp
 #, c-format

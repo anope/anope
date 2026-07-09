@@ -21,7 +21,7 @@ public:
 	CommandNSSetKeepModes(Module *creator, const Anope::string &sname = "nickserv/set/keepmodes", size_t min = 1)
 		: Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Enable or disable keep modes"));
+		this->SetDesc(_("Configure keeping user modes set across connections"));
 		this->SetSyntax("{ON | OFF}");
 	}
 
@@ -72,9 +72,9 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
-			"Enables or disables keepmodes for your nick. If keep "
-			"modes is enabled, services will remember your user modes "
-			"and attempt to re-set them the next time you authenticate."
+			"Configures keeping user modes set across connections. If this is "
+			"enabled, your last user modes will be remembered and will be "
+			"re-set the next time you identify."
 		));
 		return true;
 	}

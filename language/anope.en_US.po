@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 18:22+0100\n"
-"PO-Revision-Date: 2026-07-09 18:22+0100\n"
+"POT-Creation-Date: 2026-07-09 18:49+0100\n"
+"PO-Revision-Date: 2026-07-09 18:49+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -3044,6 +3044,10 @@ msgstr ""
 msgid "Command"
 msgstr ""
 
+#: ../modules/nickserv/ns_set_keepmodes.cpp
+msgid "Configure keeping user modes set across connections"
+msgstr ""
+
 #: ../modules/botserv/bs_kick.cpp
 msgid "Configures AMSG kicker"
 msgstr ""
@@ -3089,6 +3093,10 @@ msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
 msgid "Configures italics kicker"
+msgstr ""
+
+#: ../modules/nickserv/ns_set_keepmodes.cpp
+msgid "Configures keeping user modes set across connections. If this is enabled, your last user modes will be remembered and will be re-set the next time you identify."
 msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
@@ -3726,10 +3734,6 @@ msgstr ""
 msgid "Enable greet messages"
 msgstr ""
 
-#: ../modules/nickserv/ns_set_keepmodes.cpp
-msgid "Enable or disable keep modes"
-msgstr ""
-
 #: ../modules/botserv/bs_info.cpp ../modules/botserv/bs_kick.cpp
 msgid "Enabled"
 msgstr ""
@@ -3765,10 +3769,6 @@ msgstr ""
 
 #: ../modules/nickserv/ns_set_keepmodes.cpp
 msgid "Enables or disables keepmodes for the given nick. If keep modes is enabled, services will remember users' user modes and attempt to re-set them the next time they authenticate."
-msgstr ""
-
-#: ../modules/nickserv/ns_set_keepmodes.cpp
-msgid "Enables or disables keepmodes for your nick. If keep modes is enabled, services will remember your user modes and attempt to re-set them the next time you authenticate."
 msgstr ""
 
 #: ../modules/chanserv/cs_set.cpp

@@ -21,7 +21,7 @@ public:
 	CommandNSSetLayout(Module *creator, const Anope::string &sname = "nickserv/set/layout", size_t min = 1)
 		: Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Configures the layout used for services messages"));
+		this->SetDesc(_("Configure the layout used for services messages"));
 		this->SetSyntax("{FIXED | FLEXIBLE | MONOSPACE}");
 	}
 

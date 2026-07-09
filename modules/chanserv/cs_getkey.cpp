@@ -20,7 +20,7 @@ class CommandCSGetKey final
 public:
 	CommandCSGetKey(Module *creator) : Command(creator, "chanserv/getkey", 1, 1)
 	{
-		this->SetDesc(_("Returns the key of the given channel"));
+		this->SetDesc(_("Return the key of the given channel"));
 		this->SetSyntax(_("\037channel\037"));
 	}
 

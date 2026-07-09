@@ -487,7 +487,7 @@ class CommandHSWaiting final
 public:
 	CommandHSWaiting(Module *creator) : Command(creator, "hostserv/waiting", 0, 0)
 	{
-		this->SetDesc(_("Retrieves the vhost requests"));
+		this->SetDesc(_("Retrieve the vhost requests"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -547,7 +547,7 @@ public:
 		: Command(creator, "hostserv/validate", 0)
 		, data(sd)
 	{
-		this->SetDesc(_("Validates a previously requested vhost using DNS"));
+		this->SetDesc(_("Validate a previously requested vhost using DNS"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override

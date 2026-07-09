@@ -33,7 +33,7 @@ class CommandHelp final
 public:
 	CommandHelp(Module *creator) : Command(creator, "generic/help", 0)
 	{
-		this->SetDesc(_("Displays this list and give information about commands"));
+		this->SetDesc(_("Display this list and give information about commands"));
 		this->AllowUnregistered(true);
 	}
 

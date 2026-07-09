@@ -20,7 +20,7 @@ class CommandMSCheck final
 public:
 	CommandMSCheck(Module *creator) : Command(creator, "memoserv/check", 1, 1)
 	{
-		this->SetDesc(_("Checks if last memo to a nick was read"));
+		this->SetDesc(_("Check if last memo to a nick was read"));
 		this->SetSyntax(_("\037nick\037"));
 	}
 

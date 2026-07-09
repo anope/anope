@@ -20,7 +20,7 @@ class CommandCSKick final
 public:
 	CommandCSKick(Module *creator) : Command(creator, "chanserv/kick", 2, 3)
 	{
-		this->SetDesc(_("Kicks a specified nick from a channel"));
+		this->SetDesc(_("Kick a specified nick from a channel"));
 		this->SetSyntax(_("\037channel\037 \037nick\037 [\037reason\037]"));
 		this->SetSyntax(_("\037channel\037 \037mask\037 [\037reason\037]"));
 	}

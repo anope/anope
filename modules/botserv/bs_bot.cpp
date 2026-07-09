@@ -264,7 +264,7 @@ private:
 public:
 	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6)
 	{
-		this->SetDesc(_("Maintains network bot list"));
+		this->SetDesc(_("Maintain network bot list"));
 		this->SetSyntax(_("\002ADD \037nick\037 \037user\037 \037host\037 \037real\037\002"));
 		this->SetSyntax(_("\002CHANGE \037oldnick\037 \037newnick\037 [\037user\037 [\037host\037 [\037real\037]]]\002"));
 		this->SetSyntax(_("\002DEL \037nick\037\002"));

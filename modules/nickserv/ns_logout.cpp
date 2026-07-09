@@ -21,7 +21,7 @@ class CommandNSLogout final
 public:
 	CommandNSLogout(Module *creator) : Command(creator, "nickserv/logout", 0, 2)
 	{
-		this->SetDesc(_("Reverses the effect of the IDENTIFY command"));
+		this->SetDesc(_("Reverse the effect of the IDENTIFY command"));
 		this->SetSyntax(_("[\037nickname\037 [REVALIDATE]]"), [](auto &source) { return source.IsServicesOper(); });
 	}
 

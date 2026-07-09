@@ -20,7 +20,7 @@ class CommandMSInfo final
 public:
 	CommandMSInfo(Module *creator) : Command(creator, "memoserv/info", 0, 1)
 	{
-		this->SetDesc(_("Displays information about your memos"));
+		this->SetDesc(_("Display information about your memos"));
 		this->SetSyntax(_("[\037nick\037 | \037channel\037]"));
 	}
 

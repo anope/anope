@@ -48,7 +48,7 @@ class CommandCSUp final
 public:
 	CommandCSUp(Module *creator) : Command(creator, "chanserv/up", 0, 2)
 	{
-		this->SetDesc(_("Updates a selected nicks status on a channel"));
+		this->SetDesc(_("Update a selected nicks status on a channel"));
 		this->SetSyntax(_("[\037channel\037 [\037nick\037]]"));
 	}
 
@@ -152,7 +152,7 @@ class CommandCSDown final
 public:
 	CommandCSDown(Module *creator) : Command(creator, "chanserv/down", 0, 2)
 	{
-		this->SetDesc(_("Removes a selected nicks status from a channel"));
+		this->SetDesc(_("Remove a selected nicks status from a channel"));
 		this->SetSyntax(_("[\037channel\037 [\037nick\037]]"));
 	}
 

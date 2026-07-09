@@ -242,7 +242,7 @@ class CommandSeen final
 public:
 	CommandSeen(Module *creator) : Command(creator, "chanserv/seen", 1, 2)
 	{
-		this->SetDesc(_("Tells you about the last time a user was seen"));
+		this->SetDesc(_("Tell you about the last time a user was seen"));
 		this->SetSyntax(_("\037nick\037"));
 		this->AllowUnregistered(true);
 	}

@@ -41,7 +41,7 @@ class CommandCSStats final
 public:
 	CommandCSStats(Module *creator) : Command (creator, "chanserv/stats", 0, 2)
 	{
-		this->SetDesc(_("Displays your Channel Stats"));
+		this->SetDesc(_("Display your Channel Stats"));
 		this->SetSyntax(_("[\037channel\037] [\037nick\037]"));
 	}
 
@@ -54,7 +54,7 @@ class CommandCSGStats final
 public:
 	CommandCSGStats(Module *creator) : Command (creator, "chanserv/gstats", 0, 2)
 	{
-		this->SetDesc(_("Displays your Global Stats"));
+		this->SetDesc(_("Display your Global Stats"));
 		this->SetSyntax(_("\037nick\037"));
 	}
 

@@ -165,7 +165,7 @@ class CommandCSUnSuspend final
 public:
 	CommandCSUnSuspend(Module *creator) : Command(creator, "chanserv/unsuspend", 1, 1)
 	{
-		this->SetDesc(_("Releases a suspended channel"));
+		this->SetDesc(_("Release a suspended channel"));
 		this->SetSyntax(_("\037channel\037"));
 	}
 

@@ -73,7 +73,7 @@ class CommandCSBan final
 public:
 	CommandCSBan(Module *creator) : Command(creator, "chanserv/ban", 2, 4)
 	{
-		this->SetDesc(_("Bans a given nick or mask on a channel"));
+		this->SetDesc(_("Ban a given nick or mask on a channel"));
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] {\037nick\037 | \037mask\037} [\037reason\037]"));
 	}
 

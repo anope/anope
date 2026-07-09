@@ -20,7 +20,7 @@ class CommandBSSet final
 public:
 	CommandBSSet(Module *creator) : Command(creator, "botserv/set", 3, 3)
 	{
-		this->SetDesc(_("Configures bot options"));
+		this->SetDesc(_("Configure bot options"));
 		this->SetSyntax(_("\037option\037 \037(channel | bot)\037 \037settings\037"));
 	}
 
@@ -103,7 +103,7 @@ public:
 
 	CommandBSSetBanExpire(Module *creator, const Anope::string &sname = "botserv/set/banexpire") : Command(creator, sname, 2, 2)
 	{
-		this->SetDesc(_("Configures the time bot bans expire in"));
+		this->SetDesc(_("Configure the time bot bans expire in"));
 		this->SetSyntax(_("\037channel\037 \037time\037"));
 	}
 

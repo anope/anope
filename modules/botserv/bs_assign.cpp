@@ -20,7 +20,7 @@ class CommandBSAssign final
 public:
 	CommandBSAssign(Module *creator) : Command(creator, "botserv/assign", 2, 2)
 	{
-		this->SetDesc(_("Assigns a bot to a channel"));
+		this->SetDesc(_("Assign a bot to a channel"));
 		this->SetSyntax(_("\037channel\037 \037nick\037"));
 	}
 
@@ -101,7 +101,7 @@ class CommandBSUnassign final
 public:
 	CommandBSUnassign(Module *creator) : Command(creator, "botserv/unassign", 1, 1)
 	{
-		this->SetDesc(_("Unassigns a bot from a channel"));
+		this->SetDesc(_("Unassign a bot from a channel"));
 		this->SetSyntax(_("\037channel\037"));
 	}
 

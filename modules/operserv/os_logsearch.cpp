@@ -33,7 +33,7 @@ class CommandOSLogSearch final
 public:
 	CommandOSLogSearch(Module *creator) : Command(creator, "operserv/logsearch", 1, 3)
 	{
-		this->SetDesc(_("Searches logs for a matching pattern"));
+		this->SetDesc(_("Search logs for a matching pattern"));
 		this->SetSyntax(_("[+\037days\037d] [+\037limit\037l] \037pattern\037"));
 	}
 

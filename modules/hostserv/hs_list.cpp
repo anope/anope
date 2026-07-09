@@ -20,7 +20,7 @@ class CommandHSList final
 public:
 	CommandHSList(Module *creator) : Command(creator, "hostserv/list", 0, 1)
 	{
-		this->SetDesc(_("Displays one or more vhost entries"));
+		this->SetDesc(_("Display one or more vhost entries"));
 		this->SetSyntax(_("[\037key\037|\037#X-Y\037]"));
 	}
 

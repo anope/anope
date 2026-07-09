@@ -20,7 +20,7 @@ class CommandBSBotList final
 public:
 	CommandBSBotList(Module *creator) : Command(creator, "botserv/botlist", 0, 1)
 	{
-		this->SetDesc(_("Lists available bots"));
+		this->SetDesc(_("List available bots"));
 		this->SetSyntax("[OPERONLY] [UNUSED] [VANITY]");
 	}
 

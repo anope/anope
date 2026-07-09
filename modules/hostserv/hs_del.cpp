@@ -60,7 +60,7 @@ class CommandHSDelAll final
 public:
 	CommandHSDelAll(Module *creator) : Command(creator, "hostserv/delall", 1, 1)
 	{
-		this->SetDesc(_("Deletes the vhost for all nicks in an account"));
+		this->SetDesc(_("Delete the vhost for all nicks in an account"));
 		this->SetSyntax(_("\037nick\037"));
 	}
 

@@ -42,7 +42,7 @@ public:
 
 	CommandHSGroup(Module *creator) : Command(creator, "hostserv/group", 0, 0)
 	{
-		this->SetDesc(_("Syncs the vhost for all nicks in an account"));
+		this->SetDesc(_("Sync the vhost for all nicks in an account"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override

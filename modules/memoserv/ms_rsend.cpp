@@ -21,7 +21,7 @@ class CommandMSRSend final
 public:
 	CommandMSRSend(Module *creator) : Command(creator, "memoserv/rsend", 2, 2)
 	{
-		this->SetDesc(_("Sends a memo and requests a read receipt"));
+		this->SetDesc(_("Send a memo and requests a read receipt"));
 		this->SetSyntax(_("{\037nick\037 | \037channel\037} \037memo-text\037"));
 	}
 

@@ -20,7 +20,7 @@ class CommandNSUpdate final
 public:
 	CommandNSUpdate(Module *creator) : Command(creator, "nickserv/update", 0, 0)
 	{
-		this->SetDesc(_("Updates your current status, i.e. it checks for new memos"));
+		this->SetDesc(_("Update your current status, i.e. it checks for new memos"));
 		this->RequireUser(true);
 	}
 

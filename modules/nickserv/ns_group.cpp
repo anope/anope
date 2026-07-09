@@ -306,7 +306,7 @@ class CommandNSGList final
 public:
 	CommandNSGList(Module *creator) : Command(creator, "nickserv/glist", 0, 1)
 	{
-		this->SetDesc(_("Lists all nicknames in your account"));
+		this->SetDesc(_("List all nicknames in your account"));
 		this->SetSyntax(_("[\037nickname\037]"), [](auto &source) { return source.IsServicesOper(); });
 	}
 

@@ -130,7 +130,7 @@ public:
 	CommandGLQueue(Module *creator)
 		: Command(creator, "global/queue", 1, 2)
 	{
-		this->SetDesc(_("Manages your pending message queue."));
+		this->SetDesc(_("Manage your pending message queue."));
 		this->SetSyntax(_("ADD \037message\037"));
 		this->SetSyntax(_("DEL \037entry-num\037"));
 		this->SetSyntax("LIST");

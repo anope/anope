@@ -118,7 +118,7 @@ class CommandCSLog final
 public:
 	CommandCSLog(Module *creator) : Command(creator, "chanserv/log", 1, 4)
 	{
-		this->SetDesc(_("Configures channel logging settings"));
+		this->SetDesc(_("Configure channel logging settings"));
 		this->SetSyntax(_("\037channel\037"));
 		this->SetSyntax(_("\037channel\037 \037command\037 \037method\037 [\037status\037]"));
 	}

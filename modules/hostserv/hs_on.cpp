@@ -20,7 +20,7 @@ class CommandHSOn final
 public:
 	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 0)
 	{
-		this->SetDesc(_("Activates your assigned vhost"));
+		this->SetDesc(_("Activate your assigned vhost"));
 		this->RequireUser(true);
 	}
 

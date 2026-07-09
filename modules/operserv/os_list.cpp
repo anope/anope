@@ -20,7 +20,7 @@ class CommandOSChanList final
 public:
 	CommandOSChanList(Module *creator) : Command(creator, "operserv/chanlist", 0, 2)
 	{
-		this->SetDesc(_("Lists all channel records"));
+		this->SetDesc(_("List all channel records"));
 		this->SetSyntax(_("[{\037pattern\037 | \037nick\037} [\037SECRET\037]]"));
 	}
 
@@ -145,7 +145,7 @@ class CommandOSUserList final
 public:
 	CommandOSUserList(Module *creator) : Command(creator, "operserv/userlist", 0, 2)
 	{
-		this->SetDesc(_("Lists all user records"));
+		this->SetDesc(_("List all user records"));
 		this->SetSyntax(_("[{\037pattern\037 | \037channel\037} [\037INVISIBLE\037]]"));
 	}
 

@@ -20,7 +20,7 @@ class CommandCSInfo final
 public:
 	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
 	{
-		this->SetDesc(_("Lists information about the specified registered channel"));
+		this->SetDesc(_("List information about the specified registered channel"));
 		this->SetSyntax(_("\037channel\037"));
 		this->AllowUnregistered(true);
 	}

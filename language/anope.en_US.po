@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 18:49+0100\n"
-"PO-Revision-Date: 2026-07-09 18:49+0100\n"
+"POT-Creation-Date: 2026-07-09 18:57+0100\n"
+"PO-Revision-Date: 2026-07-09 18:57+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1857,11 +1857,11 @@ msgid "Activate the requested vhost for the given nick."
 msgstr ""
 
 #: ../modules/hostserv/hs_on.cpp
-msgid "Activates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see the vhost instead of your real host/IP address."
+msgid "Activate your assigned vhost"
 msgstr ""
 
 #: ../modules/hostserv/hs_on.cpp
-msgid "Activates your assigned vhost"
+msgid "Activates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see the vhost instead of your real host/IP address."
 msgstr ""
 
 #: ../modules/botserv/bs_badwords.cpp
@@ -2351,7 +2351,7 @@ msgid "As a Services Operator, you may drop any nick."
 msgstr ""
 
 #: ../modules/botserv/bs_assign.cpp
-msgid "Assigns a bot to a channel"
+msgid "Assign a bot to a channel"
 msgstr ""
 
 #: ../modules/botserv/bs_assign.cpp
@@ -2464,6 +2464,10 @@ msgstr ""
 msgid "Bad words list is now empty."
 msgstr ""
 
+#: ../modules/chanserv/cs_ban.cpp
+msgid "Ban a given nick or mask on a channel"
+msgstr ""
+
 #: ../modules/botserv/bs_set.cpp
 msgid "Ban expiry may not be longer than 1 day."
 msgstr ""
@@ -2480,10 +2484,6 @@ msgstr ""
 #: ../modules/chanserv/cs_set.cpp
 #, c-format
 msgid "Ban type for channel %s is now #%d."
-msgstr ""
-
-#: ../modules/chanserv/cs_ban.cpp
-msgid "Bans a given nick or mask on a channel"
 msgstr ""
 
 #: ../modules/chanserv/cs_ban.cpp
@@ -3011,12 +3011,12 @@ msgstr ""
 msgid "Chanstats statistics are now enabled for your nick."
 msgstr ""
 
-#: ../modules/chanserv/cs_seen.cpp
-msgid "Checks for the last time nick was seen joining, leaving, or changing nick on the network and tells you when and, depending on channel or user settings, where it was."
+#: ../modules/memoserv/ms_check.cpp
+msgid "Check if last memo to a nick was read"
 msgstr ""
 
-#: ../modules/memoserv/ms_check.cpp
-msgid "Checks if last memo to a nick was read"
+#: ../modules/chanserv/cs_seen.cpp
+msgid "Checks for the last time nick was seen joining, leaving, or changing nick on the network and tells you when and, depending on channel or user settings, where it was."
 msgstr ""
 
 #: ../modules/memoserv/ms_check.cpp
@@ -3044,28 +3044,72 @@ msgstr ""
 msgid "Command"
 msgstr ""
 
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure AMSG kicker"
+msgstr ""
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure badwords kicker"
+msgstr ""
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure bolds kicker"
+msgstr ""
+
+#: ../modules/botserv/bs_set.cpp
+msgid "Configure bot options"
+msgstr ""
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure caps kicker"
+msgstr ""
+
+#: ../modules/chanserv/cs_log.cpp
+msgid "Configure channel logging settings"
+msgstr ""
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure color kicker"
+msgstr ""
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure flood kicker"
+msgstr ""
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure italics kicker"
+msgstr ""
+
 #: ../modules/nickserv/ns_set_keepmodes.cpp
 msgid "Configure keeping user modes set across connections"
 msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
-msgid "Configures AMSG kicker"
+msgid "Configure kickers"
 msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
-msgid "Configures badwords kicker"
+msgid "Configure repeat kicker"
 msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
-msgid "Configures bolds kicker"
+msgid "Configure reverses kicker"
+msgstr ""
+
+#: ../modules/nickserv/ns_set_layout.cpp
+msgid "Configure the layout used for services messages"
+msgstr ""
+
+#: ../modules/botserv/bs_set.cpp
+msgid "Configure the time bot bans expire in"
+msgstr ""
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure underlines kicker"
 msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
 msgid "Configures bot kickers.  option can be one of:"
-msgstr ""
-
-#: ../modules/botserv/bs_set.cpp
-msgid "Configures bot options"
 msgstr ""
 
 #: ../modules/botserv/bs_set.cpp
@@ -3075,40 +3119,8 @@ msgid ""
 "Available options:"
 msgstr ""
 
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures caps kicker"
-msgstr ""
-
-#: ../modules/chanserv/cs_log.cpp
-msgid "Configures channel logging settings"
-msgstr ""
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures color kicker"
-msgstr ""
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures flood kicker"
-msgstr ""
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures italics kicker"
-msgstr ""
-
 #: ../modules/nickserv/ns_set_keepmodes.cpp
 msgid "Configures keeping user modes set across connections. If this is enabled, your last user modes will be remembered and will be re-set the next time you identify."
-msgstr ""
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures kickers"
-msgstr ""
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures repeat kicker"
-msgstr ""
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures reverses kicker"
 msgstr ""
 
 #: ../modules/nickserv/ns_set_layout.cpp
@@ -3123,10 +3135,6 @@ msgid ""
 msgstr ""
 
 #: ../modules/nickserv/ns_set_layout.cpp
-msgid "Configures the layout used for services messages"
-msgstr ""
-
-#: ../modules/nickserv/ns_set_layout.cpp
 msgid ""
 "Configures the layout used for services messages.\n"
 "\n"
@@ -3135,14 +3143,6 @@ msgid ""
 "When the layout is set to FLEXIBLE services will use an alternate format for messages and avoid any positioning that might be broken by a variable-width font.\n"
 "\n"
 "When the layout is set to MONOSPACE services will format messages similar to FIXED but will prefix all messages with a monospace formatting character to force it to display correctly. This requires client support for monospace text formatting."
-msgstr ""
-
-#: ../modules/botserv/bs_set.cpp
-msgid "Configures the time bot bans expire in"
-msgstr ""
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures underlines kicker"
 msgstr ""
 
 #: ../modules/nickserv/ns_register.cpp
@@ -3333,11 +3333,11 @@ msgid "Date/Time"
 msgstr ""
 
 #: ../modules/hostserv/hs_off.cpp
-msgid "Deactivates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see your real host/IP address."
+msgid "Deactivate your assigned vhost"
 msgstr ""
 
 #: ../modules/hostserv/hs_off.cpp
-msgid "Deactivates your assigned vhost"
+msgid "Deactivates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see your real host/IP address."
 msgstr ""
 
 #: ../modules/chanserv/cs_access.cpp
@@ -3368,6 +3368,10 @@ msgstr ""
 
 #: ../modules/memoserv/ms_del.cpp
 msgid "Delete a memo or memos"
+msgstr ""
+
+#: ../modules/hostserv/hs_del.cpp
+msgid "Delete the vhost for all nicks in an account"
 msgstr ""
 
 #: ../modules/hostserv/hs_del.cpp
@@ -3511,10 +3515,6 @@ msgid "Deletes the vhost assigned to the given nick from the database."
 msgstr ""
 
 #: ../modules/hostserv/hs_del.cpp
-msgid "Deletes the vhost for all nicks in an account"
-msgstr ""
-
-#: ../modules/hostserv/hs_del.cpp
 msgid "Deletes the vhost for all nicks in the same account as that of the given nick."
 msgstr ""
 
@@ -3559,6 +3559,46 @@ msgid ""
 "Reason may be required on certain networks."
 msgstr ""
 
+#: ../modules/nickserv/ns_info.cpp
+msgid "Display information about a given nickname"
+msgstr ""
+
+#: ../modules/memoserv/ms_info.cpp
+msgid "Display information about your memos"
+msgstr ""
+
+#: ../modules/hostserv/hs_list.cpp
+msgid "Display one or more vhost entries"
+msgstr ""
+
+#: ../modules/chanserv/cs_fantasy_top.cpp
+msgid "Display the top 10 users of a channel"
+msgstr ""
+
+#: ../modules/chanserv/cs_fantasy_top.cpp
+msgid "Display the top 10 users of the network"
+msgstr ""
+
+#: ../modules/chanserv/cs_fantasy_top.cpp
+msgid "Display the top 3 users of a channel"
+msgstr ""
+
+#: ../modules/chanserv/cs_fantasy_top.cpp
+msgid "Display the top 3 users of the network"
+msgstr ""
+
+#: ../modules/help.cpp
+msgid "Display this list and give information about commands"
+msgstr ""
+
+#: ../modules/chanserv/cs_fantasy_stats.cpp
+msgid "Display your Channel Stats"
+msgstr ""
+
+#: ../modules/chanserv/cs_fantasy_stats.cpp
+msgid "Display your Global Stats"
+msgstr ""
+
 #: ../modules/hostserv/hs_request.cpp
 #, c-format
 msgid "Displayed %d records (%d total)."
@@ -3588,23 +3628,11 @@ msgid "Displays any new memos."
 msgstr ""
 
 #: ../modules/nickserv/ns_info.cpp
-msgid "Displays information about a given nickname"
-msgstr ""
-
-#: ../modules/nickserv/ns_info.cpp
 msgid "Displays information about the given nickname, such as the nick's owner, last seen address and time, and nick options. If no nick is given, and you are identified, your account name is used, else your current nickname is used."
-msgstr ""
-
-#: ../modules/memoserv/ms_info.cpp
-msgid "Displays information about your memos"
 msgstr ""
 
 #: ../modules/memoserv/ms_read.cpp
 msgid "Displays memos numbered 2 through 5 and 7 through 9."
-msgstr ""
-
-#: ../modules/hostserv/hs_list.cpp
-msgid "Displays one or more vhost entries"
 msgstr ""
 
 #: ../modules/nickserv/ns_cert.cpp
@@ -3613,34 +3641,6 @@ msgstr ""
 
 #: ../modules/nickserv/ns_cert.cpp
 msgid "Displays the current certificate list of nickname."
-msgstr ""
-
-#: ../modules/chanserv/cs_fantasy_top.cpp
-msgid "Displays the top 10 users of a channel"
-msgstr ""
-
-#: ../modules/chanserv/cs_fantasy_top.cpp
-msgid "Displays the top 10 users of the network"
-msgstr ""
-
-#: ../modules/chanserv/cs_fantasy_top.cpp
-msgid "Displays the top 3 users of a channel"
-msgstr ""
-
-#: ../modules/chanserv/cs_fantasy_top.cpp
-msgid "Displays the top 3 users of the network"
-msgstr ""
-
-#: ../modules/help.cpp
-msgid "Displays this list and give information about commands"
-msgstr ""
-
-#: ../modules/chanserv/cs_fantasy_stats.cpp
-msgid "Displays your Channel Stats"
-msgstr ""
-
-#: ../modules/chanserv/cs_fantasy_stats.cpp
-msgid "Displays your Global Stats"
 msgstr ""
 
 #: ../modules/nickserv/ns_cert.cpp
@@ -4145,10 +4145,6 @@ msgstr ""
 msgid "Greet mode is now on on channel %s."
 msgstr ""
 
-#: ../modules/nickserv/ns_resetpass.cpp
-msgid "Helps you reset lost passwords"
-msgstr ""
-
 #: ../modules/nickserv/ns_info.cpp
 msgid "Hide certain pieces of nickname information"
 msgstr ""
@@ -4281,7 +4277,7 @@ msgid "Invalid value for LIMIT. Must be numerical."
 msgstr ""
 
 #: ../modules/chanserv/cs_invite.cpp
-msgid "Invites you or an optionally specified nick into a channel"
+msgid "Invite you or an optionally specified nick into a channel"
 msgstr ""
 
 #: ../modules/botserv/bs_kick.cpp
@@ -4311,6 +4307,10 @@ msgstr ""
 msgid "Key for channel %s is %s."
 msgstr ""
 
+#: ../modules/chanserv/cs_kick.cpp
+msgid "Kick a specified nick from a channel"
+msgstr ""
+
 #: ../modules/operserv/os_kick.cpp
 msgid "Kick a user from a channel"
 msgstr ""
@@ -4318,10 +4318,6 @@ msgstr ""
 #: ../modules/chanserv/cs_ban.cpp ../modules/chanserv/cs_kick.cpp
 #, c-format
 msgid "Kicked %d/%d users matching %s from %s."
-msgstr ""
-
-#: ../modules/chanserv/cs_kick.cpp
-msgid "Kicks a specified nick from a channel"
 msgstr ""
 
 #: ../modules/chanserv/cs_kick.cpp
@@ -4439,8 +4435,28 @@ msgstr ""
 msgid "Limit"
 msgstr ""
 
+#: ../modules/operserv/os_list.cpp
+msgid "List all channel records"
+msgstr ""
+
+#: ../modules/nickserv/ns_group.cpp
+msgid "List all nicknames in your account"
+msgstr ""
+
+#: ../modules/chanserv/cs_list.cpp
+msgid "List all registered channels matching the given pattern"
+msgstr ""
+
 #: ../modules/nickserv/ns_list.cpp
 msgid "List all registered nicknames that match a given pattern"
+msgstr ""
+
+#: ../modules/operserv/os_list.cpp
+msgid "List all user records"
+msgstr ""
+
+#: ../modules/botserv/bs_botlist.cpp
+msgid "List available bots"
 msgstr ""
 
 #: ../modules/nickserv/ns_alist.cpp
@@ -4450,6 +4466,10 @@ msgstr ""
 #: ../modules/chanserv/cs_mode.cpp
 #, c-format
 msgid "List for modes %s is full."
+msgstr ""
+
+#: ../modules/chanserv/cs_info.cpp
+msgid "List information about the specified registered channel"
 msgstr ""
 
 #: ../modules/operserv/os_modinfo.cpp
@@ -4536,10 +4556,6 @@ msgid "Lists all bad word entries set on #channel."
 msgstr ""
 
 #: ../modules/operserv/os_list.cpp
-msgid "Lists all channel records"
-msgstr ""
-
-#: ../modules/operserv/os_list.cpp
 msgid ""
 "Lists all channels currently in use on the IRC network, whether they are registered or not.\n"
 "\n"
@@ -4554,15 +4570,7 @@ msgid ""
 msgstr ""
 
 #: ../modules/nickserv/ns_group.cpp
-msgid "Lists all nicknames in your account"
-msgstr ""
-
-#: ../modules/nickserv/ns_group.cpp
 msgid "Lists all nicknames that belong to your account."
-msgstr ""
-
-#: ../modules/chanserv/cs_list.cpp
-msgid "Lists all registered channels matching the given pattern"
 msgstr ""
 
 #: ../modules/chanserv/cs_list.cpp
@@ -4624,10 +4632,6 @@ msgid "Lists all registered nicks within the given range (51-100)."
 msgstr ""
 
 #: ../modules/operserv/os_list.cpp
-msgid "Lists all user records"
-msgstr ""
-
-#: ../modules/operserv/os_list.cpp
 msgid ""
 "Lists all users currently online on the IRC network, whether their nick is registered or not.\n"
 "\n"
@@ -4642,10 +4646,6 @@ msgstr ""
 msgid "Lists any new memos."
 msgstr ""
 
-#: ../modules/botserv/bs_botlist.cpp
-msgid "Lists available bots"
-msgstr ""
-
 #: ../modules/botserv/bs_badwords.cpp
 msgid "Lists bad word entries set on #channel numbered 2 through 5 and 7 through 9."
 msgstr ""
@@ -4656,10 +4656,6 @@ msgstr ""
 
 #: ../modules/operserv/os_modinfo.cpp
 msgid "Lists currently loaded modules."
-msgstr ""
-
-#: ../modules/chanserv/cs_info.cpp
-msgid "Lists information about the specified registered channel"
 msgstr ""
 
 #: ../modules/chanserv/cs_info.cpp
@@ -4744,12 +4740,16 @@ msgid ""
 "The %sCLEAR command is an easy way to clear modes on a channel. what may be any mode name. Examples include bans, excepts, inviteoverrides, ops, halfops, and voices. If what is not given then all basic modes are removed."
 msgstr ""
 
+#: ../modules/botserv/bs_bot.cpp
+msgid "Maintain network bot list"
+msgstr ""
+
 #: ../modules/chanserv/cs_akick.cpp
 msgid "Maintain the AutoKick list"
 msgstr ""
 
-#: ../modules/botserv/bs_bot.cpp
-msgid "Maintains network bot list"
+#: ../modules/botserv/bs_badwords.cpp
+msgid "Maintain the bad words list"
 msgstr ""
 
 #: ../modules/chanserv/cs_xop.cpp
@@ -4797,20 +4797,16 @@ msgid ""
 "The CLEAR command clears all entries from the bad words list."
 msgstr ""
 
-#: ../modules/botserv/bs_badwords.cpp
-msgid "Maintains the bad words list"
+#: ../modules/botserv/bs_control.cpp
+msgid "Make the bot do the equivalent of a \"/me\" command"
 msgstr ""
 
 #: ../modules/botserv/bs_control.cpp
-msgid "Makes the bot do the equivalent of a \"/me\" command"
+msgid "Make the bot say the specified text on the specified channel"
 msgstr ""
 
 #: ../modules/botserv/bs_control.cpp
 msgid "Makes the bot do the equivalent of a \"/me\" command on the specified channel using the specified text."
-msgstr ""
-
-#: ../modules/botserv/bs_control.cpp
-msgid "Makes the bot say the specified text on the specified channel"
 msgstr ""
 
 #: ../modules/botserv/bs_control.cpp
@@ -4834,7 +4830,7 @@ msgid "Manage your auto join list"
 msgstr ""
 
 #: ../modules/global/gl_queue.cpp
-msgid "Manages your pending message queue."
+msgid "Manage your pending message queue."
 msgstr ""
 
 #: ../modules/operserv/os_sxline.cpp
@@ -4878,7 +4874,7 @@ msgid "Masks and unregistered users may not be on access lists."
 msgstr ""
 
 #: ../modules/nickserv/ns_email.cpp
-msgid "Matches and returns all users that registered using given email address"
+msgid "Match and return all users that registered using given email address"
 msgstr ""
 
 #: ../modules/operserv/os_logsearch.cpp
@@ -5795,7 +5791,7 @@ msgid "Redefine the meanings of access levels"
 msgstr ""
 
 #: ../modules/nickserv/ns_recover.cpp
-msgid "Regains control of your nick"
+msgid "Regain control of your nick"
 msgstr ""
 
 #: ../modules/operserv/os_akill.cpp ../modules/operserv/os_sxline.cpp
@@ -5881,7 +5877,7 @@ msgid "Reject the requested vhost of a user"
 msgstr ""
 
 #: ../modules/chanserv/cs_suspend.cpp
-msgid "Releases a suspended channel"
+msgid "Release a suspended channel"
 msgstr ""
 
 #: ../modules/chanserv/cs_suspend.cpp
@@ -5898,6 +5894,10 @@ msgstr ""
 
 #: ../modules/nickserv/ns_group.cpp
 msgid "Remove a nick from an account"
+msgstr ""
+
+#: ../modules/chanserv/cs_updown.cpp
+msgid "Remove a selected nicks status from a channel"
 msgstr ""
 
 #: ../modules/chanserv/cs_unban.cpp
@@ -5931,10 +5931,6 @@ msgstr ""
 #: ../modules/chanserv/cs_mode.cpp
 #, c-format
 msgid "Removes %s status from you or the specified nick on a channel"
-msgstr ""
-
-#: ../modules/chanserv/cs_updown.cpp
-msgid "Removes a selected nicks status from a channel"
 msgstr ""
 
 #: ../modules/chanserv/cs_updown.cpp
@@ -6018,11 +6014,11 @@ msgid "Retain topic when channel is not in use"
 msgstr ""
 
 #: ../modules/hostserv/hs_request.cpp
-msgid "Retrieves the vhost requests"
+msgid "Retrieve the vhost requests"
 msgstr ""
 
 #: ../modules/chanserv/cs_getkey.cpp
-msgid "Returns the key of the given channel"
+msgid "Return the key of the given channel"
 msgstr ""
 
 #: ../modules/chanserv/cs_getkey.cpp
@@ -6033,16 +6029,16 @@ msgstr ""
 msgid "Returns the matching accounts that used given email."
 msgstr ""
 
+#: ../modules/nickserv/ns_logout.cpp
+msgid "Reverse the effect of the IDENTIFY command"
+msgstr ""
+
 #: ../modules/botserv/bs_kick.cpp
 msgid "Reverses kicker"
 msgstr ""
 
 #: ../modules/nickserv/ns_logout.cpp
 msgid "Reverses the effect of the IDENTIFY command, i.e. make you not recognized as the real owner of the nick anymore. Note, however, that you won't be asked to reidentify yourself."
-msgstr ""
-
-#: ../modules/nickserv/ns_logout.cpp
-msgid "Reverses the effect of the IDENTIFY command"
 msgstr ""
 
 #: ../modules/operserv/os_noop.cpp
@@ -6077,7 +6073,7 @@ msgid "Save databases and restart services"
 msgstr ""
 
 #: ../modules/operserv/os_logsearch.cpp
-msgid "Searches logs for a matching pattern"
+msgid "Search logs for a matching pattern"
 msgstr ""
 
 #: ../modules/operserv/os_logsearch.cpp
@@ -6132,6 +6128,10 @@ msgstr ""
 msgid "See the %s command (%sACCESS) for information on giving a subset of these privileges to other channel users."
 msgstr ""
 
+#: ../modules/memoserv/ms_rsend.cpp
+msgid "Send a memo and requests a read receipt"
+msgstr ""
+
 #: ../modules/memoserv/ms_send.cpp
 msgid "Send a memo to a nick or channel"
 msgstr ""
@@ -6152,16 +6152,16 @@ msgstr ""
 msgid "Send a message to all users on a server"
 msgstr ""
 
+#: ../modules/nickserv/ns_resetpass.cpp
+msgid "Send an email to recover access to an account"
+msgstr ""
+
 #: ../modules/memoserv/ms_list.cpp
 msgid "Sender"
 msgstr ""
 
 #: ../modules/nickserv/ns_resetpass.cpp
 msgid "Sends a confirmation code to the nickname's email address with instructions on how to reset their password. email must be the email address associated with the account."
-msgstr ""
-
-#: ../modules/memoserv/ms_rsend.cpp
-msgid "Sends a memo and requests a read receipt"
 msgstr ""
 
 #: ../modules/chanserv/cs_log.cpp
@@ -6481,6 +6481,18 @@ msgstr ""
 msgid "Set various global services options"
 msgstr ""
 
+#: ../modules/nickserv/ns_set_op.cpp
+msgid "Set whether services should set channel status modes on you automatically."
+msgstr ""
+
+#: ../modules/nickserv/ns_set_op.cpp
+msgid "Set whether you can be added to a channel access list."
+msgstr ""
+
+#: ../modules/nickserv/ns_cert.cpp
+msgid "Set whether you should automatically be logged in when you connect using a known SSL certificate."
+msgstr ""
+
 #: ../modules/nickserv/ns_set.cpp
 msgid "Set your nickname password"
 msgstr ""
@@ -6617,10 +6629,6 @@ msgstr ""
 msgid "Sets voice status on all users in the channel."
 msgstr ""
 
-#: ../modules/nickserv/ns_set_op.cpp
-msgid "Sets whether services should set channel status modes on you automatically."
-msgstr ""
-
 #: ../modules/chanserv/cs_set.cpp
 msgid "Sets whether the given channel will expire. Setting this to ON prevents the channel from expiring."
 msgstr ""
@@ -6645,10 +6653,6 @@ msgstr ""
 
 #: ../modules/nickserv/ns_set_op.cpp
 msgid "Sets whether you can be added to a channel access list."
-msgstr ""
-
-#: ../modules/nickserv/ns_cert.cpp
-msgid "Sets whether you should automatically be logged in when you connect using a known SSL certificate."
 msgstr ""
 
 #: ../modules/nickserv/ns_cert.cpp
@@ -6813,16 +6817,16 @@ msgstr ""
 msgid "Suspension expires"
 msgstr ""
 
+#: ../modules/hostserv/hs_group.cpp
+msgid "Sync the vhost for all nicks in an account"
+msgstr ""
+
 #: ../modules/chanserv/cs_sync.cpp
 msgid "Sync users channel modes"
 msgstr ""
 
 #: ../modules/chanserv/cs_sync.cpp
 msgid "Syncs all modes set on users on the channel with the modes they should have based on their access."
-msgstr ""
-
-#: ../modules/hostserv/hs_group.cpp
-msgid "Syncs the vhost for all nicks in an account"
 msgstr ""
 
 #: ../src/command.cpp
@@ -6904,6 +6908,10 @@ msgstr ""
 msgid "TAKE {vhost | entry-num}"
 msgstr ""
 
+#: ../modules/chanserv/cs_seen.cpp
+msgid "Tell you about the last time a user was seen"
+msgstr ""
+
 #: ../modules/nickserv/ns_identify.cpp
 #, c-format
 msgid "Tells %s that you are really the owner of this nick. Many commands require you to authenticate yourself with this command before you use them. The password should be the same one you sent with the REGISTER command."
@@ -6921,10 +6929,6 @@ msgstr ""
 
 #: ../modules/operserv/os_jupe.cpp
 msgid "Tells services to jupiter a server -- that is, to create a fake \"server\" connected to services which prevents the real server of that name from connecting. The jupe may be removed using a standard SQUIT. If a reason is given, it is placed in the server information field; otherwise, the server information field will contain the text \"Juped by <nick>\", showing the nickname of the person who jupitered the server."
-msgstr ""
-
-#: ../modules/chanserv/cs_seen.cpp
-msgid "Tells you about the last time a user was seen"
 msgstr ""
 
 #: ../modules/operserv/os_shutdown.cpp
@@ -7668,7 +7672,7 @@ msgid "Unable to remove module %s."
 msgstr ""
 
 #: ../modules/botserv/bs_assign.cpp
-msgid "Unassigns a bot from a channel"
+msgid "Unassign a bot from a channel"
 msgstr ""
 
 #: ../modules/botserv/bs_assign.cpp
@@ -7760,15 +7764,15 @@ msgid "Unsuspends a nickname which allows it to be used again."
 msgstr ""
 
 #: ../modules/chanserv/cs_updown.cpp
-msgid "Updates a selected nicks status modes on a channel. If nick is omitted then your status is updated. If channel is omitted then your channel status is updated on every channel you are in."
-msgstr ""
-
-#: ../modules/chanserv/cs_updown.cpp
-msgid "Updates a selected nicks status on a channel"
+msgid "Update a selected nicks status on a channel"
 msgstr ""
 
 #: ../modules/nickserv/ns_update.cpp
-msgid "Updates your current status, i.e. it checks for new memos"
+msgid "Update your current status, i.e. it checks for new memos"
+msgstr ""
+
+#: ../modules/chanserv/cs_updown.cpp
+msgid "Updates a selected nicks status modes on a channel. If nick is omitted then your status is updated. If channel is omitted then your channel status is updated on every channel you are in."
 msgstr ""
 
 #: ../modules/nickserv/ns_update.cpp
@@ -7917,7 +7921,7 @@ msgid "VIEW [vhost-mask | entry-num | list]"
 msgstr ""
 
 #: ../modules/hostserv/hs_request.cpp
-msgid "Validates a previously requested vhost using DNS"
+msgid "Validate a previously requested vhost using DNS"
 msgstr ""
 
 #: ../modules/hostserv/hs_request.cpp

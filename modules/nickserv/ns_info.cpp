@@ -20,7 +20,7 @@ class CommandNSInfo final
 public:
 	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 0, 2)
 	{
-		this->SetDesc(_("Displays information about a given nickname"));
+		this->SetDesc(_("Display information about a given nickname"));
 		this->SetSyntax(_("[\037nickname\037]"));
 		this->AllowUnregistered(true);
 	}

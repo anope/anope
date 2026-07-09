@@ -548,7 +548,7 @@ public:
 	CommandNSSetAutologin(Module *creator, const Anope::string &sname = "nickserv/set/autologin", size_t min = 1)
 		: Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Sets whether you should automatically be logged in when you connect using a known SSL certificate."));
+		this->SetDesc(_("Set whether you should automatically be logged in when you connect using a known SSL certificate."));
 		this->SetSyntax("{ON | OFF}");
 	}
 

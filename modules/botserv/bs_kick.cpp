@@ -129,7 +129,7 @@ class CommandBSKick final
 public:
 	CommandBSKick(Module *creator) : Command(creator, "botserv/kick", 0)
 	{
-		this->SetDesc(_("Configures kickers"));
+		this->SetDesc(_("Configure kickers"));
 		this->SetSyntax(_("\037option\037 \037channel\037 {\037ON|OFF\037} [\037settings\037]"));
 	}
 
@@ -258,7 +258,7 @@ class CommandBSKickAMSG final
 public:
 	CommandBSKickAMSG(Module *creator) : CommandBSKickBase(creator, "botserv/kick/amsg", 2, 3)
 	{
-		this->SetDesc(_("Configures AMSG kicker"));
+		this->SetDesc(_("Configure AMSG kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
@@ -298,7 +298,7 @@ class CommandBSKickBadwords final
 public:
 	CommandBSKickBadwords(Module *creator) : CommandBSKickBase(creator, "botserv/kick/badwords", 2, 3)
 	{
-		this->SetDesc(_("Configures badwords kicker"));
+		this->SetDesc(_("Configure badwords kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
@@ -342,7 +342,7 @@ class CommandBSKickBolds final
 public:
 	CommandBSKickBolds(Module *creator) : CommandBSKickBase(creator, "botserv/kick/bolds", 2, 3)
 	{
-		this->SetDesc(_("Configures bolds kicker"));
+		this->SetDesc(_("Configure bolds kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
@@ -379,7 +379,7 @@ class CommandBSKickCaps final
 public:
 	CommandBSKickCaps(Module *creator) : CommandBSKickBase(creator, "botserv/kick/caps", 2, 5)
 	{
-		this->SetDesc(_("Configures caps kicker"));
+		this->SetDesc(_("Configure caps kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037min\037 [\037percent\037]]]\002"));
 	}
 
@@ -475,7 +475,7 @@ class CommandBSKickColors final
 public:
 	CommandBSKickColors(Module *creator) : CommandBSKickBase(creator, "botserv/kick/colors", 2, 3)
 	{
-		this->SetDesc(_("Configures color kicker"));
+		this->SetDesc(_("Configure color kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
@@ -512,7 +512,7 @@ class CommandBSKickFlood final
 public:
 	CommandBSKickFlood(Module *creator) : CommandBSKickBase(creator, "botserv/kick/flood", 2, 5)
 	{
-		this->SetDesc(_("Configures flood kicker"));
+		this->SetDesc(_("Configure flood kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037ln\037 [\037secs\037]]]\002"));
 	}
 
@@ -602,7 +602,7 @@ class CommandBSKickItalics final
 public:
 	CommandBSKickItalics(Module *creator) : CommandBSKickBase(creator, "botserv/kick/italics", 2, 3)
 	{
-		this->SetDesc(_("Configures italics kicker"));
+		this->SetDesc(_("Configure italics kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
@@ -639,7 +639,7 @@ class CommandBSKickRepeat final
 public:
 	CommandBSKickRepeat(Module *creator) : CommandBSKickBase(creator, "botserv/kick/repeat", 2, 4)
 	{
-		this->SetDesc(_("Configures repeat kicker"));
+		this->SetDesc(_("Configure repeat kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037 [\037num\037]]\002"));
 	}
 
@@ -750,7 +750,7 @@ class CommandBSKickReverses final
 public:
 	CommandBSKickReverses(Module *creator) : CommandBSKickBase(creator, "botserv/kick/reverses", 2, 3)
 	{
-		this->SetDesc(_("Configures reverses kicker"));
+		this->SetDesc(_("Configure reverses kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 
@@ -787,7 +787,7 @@ class CommandBSKickUnderlines final
 public:
 	CommandBSKickUnderlines(Module *creator) : CommandBSKickBase(creator, "botserv/kick/underlines", 2, 3)
 	{
-		this->SetDesc(_("Configures underlines kicker"));
+		this->SetDesc(_("Configure underlines kicker"));
 		this->SetSyntax(_("\037channel\037 {\037ON|OFF\037} [\037ttb\037]"));
 	}
 

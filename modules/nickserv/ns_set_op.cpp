@@ -21,7 +21,7 @@ public:
 	CommandNSSetOpAutoOp(Module *creator, const Anope::string &sname = "nickserv/set/autoop", size_t min = 1)
 		: Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Sets whether services should set channel status modes on you automatically."));
+		this->SetDesc(_("Set whether services should set channel status modes on you automatically."));
 		this->SetSyntax("{ON | OFF}");
 	}
 
@@ -123,7 +123,7 @@ public:
 	CommandNSSetOpNeverOp(Module *creator, const Anope::string &sname = "nickserv/set/neverop", size_t min = 1)
 		: Command(creator, sname, min, min + 1)
 	{
-		this->SetDesc(_("Sets whether you can be added to a channel access list."));
+		this->SetDesc(_("Set whether you can be added to a channel access list."));
 		this->SetSyntax("{ON | OFF}");
 	}
 

@@ -416,7 +416,7 @@ private:
 public:
 	CommandBSBadwords(Module *creator) : Command(creator, "botserv/badwords", 2, 3)
 	{
-		this->SetDesc(_("Maintains the bad words list"));
+		this->SetDesc(_("Maintain the bad words list"));
 		this->SetSyntax(_("\037channel\037 ADD \037word\037 [\037SINGLE\037 | \037START\037 | \037END\037]"));
 		this->SetSyntax(_("\037channel\037 DEL {\037word\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037list\037]"));

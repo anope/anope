@@ -20,7 +20,7 @@ class CommandCSInvite final
 public:
 	CommandCSInvite(Module *creator) : Command(creator, "chanserv/invite", 1, 3)
 	{
-		this->SetDesc(_("Invites you or an optionally specified nick into a channel"));
+		this->SetDesc(_("Invite you or an optionally specified nick into a channel"));
 		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
 	}
 

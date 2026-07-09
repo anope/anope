@@ -164,9 +164,9 @@ public:
 		else
 		{
 			u2->SetModes(source.service, modes);
-			source.Reply(_("Changed usermodes of \002%s\002 to %s."), u2->nick.c_str(), modes.c_str());
+			source.Reply(_("Changed user modes of \002%s\002 to %s."), u2->nick.c_str(), modes.c_str());
 
-			u2->SendMessage(source.service, _("\002%s\002 changed your usermodes to %s."), source.GetNick().c_str(), modes.c_str());
+			u2->SendMessage(source.service, _("\002%s\002 changed your user modes to %s."), source.GetNick().c_str(), modes.c_str());
 
 			Log(LOG_ADMIN, source, this) << modes << " on " << target;
 		}

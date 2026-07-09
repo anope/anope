@@ -378,7 +378,7 @@ void User::Identify(NickAlias *na)
 				IRCD->SendOper(this);
 
 			this->SetModes(NULL, this->nc->o->ot->modes);
-			this->SendMessage(NULL, _("Changing your usermodes to \002%s\002"), this->nc->o->ot->modes.c_str());
+			this->SendMessage(NULL, _("Changing your user modes to \002%s\002"), this->nc->o->ot->modes.c_str());
 		}
 		if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 		{
@@ -560,7 +560,7 @@ void User::SetModeInternal(const MessageSource &source, UserMode *um, const Mode
 					IRCD->SendOper(this);
 
 				this->SetModes(NULL, this->nc->o->ot->modes);
-				this->SendMessage(NULL, _("Changing your usermodes to \002%s\002"), this->nc->o->ot->modes.c_str());
+				this->SendMessage(NULL, _("Changing your user modes to \002%s\002"), this->nc->o->ot->modes.c_str());
 			}
 			if (IRCD->CanSetVHost && !this->nc->o->vhost.empty())
 			{

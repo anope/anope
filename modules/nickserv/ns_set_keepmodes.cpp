@@ -73,7 +73,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"Enables or disables keepmodes for your nick. If keep "
-			"modes is enabled, services will remember your usermodes "
+			"modes is enabled, services will remember your user modes "
 			"and attempt to re-set them the next time you authenticate."
 		));
 		return true;
@@ -102,7 +102,7 @@ public:
 		source.Reply(" ");
 		source.Reply(_(
 			"Enables or disables keepmodes for the given nick. If keep "
-			"modes is enabled, services will remember users' usermodes "
+			"modes is enabled, services will remember users' user modes "
 			"and attempt to re-set them the next time they authenticate."
 		));
 		return true;

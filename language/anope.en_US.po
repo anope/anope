@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-21 11:52+0100\n"
-"PO-Revision-Date: 2026-05-21 11:52+0100\n"
+"POT-Creation-Date: 2026-07-09 18:22+0100\n"
+"PO-Revision-Date: 2026-07-09 18:22+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -146,7 +146,7 @@ msgstr ""
 
 #: ../modules/operserv/os_mode.cpp
 #, c-format
-msgid "%s changed your usermodes to %s."
+msgid "%s changed your user modes to %s."
 msgstr ""
 
 #: ../modules/operserv/os_list.cpp
@@ -2765,7 +2765,7 @@ msgstr ""
 
 #: ../modules/operserv/os_mode.cpp
 #, c-format
-msgid "Changed usermodes of %s to %s."
+msgid "Changed user modes of %s to %s."
 msgstr ""
 
 #: ../modules/botserv/bs_bot.cpp
@@ -2840,7 +2840,7 @@ msgstr ""
 
 #: ../src/users.cpp
 #, c-format
-msgid "Changing your usermodes to %s"
+msgid "Changing your user modes to %s"
 msgstr ""
 
 #: ../src/users.cpp
@@ -3764,11 +3764,11 @@ msgid "Enables or disables keepmodes for the given channel. If keep modes is ena
 msgstr ""
 
 #: ../modules/nickserv/ns_set_keepmodes.cpp
-msgid "Enables or disables keepmodes for the given nick. If keep modes is enabled, services will remember users' usermodes and attempt to re-set them the next time they authenticate."
+msgid "Enables or disables keepmodes for the given nick. If keep modes is enabled, services will remember users' user modes and attempt to re-set them the next time they authenticate."
 msgstr ""
 
 #: ../modules/nickserv/ns_set_keepmodes.cpp
-msgid "Enables or disables keepmodes for your nick. If keep modes is enabled, services will remember your usermodes and attempt to re-set them the next time you authenticate."
+msgid "Enables or disables keepmodes for your nick. If keep modes is enabled, services will remember your user modes and attempt to re-set them the next time you authenticate."
 msgstr ""
 
 #: ../modules/chanserv/cs_set.cpp

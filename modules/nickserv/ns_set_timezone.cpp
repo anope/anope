@@ -57,9 +57,8 @@ protected:
 			}
 
 			buffer
-				.append(buffer.empty() ? "  " : " ")
-				.append(timezone)
-				.append(",");
+				.append(buffer.empty() ? "  " : ", ")
+				.append(timezone);
 		}
 
 		if (!buffer.empty())
@@ -245,23 +244,27 @@ public:
 		// Build the region list.
 		for (const auto &timezone : timezones)
 		{
-			auto tzsep = timezone.find('/');
+			const auto tzsep = timezone.rfind('/');
 			auto region = tzsep == Anope::string::npos ? "Misc" : timezone.substr(0, tzsep);
 			timeregions[region].push_back(timezone);
 		}
 
 		// Eliminate regions with only one timezone.
-		for (auto it = timeregions.begin(); it != timeregions.end(); )
+		for (auto it = timeregions.end(); it != timeregions.begin(); )
 		{
+			it--;
 			const auto &[timeregion, timezones] = *it;
 			if (!timeregion.equals_ci("Misc") && timezones.size() < 2)
 			{
-				auto& miscregion = timeregions["Misc"];
-				miscregion.insert(miscregion.end(), timezones.begin(), timezones.end());
+				const auto trsep = timeregion.rfind('/');
+				auto region = trsep == Anope::string::npos ? "Misc" : timeregion.substr(0, trsep);
+
+				auto& parentregion = timeregions[region];
+				parentregion.insert(parentregion.end(), timezones.begin(), timezones.end());
+
 				it = timeregions.erase(it);
 				continue;
 			}
-			it++;
 		}
 
 		// Ensure the timezone list is ordered alphabetically.

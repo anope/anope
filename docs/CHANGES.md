@@ -2,19 +2,71 @@
 
 ## Anope 2.1.25 (unreleased)
 
-### Changes
+### General Changes
+
+* Added a cooldown timer to `hs_request` for after a vhost is approved or rejected.
+
+* Added environment variables for configuring hashing algorithms to `anope-mkpasswd`.
+
+* Added support for building with position-independent code on supported platforms.
+
+* Added support for prioritising WHOIS entries in `ns_set_misc`.
+
+* Documented the `ns_flexible` and `ns_monospace` account options.
+
+* Dropped support for the `+draft/reply` tag in favour of the non-draft variant.
+
+* Fixed a crash on shutdown when trying to send a global without an uplink.
 
 * Fixed a crash when a temporary ban expires.
+
+* Fixed a crash when trying to upgrade TLS fingerprints from an older algorithm.
 
 * Fixed a potential crash caused by unusual timestamps being passed to `Anope::strftime`.
 
 * Fixed confirming accounts when `{ns_register}:registration` is set to "admin".
 
-* Fixed migrating access entries from xop to flags granting new privileges in cases where multiple privileges share the same flag.
+* Fixed extra CMake arguments from `./Config` being ignored.
 
-* Fixed migrating access entries sometimes giving the wrong flags.
+* Fixed flag migration sometimes giving users higher privileges than they had originally when a flag provides multiple privileges.
 
 * Fixed not being able to update the description of a flags access entry.
+
+* Fixed not migrating the last seen time with an access entry.
+
+* Fixed not using the extra CMake arguments from `./Config`.
+
+* Fixed some help messages that did not reflect the default flag/level/xop access when changed in the configuration.
+
+* Fixed the default memory hardness in the `enc_argon2` module.
+
+* Improved configuring paths at build time.
+
+* Improved importing databases from Atheme.
+
+* Improved support for reproducible builds.
+
+* Separated the delay between nickname registrations from the delay between grouping nicknames.
+
+* Updated the Portuguese translation.
+
+* Updated the Romanian translation.
+
+### Developer Changes
+
+* Added `Block::GetBlocks` to allow using a range-based for loop to iterate config blocks.
+
+* Added an event to `IRCDProto` to populate common tags onto a S2S message.
+
+* Added automated testing on InspIRCd, Solanum, and UnrealIRCd using irctest.
+
+* Added support for adding ajoin entries from modules.
+
+* Changed various configuration block index fields to use an unsigned integer.
+
+* Changed vendored libraries to be built as static libraries and linked into the modules that require them.
+
+* Simplified timer repeat logic by allowing tick events to return bool to control whether the timer continues running.
 
 ## Anope 2.1.24 (2026-04-01)
 

@@ -22,7 +22,7 @@ class CommandNSResetPass final
 public:
 	CommandNSResetPass(Module *creator) : Command(creator, "nickserv/resetpass", 2, 2)
 	{
-		this->SetDesc(_("Helps you reset lost passwords"));
+		this->SetDesc(_("Send an email to recover access to an account"));
 		this->SetSyntax(_("\037nickname\037 \037email\037"));
 		this->AllowUnregistered(true);
 	}

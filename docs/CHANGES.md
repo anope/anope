@@ -26,6 +26,8 @@
 
 * Fixed confirming accounts when `{ns_register}:registration` is set to "admin".
 
+* Fixed edge cases relating to IRCd-sent account names.
+
 * Fixed extra CMake arguments from `./Config` being ignored.
 
 * Fixed flag migration sometimes giving users higher privileges than they had originally when a flag provides multiple privileges.
@@ -36,15 +38,21 @@
 
 * Fixed not using the extra CMake arguments from `./Config`.
 
+* Fixed some command descriptions not being imperative statements.
+
 * Fixed some help messages that did not reflect the default flag/level/xop access when changed in the configuration.
 
 * Fixed the default memory hardness in the `enc_argon2` module.
 
 * Improved configuring paths at build time.
 
+* Improved help output for the `nickserv/set/timezone` command.
+
 * Improved importing databases from Atheme.
 
 * Improved support for reproducible builds.
+
+* Redocumented the `nickserv/set/keepmodes` command.
 
 * Separated the delay between nickname registrations from the delay between grouping nicknames.
 

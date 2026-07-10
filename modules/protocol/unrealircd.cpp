@@ -1651,22 +1651,28 @@ public:
 		}
 		else
 		{
-			// If we're bursting then then the user was probably logged
-			// in during a previous connection.
-			NickCore *nc = NickCore::Find(params[2]);
-			if (nc)
+			// If we're bursting then then the user was probably logged in
+			// during a previous connection.
+			auto *na = NickAlias::Find(params[2]);
+			if (!na)
+			{
+				// Nick has been dropped, force the IRCd to deauth them.
+				IRCD->SendLogout(u);
+				return;
+			}
+
+			NickCore *nc = na->nc;
+			if (na == nc->na)
+			{
+				// User is logged into their display nick.
 				u->Login(nc);
+			}
 			else
 			{
-				// Handle corner cases around database rollbacks/inconsistency and users
-				// whose display nick recently expired, causing an alias to become the
-				// display nick.
-				auto *na = NickAlias::Find(params[2]);
-				if (na)
-				{
-					Log() << "User " << u->nick << " is logged in as alias '" << na->nick << "', logging them in as the display nick '" << na->nc->na->nick << "'.";
-					u->Identify(na);
-				}
+				// User is logged into a non-display nick, their display has
+				// probably expired due to a config change so reauthenticate
+				// them as their new display nick.
+				u->Identify(nc->na);
 			}
 		}
 	}

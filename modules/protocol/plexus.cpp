@@ -227,11 +227,33 @@ struct IRCDMessageEncap final
 		if (params[1].equals_cs("SU"))
 		{
 			User *u = User::Find(params[2]);
-			NickCore *nc = NickCore::Find(params[3]);
-			if (u && nc)
+			if (!u)
+				return; // Should never happen.
+
+			// If we're bursting then then the user was probably logged in
+			// during a previous connection.
+			auto *na = NickAlias::Find(params[3]);
+			if (!na)
 			{
+				// Nick has been dropped, force the IRCd to deauth them.
+				IRCD->SendLogout(u);
+				return;
+			}
+
+			NickCore *nc = na->nc;
+			if (na == nc->na)
+			{
+				// User is logged into their display nick.
 				u->Login(nc);
 			}
+			else
+			{
+				// User is logged into a non-display nick, their display has
+				// probably expired due to a config change so reauthenticate
+				// them as their new display nick.
+				u->Identify(nc->na);
+			}
+
 		}
 
 		/*

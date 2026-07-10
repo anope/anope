@@ -156,11 +156,32 @@ struct IRCDMessageEncap final
 		if (params[1] == "LOGIN" || params[1] == "SU")
 		{
 			User *u = source.GetUser();
+			if (!u)
+				return; // Should never happen.
 
-			NickCore *nc = NickCore::Find(params[2]);
-			if (!nc)
+			// If we're bursting then then the user was probably logged in
+			// during a previous connection.
+			auto *na = NickAlias::Find(params[2]);
+			if (!na)
+			{
+				// Nick has been dropped, force the IRCd to deauth them.
+				IRCD->SendLogout(u);
 				return;
-			u->Login(nc);
+			}
+
+			NickCore *nc = na->nc;
+			if (na == nc->na)
+			{
+				// User is logged into their display nick.
+				u->Login(nc);
+			}
+			else
+			{
+				// User is logged into a non-display nick, their display has
+				// probably expired due to a config change so reauthenticate
+				// them as their new display nick.
+				u->Identify(nc->na);
+			}
 
 			/* Sometimes a user connects, we send them the usual "this nickname is registered" mess (if
 			 * their server isn't syncing) and then we receive this.. so tell them about it.

@@ -227,6 +227,9 @@ struct IRCDMessageEncap final
 		if (params[1].equals_cs("SU"))
 		{
 			User *u = User::Find(params[2]);
+			if (!u)
+				return; // Should never happen.
+
 			// If we're bursting then then the user was probably logged in
 			// during a previous connection.
 			auto *na = NickAlias::Find(params[3]);

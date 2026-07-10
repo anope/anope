@@ -156,6 +156,8 @@ struct IRCDMessageEncap final
 		if (params[1] == "LOGIN" || params[1] == "SU")
 		{
 			User *u = source.GetUser();
+			if (!u)
+				return; // Should never happen.
 
 			// If we're bursting then then the user was probably logged in
 			// during a previous connection.

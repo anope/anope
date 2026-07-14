@@ -201,10 +201,12 @@ public:
 		const auto minlen = std::min(nick.length(), guestnick.length());
 		for (size_t idx = 0; idx < minlen; ++idx)
 		{
-			if (guestnick[idx] == '#' && !isdigit(nick[idx]))
-				return false;
-
-			if (Anope::tolower(guestnick[idx]) != Anope::tolower(nick[idx]))
+			if (guestnick[idx] == '#')
+			{
+				if (!isdigit(nick[idx]))
+					return false;
+			}
+			else if (Anope::tolower(guestnick[idx]) != Anope::tolower(nick[idx]))
 				return false;
 		}
 		return true;

@@ -1160,7 +1160,9 @@ private:
 			return HandleIgnoreMetadata(ci->name, key, value);
 		else if (key.find(':') == Anope::string::npos)
 		{
-			ExtensibleRef<MiscData> extref("cs_set_misc:" + key.upper());
+			// Make a guess that there could be a ChanServ SET MISC entry w/the mystery key's exact (uppercase) name
+			const Anope::string name = "cs_set_misc:" + key.upper();
+			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
 				Log(this) << "Unknown public channel metadata for " << ci->name << ": " << key << " = " << value;
@@ -1169,11 +1171,12 @@ private:
 
 			auto *data = extref->Set(ci);
 			data->object = ci->name;
-			data->name = key;
+			data->name = name;
 			data->data = value;
 		}
 		else
 		{
+			// Look for a ChanServ SET MISC entry defined in the configuration
 			auto it = csmiscdata.find(key);
 			if (it == csmiscdata.end())
 			{
@@ -1181,16 +1184,18 @@ private:
 				return true;
 			}
 
-			ExtensibleRef<MiscData> extref("cs_set_misc:" + it->second);
+			const Anope::string name = "cs_set_misc:" + it->second;
+			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
-				Log(this) << "Unknown imported channel metadata for " << ci->name << ": " << it->second << " = " << value;
-				return true;
+				Log(this) << "Configuration error: " << Module::name << " cs_set_misc entry " << it->second
+					<< " lacks a corresponding chanserv/set/misc command";
+				throw new ConfigException; // Can't check when reading the config becuase cs_set_misc might not be loaded
 			}
 
 			auto *data = extref->Set(ci);
 			data->object = ci->name;
-			data->name = it->second;
+			data->name = name;
 			data->data = value;
 		}
 
@@ -1305,7 +1310,9 @@ private:
 			data->vhost_nick[key.substr(18)] = value;
 		else if (key.find(':') == Anope::string::npos)
 		{
-			ExtensibleRef<MiscData> extref("ns_set_misc:" + key.upper());
+			// Make a guess that there could be a NickServ SET MISC entry w/the mystery key's exact (uppercase) name
+			const Anope::string name = "ns_set_misc:" + key.upper();
+			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
 				Log(this) << "Unknown public account metadata for " << nc->display << ": " << key << " = " << value;
@@ -1314,11 +1321,12 @@ private:
 
 			auto *data = extref->Set(nc);
 			data->object = nc->display;
-			data->name = key;
+			data->name = name;
 			data->data = value;
 		}
 		else
 		{
+			// Look for a NickServ SET MISC entry defined in the configuration
 			auto it = nsmiscdata.find(key);
 			if (it == nsmiscdata.end())
 			{
@@ -1326,16 +1334,18 @@ private:
 				return true;
 			}
 
-			ExtensibleRef<MiscData> extref("ns_set_misc:" + it->second);
+			const Anope::string name = "ns_set_misc:" + it->second;
+			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
-				Log(this) << "Unknown imported account metadata for " << nc->display << ": " << key << " = " << value;
-				return true;
+				Log(this) << "Configuration error: " << Module::name << " ns_set_misc entry " << it->second
+					<< " lacks a corresponding nickserv/set/misc command";
+				throw new ConfigException; // Can't check when reading the config becuase ns_set_misc might not be loaded
 			}
 
 			auto *data = extref->Set(nc);
 			data->object = nc->display;
-			data->name = it->second;
+			data->name = name;
 			data->data = value;
 		}
 
@@ -1693,7 +1703,17 @@ public:
 		{
 			const auto &anope = data.Get<const Anope::string>("anope");
 			const auto &atheme = data.Get<const Anope::string>("atheme");
-			if (!anope.empty() && !atheme.empty())
+			if (anope.empty())
+			{
+				Log(this) << " missing cs_set_misc anope config entry" << (atheme.empty() ? "" : (" for atheme entry " + atheme));
+				throw new ConfigException;
+			}
+			else if (atheme.empty())
+			{
+				Log(this) << " missing cs_set_misc atheme config entry for anope entry " << anope;
+				throw new ConfigException;
+			}
+			else
 				csmiscdata[atheme] = anope.upper();
 		}
 
@@ -1702,7 +1722,17 @@ public:
 		{
 			const auto &anope = data.Get<const Anope::string>("anope");
 			const auto &atheme = data.Get<const Anope::string>("atheme");
-			if (!anope.empty() && !atheme.empty())
+			if (anope.empty())
+			{
+				Log(this) << " missing ns_set_misc anope config entry" << (atheme.empty() ? "" : (" for atheme entry " + atheme));
+				throw new ConfigException;
+			}
+			else if (atheme.empty())
+			{
+				Log(this) << " missing ns_set_misc atheme config entry for anope entry " << anope;
+				throw new ConfigException;
+			}
+			else
 				nsmiscdata[atheme] = anope.upper();
 		}
 

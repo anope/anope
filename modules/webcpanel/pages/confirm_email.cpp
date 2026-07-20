@@ -63,7 +63,7 @@ bool WebCPanel::ConfirmEmail::OnRequest(HTTP::Provider *server, const Anope::str
 
     // User may or may not be logged in, but if they're logged in as a different nick then log them out to avoid confusion
     NickAlias *logged_in_as = ServiceReference<Panel>("Panel", "webcpanel")->GetNickFromSession(client, message);
-    if ((!logged_in_as) || logged_in_as != na)
+    if (logged_in_as != na)
     {
         logged_in_as->Shrink<Anope::string>("webcpanel_id");
         logged_in_as->Shrink<Anope::string>("webcpanel_ip");

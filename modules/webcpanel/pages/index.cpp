@@ -108,7 +108,18 @@ bool WebCPanel::Index::OnRequest(HTTP::Provider *server, const Anope::string &pa
 
 	replacements["TITLE"] = page_title;
 
-	if (!user.empty() && !pass.empty())
+	// Redirect if already logged in
+	ServiceReference<Panel> panel("Panel", "webcpanel");
+	auto *na = panel->GetNickFromSession(client, message);
+	if (na)
+	{
+		reply.error = HTTP::FOUND;
+		reply.headers["Location"] = Anope::string("http") + (server->IsSSL() ? "s" : "") + "://" + message.headers["Host"] + "/nickserv/info";
+
+		client->SendReply(&reply);
+		return false;
+	}
+	else if (!user.empty() && !pass.empty())
 	{
 		// Rate limit check.
 		Anope::string ip = client->clientaddr.addr();
@@ -141,6 +152,8 @@ bool WebCPanel::Index::OnRequest(HTTP::Provider *server, const Anope::string &pa
 		req->Dispatch();
 		return false;
 	}
+
+	replacements["ALLOW_REGISTER"];
 
 	TemplateFileServer page("login.html");
 	page.Serve(server, page_name, client, message, reply, replacements);

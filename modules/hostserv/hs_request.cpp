@@ -462,8 +462,8 @@ public:
 				MemoServ::service->Send(source.service->nick, nick, source.Translate(message.c_str()), true);
 			}
 
-			source.Reply(_("VHost for %s has been rejected."), nick.c_str());
-			Log(LOG_COMMAND, source, this) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "no reason") << ")";
+			source.Reply(_("VHost for %s has been rejected."), na->nick.c_str());
+			Log(LOG_COMMAND, source, this) << "to reject vhost for " << na->nick << " (" << (!reason.empty() ? reason : "no reason") << ")";
 		}
 		else
 			source.Reply(_("No request for nick %s found."), nick.c_str());

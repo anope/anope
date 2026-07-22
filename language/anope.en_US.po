@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 21:01+0100\n"
-"PO-Revision-Date: 2026-07-09 21:02+0100\n"
+"POT-Creation-Date: 2026-07-22 15:43+0100\n"
+"PO-Revision-Date: 2026-07-22 15:43+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -876,7 +876,7 @@ msgid "nick channel [reason]"
 msgstr ""
 
 #: ../modules/hostserv/hs_set.cpp
-msgid "nick hostmask"
+msgid "nick hostmask [SYNC]"
 msgstr ""
 
 #: ../modules/operserv/os_svs.cpp
@@ -6477,11 +6477,7 @@ msgid "Set the timezone services will use when messaging you"
 msgstr ""
 
 #: ../modules/hostserv/hs_set.cpp
-msgid "Set the vhost for all nicks in an account"
-msgstr ""
-
-#: ../modules/hostserv/hs_set.cpp
-msgid "Set the vhost of another user"
+msgid "Set the vhost of a nick"
 msgstr ""
 
 #: ../modules/operserv/os_set.cpp
@@ -6611,13 +6607,9 @@ msgstr ""
 
 #: ../modules/hostserv/hs_set.cpp
 msgid ""
-"Sets the vhost for all nicks in the same account as that of the given nick. If your IRCD supports vidents, then using SETALL <nick> <ident>@<hostmask> will set idents for users as well as vhosts.\n"
+"Sets the vhost for the given nick to the given host. If your IRCd supports vidents then you can also specify a user@host mask.\n"
 "\n"
-"* NOTE, this will not update the vhost for any nicks added to the account after this command was used."
-msgstr ""
-
-#: ../modules/hostserv/hs_set.cpp
-msgid "Sets the vhost for the given nick to that of the given hostmask. If your IRCD supports vidents, then using SET <nick> <ident>@<hostmask> set idents for users as well as vhosts."
+"If SYNC is specified then the vhost will be synchronised to all nicks currently grouped to the account."
 msgstr ""
 
 #: ../modules/operserv/os_set.cpp

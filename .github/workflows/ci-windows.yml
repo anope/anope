@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     if: "!contains(github.event.head_commit.message, '[skip windows ci]')"
-    runs-on: windows-2025
+    runs-on: windows-2022
     env:
       BUILD_TYPE: ${{ github.event_name == 'release' && 'Release' || 'Debug' }}
       CONAN_USER_HOME: ${{ github.workspace }}/win/build
@@ -22,7 +22,7 @@ jobs:
           choco install nsis
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Setup Conan
         uses: turtlebrowser/get-conan@v1.2

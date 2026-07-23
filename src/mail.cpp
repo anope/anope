@@ -51,20 +51,20 @@ void Mail::Message::Run()
 		return;
 	}
 
-	fprintf(pipe, "From: %s%s\n", send_from.c_str(), eol.c_str());
+	fprintf(pipe, "From: %s%s", send_from.c_str(), eol.c_str());
 	if (this->dont_quote_addresses)
-		fprintf(pipe, "To: %s <%s>%s\n", mail_to.c_str(), addr.c_str(), eol.c_str());
+		fprintf(pipe, "To: %s <%s>%s", mail_to.c_str(), addr.c_str(), eol.c_str());
 	else
-		fprintf(pipe, "To: \"%s\" <%s>%s\n", mail_to.replace_all_cs("\\", "\\\\").c_str(), addr.c_str(), eol.c_str());
-	fprintf(pipe, "Subject: %s%s\n", subject.c_str(), eol.c_str());
-	fprintf(pipe, "Content-Type: %s%s\n", content_type.c_str(), eol.c_str());
-	fprintf(pipe, "Content-Transfer-Encoding: 8bit%s\n", eol.c_str());
-	fprintf(pipe, "%s\n", eol.c_str());
+		fprintf(pipe, "To: \"%s\" <%s>%s", mail_to.replace_all_cs("\\", "\\\\").c_str(), addr.c_str(), eol.c_str());
+	fprintf(pipe, "Subject: %s%s", subject.c_str(), eol.c_str());
+	fprintf(pipe, "Content-Type: %s%s", content_type.c_str(), eol.c_str());
+	fprintf(pipe, "Content-Transfer-Encoding: 8bit%s", eol.c_str());
+	fprintf(pipe, "%s", eol.c_str());
 
 	std::stringstream stream(message.str());
 	for (Anope::string line; std::getline(stream, line.str()); )
-		fprintf(pipe, "%s%s\n", line.c_str(), eol.c_str());
-	fprintf(pipe, "%s\n", eol.c_str());
+		fprintf(pipe, "%s%s", line.c_str(), eol.c_str());
+	fprintf(pipe, "%s", eol.c_str());
 
 	auto result = pclose(pipe);
 	if (result > 0)

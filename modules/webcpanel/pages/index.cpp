@@ -153,8 +153,6 @@ bool WebCPanel::Index::OnRequest(HTTP::Provider *server, const Anope::string &pa
 		return false;
 	}
 
-	replacements["ALLOW_REGISTER"];
-
 	TemplateFileServer page("login.html");
 	page.Serve(server, page_name, client, message, reply, replacements);
 	return true;

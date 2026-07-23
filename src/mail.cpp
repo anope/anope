@@ -28,7 +28,7 @@ Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, con
 	, message(m)
 	, content_type(Config->GetBlock("mail").Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"))
 	, dont_quote_addresses(Config->GetBlock("mail").Get<bool>("dontquoteaddresses"))
-	, dont_include_cr(Config->GetBlock("mail").Get<bool>("dontincludecr"))
+	, eol(Config->GetBlock("mail").Get<bool>("dontincludecr") ? "\n" : "\r\n")
 {
 }
 
@@ -50,22 +50,21 @@ void Mail::Message::Run()
 		SetExitState();
 		return;
 	}
-	const Anope::string maybe_cr = dont_include_cr ? "" : "\r";
 
-	fprintf(pipe, "From: %s%s\n", send_from.c_str(), maybe_cr.c_str());
+	fprintf(pipe, "From: %s%s\n", send_from.c_str(), eol.c_str());
 	if (this->dont_quote_addresses)
-		fprintf(pipe, "To: %s <%s>%s\n", mail_to.c_str(), addr.c_str(), maybe_cr.c_str());
+		fprintf(pipe, "To: %s <%s>%s\n", mail_to.c_str(), addr.c_str(), eol.c_str());
 	else
-		fprintf(pipe, "To: \"%s\" <%s>%s\n", mail_to.replace_all_cs("\\", "\\\\").c_str(), addr.c_str(), maybe_cr.c_str());
-	fprintf(pipe, "Subject: %s%s\n", subject.c_str(), maybe_cr.c_str());
-	fprintf(pipe, "Content-Type: %s%s\n", content_type.c_str(), maybe_cr.c_str());
-	fprintf(pipe, "Content-Transfer-Encoding: 8bit%s\n", maybe_cr.c_str());
-	fprintf(pipe, "%s\n", maybe_cr.c_str());
+		fprintf(pipe, "To: \"%s\" <%s>%s\n", mail_to.replace_all_cs("\\", "\\\\").c_str(), addr.c_str(), eol.c_str());
+	fprintf(pipe, "Subject: %s%s\n", subject.c_str(), eol.c_str());
+	fprintf(pipe, "Content-Type: %s%s\n", content_type.c_str(), eol.c_str());
+	fprintf(pipe, "Content-Transfer-Encoding: 8bit%s\n", eol.c_str());
+	fprintf(pipe, "%s\n", eol.c_str());
 
 	std::stringstream stream(message.str());
 	for (Anope::string line; std::getline(stream, line.str()); )
-		fprintf(pipe, "%s%s\n", line.c_str(), maybe_cr.c_str());
-	fprintf(pipe, "%s\n", maybe_cr.c_str());
+		fprintf(pipe, "%s%s\n", line.c_str(), eol.c_str());
+	fprintf(pipe, "%s\n", eol.c_str());
 
 	auto result = pclose(pipe);
 	if (result > 0)

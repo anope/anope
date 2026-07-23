@@ -38,7 +38,7 @@ namespace Mail
 		Anope::string message;
 		Anope::string content_type;
 		bool dont_quote_addresses;
-		bool dont_include_cr;
+		Anope::string eol;
 
 	public:
 		/** Construct this message. Once constructed call Thread::Start to launch the mail sending.

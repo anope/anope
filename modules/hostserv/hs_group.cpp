@@ -59,6 +59,7 @@ public:
 			this->Sync(na);
 			source.Reply(_("All vhosts for the account \002%s\002 have been set to \002%s\002."),
 				source.nc->display.c_str(), na->GetVHostMask().c_str());
+			Log(LOG_COMMAND, source, this) << "to sync their vhost of " << na->GetVHostMask() << " across all nicks in their group";
 		}
 		else
 			source.Reply(HOST_NOT_ASSIGNED);

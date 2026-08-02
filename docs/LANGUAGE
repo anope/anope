@@ -5,6 +5,7 @@ Anope Multi Language Support
 2) Adding a new language
 3) Using languages with modules
 4) Updating a language file
+5) Email translations
 
 1) Building Anope with gettext support
 
@@ -61,3 +62,23 @@ Anope Multi Language Support
     This will update the language file to contain all strings that need a translation.
 
     Then commit only the changed .po files in git.
+
+5) Email translations
+
+In addition the regular translations the email templates can now be translated. To translate the
+email templates:
+
+  1] Copy data/email/*.html and data/email/*.txt to data/email/[CODE] where CODE is the code for the
+     language you are translating for (e.g. en_US).
+
+  2] Translate the contents of the email templates
+
+  3] Add language-specific files to data/anope.example.conf below the subject and file fields, e.g.
+     if you are translating to Spanish:
+
+        subject = "Example email"
+        subject[es_ES.UTF-8] = "Ejemplo de correo electrónico"
+
+        file = "email/example.txt"
+        file[es_ES.UTF-8] = "email/es_ES.UTF-8/example.txt"
+

@@ -244,6 +244,8 @@ public:
 	}
 };
 
+static Mail::Template confirmemail("email_change");
+
 class CommandNSSetEmail
 	: public Command
 {
@@ -262,12 +264,9 @@ class CommandNSSetEmail
 			{ "expiry",    Anope::Duration(GetExpiry(owner), nc)                                   },
 		};
 
-		auto subject = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_subject"), vars);
-		auto message = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_message"), vars);
-
 		Anope::string old = nc->email;
 		nc->email = new_email;
-		bool b = Mail::Send(u, nc, bi, subject, message);
+		auto b = confirmemail.Send(u, nc, bi, vars);
 		nc->email = old;
 		return b;
 	}
@@ -420,6 +419,7 @@ public:
 		const auto &modconf = conf.GetModule(this);
 		maxemails = modconf.Get<unsigned>("maxemails");
 		clean = modconf.Get<bool>("remove_aliases", "yes");
+		confirmemail.Reload(conf);
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override

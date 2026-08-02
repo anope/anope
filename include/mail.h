@@ -15,6 +15,7 @@
 #pragma once
 
 #include "anope.h"
+#include "config.h"
 #include "threadengine.h"
 #include "serialize.h"
 
@@ -58,6 +59,29 @@ namespace Mail
 
 		/* Called from within the thread to actually send the mail */
 		void Run() override;
+	};
+
+	class CoreExport Template final
+	{
+	private:
+		struct MessagePart final
+		{
+			Anope::string body;
+			Anope::string content_type;
+		};
+		const Anope::string config;
+		Anope::map<Anope::string> subjects;
+		Anope::multimap<MessagePart> messages;
+
+		bool FormatMessage(NickCore* to, const Anope::map<Anope::string> &vars, Anope::string &subject, Anope::string &message, Mail::HeaderMap &headers) const;
+		void ParseMessages(const Configuration::Block &conf, Anope::multimap<MessagePart> &newmessages, const Anope::string &language, const Anope::string &ckey) const;
+		void ParseSubject(const Configuration::Block &conf, Anope::map<Anope::string> &newsubjects, const Anope::string &language, const Anope::string &ckey) const;
+
+	public:
+		Template(const Anope::string &c);
+		void Reload(const Configuration::Conf &conf);
+		bool Send(User *from, NickCore *to, BotInfo *service, const Anope::map<Anope::string> &vars) const;
+		bool Send(NickCore *to, const Anope::map<Anope::string> &vars) const;
 	};
 
 } // namespace Mail

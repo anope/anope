@@ -18,7 +18,7 @@
 #include "mail.h"
 #include "config.h"
 
-Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m)
+Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m, const Mail::HeaderMap& hm)
 	: Thread()
 	, sendmail_path(Config->GetBlock("mail").Get<const Anope::string>("sendmailpath", "/usr/sbin/sendmail -it"))
 	, send_from(sf)
@@ -26,10 +26,12 @@ Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, con
 	, addr(a)
 	, subject(s)
 	, message(m)
-	, content_type(Config->GetBlock("mail").Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"))
+	, headers(hm)
 	, dont_quote_addresses(Config->GetBlock("mail").Get<bool>("dontquoteaddresses"))
 	, eol(Config->GetBlock("mail").Get<bool>("dontincludecr") ? "\n" : "\r\n")
 {
+	this->headers.emplace("Content-Transfer-Encoding", "8bit");
+	this->headers.emplace("Content-Type", Config->GetBlock("mail").Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"));
 }
 
 Mail::Message::~Message()
@@ -57,8 +59,8 @@ void Mail::Message::Run()
 	else
 		fprintf(pipe, "To: \"%s\" <%s>%s", mail_to.replace_all_cs("\\", "\\\\").c_str(), addr.c_str(), eol.c_str());
 	fprintf(pipe, "Subject: %s%s", subject.c_str(), eol.c_str());
-	fprintf(pipe, "Content-Type: %s%s", content_type.c_str(), eol.c_str());
-	fprintf(pipe, "Content-Transfer-Encoding: 8bit%s", eol.c_str());
+	for (const auto &[hname, hvalue] : this->headers)
+		fprintf(pipe, "%s: %s%s", hname.c_str(), hvalue.c_str(), eol.c_str());
 	fprintf(pipe, "%s", eol.c_str());
 
 	std::stringstream stream(message.str());
@@ -73,7 +75,7 @@ void Mail::Message::Run()
 	SetExitState();
 }
 
-bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message)
+bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message, const Mail::HeaderMap& hm)
 {
 	if (!nc || !service || subject.empty() || message.empty())
 		return false;
@@ -88,7 +90,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 			return false;
 
 		nc->lastmail = Anope::CurTime;
-		Thread *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+		auto *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message, hm);
 		t->Start();
 		return true;
 	}
@@ -106,7 +108,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 		else
 		{
 			u->lastmail = nc->lastmail = Anope::CurTime;
-			Thread *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+			auto *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message, hm);
 			t->Start();
 			return true;
 		}
@@ -115,14 +117,14 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 	}
 }
 
-bool Mail::Send(NickCore *nc, const Anope::string &subject, const Anope::string &message)
+bool Mail::Send(NickCore *nc, const Anope::string &subject, const Anope::string &message, const Mail::HeaderMap& hm)
 {
 	const auto &b = Config->GetBlock("mail");
 	if (!b.Get<bool>("usemail") || b.Get<const Anope::string>("sendfrom").empty() || !nc || nc->email.empty() || subject.empty() || message.empty())
 		return false;
 
 	nc->lastmail = Anope::CurTime;
-	Thread *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+	auto *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message, hm);
 	t->Start();
 
 	return true;

@@ -20,8 +20,10 @@
 
 namespace Mail
 {
-	extern CoreExport bool Send(User *from, NickCore *to, BotInfo *service, const Anope::string &subject, const Anope::string &message);
-	extern CoreExport bool Send(NickCore *to, const Anope::string &subject, const Anope::string &message);
+	using HeaderMap = Anope::map<Anope::string>;
+
+	extern CoreExport bool Send(User *from, NickCore *to, BotInfo *service, const Anope::string &subject, const Anope::string &message, const HeaderMap& hm = {});
+	extern CoreExport bool Send(NickCore *to, const Anope::string &subject, const Anope::string &message, const HeaderMap& hm = {});
 	extern CoreExport bool Validate(const Anope::string &email);
 
 	/* A email message being sent */
@@ -36,7 +38,7 @@ namespace Mail
 		Anope::string addr;
 		Anope::string subject;
 		Anope::string message;
-		Anope::string content_type;
+		HeaderMap headers;
 		bool dont_quote_addresses;
 		Anope::string eol;
 
@@ -47,9 +49,11 @@ namespace Mail
 		 * @param addr Destination address to mail
 		 * @param subject Message subject
 		 * @param message The actual message
+		 * @param hm Headers to include in the email
 		 */
-		Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message);
+		Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message, const HeaderMap& hm);
 
+		/** @nodoc */
 		~Message();
 
 		/* Called from within the thread to actually send the mail */

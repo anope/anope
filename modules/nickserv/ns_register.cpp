@@ -27,9 +27,14 @@ namespace
 		}
 		return code;
 	}
+
+	time_t GetExpiry(Module* owner)
+	{
+		return Config->GetModule(owner).Get<time_t>("unconfirmedexpire", "1d");
+	}
 }
 
-static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi);
+static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi, Module* owner);
 
 class CommandNSRegister final
 	: public Command
@@ -152,7 +157,7 @@ public:
 				if (!email.empty())
 				{
 					nc->Extend<bool>("UNCONFIRMED");
-					SendRegmail(NULL, na, source.service);
+					SendRegmail(NULL, na, source.service, owner);
 				}
 			}
 
@@ -326,15 +331,13 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		auto unconfirmedexpire = Config->GetModule(owner).Get<time_t>("unconfirmedexpire", "1d");
-
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
 				"Confirms an account registration. You have %s after registration to do this "
 				"before your registration expires."
 			),
-			Anope::Duration(unconfirmedexpire, source.GetAccount()).c_str());
+			Anope::Duration(GetExpiry(owner), source.GetAccount()).c_str());
 
 		if (source.HasPriv("nickserv/confirm/register"))
 		{
@@ -401,7 +404,7 @@ public:
 			return;
 		}
 
-		if (!SendRegmail(source.GetUser(), na, source.service))
+		if (!SendRegmail(source.GetUser(), na, source.service, owner))
 		{
 			Log(this->owner) << "Unable to resend registration confirmation code for " << na->nick;
 			return;
@@ -482,7 +485,7 @@ public:
 
 			const NickAlias *this_na = u->AccountNick();
 			time_t registered = Anope::CurTime - this_na->registered;
-			time_t unconfirmed_expire = Config->GetModule(this).Get<time_t>("unconfirmedexpire", "1d");
+			const auto unconfirmed_expire = GetExpiry(this);
 			if (unconfirmed_expire > registered)
 				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s."), Anope::Duration(unconfirmed_expire - registered, u->Account()).c_str());
 		}
@@ -492,14 +495,14 @@ public:
 	{
 		if (unconfirmed.HasExt(na->nc))
 		{
-			time_t unconfirmed_expire = Config->GetModule(this).Get<time_t>("unconfirmedexpire", "1d");
+			const auto unconfirmed_expire = GetExpiry(this);
 			if (unconfirmed_expire && Anope::CurTime - na->registered >= unconfirmed_expire)
 				expire = true;
 		}
 	}
 };
 
-static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi)
+static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi, Module *owner)
 {
 	NickCore *nc = na->nc;
 	auto *code = GetCode(na->nc);
@@ -508,6 +511,7 @@ static bool SendRegmail(User *u, const NickAlias *na, BotInfo *bi)
 		{ "nick",    na->nick                                                                },
 		{ "network", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
 		{ "code",    *code                                                                   },
+		{ "expiry",  Anope::Duration(GetExpiry(owner), na->nc)                               },
 	};
 
 	auto subject = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("registration_subject").c_str()), vars);

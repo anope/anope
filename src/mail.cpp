@@ -32,6 +32,7 @@ Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, con
 {
 	this->headers.emplace("Content-Transfer-Encoding", "8bit");
 	this->headers.emplace("Content-Type", Config->GetBlock("mail").Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"));
+
 }
 
 Mail::Message::~Message()
@@ -98,7 +99,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 	{
 		if (!b.Get<bool>("usemail") || b.Get<const Anope::string>("sendfrom").empty())
 			u->SendMessage(service, _("Services have been configured to not send mail."));
-		else if (Anope::CurTime - u->lastmail < b.Get<time_t>("delay"))
+		else if (Anope::CurTime - u->lastmail < b.Get<time_t>("delay", "5m"))
 		{
 			const auto delay = b.Get<time_t>("delay") - (Anope::CurTime - u->lastmail);
 			u->SendMessage(service, _("Please wait \002%s\002 and retry."), Anope::Duration(delay, u->Account()).c_str());

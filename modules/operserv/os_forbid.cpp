@@ -237,7 +237,7 @@ public:
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
 		this->SetSyntax(_("ADD {CHAN|EMAIL|NICK|PASSWORD|REGISTER} [+\037expiry\037] \037entry\037 \037reason\037"));
 		this->SetSyntax(_("DEL {CHAN|EMAIL|NICK|PASSWORD|REGISTER} \037entry\037"));
-		this->SetSyntax("LIST {CHAN|EMAIL|NICK|PASSWORD|REGISTER}");
+		this->SetSyntax(_("LIST {CHAN|EMAIL|NICK|PASSWORD|REGISTER} [\037from\037-\037to\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) override
@@ -432,6 +432,25 @@ public:
 				source.Reply(_("Forbid list is empty."));
 			else
 			{
+				unsigned from = 0, to = 0;
+				if (params.size() > 2 && !params[2].empty())
+				{
+					Anope::string n1, n2;
+					sepstream(params[2], '-').GetToken(n1, 0);
+					sepstream(params[2], '-').GetToken(n2, 1);
+
+					auto num1 = Anope::TryConvert<unsigned>(n1);
+					auto num2 = Anope::TryConvert<unsigned>(n2);
+					if (!num1.has_value() || !num2.has_value())
+					{
+						source.Reply(_("Incorrect range specified. The correct syntax is \037from\037-\037to\037."));
+						return;
+					}
+
+					from = num1.value();
+					to = num2.value();
+				}
+
 				ListFormatter list(source.GetAccount());
 				list.AddColumn(_("Mask")).AddColumn(_("Type")).AddColumn(_("Creator")).AddColumn(_("Expires")).AddColumn(_("Reason"));
 				list.SetFlexible([](ListFormatter::ListEntry &row)
@@ -441,7 +460,14 @@ public:
 						: _("\002{mask}\002 on {type} -- created by {creator}; expires in {expires} ({reason})");
 				});
 
-				size_t shown = 0;
+				/* An explicit range is the oper's own paging mechanism, so it isn't
+				 * additionally capped by listmax -- only the default (unbounded)
+				 * listing is.
+				 */
+				const auto listmax = Config->GetModule(this->owner).Get<unsigned>("listmax", "50");
+				const auto cap = (from || to) ? 0 : listmax;
+
+				size_t matched = 0, shown = 0, shown_from = 0, shown_to = 0;
 				for (auto *forbid : forbids)
 				{
 					if (ftype != OperServ::FT_SIZE && ftype != forbid->type)
@@ -451,6 +477,17 @@ public:
 					if (stype == OperServ::FT_SIZE)
 						continue;
 
+					++matched;
+
+					if (from || to)
+					{
+						if (matched < from || matched > to)
+							continue;
+					}
+
+					if (cap && shown >= cap)
+						continue;
+
 					ListFormatter::ListEntry entry;
 					entry["Mask"] = forbid->mask;
 					entry["Type"] = stype;
@@ -458,10 +495,14 @@ public:
 					entry["Expires"] = forbid->expires ? Anope::strftime(forbid->expires, NULL, true).c_str() : TIME_NEVER;
 					entry["Reason"] = forbid->reason;
 					list.AddEntry(entry);
+
+					if (!shown)
+						shown_from = matched;
+					shown_to = matched;
 					++shown;
 				}
 
-				if (!shown)
+				if (!matched)
 				{
 					source.Reply(_("There are no forbids of type %s."), subcommand.upper().c_str());
 				}
@@ -470,10 +511,10 @@ public:
 					source.Reply(_("Forbid list:"));
 					list.SendTo(source);
 
-					if (shown >= forbids.size())
+					if (shown >= matched)
 						source.Reply(_("End of forbid list."));
 					else
-						source.Reply(_("End of forbid list - %zu/%zu entries shown."), shown, forbids.size());
+						source.Reply(_("End of forbid list - %zu/%zu entries shown (%zu-%zu)."), shown, matched, shown_from, shown_to);
 				}
 			}
 		}

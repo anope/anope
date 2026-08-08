@@ -95,7 +95,7 @@ public:
 			return;
 		}
 
-		const size_t expiry_idx = params.size() >= 1 && params[1][0] == '+' ? 1 : 0;
+		const size_t expiry_idx = params.size() > 1 && params[1][0] == '+' ? 1 : 0;
 		const size_t reason_idx = expiry_idx ? 2 : 1;
 
 		time_t expiry_secs = Config->GetModule(this->owner).Get<time_t>("suspendexpire");

@@ -60,8 +60,6 @@ public:
 		if (MOD_RESULT == EVENT_STOP)
 			return;
 
-		Log() << "PARAM-EMPTY: " << param;
-
 		Anope::string langname;
 		if (param.empty())
 		{

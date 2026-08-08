@@ -69,6 +69,11 @@ namespace
 		source.Reply(maxemails, N_("The email address \002%s\002 has reached its usage limit of %u user.", "The email address \002%s\002 has reached its usage limit of %u users."), email.c_str(), maxemails);
 		return true;
 	}
+
+	time_t GetExpiry(Module* owner)
+	{
+		return Config->GetModule(owner).Get<time_t>("changeexpire", "1d");
+	}
 }
 
 struct EmailChange final
@@ -146,8 +151,7 @@ public:
 				return;
 			}
 
-			auto changeexpire = Config->GetModule(owner).Get<time_t>("changeexpire", "1d");
-			if (nse->requested < Anope::CurTime - changeexpire)
+			if (nse->requested < Anope::CurTime - GetExpiry(owner))
 			{
 				ns_set_email.Unset(nc);
 				source.Reply(_("The email address change request for %s has expired."),
@@ -175,7 +179,6 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		auto changeexpire = Config->GetModule(owner).Get<time_t>("changeexpire", "1d");
 
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -183,7 +186,7 @@ public:
 				"Confirms an change of email address. You have %s after requesting an email "
 				"address change to do this before your request expires."
 			),
-			Anope::Duration(changeexpire, source.GetAccount()).c_str());
+			Anope::Duration(GetExpiry(owner), source.GetAccount()).c_str());
 
 		if (source.HasPriv("nickserv/confirm/email"))
 		{
@@ -241,10 +244,12 @@ public:
 	}
 };
 
+static Mail::Template confirmemail("email_change");
+
 class CommandNSSetEmail
 	: public Command
 {
-	static bool SendConfirmMail(User *u, NickCore *nc, BotInfo *bi, const Anope::string &new_email)
+	static bool SendConfirmMail(User *u, NickCore *nc, BotInfo *bi, const Anope::string &new_email, Module *owner)
 	{
 		auto *nse = nc->Extend<EmailChange>("ns_set_email");
 		nse->code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
@@ -256,14 +261,12 @@ class CommandNSSetEmail
 			{ "account",   nc->display                                                             },
 			{ "network",   Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
 			{ "code",      nse->code                                                               },
+			{ "expiry",    Anope::Duration(GetExpiry(owner), nc)                                   },
 		};
-
-		auto subject = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_subject"), vars);
-		auto message = Anope::Template(Config->GetBlock("mail").Get<const Anope::string>("emailchange_message"), vars);
 
 		Anope::string old = nc->email;
 		nc->email = new_email;
-		bool b = Mail::Send(u, nc, bi, subject, message);
+		auto b = confirmemail.Send(u, nc, bi, vars);
 		nc->email = old;
 		return b;
 	}
@@ -323,7 +326,7 @@ public:
 		const auto nsmailreg = Config->GetModule("ns_register").Get<const Anope::string>("registration").equals_ci("mail");
 		if (!param.empty() && Config->GetModule("nickserv").Get<bool>("confirmemailchanges", nsmailreg ? "yes" : "no") && source.GetAccount() == nc)
 		{
-			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param))
+			if (SendConfirmMail(source.GetUser(), source.GetAccount(), source.service, param, owner))
 			{
 				Log(LOG_COMMAND, source, this) << "to request changing the email address of " << nc->display << " to " << param;
 				source.Reply(_("A confirmation email has been sent to \002%s\002. Follow the instructions in it to change your email address."), param.c_str());
@@ -416,6 +419,7 @@ public:
 		const auto &modconf = conf.GetModule(this);
 		maxemails = modconf.Get<unsigned>("maxemails");
 		clean = modconf.Get<bool>("remove_aliases", "yes");
+		confirmemail.Reload(conf);
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) override

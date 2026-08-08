@@ -49,7 +49,13 @@ bool WebCPanel::ConfirmEmail::OnRequest(HTTP::Provider *server, const Anope::str
                 return fail();
         }
         else
-            return fail();
+        {
+            replacements["INVALID_LOGIN"] = "This nickname has already been confirmed.";
+            TemplateFileServer page("login.html");
+
+            page.Serve(server, page_name, client, message, reply, replacements);
+            return true;
+        }
     }
     else if (confirm_type == "EMAIL")
     {

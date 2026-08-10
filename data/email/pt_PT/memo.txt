@@ -1,0 +1,11 @@
+Olá,
+
+O seu nickname {receiver} na {network} recebeu um novo memo de {sender}.
+
+> {text}
+
+Este é o memo número {number}.
+
+Cumprimentos,
+
+{network}

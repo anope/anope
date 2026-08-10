@@ -15,6 +15,8 @@
 #include "module.h"
 #include "modules/memoserv/service.h"
 
+static Mail::Template memoemail("memo");
+
 class MemoServCore final
 	: public Module
 	, public MemoServ::Service
@@ -31,10 +33,7 @@ class MemoServCore final
 			{ "network",  Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
 		};
 
-		auto subject = Anope::Template(Language::Translate(nc, Config->GetBlock("mail").Get<const Anope::string>("memo_subject").c_str()), vars);
-		auto message = Anope::Template(Language::Translate(nc, Config->GetBlock("mail").Get<const Anope::string>("memo_message").c_str()), vars);
-
-		return Mail::Send(nc, subject, message);
+		return memoemail.Send(nc, vars);
 	}
 
 public:
@@ -165,6 +164,7 @@ public:
 			throw ConfigException(Module::name + ": no bot named " + msnick);
 
 		MemoServ = bi;
+		memoemail.Reload(conf);
 	}
 
 	void OnNickCoreCreate(NickCore *nc) override

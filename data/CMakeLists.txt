@@ -4,3 +4,11 @@ set(DATA cron.example.sh anope.example.conf botserv.example.conf hostserv.exampl
 install(FILES ${DATA}
   DESTINATION ${CONF_DIR}
 )
+
+set(EMAILS "email_change" "memo" "password_reset" "registration")
+foreach(EMAIL IN LISTS EMAILS)
+  install(
+    FILES "email/${EMAIL}.html" "email/${EMAIL}.txt"
+    DESTINATION "${CONF_DIR}/email"
+  )
+endforeach()

@@ -195,11 +195,7 @@ Configuration::Conf::Conf() : Configuration::Block("")
 	spacesepstream(options.Get<const Anope::string>("ulineservers")).GetTokens(this->Ulines);
 
 	if (mail.Get<bool>("usemail"))
-	{
-		Anope::string check[] = { "sendfrom", "registration_subject", "registration_message", "emailchange_subject", "emailchange_message", "memo_subject", "memo_message" };
-		for (const auto &field : check)
-			ValidateNotEmpty("mail", field, mail.Get<const Anope::string>(field));
-	}
+		ValidateNotEmpty("mail", "sendfrom", mail.Get<const Anope::string>("sendfrom"));
 
 	this->ReadTimeout = options.Get<time_t>("readtimeout");
 	this->ServiceAlias = options.Get<bool>("servicealias");

@@ -48,10 +48,10 @@ class Anope::iterator_range final
 {
 private:
 	/** An iterator which points to the start of the range. */
-	const Iterator begini;
+	Iterator begini;
 
 	/* An iterator which points to one past the end of the range. */
-	const Iterator endi;
+	Iterator endi;
 
 public:
 	/** Initialises a new iterator range with the specified iterators.

@@ -14,7 +14,16 @@
 
 #include "module.h"
 
-static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi);
+namespace
+{
+	time_t GetExpiry(Module* owner)
+	{
+		return Config->GetModule(owner).Get<time_t>("resetexpire", "1d");
+	}
+}
+
+static Mail::Template resetemail("password_reset");
+static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi, Module *owner);
 
 class CommandNSResetPass final
 	: public Command
@@ -39,7 +48,7 @@ public:
 			source.Reply(_("Incorrect email address."));
 		else
 		{
-			if (SendResetEmail(source.GetUser(), na, source.service))
+			if (SendResetEmail(source.GetUser(), na, source.service, owner))
 			{
 				Log(LOG_COMMAND, source, this) << "for " << na->nick << " (account: " << na->nc->display << ")";
 				source.Reply(_("Password reset email for \002%s\002 has been sent."), na->nick.c_str());
@@ -124,8 +133,7 @@ public:
 			return;
 		}
 
-		auto resetexpire = Config->GetModule(owner).Get<time_t>("resetexpire", "1d");
-		if (ri->time < Anope::CurTime - resetexpire)
+		if (ri->time < Anope::CurTime - GetExpiry(owner))
 		{
 			reset.Unset(nc);
 			source.Reply(_("The password reset request for %s has expired."),
@@ -148,8 +156,6 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &) override
 	{
-		auto resetexpire = Config->GetModule(owner).Get<time_t>("resetexpire", "1d");
-
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_(
@@ -157,7 +163,7 @@ public:
 				"%s after requesting a reset to do this before your request expires. Once you "
 				"have done this you can set the password using %s."
 			),
-			Anope::Duration(resetexpire, source.GetAccount()).c_str(),
+			Anope::Duration(GetExpiry(owner), source.GetAccount()).c_str(),
 			source.service->GetQueryCommand("nickserv/set/password").c_str()
 		);
 		return true;
@@ -182,9 +188,14 @@ public:
 		if (!Config->GetBlock("mail").Get<bool>("usemail"))
 			throw ModuleException("Not using mail.");
 	}
+
+	void OnReload(Configuration::Conf &conf) override
+	{
+		resetemail.Reload(conf);
+	}
 };
 
-static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi)
+static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi, Module* owner)
 {
 	auto *ri = na->nc->Extend<ResetInfo>("reset");
 	ri->code = Anope::Random(Config->GetBlock("options").Get<size_t>("codelength", "15"));
@@ -194,12 +205,10 @@ static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi)
 		{ "nick",    na->nick                                                                },
 		{ "network", Config->GetBlock("networkinfo").Get<const Anope::string>("networkname") },
 		{ "code",    ri->code                                                                },
+		{ "expiry",  Anope::Duration(GetExpiry(owner), na->nc)                               },
 	};
 
-	auto subject = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_subject").c_str()), vars);
-	auto message = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_message").c_str()), vars);
-
-	return Mail::Send(u, na->nc, bi, subject, message);
+	return resetemail.Send(u, na->nc, bi, vars);
 }
 
 MODULE_INIT(NSResetPass)

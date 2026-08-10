@@ -1,0 +1,15 @@
+Hello,
+
+You have requested to change the email address associated with the account {account} on {network} from {old_email} to {new_email}.
+
+Please use the following command on IRC to confirm your change of email address:
+
+> /msg NickServ CONFIRM EMAIL {code}
+
+If not confirmed your change of email address will automatically expire in {expiry}
+
+If you don't know why this email was sent to you, please ignore it silently.
+
+Regards,
+
+{network}

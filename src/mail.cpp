@@ -14,11 +14,13 @@
 
 #include <cerrno>
 
+#include "anope.h"
 #include "services.h"
 #include "mail.h"
 #include "config.h"
+#include "language.h"
 
-Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m)
+Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, const Anope::string &a, const Anope::string &s, const Anope::string &m, const Mail::HeaderMap& hm)
 	: Thread()
 	, sendmail_path(Config->GetBlock("mail").Get<const Anope::string>("sendmailpath", "/usr/sbin/sendmail -it"))
 	, send_from(sf)
@@ -26,10 +28,13 @@ Mail::Message::Message(const Anope::string &sf, const Anope::string &mailto, con
 	, addr(a)
 	, subject(s)
 	, message(m)
-	, content_type(Config->GetBlock("mail").Get<const Anope::string>("content_type", "text/plain; charset=UTF-8"))
+	, headers(hm)
 	, dont_quote_addresses(Config->GetBlock("mail").Get<bool>("dontquoteaddresses"))
 	, eol(Config->GetBlock("mail").Get<bool>("dontincludecr") ? "\n" : "\r\n")
 {
+	// These are a safe UTF-8 default if nothing else has been specified.
+	this->headers.emplace("Content-Transfer-Encoding", "8bit");
+	this->headers.emplace("Content-Type", "text/plain; charset=UTF-8");
 }
 
 Mail::Message::~Message()
@@ -57,8 +62,8 @@ void Mail::Message::Run()
 	else
 		fprintf(pipe, "To: \"%s\" <%s>%s", mail_to.replace_all_cs("\\", "\\\\").c_str(), addr.c_str(), eol.c_str());
 	fprintf(pipe, "Subject: %s%s", subject.c_str(), eol.c_str());
-	fprintf(pipe, "Content-Type: %s%s", content_type.c_str(), eol.c_str());
-	fprintf(pipe, "Content-Transfer-Encoding: 8bit%s", eol.c_str());
+	for (const auto &[hname, hvalue] : this->headers)
+		fprintf(pipe, "%s: %s%s", hname.c_str(), hvalue.c_str(), eol.c_str());
 	fprintf(pipe, "%s", eol.c_str());
 
 	std::stringstream stream(message.str());
@@ -73,7 +78,215 @@ void Mail::Message::Run()
 	SetExitState();
 }
 
-bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message)
+Mail::Template::Template(const Anope::string &c)
+	: config(c)
+{
+	Reload(*Config);
+}
+
+void Mail::Template::ParseSubject(const Configuration::Block &conf, Anope::map<Anope::string>& newsubjects,
+		const Anope::string &language, const Anope::string &ckey) const
+{
+	auto newsubject = conf.Get<const Anope::string>(ckey);
+	newsubject.trim();
+	if (newsubject.empty())
+	{
+		if (language.empty())
+			throw ConfigException(Anope::Format("The mail:%s:%s field must be specified!", this->config.c_str(), ckey.c_str()));
+		return; // No translation for the current type.
+	}
+	newsubjects[language] = newsubject;
+}
+
+void Mail::Template::ParseMessages(const Configuration::Block &conf, Anope::multimap<MessagePart> &newmessages,
+	const Anope::string &language, const Anope::string &ckey) const
+{
+	for (const auto &[_, block] : conf.GetBlocks("message"))
+	{
+		MessagePart message;
+		message.content_type = block.Get<const Anope::string>("content_type", "text/plain; charset=UTF-8");
+
+		const auto file = Anope::ExpandConfig(block.Get<const Anope::string>(ckey));
+		if (file.empty())
+		{
+			if (language.empty())
+				throw ConfigException(Anope::Format("The mail:%s:message:%s field must be specified!", this->config.c_str(), ckey.c_str()));
+			continue; // No translation for the current type.
+		}
+
+		std::ifstream ifile(file.str());
+		if (!ifile.is_open())
+			throw ConfigException(Anope::Format("The %s file specified in the mail:%s:message:%s field is not readable!", file.c_str(), this->config.c_str(), ckey.c_str()));
+
+		std::stringstream buffer;
+		buffer << ifile.rdbuf();
+		message.body = Anope::string(buffer.str()).trim();
+
+		if (message.body.empty())
+			throw ConfigException(Anope::Format("The %s file specified in the mail:%s:message:%s field is empty!", file.c_str(), this->config.c_str(), ckey.c_str()));
+
+		newmessages.emplace(language, std::move(message));
+	}
+}
+
+void Mail::Template::Reload(const Configuration::Conf &conf)
+{
+	const auto &mconf = conf.GetBlock("mail");
+	if (!mconf.Get<bool>("usemail"))
+	{
+		this->subjects.clear();
+		this->messages.clear();
+		return; // Email is disabled.
+	}
+
+	const auto &tconf = mconf.GetBlock(this->config);
+
+	Anope::map<Anope::string> newsubjects;
+	Anope::multimap<MessagePart> newmessages;
+
+	// These are the defaults for if a user has no language set.
+	ParseSubject(tconf, newsubjects, "", "subject");
+	ParseMessages(tconf, newmessages, "", "file");
+
+	// These are the per-language translations for users with a language set.
+	for (const auto &language : Language::Languages)
+	{
+		ParseSubject(tconf, newsubjects, language, Anope::Format("subject[%s]", language.c_str()));
+		ParseMessages(tconf, newmessages, language, Anope::Format("file[%s]", language.c_str()));
+	}
+
+	// Apply the new configuration.
+	std::swap(this->subjects, newsubjects);
+	std::swap(this->messages, newmessages);
+}
+
+namespace
+{
+	// Retrieves the default language code.
+	Anope::string GetLanguage(NickCore *nc)
+	{
+		if (!nc->language.empty())
+		{
+			// The user has a language configured, check whether it is currently supported.
+			if (std::find(Language::Languages.begin(), Language::Languages.end(), nc->language) != Language::Languages.end())
+				return nc->language;
+		}
+
+		// Fall back to the default language.
+		return Config->DefLanguage;
+	}
+}
+
+bool Mail::Template::FormatMessage(NickCore* to, const Anope::map<Anope::string> &vars,
+	Anope::string &subject, Anope::string &message, Mail::HeaderMap &headers) const
+{
+	// Create a HTML-safe version of the template vars.
+	auto fullvars = vars;
+	for (const auto &[name, value] : vars)
+	{
+		auto& buffer = fullvars[name + ".html"];
+		for (auto chr : value)
+		{
+			switch (chr)
+			{
+				case '<':
+					buffer.append("&lt;");
+					break;
+				case '>':
+					buffer.append("&gt;");
+					break;
+				case '&':
+					buffer.append("&amp;");
+					break;
+				case '"':
+					buffer.append("&quot;");
+					break;
+				case '\'':
+					buffer.append("&apos;");
+					break;
+				default:
+					buffer.push_back(chr);
+					break;
+			}
+		}
+	}
+
+	// Get the translated subject.
+	auto translated_subject = subjects.find(GetLanguage(to));
+	if (translated_subject == subjects.end())
+		translated_subject = subjects.find(""); // Fallback to no translation.
+	if (translated_subject == subjects.end())
+		return false; // No messages to send (should never happen).
+
+	// Get the translated messages.
+	auto translated_messages = Anope::equal_range(this->messages, GetLanguage(to));
+	if (translated_messages.empty())
+		translated_messages = Anope::equal_range(this->messages, ""); // Fallback to no translation.
+	if (translated_messages.empty())
+		return false; // No messages to send (should never happen).
+
+	// Create the multipart separator for use later. We may not actually use
+	// this if the email only has one part.
+	const auto separator = Anope::Random(50); // As long as it can be without linewrapping.
+
+	const auto use_multipart = (translated_messages.count() != 1);
+	if (use_multipart)
+		headers.emplace("Content-Type", "multipart/alternative; boundary=" + separator);
+
+	std::stringstream messagebuf;
+	for (const auto& [_, message] : translated_messages)
+	{
+		if (use_multipart)
+		{
+			messagebuf << "--" << separator << std::endl
+				<< "Content-Transfer-Encoding: 8bit" << std::endl
+				<< "Content-Type: " << message.content_type << std::endl
+				<< std::endl;
+		}
+		else
+		{
+			headers.emplace("Content-Type", message.content_type);
+		}
+
+		messagebuf << Anope::Template(message.body, fullvars) << std::endl
+			<< std::endl;
+	}
+	if (use_multipart)
+		messagebuf << "--" << separator << "--" << std::endl;
+
+	subject = Anope::Template(translated_subject->second, fullvars);
+	message = messagebuf.str();
+	return true;
+}
+
+
+bool Mail::Template::Send(User *from, NickCore *to, BotInfo *service, const Anope::map<Anope::string> &vars) const
+{
+	if (!to || !service)
+		return false; // Malformed.
+
+	Anope::string real_subject, real_message;
+	Mail::HeaderMap headers;
+	if (!FormatMessage(to, vars, real_subject, real_message, headers))
+		return false; // Malformed
+
+	return Mail::Send(from, to, service, real_subject, real_message, headers);
+}
+
+bool Mail::Template::Send(NickCore *to, const Anope::map<Anope::string> &vars) const
+{
+	if (!to)
+		return false; // Malformed.
+
+	Anope::string real_subject, real_message;
+	Mail::HeaderMap headers;
+	if (!FormatMessage(to, vars, real_subject, real_message, headers))
+		return false; // Malformed
+
+	return Mail::Send(to, real_subject, real_message, headers);
+}
+
+bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message, const Mail::HeaderMap& hm)
 {
 	if (!nc || !service || subject.empty() || message.empty())
 		return false;
@@ -88,7 +301,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 			return false;
 
 		nc->lastmail = Anope::CurTime;
-		Thread *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+		auto *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message, hm);
 		t->Start();
 		return true;
 	}
@@ -96,7 +309,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 	{
 		if (!b.Get<bool>("usemail") || b.Get<const Anope::string>("sendfrom").empty())
 			u->SendMessage(service, _("Services have been configured to not send mail."));
-		else if (Anope::CurTime - u->lastmail < b.Get<time_t>("delay"))
+		else if (Anope::CurTime - u->lastmail < b.Get<time_t>("delay", "5m"))
 		{
 			const auto delay = b.Get<time_t>("delay") - (Anope::CurTime - u->lastmail);
 			u->SendMessage(service, _("Please wait \002%s\002 and retry."), Anope::Duration(delay, u->Account()).c_str());
@@ -106,7 +319,7 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 		else
 		{
 			u->lastmail = nc->lastmail = Anope::CurTime;
-			Thread *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+			auto *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message, hm);
 			t->Start();
 			return true;
 		}
@@ -115,14 +328,14 @@ bool Mail::Send(User *u, NickCore *nc, BotInfo *service, const Anope::string &su
 	}
 }
 
-bool Mail::Send(NickCore *nc, const Anope::string &subject, const Anope::string &message)
+bool Mail::Send(NickCore *nc, const Anope::string &subject, const Anope::string &message, const Mail::HeaderMap& hm)
 {
 	const auto &b = Config->GetBlock("mail");
 	if (!b.Get<bool>("usemail") || b.Get<const Anope::string>("sendfrom").empty() || !nc || nc->email.empty() || subject.empty() || message.empty())
 		return false;
 
 	nc->lastmail = Anope::CurTime;
-	Thread *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message);
+	auto *t = new Mail::Message(b.Get<const Anope::string>("sendfrom"), nc->display, nc->email, subject, message, hm);
 	t->Start();
 
 	return true;

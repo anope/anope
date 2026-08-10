@@ -22,6 +22,7 @@ namespace
 	}
 }
 
+static Mail::Template resetemail("password_reset");
 static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi, Module *owner);
 
 class CommandNSResetPass final
@@ -187,6 +188,11 @@ public:
 		if (!Config->GetBlock("mail").Get<bool>("usemail"))
 			throw ModuleException("Not using mail.");
 	}
+
+	void OnReload(Configuration::Conf &conf) override
+	{
+		resetemail.Reload(conf);
+	}
 };
 
 static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi, Module* owner)
@@ -202,10 +208,7 @@ static bool SendResetEmail(User *u, const NickAlias *na, BotInfo *bi, Module* ow
 		{ "expiry",  Anope::Duration(GetExpiry(owner), na->nc)                               },
 	};
 
-	auto subject = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_subject").c_str()), vars);
-	auto message = Anope::Template(Language::Translate(na->nc, Config->GetBlock("mail").Get<const Anope::string>("reset_message").c_str()), vars);
-
-	return Mail::Send(u, na->nc, bi, subject, message);
+	return resetemail.Send(u, na->nc, bi, vars);
 }
 
 MODULE_INIT(NSResetPass)

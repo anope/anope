@@ -11,4 +11,13 @@ foreach(EMAIL IN LISTS EMAILS)
     FILES "email/${EMAIL}.html" "email/${EMAIL}.txt"
     DESTINATION "${CONF_DIR}/email"
   )
+
+  set(EMAIL_LANGS "pt_PT")
+  foreach(EMAIL_LANG IN LISTS EMAIL_LANGS)
+    set(EMAIL_DIR "email/${EMAIL_LANG}")
+    install(
+      FILES "${EMAIL_DIR}/${EMAIL}.html" "${EMAIL_DIR}/${EMAIL}.txt"
+      DESTINATION "${CONF_DIR}/${EMAIL_DIR}"
+    )
+  endforeach()
 endforeach()

@@ -1161,7 +1161,7 @@ private:
 		else if (key.find(':') == Anope::string::npos)
 		{
 			// Make a guess that there could be a ChanServ SET MISC entry w/the mystery key's exact (uppercase) name
-			const Anope::string name = "cs_set_misc:" + key.upper();
+			const Anope::string name = CHANSERV_SET_MISC_PREFIX + key.upper();
 			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
@@ -1184,13 +1184,13 @@ private:
 				return true;
 			}
 
-			const Anope::string name = "cs_set_misc:" + it->second;
+			const Anope::string name = CHANSERV_SET_MISC_PREFIX + it->second;
 			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
 				Log(this) << "Configuration error: " << Module::name << " cs_set_misc entry " << it->second
 					<< " lacks a corresponding chanserv/set/misc command";
-				throw new ConfigException; // Can't check when reading the config becuase cs_set_misc might not be loaded
+				throw ConfigException(); // Can't check when reading the config becuase cs_set_misc might not be loaded
 			}
 
 			auto *data = extref->Set(ci);
@@ -1311,7 +1311,7 @@ private:
 		else if (key.find(':') == Anope::string::npos)
 		{
 			// Make a guess that there could be a NickServ SET MISC entry w/the mystery key's exact (uppercase) name
-			const Anope::string name = "ns_set_misc:" + key.upper();
+			const Anope::string name = NICKSERV_SET_MISC_PREFIX + key.upper();
 			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
@@ -1334,13 +1334,13 @@ private:
 				return true;
 			}
 
-			const Anope::string name = "ns_set_misc:" + it->second;
+			const Anope::string name = NICKSERV_SET_MISC_PREFIX + it->second;
 			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
 				Log(this) << "Configuration error: " << Module::name << " ns_set_misc entry " << it->second
 					<< " lacks a corresponding nickserv/set/misc command";
-				throw new ConfigException; // Can't check when reading the config becuase ns_set_misc might not be loaded
+				throw ConfigException(); // Can't check when reading the config becuase ns_set_misc might not be loaded
 			}
 
 			auto *data = extref->Set(nc);
@@ -1698,52 +1698,44 @@ public:
 	{
 		const auto &modconf = conf.GetModule(this);
 
-		csmiscdata.clear();
+		Anope::map<Anope::string> tmp_csmiscdata;
 		for (const auto &[_,  data] : modconf.GetBlocks("cs_set_misc"))
 		{
 			const auto &anope = data.Get<const Anope::string>("anope");
 			const auto &atheme = data.Get<const Anope::string>("atheme");
 			if (anope.empty())
-			{
-				Log(this) << " missing cs_set_misc anope config entry" << (atheme.empty() ? "" : (" for atheme entry " + atheme));
-				throw new ConfigException;
-			}
+				throw ConfigException(this->name + " missing cs_set_misc anope config entry" + (atheme.empty() ? "" : (" for atheme entry " + atheme)));
 			else if (atheme.empty())
-			{
-				Log(this) << " missing cs_set_misc atheme config entry for anope entry " << anope;
-				throw new ConfigException;
-			}
+				throw ConfigException(this->name + " missing cs_set_misc atheme config entry for anope entry " + anope);
 			else
-				csmiscdata[atheme] = anope.upper();
+				tmp_csmiscdata[atheme] = anope.upper();
 		}
 
-		nsmiscdata.clear();
+		Anope::map<Anope::string> tmp_nsmiscdata;
 		for (const auto &[_,  data] : modconf.GetBlocks("ns_set_misc"))
 		{
 			const auto &anope = data.Get<const Anope::string>("anope");
 			const auto &atheme = data.Get<const Anope::string>("atheme");
 			if (anope.empty())
-			{
-				Log(this) << " missing ns_set_misc anope config entry" << (atheme.empty() ? "" : (" for atheme entry " + atheme));
-				throw new ConfigException;
-			}
+				throw ConfigException(this->name + "missing ns_set_misc anope config entry" + (atheme.empty() ? "" : (" for atheme entry " + atheme)));
 			else if (atheme.empty())
-			{
-				Log(this) << " missing ns_set_misc atheme config entry for anope entry " << anope;
-				throw new ConfigException;
-			}
+				throw ConfigException(this->name + " missing ns_set_misc atheme config entry for anope entry " + anope);
 			else
-				nsmiscdata[atheme] = anope.upper();
+				tmp_nsmiscdata[atheme] = anope.upper();
 		}
 
-		flags.clear();
+		std::map<Anope::string, char> tmp_flags;
 		for (const auto &[_,  priv] : conf.GetBlocks("privilege"))
 		{
 			const Anope::string &name = priv.Get<const Anope::string>("name");
 			const Anope::string &value = priv.Get<const Anope::string>("flag");
 			if (!name.empty() && !value.empty())
-				flags[name] = value[0];
+				tmp_flags[name] = value[0];
 		}
+
+		csmiscdata = tmp_csmiscdata;
+		nsmiscdata = tmp_nsmiscdata;
+		flags = tmp_flags;
 	}
 
 	EventReturn OnLoadDatabase() override

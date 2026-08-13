@@ -17,8 +17,6 @@
 
 static Module *me;
 
-#define MISC_PREFIX "cs_set_misc:"
-
 struct CommandData final
 {
 	Anope::string description;
@@ -107,8 +105,8 @@ static Anope::string GetAttribute(const Anope::string &command)
 {
 	size_t sp = command.rfind(' ');
 	if (sp != Anope::string::npos)
-		return MISC_PREFIX + command.substr(sp + 1);
-	return MISC_PREFIX + command;
+		return CHANSERV_SET_MISC_PREFIX + command.substr(sp + 1);
+	return CHANSERV_SET_MISC_PREFIX + command;
 }
 
 static const char* GetTitle(ExtensibleItem<CSMiscData> *ext)

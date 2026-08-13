@@ -14,6 +14,9 @@
 
 #pragma once
 
+#define CHANSERV_SET_MISC_PREFIX "cs_set_misc:"
+#define NICKSERV_SET_MISC_PREFIX "ns_set_misc:"
+
 struct MiscData
 {
 	Anope::string object;

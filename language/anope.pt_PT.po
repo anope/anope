@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-08-15 17:34+0200\n"
-"PO-Revision-Date: 2026-08-15 18:12+0200\n"
+"PO-Revision-Date: 2026-08-15 19:55+0200\n"
 "Last-Translator: PeGaSuS <25697531+TehPeGaSuS@users.noreply.github.com>\n"
 "Language-Team: Portuguese (Portugal)\n"
 "Language: pt_PT\n"
@@ -9373,34 +9373,3 @@ msgstr "{number}: {message} -- criado por {creator} em {created}"
 #: ../modules/operserv/os_news.cpp
 msgid "{number}: {text} -- created by {creator} on {created}"
 msgstr "{number}: {text} -- criado por {creator} a {created}"
-
-#~ msgid "Enable or disable keep modes"
-#~ msgstr "Ativar ou desativar a manutenção de modos"
-
-#~ msgid "Enables or disables keepmodes for your nick. If keep modes is enabled, services will remember your usermodes and attempt to re-set them the next time you authenticate."
-#~ msgstr "Ativa ou desativa a manutenção de modos para o teu nick. Se a manutenção de modos estiver ativada, os serviços lembrar-se-ão dos teus modos de utilizador e tentarão redefini-los da próxima vez que autenticares."
-
-#~ msgid "Helps you reset lost passwords"
-#~ msgstr "Ajuda-te a repor palavras-passe perdidas"
-
-#~ msgid "Set the vhost for all nicks in an account"
-#~ msgstr "Definir o vhost para todos os nicks numa conta"
-
-#~ msgid ""
-#~ "Sets the vhost for all nicks in the same account as that of the given nick. If your IRCD supports vidents, then using SETALL <nick> <ident>@<hostmask> will set idents for users as well as vhosts.\n"
-#~ "\n"
-#~ "* NOTE, this will not update the vhost for any nicks added to the account after this command was used."
-#~ msgstr ""
-#~ "Define o vhost para todos os nicks na mesma conta que a do nick indicado. Se o teu IRCD suporta vidents, então usar SETALL <nick> <ident>@<hostname> definirá idents para os utilizadores, bem como vhosts.\n"
-#~ "\n"
-#~ "* NOTA, isto não atualizará o vhost para quaisquer nicks adicionados à conta depois de este comando ser usado."
-
-#, c-format
-#~ msgid ""
-#~ "Tells %s to invite you or an optionally specified nick into the given channel.\n"
-#~ "\n"
-#~ "By default, limited to AOPs or those with level 5 access and above on the channel."
-#~ msgstr ""
-#~ "Diz ao %s para convidar-te a ti ou a um nick opcionalmente especificado para o canal indicado.\n"
-#~ "\n"
-#~ "Por padrão, limitado a AOPs ou aqueles com nível de acesso 5 ou superior no canal."

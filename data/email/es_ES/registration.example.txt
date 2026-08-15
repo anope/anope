@@ -1,0 +1,15 @@
+Hola,
+
+Has solicitado registrar el nickname {nick} en {network}.
+
+Por favor, usa el siguiente comando en IRC para confirmar tu registro:
+
+> /msg NickServ CONFIRM REGISTER {code}
+
+Si no se confirma, tu registro expirará automáticamente en {expiry}.
+
+Si no sabes por qué se te ha enviado este e-mail, ignóralo simplemente.
+
+Saludos,
+
+{network}

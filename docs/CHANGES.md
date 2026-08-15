@@ -1,6 +1,6 @@
 # Anope Change Log
 
-## Anope 2.1.26 (unreleased)
+## Anope 2.1.26 (2026-08-15)
 
 ### Breaking Changes
 

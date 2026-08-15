@@ -1,5 +1,29 @@
 # Anope Change Log
 
+## Anope 2.1.26 (2026-08-15)
+
+### Breaking Changes
+
+* Support for multi-part (hybrid HTML/text) and localised emails has been added. If you are using a custom email message you will need to move them to an external file and update your email block with the new sub-blocks for each email type. Otherwise, you can just replace the config with that from the example config.
+
+* The hostserv/setall command has been removed. You should instead specify the SYNC flag to the hostserv/set command to synchronise vhosts across an entire command.
+
+## General Changes
+
+* Added support for using UNIX-style line endings with sendmail-incompatible mailers like nullmailer.
+
+* Added the `{expiry}` template variable to the registration, email change, and password reset emails.
+
+* Fixed a crash in the `chanserv/suspend` and `nickserv/suspend` commands.
+
+* Fixed checking whether a nickname is a guest nickname.
+
+* Redocumented the email configuration.
+
+## Developer Changes
+
+* Added `Mail::Template` for sending templatable and translatable mail messages.
+
 ## Anope 2.1.25 (2026-07-10)
 
 ### General Changes

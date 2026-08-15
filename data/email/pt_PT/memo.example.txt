@@ -1,6 +1,6 @@
 Olá,
 
-O seu nickname {receiver} na {network} recebeu um novo memo de {sender}.
+A tua conta {receiver} na {network} recebeu um novo memo de {sender}.
 
 > {text}
 

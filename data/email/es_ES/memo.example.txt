@@ -1,0 +1,11 @@
+Hola,
+
+Tu cuenta {receiver} en {network} ha recibido un nuevo memo de {sender}.
+
+> {text}
+
+Este es el memo número {number}.
+
+Saludos,
+
+{network}

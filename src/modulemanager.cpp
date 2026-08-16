@@ -52,20 +52,18 @@ void ModuleManager::CleanupRuntimeDirectory()
 }
 #endif
 
-/* This code was found online at https://web.archive.org/web/20180318184211/https://www.linuxjournal.com/article/3687#comment-26593
- *
- * This function will take a pointer from either dlsym or GetProcAddress and cast it in
- * a way that won't cause C++ warnings/errors to come up.
- */
-template <class TYPE> static TYPE function_cast(void *symbol)
+template <class Type>
+static Type GetSymbol(void *handle, const Anope::string &symbol)
 {
 	union
 	{
 		void *symbol;
-		TYPE function;
+		Type typed;
 	} cast;
-	cast.symbol = symbol;
-	return cast.function;
+
+	dlerror();
+	cast.symbol = dlsym(handle, symbol.c_str());
+	return cast.typed;
 }
 
 static ModuleReturn HandleThrowable(const Anope::string &modname, const Anope::string &what,
@@ -160,8 +158,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		return MOD_ERR_NOLOAD;
 	}
 
-	dlerror();
-	auto *func = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
+	auto *func = GetSymbol<Module *(*)(const Anope::string &, const Anope::string &)>(handle, "AnopeInit");
 	err = dlerror();
 	if (!func)
 	{
@@ -219,8 +216,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 ModuleVersion ModuleManager::GetVersion(void *handle)
 {
-	dlerror();
-	auto *func = function_cast<ModuleVersion (*)()>(dlsym(handle, "AnopeVersion"));
+	auto *func = GetSymbol<ModuleVersion (*)()>(handle, "AnopeVersion");
 	if (!func)
 	{
 		Log() << "No version function found, not an Anope module";
@@ -280,8 +276,7 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 
 	Log(LOG_DEBUG) << "Unloading module " << m->name;
 
-	dlerror();
-	auto *destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
+	auto *destroy_func = GetSymbol<void (*)(Module *)>(m->handle, "AnopeFini");
 	const char *err = dlerror();
 	if (!destroy_func || (err && *err))
 	{

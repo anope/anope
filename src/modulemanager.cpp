@@ -178,6 +178,11 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		Log() << "Error while loading " << modname << ": " << ex.GetReason();
 		moderr = MOD_ERR_EXCEPTION;
 	}
+	catch (const ConfigException &ex)
+	{
+		Log(LOG_TERMINAL) << "Error while loading " << modname << ": " << ex.GetReason();
+		moderr = MOD_ERR_CONFIG;
+	}
 
 	if (moderr != MOD_ERR_OK)
 	{
@@ -204,8 +209,8 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	}
 	catch (const ConfigException &ex)
 	{
-		Log() << "Module " << modname << " couldn't load due to configuration problems: " << ex.GetReason();
-		moderr = MOD_ERR_EXCEPTION;
+		Log(LOG_TERMINAL) << "Module " << modname << " couldn't load due to configuration problems: " << ex.GetReason();
+		moderr = MOD_ERR_CONFIG;
 	}
 	catch (const NotImplementedException &ex)
 	{

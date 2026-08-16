@@ -538,7 +538,15 @@ bool Anope::Init(int ac, char **av)
 	/* load modules */
 	Log() << "Loading modules...";
 	for (const auto &[_,  block] : Config->GetBlocks("module"))
-		ModuleManager::LoadModule(block.Get<const Anope::string>("name"), NULL);
+	{
+		const auto res = ModuleManager::LoadModule(block.Get<const Anope::string>("name"), NULL);
+		if (res == MOD_ERR_CONFIG)
+		{
+			Log(LOG_TERMINAL) << "You must fix this issue before Anope will start.";
+			Anope::ReturnValue = EXIT_FAILURE;
+			return false;
+		}
+	}
 
 #ifndef _WIN32
 	/* If we're root, issue a warning now */

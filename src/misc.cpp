@@ -1258,7 +1258,8 @@ Anope::string Anope::Template(const Anope::string &str, const Anope::map<Anope::
 					break;
 				}
 
-				auto var = vars.find(str.substr(idx + 1, endidx - idx - 1));
+				auto varname = str.substr(idx + 1, endidx - idx - 1).trim();
+				auto var = vars.find(varname);
 				if (var != vars.end())
 				{
 					// We have a variable, replace it in the string.

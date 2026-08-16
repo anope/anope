@@ -12,7 +12,7 @@ foreach(EMAIL IN LISTS EMAILS)
     DESTINATION "${CONF_DIR}/email"
   )
 
-  set(EMAIL_LANGS "pt_PT")
+  set(EMAIL_LANGS "es_ES" "pt_PT")
   foreach(EMAIL_LANG IN LISTS EMAIL_LANGS)
     set(EMAIL_DIR "email/${EMAIL_LANG}")
     install(

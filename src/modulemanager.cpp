@@ -68,6 +68,30 @@ template <class TYPE> static TYPE function_cast(void *symbol)
 	return cast.function;
 }
 
+static ModuleReturn HandleThrowable(const Anope::string &modname, const Anope::string &what,
+	const std::function<void(void)>& callback)
+{
+	try
+	{
+		callback();
+	}
+	catch (const ConfigException &ex)
+	{
+		Log(LOG_TERMINAL) << "Module " << modname << " couldn't " << what << " due to configuration problems: " << ex.GetReason();
+		return MOD_ERR_CONFIG;
+	}
+	catch (const NotImplementedException &)
+	{
+		// Module does not implement the function we called.
+	}
+	catch (const CoreException &ex)
+	{
+		Log() << "Module " << modname << " couldn't " << what << ":" << ex.GetReason();
+		return MOD_ERR_EXCEPTION;
+	}
+	return MOD_ERR_OK;
+}
+
 ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 {
 	if (modname.empty())
@@ -161,29 +185,13 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		return MOD_ERR_NOLOAD;
 	}
 
-	/* Create module. */
-	Anope::string nick;
-	if (u)
-		nick = u->nick;
-
-	Module *m;
-
 	ModuleReturn moderr = MOD_ERR_OK;
-	try
-	{
-		m = func(modname, nick);
-	}
-	catch (const ConfigException &ex)
-	{
-		Log(LOG_TERMINAL) << "Error while loading " << modname << ": " << ex.GetReason();
-		moderr = MOD_ERR_CONFIG;
-	}
-	catch (const CoreException &ex)
-	{
-		Log() << "Error while loading " << modname << ": " << ex.GetReason();
-		moderr = MOD_ERR_EXCEPTION;
-	}
 
+	Module *m = nullptr;
+	moderr = HandleThrowable(modname, "initialise module", [&func, &m, &modname, &u]()
+	{
+		m = func(modname, u ? u->nick: "");
+	});
 	if (moderr != MOD_ERR_OK)
 	{
 		if (dlclose(handle))
@@ -198,25 +206,10 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		Log(LOG_TERMINAL) << "Warning: " << modname << " is deprecated and will be removed in a future release";
 
 	/* Initialize config */
-	try
+	moderr = HandleThrowable(modname, "read configuration", [&m]()
 	{
 		m->OnReload(*Config);
-	}
-	catch (const ConfigException &ex)
-	{
-		Log(LOG_TERMINAL) << "Module " << modname << " couldn't load due to configuration problems: " << ex.GetReason();
-		moderr = MOD_ERR_CONFIG;
-	}
-	catch (const NotImplementedException &ex)
-	{
-		// Module does not implement OnReload.
-	}
-	catch (const CoreException &ex)
-	{
-		Log() << "Module " << modname << " couldn't load:" << ex.GetReason();
-		moderr = MOD_ERR_EXCEPTION;
-	}
-
+	});
 	if (moderr != MOD_ERR_OK)
 	{
 		DeleteModule(m);

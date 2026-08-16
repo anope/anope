@@ -683,12 +683,15 @@ public:
 	/** Returns the reason for the exception.
 	 * The module should probably put something informative here as the user will see this upon failure.
 	 */
-	virtual const Anope::string &GetReason() const
+	const Anope::string &GetReason() const
 	{
 		return err;
 	}
-
-	virtual const Anope::string &GetSource() const
+	const char* what() const noexcept override
+	{
+		return err.c_str();
+	}
+	const Anope::string &GetSource() const
 	{
 		return source;
 	}

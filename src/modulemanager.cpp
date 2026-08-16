@@ -173,15 +173,15 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	{
 		m = func(modname, nick);
 	}
-	catch (const ModuleException &ex)
-	{
-		Log() << "Error while loading " << modname << ": " << ex.GetReason();
-		moderr = MOD_ERR_EXCEPTION;
-	}
 	catch (const ConfigException &ex)
 	{
 		Log(LOG_TERMINAL) << "Error while loading " << modname << ": " << ex.GetReason();
 		moderr = MOD_ERR_CONFIG;
+	}
+	catch (const CoreException &ex)
+	{
+		Log() << "Error while loading " << modname << ": " << ex.GetReason();
+		moderr = MOD_ERR_EXCEPTION;
 	}
 
 	if (moderr != MOD_ERR_OK)
@@ -202,11 +202,6 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	{
 		m->OnReload(*Config);
 	}
-	catch (const ModuleException &ex)
-	{
-		Log() << "Module " << modname << " couldn't load:" << ex.GetReason();
-		moderr = MOD_ERR_EXCEPTION;
-	}
 	catch (const ConfigException &ex)
 	{
 		Log(LOG_TERMINAL) << "Module " << modname << " couldn't load due to configuration problems: " << ex.GetReason();
@@ -214,6 +209,12 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	}
 	catch (const NotImplementedException &ex)
 	{
+		// Module does not implement OnReload.
+	}
+	catch (const CoreException &ex)
+	{
+		Log() << "Module " << modname << " couldn't load:" << ex.GetReason();
+		moderr = MOD_ERR_EXCEPTION;
 	}
 
 	if (moderr != MOD_ERR_OK)

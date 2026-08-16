@@ -23,6 +23,8 @@
 
 namespace Anope
 {
+	typedef unsigned short VersionComponent;
+
 	/**
 	 * A wrapper string class around all the other string classes, this class will
 	 * allow us to only require one type of string everywhere that can be converted
@@ -414,9 +416,9 @@ namespace Anope
 	extern CoreExport string Version();
 	extern CoreExport string VersionShort();
 	extern CoreExport string VersionBuildString();
-	extern CoreExport unsigned VersionMajor();
-	extern CoreExport unsigned VersionMinor();
-	extern CoreExport unsigned VersionPatch();
+	extern CoreExport VersionComponent VersionMajor();
+	extern CoreExport VersionComponent VersionMinor();
+	extern CoreExport VersionComponent VersionPatch();
 
 	/** Determines if we are still attached to the terminal, and can print
 	 * messages to the user via stderr/stdout.

@@ -115,25 +115,3 @@ void Module::SetAuthor(const Anope::string &nauthor)
 void Module::Prioritize()
 {
 }
-
-ModuleVersion::ModuleVersion(const ModuleVersionC &ver)
-	: version_major(ver.version_major)
-	, version_minor(ver.version_minor)
-	, version_patch(ver.version_patch)
-{
-}
-
-unsigned ModuleVersion::GetMajor() const
-{
-	return this->version_major;
-}
-
-unsigned ModuleVersion::GetMinor() const
-{
-	return this->version_minor;
-}
-
-unsigned ModuleVersion::GetPatch() const
-{
-	return this->version_patch;
-}

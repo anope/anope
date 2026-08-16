@@ -23,6 +23,19 @@
 #include "extensible.h"
 #include "version.h"
 
+/** Packs three version shorts into an unsigned long long. */
+#define MODULE_VERSION_PACK(MAJOR, MINOR, PATCH) \
+	((ModuleVersion)(MAJOR & 0x3FF) << 20) | \
+	((ModuleVersion)(MINOR & 0x3FF) << 10) | \
+	((ModuleVersion)(PATCH & 0x3FF))
+
+#define MODULE_VERSION_UNPACK(VERSION) \
+	std::tuple( \
+		((VERSION >> 20) & 0x3FF), \
+		((VERSION >> 10) & 0x3FF), \
+		(VERSION & 0x3FF) \
+	)
+
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
  * It defines the class factory and external AnopeInit and AnopeFini functions.
@@ -36,13 +49,9 @@
 	{ \
 		delete m; \
 	} \
-	extern "C" DllExport ModuleVersionC AnopeVersion() \
+	extern "C" DllExport ModuleVersion AnopeVersion() noexcept \
 	{ \
-		ModuleVersionC ver; \
-		ver.version_major = VERSION_MAJOR; \
-		ver.version_minor = VERSION_MINOR; \
-		ver.version_patch = VERSION_PATCH; \
-		return ver; \
+		return MODULE_VERSION_PACK(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH); \
 	}
 
 /**
@@ -168,39 +177,7 @@ enum
 };
 typedef unsigned short ModType;
 
-struct ModuleVersionC final
-{
-	unsigned version_major, version_minor, version_patch;
-};
-
-/** Returned by Module::GetVersion, used to see what version of Anope
- * a module is compiled against.
- */
-class ModuleVersion final
-{
-private:
-	unsigned version_major;
-	unsigned version_minor;
-	unsigned version_patch;
-
-public:
-	ModuleVersion(const ModuleVersionC &);
-
-	/** Get the major version of Anope this was built against
-	 * @return The major version
-	 */
-	unsigned GetMajor() const;
-
-	/** Get the minor version of Anope this was built against
-	 * @return The minor version
-	 */
-	unsigned GetMinor() const;
-
-	/** Get the patch version this was built against
-	 * @return The patch version
-	 */
-	unsigned GetPatch() const;
-};
+typedef unsigned long long ModuleVersion;
 
 class CoreExport NotImplementedException final
 	: public CoreException
@@ -1267,14 +1244,6 @@ public:
 	 * @return The module
 	 */
 	static Module *FindFirstOf(ModType type, bool ignoredeprecated = false);
-
-	/** Checks whether this version of Anope is at least major.minor.patch.build
-	 * Throws a ModuleException if not
-	 * @param major The major version
-	 * @param minor The minor version
-	 * @param patch The patch version
-	 */
-	static void RequireVersion(unsigned major, unsigned minor, unsigned patch);
 
 	/** Change the priority of one event in a module.
 	 * Each module event has a list of modules which are attached to that event type. If you wish to be called before or after other specific modules, you may use this

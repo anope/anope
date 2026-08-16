@@ -81,7 +81,6 @@ void Mail::Message::Run()
 Mail::Template::Template(const Anope::string &c)
 	: config(c)
 {
-	Reload(*Config);
 }
 
 void Mail::Template::ParseSubject(const Configuration::Block &conf, Anope::map<Anope::string>& newsubjects,

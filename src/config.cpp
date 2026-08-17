@@ -29,7 +29,9 @@ Configuration::Conf *Config = NULL;
 
 Configuration::Block Configuration::Block::EmptyBlock("");
 
-Configuration::Block::Block(const Anope::string &n) : name(n), linenum(-1)
+Configuration::Block::Block(const Anope::string &n)
+	: name(n)
+	, position("<unknown>")
 {
 }
 
@@ -753,6 +755,17 @@ Anope::string Configuration::File::Read()
 	return ret;
 }
 
+Configuration::FilePosition::FilePosition(const Anope::string& n)
+	: name(n)
+{
+}
+
+Anope::string Configuration::FilePosition::str() const
+{
+	return Anope::Format("%s:%zu:%zu", this->name.c_str(),
+		this->line, this->column);
+}
+
 void Configuration::Conf::LoadConf(Configuration::File &file)
 {
 	if (file.GetName().empty())
@@ -766,7 +779,7 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 
 	Anope::string itemname, wordbuffer;
 	std::stack<Configuration::Block *> block_stack;
-	unsigned linenumber = 0;
+	Configuration::FilePosition position(file.GetName());
 	bool in_word = false, in_quote = false, in_comment = false;
 
 	Log(LOG_DEBUG) << "Start to read conf " << file.GetPath();
@@ -774,7 +787,9 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 	while (!file.End())
 	{
 		Anope::string line = file.Read();
-		++linenumber;
+
+		position.column = 0;
+		position.line++;
 
 		/* If this line is completely empty and we are in a quote, just append a newline */
 		if (line.empty() && in_quote)
@@ -782,6 +797,7 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 
 		for (unsigned c = 0, len = line.length(); c < len; ++c)
 		{
+			position.column++;
 			char ch = line[c];
 			if (in_quote)
 			{
@@ -829,12 +845,12 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 				if (block_stack.empty() || itemname.empty())
 				{
 					file.Close();
-					throw ConfigException("Unexpected quoted string: " + file.GetName() + ":" + Anope::ToString(linenumber));
+					throw ConfigException("Unexpected quoted string: " + position.str());
 				}
 				if (in_word || !wordbuffer.empty())
 				{
 					file.Close();
-					throw ConfigException("Unexpected quoted string (prior unhandled words): " + file.GetName() + ":" + Anope::ToString(linenumber));
+					throw ConfigException("Unexpected quoted string (prior unhandled words): " + position.str());
 				}
 				in_quote = in_word = true;
 			}
@@ -843,13 +859,13 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 				if (block_stack.empty())
 				{
 					file.Close();
-					throw ConfigException("Config item outside of section (or stray '='): " + file.GetName() + ":" + Anope::ToString(linenumber));
+					throw ConfigException("Config item outside of section (or stray '='): " + position.str());
 				}
 
 				if (!itemname.empty() || wordbuffer.empty())
 				{
 					file.Close();
-					throw ConfigException("Stray '=' sign or item without value: " + file.GetName() + ":" + Anope::ToString(linenumber));
+					throw ConfigException("Stray '=' sign or item without value: " + position.str());
 				}
 
 				in_word = false;
@@ -877,7 +893,7 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 				auto *b = block_stack.empty() ? this : block_stack.top();
 				auto it = b->blocks.emplace(wordbuffer, Configuration::Block(wordbuffer));
 				b = &it->second;
-				b->linenum = linenumber;
+				b->position = position;
 				block_stack.push(b);
 
 				in_word = false;
@@ -896,7 +912,7 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 				if (!in_word && !wordbuffer.empty())
 				{
 					file.Close();
-					throw ConfigException("Unexpected word: " + file.GetName() + ":" + Anope::ToString(linenumber));
+					throw ConfigException("Unexpected word: " + position.str());
 				}
 				wordbuffer += ch;
 				in_word = true;
@@ -923,14 +939,14 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 					if (block_stack.empty())
 					{
 						file.Close();
-						throw ConfigException("Stray ';' outside of block: " + file.GetName() + ":" + Anope::ToString(linenumber));
+						throw ConfigException("Stray ';' outside of block: " + position.str());
 					}
 
 					auto *b = block_stack.top();
 					if (b)
 					{
-						Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << b->name << "' '" << itemname << "' set to '" << wordbuffer << "'";
-						b->items[itemname] = ReplaceVars(wordbuffer, file, linenumber);
+						Log(LOG_DEBUG) << "ln " << position.line << " EOL: s='" << b->name << "' '" << itemname << "' set to '" << wordbuffer << "'";
+						b->items[itemname] = ReplaceVars(wordbuffer, file, position);
 					}
 
 					wordbuffer.clear();
@@ -942,7 +958,7 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 					if (block_stack.empty())
 					{
 						file.Close();
-						throw ConfigException("Stray '}': " + file.GetName() + ":" + Anope::ToString(linenumber));
+						throw ConfigException("Stray '}': " + position.str());
 					}
 
 					block_stack.pop();
@@ -962,13 +978,13 @@ void Configuration::Conf::LoadConf(Configuration::File &file)
 	if (!block_stack.empty())
 	{
 		if (block_stack.top())
-			throw ConfigException("Unterminated block at end of file: " + file.GetName() + ". Block was opened on line " + Anope::ToString(block_stack.top()->linenum));
+			throw ConfigException("Unterminated block at end of file. Block was opened at " + block_stack.top()->position.str());
 		else
 			throw ConfigException("Unterminated commented block at end of file: " + file.GetName());
 	}
 }
 
-Anope::string Configuration::Conf::ReplaceVars(const Anope::string &str, const Configuration::File &file, unsigned linenumber)
+Anope::string Configuration::Conf::ReplaceVars(const Anope::string &str, const Configuration::File &file, const Configuration::FilePosition &position)
 {
 	Anope::string ret;
 	for (auto it = str.begin(); it != str.end(); )
@@ -991,7 +1007,7 @@ Anope::string Configuration::Conf::ReplaceVars(const Anope::string &str, const C
 			var.push_back(*it++);
 
 		if (it == str.end())
-			throw ConfigException("Unterminated variable: " + file.GetName() + ":" + Anope::ToString(linenumber));
+			throw ConfigException("Unterminated variable: " + position.str());
 
 		it++;
 		if (var.compare(0, 4, "env.", 4) == 0)
@@ -1016,7 +1032,7 @@ Anope::string Configuration::Conf::ReplaceVars(const Anope::string &str, const C
 		}
 
 		if (!found)
-			throw ConfigException("Undefined variable: " + var + " at " + file.GetName() + ":" + Anope::ToString(linenumber));
+			throw ConfigException("Undefined variable: " + var + " at " + position.str());
 	}
 
 	if (!str.equals_cs(ret))

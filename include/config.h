@@ -22,6 +22,17 @@
 
 namespace Configuration
 {
+	/** Represents a position within a config file. */
+	class CoreExport FilePosition final
+	{
+	public:
+		Anope::string name;
+		size_t line = 0;
+		size_t column = 0;
+		FilePosition(const Anope::string& n);
+		Anope::string str() const;
+	};
+
 	class CoreExport Block
 	{
 		friend class Configuration::Conf;
@@ -35,7 +46,7 @@ namespace Configuration
 		Anope::string name;
 		ItemMap items;
 		BlockMap blocks;
-		unsigned linenum;
+		FilePosition position;
 
 		/* Represents a missing tag. */
 		static Block EmptyBlock;
@@ -88,7 +99,7 @@ namespace Configuration
 	{
 	private:
 		/** Replaces defined variables within a string. */
-		Anope::string ReplaceVars(const Anope::string &str, const File &file, unsigned linenumber);
+		Anope::string ReplaceVars(const Anope::string &str, const File &file, const FilePosition &position);
 
 	public:
 		/* options:readtimeout */

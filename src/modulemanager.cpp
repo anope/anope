@@ -55,6 +55,7 @@ void ModuleManager::CleanupRuntimeDirectory()
 template <class Type>
 static Type GetSymbol(void *handle, const Anope::string &symbol)
 {
+	static_assert(sizeof(Type) <= sizeof(void*));
 	union
 	{
 		void *symbol;

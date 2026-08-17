@@ -25,15 +25,15 @@
 
 /** Packs three version shorts into an unsigned long long. */
 #define MODULE_VERSION_PACK(MAJOR, MINOR, PATCH) \
-	((ModuleVersion)(MAJOR & 0x3FF) << 20) | \
-	((ModuleVersion)(MINOR & 0x3FF) << 10) | \
-	((ModuleVersion)(PATCH & 0x3FF))
+	((ModuleVersion)(MAJOR & 0xFFFF) << 32) | \
+	((ModuleVersion)(MINOR & 0xFFFF) << 16) | \
+	((ModuleVersion)(PATCH & 0xFFFF))
 
 #define MODULE_VERSION_UNPACK(VERSION) \
 	std::tuple( \
-		((VERSION >> 20) & 0x3FF), \
-		((VERSION >> 10) & 0x3FF), \
-		(VERSION & 0x3FF) \
+		(Anope::VersionComponent)((VERSION >> 32) & 0xFFFF), \
+		(Anope::VersionComponent)((VERSION >> 16) & 0xFFFF), \
+		(Anope::VersionComponent)(VERSION & 0x3FF) \
 	)
 
 /** This definition is used as shorthand for the various classes
@@ -177,7 +177,7 @@ enum
 };
 typedef unsigned short ModType;
 
-typedef unsigned long long ModuleVersion;
+typedef uint64_t ModuleVersion;
 
 class CoreExport NotImplementedException final
 	: public CoreException

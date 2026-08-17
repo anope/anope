@@ -23,7 +23,8 @@
 
 namespace Anope
 {
-	typedef unsigned short VersionComponent;
+	/** A single component of the Anope version. */
+	typedef uint16_t VersionComponent;
 
 	/**
 	 * A wrapper string class around all the other string classes, this class will

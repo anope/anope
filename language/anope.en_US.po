@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-22 15:43+0100\n"
-"PO-Revision-Date: 2026-07-22 15:43+0100\n"
+"POT-Creation-Date: 2026-08-25 16:14+0100\n"
+"PO-Revision-Date: 2026-08-25 16:14+0100\n"
 "Last-Translator: Sadie Powell <sadie@sadiepowell.dev>\n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -5527,10 +5527,6 @@ msgstr ""
 msgid "Password accepted - you are now recognized."
 msgstr ""
 
-#: ../modules/operserv/os_login.cpp
-msgid "Password accepted."
-msgstr ""
-
 #: ../modules/nickserv/ns_set.cpp
 #, c-format
 msgid "Password for %s changed."
@@ -8043,6 +8039,10 @@ msgstr ""
 
 #: ../modules/nickserv/ns_cert.cpp
 msgid "You are not using a client certificate."
+msgstr ""
+
+#: ../modules/operserv/os_login.cpp
+msgid "You are now a Services Operator."
 msgstr ""
 
 #: ../modules/operserv/os_set.cpp

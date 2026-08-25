@@ -45,11 +45,11 @@ public:
 		Oper *o = source.nc->o;
 		if (o == NULL)
 			source.Reply(_("No oper block for your nick."));
-		else if (o->password.empty())
+		else if (!o->require_login && o->password.empty())
 			source.Reply(_("Your oper block doesn't require logging in."));
 		else if (u->HasExt("os_login"))
 			source.Reply(_("You are already identified."));
-		else if (params.empty() || !ComparePassword(o, params[0]))
+		else if (!o->password.empty() && (params.empty() || !ComparePassword(o, params[0])))
 		{
 			source.Reply(PASSWORD_INCORRECT);
 			u->BadPassword();
@@ -58,7 +58,7 @@ public:
 		{
 			Log(LOG_ADMIN, source, this) << "and successfully identified to " << source.service->nick;
 			u->Extend<bool>("os_login");
-			source.Reply(_("Password accepted."));
+			source.Reply(_("You are now a Services Operator."));
 		}
 	}
 
@@ -96,7 +96,7 @@ public:
 		Oper *o = source.nc->o;
 		if (o == NULL)
 			source.Reply(_("No oper block for your nick."));
-		else if (o->password.empty())
+		else if (!o->require_login && o->password.empty())
 			source.Reply(_("Your oper block doesn't require logging in."));
 		else if (!u->HasExt("os_login"))
 			source.Reply(_("You are not identified."));
@@ -143,7 +143,8 @@ public:
 
 	EventReturn IsServicesOper(User *u) override
 	{
-		if (!u->Account()->o->password.empty())
+		auto *oper = u->Account()->o;
+		if (oper->require_login || !oper->password.empty())
 		{
 			if (os_login.HasExt(u))
 				return EVENT_ALLOW;

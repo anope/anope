@@ -300,7 +300,6 @@ Configuration::Conf::Conf() : Configuration::Block("")
 					&certfp = oper.Get<const Anope::string>("certfp"),
 					&host = oper.Get<const Anope::string>("host"),
 					&vhost = oper.Get<const Anope::string>("vhost");
-		bool require_oper = oper.Get<bool>("require_oper");
 
 		ValidateNotEmptyOrSpaces("oper", "name", nname);
 		ValidateNotEmpty("oper", "type", type);
@@ -315,7 +314,8 @@ Configuration::Conf::Conf() : Configuration::Block("")
 			throw ConfigException("Oper block for " + nname + " has invalid oper type " + type);
 
 		auto *o = new Oper(nname, ot);
-		o->require_oper = require_oper;
+		o->require_login = oper.Get<bool>("require_login");
+		o->require_oper = oper.Get<bool>("require_oper");
 		o->password = password;
 		o->password_hash = password_hash;
 		spacesepstream(certfp).GetTokens(o->certfp);

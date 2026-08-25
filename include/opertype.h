@@ -27,6 +27,8 @@ struct CoreExport Oper
 	Anope::string name;
 	/* The type of operator this operator is */
 	OperType *ot;
+	/* Whether the user must log in with /OPERSERV LOGIN. */
+	bool require_login = false;
 	/* Whether the user must be an IRC operator (umode +o) to be considered a services operator */
 	bool require_oper = true;
 	Anope::string password;

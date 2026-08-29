@@ -1188,9 +1188,8 @@ private:
 			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
-				Log(this) << "Configuration error: " << Module::name << " cs_set_misc entry " << it->second
-					<< " lacks a corresponding chanserv/set/misc command";
-				throw ConfigException(); // Can't check when reading the config becuase cs_set_misc might not be loaded
+				throw ConfigException(this->name + " cs_set_misc entry " + it->second
+					+ " lacks a corresponding chanserv/set/misc command");
 			}
 
 			auto *data = extref->Set(ci);
@@ -1338,9 +1337,8 @@ private:
 			ExtensibleRef<MiscData> extref(name);
 			if (!extref)
 			{
-				Log(this) << "Configuration error: " << Module::name << " ns_set_misc entry " << it->second
-					<< " lacks a corresponding nickserv/set/misc command";
-				throw ConfigException(); // Can't check when reading the config becuase ns_set_misc might not be loaded
+				throw ConfigException(this->name + " ns_set_misc entry " + it->second
+					+ " lacks a corresponding nickserv/set/misc command");
 			}
 
 			auto *data = extref->Set(nc);

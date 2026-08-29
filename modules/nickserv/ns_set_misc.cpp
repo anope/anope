@@ -108,8 +108,8 @@ static Anope::string GetAttribute(const Anope::string &command)
 {
 	size_t sp = command.rfind(' ');
 	if (sp != Anope::string::npos)
-		return CHANSERV_SET_MISC_PREFIX + command.substr(sp + 1);
-	return CHANSERV_SET_MISC_PREFIX + command;
+		return NICKSERV_SET_MISC_PREFIX + command.substr(sp + 1);
+	return NICKSERV_SET_MISC_PREFIX + command;
 }
 
 static const char* GetTitle(ExtensibleItem<NSMiscData> *ext)

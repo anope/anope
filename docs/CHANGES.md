@@ -6,7 +6,7 @@
 
 * Support for multi-part (hybrid HTML/text) and localised emails has been added. If you are using a custom email message you will need to move them to an external file and update your email block with the new sub-blocks for each email type. Otherwise, you can just replace the config with that from the example config.
 
-* The hostserv/setall command has been removed. You should instead specify the SYNC flag to the hostserv/set command to synchronise vhosts across an entire command.
+* The hostserv/setall command has been removed. You should instead specify the SYNC flag to the hostserv/set command to synchronise vhosts across an entire account.
 
 ## General Changes
 

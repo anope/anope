@@ -227,10 +227,6 @@ if(WIN32)
   configure_file(${Anope_SOURCE_DIR}/src/win32/win32.rc.cmake ${Anope_BINARY_DIR}/src/win32/win32.rc)
 endif()
 
-# Get the filename of the Anope binary, to use later
-set(SERVICES_BINARY "$<TARGET_FILE:${PROGRAM_NAME}>")
-cmake_path(GET SERVICES_BINARY FILENAME SERVICES_BINARY)
-
 # At install time, create the following additional directories
 install(DIRECTORY DESTINATION "${DATA_DIR}/backups")
 if(WIN32)
@@ -265,6 +261,8 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   #set(CPACK_RESOURCE_FILE_README "${Anope_SOURCE_DIR}/docs/README")
   # The following is primarily for NSIS
   if(WIN32)
+    # Get the filename of the Anope binary, to use later
+    set(SERVICES_BINARY "${PROGRAM_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
     # By default, do not warn when built on machines using only VS Express:
     IF(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
       SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)

@@ -505,7 +505,7 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
   # The following is primarily for NSIS
   if(WIN32)
     # Get the filename of the Anope binary, to use later
-    set(SERVICES_BINARY "${PROGRAM_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
+    set(SERVICES_BINARY "bin\\\\${PROGRAM_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
     # By default, do not warn when built on machines using only VS Express:
     IF(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
       SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
@@ -516,7 +516,7 @@ if(EXISTS "${CMAKE_ROOT}/Modules/CPack.cmake")
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "Anope")
     set(CPACK_PACKAGE_EXECUTABLES "")
     set(CPACK_NSIS_MENU_LINKS
-      "bin\\\\${SERVICES_BINARY}" "Anope IRC Services"
+      "${SERVICES_BINARY}" "Anope IRC Services"
       "bin\\\\anope.bat\\\" \\\"-debug -nofork" "Anope IRC Services (Debug and Window Logging)"
       "bin\\\\anope.bat\\\" \\\"-nofork" "Anope IRC Services (Window Logging)"
       "bin\\\\anope.bat\\\" \\\"-nothird" "Anope IRC Services (No Third Party Modules)"

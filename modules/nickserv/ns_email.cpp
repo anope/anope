@@ -105,7 +105,7 @@ public:
 
 		Anope::string code;
 		NickAlias *na;
-		if (params[0] == '@')
+		if (params[0][0] == '@')
 		{
 			if (!has_priv)
 			{
@@ -113,7 +113,7 @@ public:
 				return;
 			}
 
-			auto nick = params[0].substr(0);
+			auto nick = params[0].substr(1);
 			na = NickAlias::Find(nick);
 			if (!na)
 			{

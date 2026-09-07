@@ -214,6 +214,9 @@ public:
 			auto *nc = anope_dynamic_static_cast<NickCore *>(e);
 			auto *cl = this->Require(nc);
 
+			// Try to avoid breaking autologin compatibility for upgrading users.
+			nc->Extend<bool>("AUTOLOGIN");
+
 			// Delete the old cert list.
 			for (const auto *cert : cl->certs)
 			{

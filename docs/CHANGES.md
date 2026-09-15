@@ -1,5 +1,29 @@
 # Anope Change Log
 
+## Anope 2.1.27 (2026-09-15)
+
+### General Changes
+
+* Added a Spanish translation for the email templates.
+
+* Added column numbers to config error messages.
+
+* Added support for passwordless services operators that have to manually log in using `/msg OperServ LOGIN`.
+
+* Fixed a crash caused by modules throwing an unhandled exception from their constructor.
+
+* Modernized the example UnrealIRCd configuration.
+
+* Updated the Portuguese translation.
+
+### Developer Changes
+
+* Added a `what()` overload for `CoreException` making it easier to get error messages out of GDB.
+
+* Removed `ModuleManager::RequireVersion` as it can't ever fail.
+
+* Simplified module version requirements to use a `uint64_t` for the full version and `uint16_t` for each component.
+
 ## Anope 2.1.26 (2026-08-15)
 
 ### Breaking Changes
@@ -8,7 +32,7 @@
 
 * The hostserv/setall command has been removed. You should instead specify the SYNC flag to the hostserv/set command to synchronise vhosts across an entire account.
 
-## General Changes
+### General Changes
 
 * Added support for using UNIX-style line endings with sendmail-incompatible mailers like nullmailer.
 
@@ -20,7 +44,7 @@
 
 * Redocumented the email configuration.
 
-## Developer Changes
+### Developer Changes
 
 * Added `Mail::Template` for sending templatable and translatable mail messages.
 

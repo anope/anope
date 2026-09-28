@@ -9370,37 +9370,3 @@ msgstr "{number}: {message} -- creat de {creator} la {created}"
 #: ../modules/operserv/os_news.cpp
 msgid "{number}: {text} -- created by {creator} on {created}"
 msgstr "{number}: {text} -- creat de {creator} pe {created}"
-
-#~ msgid "Enable or disable keep modes"
-#~ msgstr "Activează sau dezactivează păstrarea modurilor"
-
-#~ msgid "Enables or disables keepmodes for your nick. If keep modes is enabled, services will remember your usermodes and attempt to re-set them the next time you authenticate."
-#~ msgstr "Activează sau dezactivează păstrarea modurilor pentru pseudonimul dumneavoastră. Dacă este activată opțiunea de păstrare a modurilor, serviciile vor reține modurile de utilizator și vor încerca să le reașeze data viitoare când vă identificați."
-
-#~ msgid "Helps you reset lost passwords"
-#~ msgstr "Vă ajută să resetați parola pierdută"
-
-#~ msgid "Password accepted."
-#~ msgstr "Parolă acceptată."
-
-#~ msgid "Set the vhost for all nicks in an account"
-#~ msgstr "Setează gazda virtuală pentru toate pseudonimele dintr-un cont"
-
-#~ msgid ""
-#~ "Sets the vhost for all nicks in the same account as that of the given nick. If your IRCD supports vidents, then using SETALL <nick> <ident>@<hostmask> will set idents for users as well as vhosts.\n"
-#~ "\n"
-#~ "* NOTE, this will not update the vhost for any nicks added to the account after this command was used."
-#~ msgstr ""
-#~ "Setează gazda virtuală să fe pentru toate pseudonimele din același cont, la fel ca cea a pseudonimului precizat. Dacă serverul dumneavoastră de IRCd acceptă schimbarea identității virtuale, atunci utilizarea comenzii SETALL <pseudonim> <ident>@<hostmask> va schimba și identitatea, împreună cu gazda virtuală.\n"
-#~ "\n"
-#~ "* Rețineți totuși că această comandă nu va actualiza gazda virtuală pentru pseudonimele adăugate contului după utilizarea acestei comenzi."
-
-#, c-format
-#~ msgid ""
-#~ "Tells %s to invite you or an optionally specified nick into the given channel.\n"
-#~ "\n"
-#~ "By default, limited to AOPs or those with level 5 access and above on the channel."
-#~ msgstr ""
-#~ "Solicită de la %s să vă invite pe dumneavoastră sau pe un pseudonim specificat în canalul precizat.\n"
-#~ "\n"
-#~ "Implicit, se limitează la AOP sau la cei cu acces de nivel 5 ori superior în canal."

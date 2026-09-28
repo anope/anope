@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-20 00:08+0100\n"
-"PO-Revision-Date: 2026-05-19 23:58+0100\n"
+"POT-Creation-Date: 2026-09-27 15:40+0100\n"
+"PO-Revision-Date: 2026-09-27 17:00+0100\n"
 "Last-Translator: Cristian Anghel <kidprotect-cristian@yahoo.com>\n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -146,8 +146,8 @@ msgstr "%s nu pot fi considerate ca momente de blocare."
 
 #: ../modules/operserv/os_mode.cpp
 #, c-format
-msgid "%s changed your usermodes to %s."
-msgstr "%s v-a schimbat modurile de utilizator în %s."
+msgid "%s changed your user modes to %s."
+msgstr "%s a schimbat modurile de utilizator ale dumneavoastră în %s."
 
 #: ../modules/operserv/os_list.cpp
 #, c-format
@@ -879,8 +879,8 @@ msgid "nick channel [reason]"
 msgstr "pseudonim canal [motiv]"
 
 #: ../modules/hostserv/hs_set.cpp
-msgid "nick hostmask"
-msgstr "pseudonim masca-gazdei"
+msgid "nick hostmask [SYNC]"
+msgstr "pseudonim masca-gazdei [SYNC]"
 
 #: ../modules/operserv/os_svs.cpp
 msgid "nick newnick"
@@ -1021,6 +1021,13 @@ msgstr "utilizator moduri"
 #: ../modules/operserv/os_kill.cpp
 msgid "user [reason]"
 msgstr "utilizator [motiv]"
+
+#: ../modules/nickserv/ns_set_timezone.cpp
+#, c-format
+msgid "    %s (%zu timezone)"
+msgid_plural "    %s (%zu timezones)"
+msgstr[0] "    %s (%zu fus orar)"
+msgstr[1] "    %s (%zu fusuri orare)"
 
 #: ../modules/operserv/os_oper.cpp
 #, c-format
@@ -1869,12 +1876,12 @@ msgid "Activate the requested vhost for the given nick."
 msgstr "Activează gazda virtuală solicitată pentru pseudonimul precizat."
 
 #: ../modules/hostserv/hs_on.cpp
-msgid "Activates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see the vhost instead of your real host/IP address."
-msgstr "Activează gazda virtuală care v-a fost atribuită pentru pseudoniumul folosit acum. Când utilizați această comandă, orice utilizator care efectuează un /whois asupra pseudonimului dumneavoastră, va vedea gazda virtuală atribuită în loc de gazda ori adresa IP reală."
+msgid "Activate your assigned vhost"
+msgstr "Activați gazda virtuală atribuită dumneavoastră"
 
 #: ../modules/hostserv/hs_on.cpp
-msgid "Activates your assigned vhost"
-msgstr "Activează gazda virtuală atribuită dumneavoastră"
+msgid "Activates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see the vhost instead of your real host/IP address."
+msgstr "Activează gazda virtuală care v-a fost atribuită pentru pseudoniumul folosit acum. Când utilizați această comandă, orice utilizator care efectuează un /whois asupra pseudonimului dumneavoastră, va vedea gazda virtuală atribuită în loc de gazda ori adresa IP reală."
 
 #: ../modules/botserv/bs_badwords.cpp
 msgid "Add smeg to the bad word list of #channel. If a user says only this word in a message they will be kicked."
@@ -2426,8 +2433,8 @@ msgid "As a Services Operator, you may drop any nick."
 msgstr "Ca Operator de Servicii, puteți radia orice pseudonim."
 
 #: ../modules/botserv/bs_assign.cpp
-msgid "Assigns a bot to a channel"
-msgstr "Asociază un bot unui canal"
+msgid "Assign a bot to a channel"
+msgstr "Asociați un bot unui canal"
 
 #: ../modules/botserv/bs_assign.cpp
 msgid "Assigns the OperServ bot to #opers."
@@ -2539,6 +2546,10 @@ msgstr "Lista de cuvinte nepotrivite pentru %s este după cum urmează:"
 msgid "Bad words list is now empty."
 msgstr "Lista de cuvinte nepotrivite este goală acum."
 
+#: ../modules/chanserv/cs_ban.cpp
+msgid "Ban a given nick or mask on a channel"
+msgstr "Blocați un anumit pseudonim sau mască într-un canal"
+
 #: ../modules/botserv/bs_set.cpp
 msgid "Ban expiry may not be longer than 1 day."
 msgstr "Expirarea blocării nu poate depăși o zi."
@@ -2558,18 +2569,8 @@ msgid "Ban type for channel %s is now #%d."
 msgstr "Tipul de blocare pentru canalul %s este acum #%d."
 
 #: ../modules/chanserv/cs_ban.cpp
-msgid "Bans a given nick or mask on a channel"
-msgstr "Blochează un anumit pseudonim sau mască într-un canal"
-
-#: ../modules/chanserv/cs_ban.cpp
-msgid ""
-"Bans a given nick or mask on a channel. An optional expiry may be given to cause services to remove the ban after a set amount of time.\n"
-"\n"
-"By default, limited to AOPs or those with level 5 access and above on the channel. Channel founders may ban masks."
-msgstr ""
-"Blochează un pseudonim sau o mască într-un canal. Se poate acorda o expirare opțională pentru ca serviciile să înlăture blocajul după o anumită perioadă de timp.\n"
-"\n"
-"Implicit, blocarea este limitată la AOP ori la cei cu acces de nivel 5 sau superior în canal. Fondatorii de canale pot bloca măștile."
+msgid "Bans a given nick or mask on a channel. An optional expiry may be given to cause services to remove the ban after a set amount of time. Channel founders may ban masks."
+msgstr "Blochează un pseudonim sau o mască într-un canal. Se poate acorda o expirare opțională pentru ca serviciile să înlăture blocajul după o anumită perioadă de timp. Fondatorii de canal pot bloca măști."
 
 #: ../modules/chanserv/cs_enforce.cpp
 #, c-format
@@ -2761,6 +2762,11 @@ msgstr "Botul nu va mai izgoni pentru inundări."
 msgid "Bot won't kick for repeats anymore."
 msgstr "Botul nu va mai izgoni pentru repetări."
 
+#: ../src/access.cpp
+#, c-format
+msgid "By default, the %s command is limited to:"
+msgstr "Implicit, comanda %s este limitată la:"
+
 #: ../modules/operserv/os_info.cpp
 msgid "CLEAR target"
 msgstr "CLEAR destinație"
@@ -2841,8 +2847,8 @@ msgstr "Schimbă modurile de utilizator"
 
 #: ../modules/operserv/os_mode.cpp
 #, c-format
-msgid "Changed usermodes of %s to %s."
-msgstr "Modurile de utilizator ale %s au fost schimbate în %s."
+msgid "Changed user modes of %s to %s."
+msgstr "Au fost schimbate modurile de utilizator ale %s în %s."
 
 #: ../modules/botserv/bs_bot.cpp
 msgid "Changes all of the information of the bot called Chii. The new nickname will be Mahoro, the new username will be saint, the new hostname will be vesper.test, and the new realname will be Mahoro Andou."
@@ -2916,7 +2922,7 @@ msgstr "Schimbă mesajul de întâmpinare al dumneavoastră. Acest mesaj va fi a
 
 #: ../src/users.cpp
 #, c-format
-msgid "Changing your usermodes to %s"
+msgid "Changing your user modes to %s"
 msgstr "Se schimbă modurile de utilizator ale dumneavoastră în %s"
 
 #: ../src/users.cpp
@@ -3087,13 +3093,13 @@ msgstr "Statisticile Chanstats sunt activate acum pentru acest canal."
 msgid "Chanstats statistics are now enabled for your nick."
 msgstr "Statisticile Chanstats sunt activate acum pentru pseudonimul dumneavoastră."
 
+#: ../modules/memoserv/ms_check.cpp
+msgid "Check if last memo to a nick was read"
+msgstr "Verificați dacă ultima misivă către un pseudonim a fost citită"
+
 #: ../modules/chanserv/cs_seen.cpp
 msgid "Checks for the last time nick was seen joining, leaving, or changing nick on the network and tells you when and, depending on channel or user settings, where it was."
 msgstr "Verifică ultima dată când pseudonimul a fost văzut alăturându-se, îndepărtându-se, sau schimbându-și pseudonimul în rețea, și vă informează când și unde se afla, în funcție de setările canalului ori ale utilizatorului."
-
-#: ../modules/memoserv/ms_check.cpp
-msgid "Checks if last memo to a nick was read"
-msgstr "Verifică dacă ultima misivă către un pseudonim a fost citită"
 
 #: ../modules/memoserv/ms_check.cpp
 msgid "Checks whether the _last_ memo you sent to nick has been read or not. Note that this only works with nicks, not with channels."
@@ -3121,24 +3127,72 @@ msgid "Command"
 msgstr "Comandă"
 
 #: ../modules/botserv/bs_kick.cpp
-msgid "Configures AMSG kicker"
-msgstr "Configurează izgonirea la AMSG"
+msgid "Configure AMSG kicker"
+msgstr "Configurați izgonirea la AMSG"
 
 #: ../modules/botserv/bs_kick.cpp
-msgid "Configures badwords kicker"
-msgstr "Configurează izgonirea la cuvinte nepotrivite"
+msgid "Configure badwords kicker"
+msgstr "Configurați izgonirea la cuvinte nepotrivite"
 
 #: ../modules/botserv/bs_kick.cpp
-msgid "Configures bolds kicker"
-msgstr "Configurează izgonirea la îngroșări"
+msgid "Configure bolds kicker"
+msgstr "Configurați izgonirea la îngroșări"
+
+#: ../modules/botserv/bs_set.cpp
+msgid "Configure bot options"
+msgstr "Configurați opțiunile botului"
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure caps kicker"
+msgstr "Configurați izgonirea la majuscule"
+
+#: ../modules/chanserv/cs_log.cpp
+msgid "Configure channel logging settings"
+msgstr "Configurați setările de logare canal"
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure color kicker"
+msgstr "Configurați izgonirea la culori"
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure flood kicker"
+msgstr "Configurați izgonirea la inundări"
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure italics kicker"
+msgstr "Configurați izgonirea la înclinări"
+
+#: ../modules/nickserv/ns_set_keepmodes.cpp
+msgid "Configure keeping user modes set across connections"
+msgstr "Configurați păstrarea modurilor de utilizator între conexiuni"
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure kickers"
+msgstr "Configurați izgoniri"
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure repeat kicker"
+msgstr "Configurați izgonirea la repetări"
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure reverses kicker"
+msgstr "Configurați izgonirea la inversări"
+
+#: ../modules/nickserv/ns_set_layout.cpp
+msgid "Configure the layout used for services messages"
+msgstr "Configurați aspectul utilizat pentru mesajele de la servicii"
+
+#: ../modules/botserv/bs_set.cpp
+msgid "Configure the time bot bans expire in"
+msgstr "Configurați timpul în care expiră blocările boților"
+
+#: ../modules/botserv/bs_kick.cpp
+msgid "Configure underlines kicker"
+msgstr "Configurați izgonirea la sublinieri"
 
 #: ../modules/botserv/bs_kick.cpp
 msgid "Configures bot kickers.  option can be one of:"
 msgstr "Configurează izgonirile botului.  opțiunea poate fi una din următoarele:"
-
-#: ../modules/botserv/bs_set.cpp
-msgid "Configures bot options"
-msgstr "Configurează opțiunile botului"
 
 #: ../modules/botserv/bs_set.cpp
 msgid ""
@@ -3150,37 +3204,9 @@ msgstr ""
 "\n"
 "Opțiunile disponibile sunt după cum urmează:"
 
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures caps kicker"
-msgstr "Configurează izgonirea la majuscule"
-
-#: ../modules/chanserv/cs_log.cpp
-msgid "Configures channel logging settings"
-msgstr "Configurează setările de logare canal"
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures color kicker"
-msgstr "Configurează izgonirea la culori"
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures flood kicker"
-msgstr "Configurează izgonirea la inundări"
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures italics kicker"
-msgstr "Configurează izgonirea la înclinări"
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures kickers"
-msgstr "Configurează izgoniri"
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures repeat kicker"
-msgstr "Configurează izgonirea la repetări"
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures reverses kicker"
-msgstr "Configurează izgonirea la inversări"
+#: ../modules/nickserv/ns_set_keepmodes.cpp
+msgid "Configures keeping user modes set across connections. If this is enabled, your last user modes will be remembered and will be re-set the next time you identify."
+msgstr "Configurează păstrarea modurilor de utilizator între conexiuni. Dacă este activată, atunci ultimele moduri de utilizator ale dumneavoastră vor fi reținute și reaplicate data viitoare cănd vă identificați."
 
 #: ../modules/nickserv/ns_set_layout.cpp
 msgid ""
@@ -3201,10 +3227,6 @@ msgstr ""
 "Când aspectul este setat la MONOSPACE, serviciile vor formata mesajele la fel ca FIXED, dar vor prefixa toate mesajele cu un caracter de formatare monospațiu pentru a le forța să se afișeze corect. Acest aspect necesită asistență din partea programelor de client pentru formatarea textului monospațial."
 
 #: ../modules/nickserv/ns_set_layout.cpp
-msgid "Configures the layout used for services messages"
-msgstr "Configurează aspectul utilizat pentru mesajele de la servicii"
-
-#: ../modules/nickserv/ns_set_layout.cpp
 msgid ""
 "Configures the layout used for services messages.\n"
 "\n"
@@ -3221,14 +3243,6 @@ msgstr ""
 "Când aspectul este setat la FLEXIBLE, serviciile vor utiliza un format alternativ pentru mesaje și vor evita orice poziționare care ar putea fi întreruptă de un font cu lățime variabilă.\n"
 "\n"
 "Când aspectul este setat la MONOSPACE, serviciile vor formata mesajele la fel ca FIXED, dar vor prefixa toate mesajele cu un caracter de formatare monospațiu pentru a le forța să se afișeze corect. Acest aspect necesită asistență din partea programelor de client pentru formatarea textului monospațial."
-
-#: ../modules/botserv/bs_set.cpp
-msgid "Configures the time bot bans expire in"
-msgstr "Configurează timpul în care expiră blocările boților"
-
-#: ../modules/botserv/bs_kick.cpp
-msgid "Configures underlines kicker"
-msgstr "Configurează izgonirea la sublinieri"
 
 #: ../modules/nickserv/ns_register.cpp
 msgid "Confirm a previous account registration"
@@ -3429,12 +3443,12 @@ msgid "Date/Time"
 msgstr "Dată/Timp"
 
 #: ../modules/hostserv/hs_off.cpp
-msgid "Deactivates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see your real host/IP address."
-msgstr "Dezactivează gazda virtuală atribuită acum pseudonimului în uz. Când utilizați această comandă, orice utilizator care efectuează o verificare /whois asupra dumneavoastră va vedea gazda ori adresa IP reală."
+msgid "Deactivate your assigned vhost"
+msgstr "Dezactivați gazda virtuală atribuită dumneavoastră"
 
 #: ../modules/hostserv/hs_off.cpp
-msgid "Deactivates your assigned vhost"
-msgstr "Dezactivează gazda virtuală atribuită dumneavoastră"
+msgid "Deactivates the vhost currently assigned to the nick in use. When you use this command any user who performs a /whois on you will see your real host/IP address."
+msgstr "Dezactivează gazda virtuală atribuită acum pseudonimului în uz. Când utilizați această comandă, orice utilizator care efectuează o verificare /whois asupra dumneavoastră va vedea gazda ori adresa IP reală."
 
 #: ../modules/chanserv/cs_access.cpp
 msgid "Default"
@@ -3465,6 +3479,10 @@ msgstr "Definește mesajele care vor fi afișate utilizatorilor la Operare"
 #: ../modules/memoserv/ms_del.cpp
 msgid "Delete a memo or memos"
 msgstr "Șterge o misivă sau mai multe"
+
+#: ../modules/hostserv/hs_del.cpp
+msgid "Delete the vhost for all nicks in an account"
+msgstr "Ștergeți gazda virtuală pentru toate pseudonimele dintr-un cont"
 
 #: ../modules/hostserv/hs_del.cpp
 msgid "Delete the vhost of another user"
@@ -3607,10 +3625,6 @@ msgid "Deletes the vhost assigned to the given nick from the database."
 msgstr "Șterge gazda virtuală atribuită pseudonimului precizat din baza de date."
 
 #: ../modules/hostserv/hs_del.cpp
-msgid "Deletes the vhost for all nicks in an account"
-msgstr "Șterge gazda virtuală pentru toate pseudonimele dintr-un cont"
-
-#: ../modules/hostserv/hs_del.cpp
 msgid "Deletes the vhost for all nicks in the same account as that of the given nick."
 msgstr "Șterge gazda virtuală pentru toate pseudonimele din același cont cu cel al pseudonimului precizat."
 
@@ -3658,6 +3672,46 @@ msgstr ""
 "\n"
 "În anumite rețele, este posibil să fie necesar un motiv."
 
+#: ../modules/nickserv/ns_info.cpp
+msgid "Display information about a given nickname"
+msgstr "Afișați informații despre un pseudonim specificat"
+
+#: ../modules/memoserv/ms_info.cpp
+msgid "Display information about your memos"
+msgstr "Afișați informații despre misivele dumneavoastră"
+
+#: ../modules/hostserv/hs_list.cpp
+msgid "Display one or more vhost entries"
+msgstr "Afișați una sau mai multe intrări de gazde virtuale"
+
+#: ../modules/chanserv/cs_fantasy_top.cpp
+msgid "Display the top 10 users of a channel"
+msgstr "Afișați top 10 utilizatori ai unui canal"
+
+#: ../modules/chanserv/cs_fantasy_top.cpp
+msgid "Display the top 10 users of the network"
+msgstr "Afișați top 10 utilizatori ai rețelei"
+
+#: ../modules/chanserv/cs_fantasy_top.cpp
+msgid "Display the top 3 users of a channel"
+msgstr "Afișați top 3 utilizatori ai unui canal"
+
+#: ../modules/chanserv/cs_fantasy_top.cpp
+msgid "Display the top 3 users of the network"
+msgstr "Afișați top 3 utilizatori ai rețelei"
+
+#: ../modules/help.cpp
+msgid "Display this list and give information about commands"
+msgstr "Afișați această listă și oferă informații despre commenzi"
+
+#: ../modules/chanserv/cs_fantasy_stats.cpp
+msgid "Display your Channel Stats"
+msgstr "Afișați statisticile canalului dumneavoastră"
+
+#: ../modules/chanserv/cs_fantasy_stats.cpp
+msgid "Display your Global Stats"
+msgstr "Afișați statisticile globale ale dumneavoastră"
+
 #: ../modules/hostserv/hs_request.cpp
 #, c-format
 msgid "Displayed %d records (%d total)."
@@ -3687,24 +3741,12 @@ msgid "Displays any new memos."
 msgstr "Afișează noile misive."
 
 #: ../modules/nickserv/ns_info.cpp
-msgid "Displays information about a given nickname"
-msgstr "Afișează informații despre un pseudonim specificat"
-
-#: ../modules/nickserv/ns_info.cpp
 msgid "Displays information about the given nickname, such as the nick's owner, last seen address and time, and nick options. If no nick is given, and you are identified, your account name is used, else your current nickname is used."
 msgstr "Afișează informații despre pseudonimul specificat, cum ar fi proprietarul pseudonimului, adresa și ora ultime accesări, cât și opțiunile pentru pseudonimul respectiv. Dacă nu este menționat niciun pseudonim și sunteți identificat(ă), numele contului dumneavoastră este folosit, altfel este folosit pseudonimul curent."
-
-#: ../modules/memoserv/ms_info.cpp
-msgid "Displays information about your memos"
-msgstr "Afișează informații despre misivele dumneavoastră"
 
 #: ../modules/memoserv/ms_read.cpp
 msgid "Displays memos numbered 2 through 5 and 7 through 9."
 msgstr "Afișează misivele numerotate de la 2 la 7 și de la 7 la 9."
-
-#: ../modules/hostserv/hs_list.cpp
-msgid "Displays one or more vhost entries"
-msgstr "Afișează una sau mai multe intrări de gazde virtuale"
 
 #: ../modules/nickserv/ns_cert.cpp
 msgid "Displays the current certificate list of nickname as well as the details about who added each entry and when they added it."
@@ -3713,34 +3755,6 @@ msgstr "Afișează lista curentă de certificate a pseudonimului precum și de
 #: ../modules/nickserv/ns_cert.cpp
 msgid "Displays the current certificate list of nickname."
 msgstr "Afișează lista curentă de certificate a pseudonimului."
-
-#: ../modules/chanserv/cs_fantasy_top.cpp
-msgid "Displays the top 10 users of a channel"
-msgstr "Afișează top 10 utilizatori ai unui canal"
-
-#: ../modules/chanserv/cs_fantasy_top.cpp
-msgid "Displays the top 10 users of the network"
-msgstr "Afișează top 10 utilizatori ai rețelei"
-
-#: ../modules/chanserv/cs_fantasy_top.cpp
-msgid "Displays the top 3 users of a channel"
-msgstr "Afișează top 3 utilizatori ai unui canal"
-
-#: ../modules/chanserv/cs_fantasy_top.cpp
-msgid "Displays the top 3 users of the network"
-msgstr "Afișează top 3 utilizatori ai rețelei"
-
-#: ../modules/help.cpp
-msgid "Displays this list and give information about commands"
-msgstr "Afișează această listă și oferă informații despre commenzi"
-
-#: ../modules/chanserv/cs_fantasy_stats.cpp
-msgid "Displays your Channel Stats"
-msgstr "Afișează statisticile canalului dumneavoastră"
-
-#: ../modules/chanserv/cs_fantasy_stats.cpp
-msgid "Displays your Global Stats"
-msgstr "Afișează statisticile globale ale dumneavoastră"
 
 #: ../modules/nickserv/ns_cert.cpp
 msgid "Displays your current certificate list as well the details about who added each entry and when they added it."
@@ -3833,10 +3847,6 @@ msgstr "Activează comenzile fanteziste"
 msgid "Enable greet messages"
 msgstr "Activează mesajele de întâmpinare"
 
-#: ../modules/nickserv/ns_set_keepmodes.cpp
-msgid "Enable or disable keep modes"
-msgstr "Activează sau dezactivează păstrarea modurilor"
-
 #: ../modules/botserv/bs_info.cpp ../modules/botserv/bs_kick.cpp
 msgid "Enabled"
 msgstr "Activat"
@@ -3874,12 +3884,8 @@ msgid "Enables or disables keepmodes for the given channel. If keep modes is ena
 msgstr "Activează sau dezactivează păstrarea modurilor pentru canalul precizat. Dacă este activată opțiunea de păstrare a modurilor, serviciile vor reține modurile setate în canal și vor încerca să le reașeze data viitoare când canalul este creat."
 
 #: ../modules/nickserv/ns_set_keepmodes.cpp
-msgid "Enables or disables keepmodes for the given nick. If keep modes is enabled, services will remember users' usermodes and attempt to re-set them the next time they authenticate."
-msgstr "Activează sau dezactivează păstrarea modurilor pentru pseudonimul precizat. Dacă este activată opțiunea de păstrare a modurilor, serviciile vor reține modurile de utilizator ale utilizatorilor și vor încerca să le reașeze data viitoare când se identifică."
-
-#: ../modules/nickserv/ns_set_keepmodes.cpp
-msgid "Enables or disables keepmodes for your nick. If keep modes is enabled, services will remember your usermodes and attempt to re-set them the next time you authenticate."
-msgstr "Activează sau dezactivează păstrarea modurilor pentru pseudonimul dumneavoastră. Dacă este activată opțiunea de păstrare a modurilor, serviciile vor reține modurile de utilizator și vor încerca să le reașeze data viitoare când vă identificați."
+msgid "Enables or disables keepmodes for the given nick. If keep modes is enabled, services will remember users' user modes and attempt to re-set them the next time they authenticate."
+msgstr "Activează sau dezactivează păstrarea modurilor pentru pseudonimul precizat. Dacă este activată opțiunea de păstrare a modurilor, serviciile vor reține modurile de utilizator ale utilizatorilor și vor încerca să le reașeze data viitoare când se autentifică."
 
 #: ../modules/chanserv/cs_set.cpp
 msgid ""
@@ -4138,6 +4144,10 @@ msgid "Fixed layout"
 msgstr "Aspect fix"
 
 #: ../modules/chanserv/cs_flags.cpp
+msgid "Flag"
+msgstr "Steguleț"
+
+#: ../modules/chanserv/cs_flags.cpp
 msgid "Flags"
 msgstr "Stegulețe"
 
@@ -4263,10 +4273,6 @@ msgstr "Modul de întâmpinare este acum dezactivat în canalul %s."
 #, c-format
 msgid "Greet mode is now on on channel %s."
 msgstr "Modul de întâmpinare este acum activat în canalul %s."
-
-#: ../modules/nickserv/ns_resetpass.cpp
-msgid "Helps you reset lost passwords"
-msgstr "Vă ajută să resetați parola pierdută"
 
 #: ../modules/nickserv/ns_info.cpp
 msgid "Hide certain pieces of nickname information"
@@ -4400,8 +4406,8 @@ msgid "Invalid value for LIMIT. Must be numerical."
 msgstr "Valoarea pentru LIMIT este invalidă. Aceasta să fie o valoare numerică."
 
 #: ../modules/chanserv/cs_invite.cpp
-msgid "Invites you or an optionally specified nick into a channel"
-msgstr "Vă invită într-un canal pe dumneavoastră, sau pe un pseudonim specificat opțional"
+msgid "Invite you or an optionally specified nick into a channel"
+msgstr "Vă invitați într-un canal pe dumneavoastră, sau pe un pseudonim specificat opțional"
 
 #: ../modules/botserv/bs_kick.cpp
 msgid "Italics kicker"
@@ -4430,6 +4436,10 @@ msgstr "Cheie"
 msgid "Key for channel %s is %s."
 msgstr "Cheia pentru canalul %s este %s."
 
+#: ../modules/chanserv/cs_kick.cpp
+msgid "Kick a specified nick from a channel"
+msgstr "Izgoniți un pseudonim specificat dintr-un canal"
+
 #: ../modules/operserv/os_kick.cpp
 msgid "Kick a user from a channel"
 msgstr "Izgonește un utilizator dintr-un canal"
@@ -4440,18 +4450,8 @@ msgid "Kicked %d/%d users matching %s from %s."
 msgstr "Au fost izgoniți %d/%d utilizatori care corespund %s din %s."
 
 #: ../modules/chanserv/cs_kick.cpp
-msgid "Kicks a specified nick from a channel"
-msgstr "Izgonește un pseudonim specificat dintr-un canal"
-
-#: ../modules/chanserv/cs_kick.cpp
-msgid ""
-"Kicks a specified nick from a channel.\n"
-"\n"
-"By default, limited to AOPs or those with level 5 access and above on the channel. Channel founders can also specify masks."
-msgstr ""
-"Izgonește un utilizator specificat dintr-un canal.\n"
-"\n"
-"În mod implicit, se limitează la AOP-uri ori la cei cu acces de nivel 5 sau superior în canal. Fondatorii canalului pot specifica și măști."
+msgid "Kicks a specified nick from a channel. Channel founders can also specify masks."
+msgstr "Izgonește un utilizator specificat dintr-un canal. Fondatorii de canal pot de asemenea să specifice măști."
 
 #: ../modules/operserv/os_kill.cpp
 msgid "Kill a user"
@@ -4564,18 +4564,42 @@ msgstr "Nivelul trebuie să fie între %d și %d inclusiv."
 msgid "Limit"
 msgstr "Limită"
 
+#: ../modules/operserv/os_list.cpp
+msgid "List all channel records"
+msgstr "Listați toate înregistrările de canale"
+
+#: ../modules/nickserv/ns_group.cpp
+msgid "List all nicknames in your account"
+msgstr "Listați toate pseudonimele din contul dumneavoastră"
+
+#: ../modules/chanserv/cs_list.cpp
+msgid "List all registered channels matching the given pattern"
+msgstr "Listați toate canalele înregistrate care corespund modelului specificat"
+
 #: ../modules/nickserv/ns_list.cpp
 msgid "List all registered nicknames that match a given pattern"
-msgstr "Listează toate pseudonimele înregistrate care corespund unui anumit model"
+msgstr "Listați toate pseudonimele înregistrate care corespund unui anumit model"
+
+#: ../modules/operserv/os_list.cpp
+msgid "List all user records"
+msgstr "Listați toate înregistrările utilizatorilor"
+
+#: ../modules/botserv/bs_botlist.cpp
+msgid "List available bots"
+msgstr "Listați boții disponibili"
 
 #: ../modules/nickserv/ns_alist.cpp
 msgid "List channels you have access on"
-msgstr "Listează canalele la care aveți acces"
+msgstr "Listați canalele la care aveți acces"
 
 #: ../modules/chanserv/cs_mode.cpp
 #, c-format
 msgid "List for modes %s is full."
 msgstr "Lista pentru moduri %s este plină."
+
+#: ../modules/chanserv/cs_info.cpp
+msgid "List information about the specified registered channel"
+msgstr "Listați informații despre canalul înregistrat specificat"
 
 #: ../modules/operserv/os_modinfo.cpp
 msgid "List loaded modules"
@@ -4675,10 +4699,6 @@ msgid "Lists all bad word entries set on #channel."
 msgstr "Listează intrările de cuvinte nepotrivite setate în #channel."
 
 #: ../modules/operserv/os_list.cpp
-msgid "Lists all channel records"
-msgstr "Listează toate canalele"
-
-#: ../modules/operserv/os_list.cpp
 msgid ""
 "Lists all channels currently in use on the IRC network, whether they are registered or not.\n"
 "\n"
@@ -4699,16 +4719,8 @@ msgstr ""
 "Canalele care au setată opțiunea NOEXPIRE vor fi precedate de un semn de exclamare. Parametrul de pseudonim este limitat la Operatorii de Servicii."
 
 #: ../modules/nickserv/ns_group.cpp
-msgid "Lists all nicknames in your account"
-msgstr "Listează toate pseudonimele din contul dumneavoastră"
-
-#: ../modules/nickserv/ns_group.cpp
 msgid "Lists all nicknames that belong to your account."
 msgstr "Listează toate pseudonimele care aparțin contului dumneavoastră."
-
-#: ../modules/chanserv/cs_list.cpp
-msgid "Lists all registered channels matching the given pattern"
-msgstr "Listează toate canalele înregistrate care corespund modelului specificat"
 
 #: ../modules/chanserv/cs_list.cpp
 msgid ""
@@ -4779,10 +4791,6 @@ msgid "Lists all registered nicks within the given range (51-100)."
 msgstr "Listează toate pseudonimele în intervalul menționat (51-100)."
 
 #: ../modules/operserv/os_list.cpp
-msgid "Lists all user records"
-msgstr "Listează toate înregistrările utilizatorilor"
-
-#: ../modules/operserv/os_list.cpp
 msgid ""
 "Lists all users currently online on the IRC network, whether their nick is registered or not.\n"
 "\n"
@@ -4800,10 +4808,6 @@ msgstr "Listează toate misivele pe care le aveți în prezent. Cu NEW, listea
 msgid "Lists any new memos."
 msgstr "Listează misivele noi."
 
-#: ../modules/botserv/bs_botlist.cpp
-msgid "Lists available bots"
-msgstr "Listează boții disponibili"
-
 #: ../modules/botserv/bs_badwords.cpp
 msgid "Lists bad word entries set on #channel numbered 2 through 5 and 7 through 9."
 msgstr "Listează intrările de cuvinte nepotrivite setate în #channel numerotate de la 2 la 5 și de la 7 la 9."
@@ -4815,10 +4819,6 @@ msgstr "Listează intrările de cuvinte nepotrivite setate în #channel care c
 #: ../modules/operserv/os_modinfo.cpp
 msgid "Lists currently loaded modules."
 msgstr "Listează modulele încărcate în prezent."
-
-#: ../modules/chanserv/cs_info.cpp
-msgid "Lists information about the specified registered channel"
-msgstr "Listează informații despre canalul înregistrat specificat"
 
 #: ../modules/chanserv/cs_info.cpp
 msgid "Lists information about the specified registered channel, including its founder, time of registration, last time used, and description. If the user issuing the command has the appropriate access for it, then the successor, last topic set, settings and expiration time will also be displayed when applicable."
@@ -4909,13 +4909,17 @@ msgstr ""
 "\n"
 "Comanda %sCLEAR este o modalitate ușoară de a goli modurile dintr-un canal. ce poate fi orice nume de mod. Exemplele includ blocări, excepții, suprascrieri de invitații, operatori, semi-operatori și membri voce. Dacă ce nu este menționat, atunci toate modurile de bază sunt înlăturate."
 
+#: ../modules/botserv/bs_bot.cpp
+msgid "Maintain network bot list"
+msgstr "Întrețineți lista de boți de rețea"
+
 #: ../modules/chanserv/cs_akick.cpp
 msgid "Maintain the AutoKick list"
-msgstr "Întreține lista de izgoniri automate"
+msgstr "Întrețineți lista de izgoniri automate"
 
-#: ../modules/botserv/bs_bot.cpp
-msgid "Maintains network bot list"
-msgstr "Întreține lista de boți de rețea"
+#: ../modules/botserv/bs_badwords.cpp
+msgid "Maintain the bad words list"
+msgstr "Întrețineți lista de cuvinte nepotrivite"
 
 #: ../modules/chanserv/cs_xop.cpp
 #, c-format
@@ -4987,21 +4991,17 @@ msgstr ""
 "\n"
 "Comanda CLEAR golește toate intrările din lista de cuvinte nepotrivite."
 
-#: ../modules/botserv/bs_badwords.cpp
-msgid "Maintains the bad words list"
-msgstr "Întreține lista de cuvinte nepotrivite"
+#: ../modules/botserv/bs_control.cpp
+msgid "Make the bot do the equivalent of a \"/me\" command"
+msgstr "Faceți ca botul să execute echivalentul unei comenzi \"/me\""
 
 #: ../modules/botserv/bs_control.cpp
-msgid "Makes the bot do the equivalent of a \"/me\" command"
-msgstr "Face ca botul să execute echivalentul unei comenzi \"/me\""
+msgid "Make the bot say the specified text on the specified channel"
+msgstr "Faceți ca botul să scrie textul specificat în canalul specificat"
 
 #: ../modules/botserv/bs_control.cpp
 msgid "Makes the bot do the equivalent of a \"/me\" command on the specified channel using the specified text."
 msgstr "Face ca botul să execute echivalentul unei comenzi \"/me\" în canalul specificat folosind textul specificat."
-
-#: ../modules/botserv/bs_control.cpp
-msgid "Makes the bot say the specified text on the specified channel"
-msgstr "Face ca botul să scrie textul specificat în canalul specificat"
 
 #: ../modules/botserv/bs_control.cpp
 msgid "Makes the bot say the specified text on the specified channel."
@@ -5024,8 +5024,8 @@ msgid "Manage your auto join list"
 msgstr "Gestionează lista de alăturări automate"
 
 #: ../modules/global/gl_queue.cpp
-msgid "Manages your pending message queue."
-msgstr "Gestionează coada de mesaje în așteptare."
+msgid "Manage your pending message queue."
+msgstr "Gestionați coada de mesaje în așteptare."
 
 #: ../modules/operserv/os_sxline.cpp
 #, c-format
@@ -5068,8 +5068,8 @@ msgid "Masks and unregistered users may not be on access lists."
 msgstr "Este posibil ca măștile și utilizatorii neînregistrați să nu fie în listele de acces."
 
 #: ../modules/nickserv/ns_email.cpp
-msgid "Matches and returns all users that registered using given email address"
-msgstr "Corespunde și returnează toți utilizatorii care s-au înregistrat folosind adresa de email precizată"
+msgid "Match and return all users that registered using given email address"
+msgstr "Corespundeți și returnați toți utilizatorii care s-au înregistrat folosind adresa de email precizată"
 
 #: ../modules/operserv/os_logsearch.cpp
 #, c-format
@@ -5729,10 +5729,6 @@ msgstr "Parametru"
 msgid "Password accepted - you are now recognized."
 msgstr "Parolă acceptată - acum ești recunoscut(ă)."
 
-#: ../modules/operserv/os_login.cpp
-msgid "Password accepted."
-msgstr "Parolă acceptată."
-
 #: ../modules/nickserv/ns_set.cpp
 #, c-format
 msgid "Password for %s changed."
@@ -6000,8 +5996,8 @@ msgid "Redefine the meanings of access levels"
 msgstr "Redefinește semnificațiile nivelurilor de acces"
 
 #: ../modules/nickserv/ns_recover.cpp
-msgid "Regains control of your nick"
-msgstr "Recapătă controlul asupra pseudonimului dumneavoastră"
+msgid "Regain control of your nick"
+msgstr "Reobțineți controlul asupra pseudonimului dumneavoastră"
 
 #: ../modules/operserv/os_akill.cpp ../modules/operserv/os_sxline.cpp
 msgid "Regex is disabled."
@@ -6094,8 +6090,8 @@ msgid "Reject the requested vhost of a user"
 msgstr "Respinge gazda virtuală solicitată de un utilizator"
 
 #: ../modules/chanserv/cs_suspend.cpp
-msgid "Releases a suspended channel"
-msgstr "Eliberează un canal suspendat"
+msgid "Release a suspended channel"
+msgstr "Eliberați un canal suspendat"
 
 #: ../modules/chanserv/cs_suspend.cpp
 msgid "Releases a suspended channel. All data and settings are preserved from before the suspension."
@@ -6112,6 +6108,10 @@ msgstr "Reîncarcă fișierul de configurare al serviciilor"
 #: ../modules/nickserv/ns_group.cpp
 msgid "Remove a nick from an account"
 msgstr "Înlătură un pseudonim dintr-un cont"
+
+#: ../modules/chanserv/cs_updown.cpp
+msgid "Remove a selected nicks status from a channel"
+msgstr "Înlăturați starea unui pseudonim selectat într-un canal"
 
 #: ../modules/chanserv/cs_unban.cpp
 msgid "Remove all bans preventing a user from entering a channel"
@@ -6145,10 +6145,6 @@ msgstr "Înlătură starea %s de la pseudonimul selectat într-un canal. Dacă 
 #, c-format
 msgid "Removes %s status from you or the specified nick on a channel"
 msgstr "Înlătură starea %s de la dumneavoastră sau de la pseudonimul specificat într-un canal"
-
-#: ../modules/chanserv/cs_updown.cpp
-msgid "Removes a selected nicks status from a channel"
-msgstr "Înlătură starea unui pseudonim selectat într-un canal"
 
 #: ../modules/chanserv/cs_updown.cpp
 msgid "Removes a selected nicks status modes on a channel. If nick is omitted then your status is removed. If channel is omitted then your channel status is removed on every channel you are in."
@@ -6231,12 +6227,12 @@ msgid "Retain topic when channel is not in use"
 msgstr "Păstrează subiectul atunci când canalul nu este utilizat"
 
 #: ../modules/hostserv/hs_request.cpp
-msgid "Retrieves the vhost requests"
-msgstr "Preia solicitările de gazdă virtuală"
+msgid "Retrieve the vhost requests"
+msgstr "Preluați solicitările de gazdă virtuală"
 
 #: ../modules/chanserv/cs_getkey.cpp
-msgid "Returns the key of the given channel"
-msgstr "Returnează cheia canalului precizat"
+msgid "Return the key of the given channel"
+msgstr "Returnați cheia canalului precizat"
 
 #: ../modules/chanserv/cs_getkey.cpp
 msgid "Returns the key of the given channel."
@@ -6246,6 +6242,10 @@ msgstr "Returnează cheia canalului precizat."
 msgid "Returns the matching accounts that used given email."
 msgstr "Returnează conturile corespunzătoare care au folosit adresa de email precizată."
 
+#: ../modules/nickserv/ns_logout.cpp
+msgid "Reverse the effect of the IDENTIFY command"
+msgstr "Inversați efectul comenzii IDENTIFY"
+
 #: ../modules/botserv/bs_kick.cpp
 msgid "Reverses kicker"
 msgstr "Izgonire la inversări"
@@ -6253,10 +6253,6 @@ msgstr "Izgonire la inversări"
 #: ../modules/nickserv/ns_logout.cpp
 msgid "Reverses the effect of the IDENTIFY command, i.e. make you not recognized as the real owner of the nick anymore. Note, however, that you won't be asked to reidentify yourself."
 msgstr "Inversează efectul comenzii IDENTIFY, adică vă face să nu mai fiți recunoscut(ă) ca proprietarul real al pseudonimului. Rețineți, totuși, că nu vi se va cere să vă reidentificați."
-
-#: ../modules/nickserv/ns_logout.cpp
-msgid "Reverses the effect of the IDENTIFY command"
-msgstr "Inversează efectul comenzii IDENTIFY"
 
 #: ../modules/operserv/os_noop.cpp
 msgid "SET server"
@@ -6287,11 +6283,11 @@ msgstr "SSLONLY impus de %s"
 
 #: ../modules/operserv/os_shutdown.cpp
 msgid "Save databases and restart services"
-msgstr "Salvează bazele de date și reporniți serviciile"
+msgstr "Salvați bazele de date și reporniți serviciile"
 
 #: ../modules/operserv/os_logsearch.cpp
-msgid "Searches logs for a matching pattern"
-msgstr "Caută în jurnale un model corespunzător"
+msgid "Search logs for a matching pattern"
+msgstr "Căutați în jurnale un model corespunzător"
 
 #: ../modules/operserv/os_logsearch.cpp
 msgid "Searches the last 21 days worth of logs for messages containing Anope and lists the most recent 500 of them."
@@ -6345,6 +6341,10 @@ msgstr "Vedeți %s pentru mai multe informații despre sistemul de stegulețe."
 msgid "See the %s command (%sACCESS) for information on giving a subset of these privileges to other channel users."
 msgstr "Consultați comanda %s (%sACCESS) pentru informații despre acordarea unui subset al acestor privilegii altor utilizatori ai canalului."
 
+#: ../modules/memoserv/ms_rsend.cpp
+msgid "Send a memo and requests a read receipt"
+msgstr "Expediază o misivă și se solicită o confirmare de citire"
+
 #: ../modules/memoserv/ms_send.cpp
 msgid "Send a memo to a nick or channel"
 msgstr "Expediază o misivă către un pseudonim sau canal"
@@ -6365,6 +6365,10 @@ msgstr "Expediază un mesaj tuturor utilizatorilor"
 msgid "Send a message to all users on a server"
 msgstr "Expediază un mesaj tuturor utilizatorilor dintr-un server"
 
+#: ../modules/nickserv/ns_resetpass.cpp
+msgid "Send an email to recover access to an account"
+msgstr "Trimiteți un mesaj email pentru recuperarea accesului la un cont"
+
 #: ../modules/memoserv/ms_list.cpp
 msgid "Sender"
 msgstr "Expeditor"
@@ -6372,10 +6376,6 @@ msgstr "Expeditor"
 #: ../modules/nickserv/ns_resetpass.cpp
 msgid "Sends a confirmation code to the nickname's email address with instructions on how to reset their password. email must be the email address associated with the account."
 msgstr "Trimite un cod de confirmare la adresa de email a pseudonimului cu instrucțiuni despre cum să reseteze parola. Adresa de email trebuie să fie adresa de email atribuită contului."
-
-#: ../modules/memoserv/ms_rsend.cpp
-msgid "Sends a memo and requests a read receipt"
-msgstr "Expediază o misivă și solicită o confirmare de citire"
 
 #: ../modules/chanserv/cs_log.cpp
 msgid "Sends a memo to the channel when someone uses the chanserv/xop command on #anope."
@@ -6683,20 +6683,28 @@ msgid "Set the timezone services will use when messaging you"
 msgstr "Setează fusul orar pe care îl vor folosi serviciile când vă vor trimite mesaje"
 
 #: ../modules/hostserv/hs_set.cpp
-msgid "Set the vhost for all nicks in an account"
-msgstr "Setează gazda virtuală pentru toate pseudonimele dintr-un cont"
-
-#: ../modules/hostserv/hs_set.cpp
-msgid "Set the vhost of another user"
-msgstr "Setează gazda virtuală a unui alt utilizator"
+msgid "Set the vhost of a nick"
+msgstr "Setați gazda virtuală a unui alt utilizator"
 
 #: ../modules/operserv/os_set.cpp
 msgid "Set various global services options"
 msgstr "Setează diverse opțiuni de servicii globale"
 
+#: ../modules/nickserv/ns_set_op.cpp
+msgid "Set whether services should set channel status modes on you automatically."
+msgstr "Setați dacă serviciile ar trebui să seteze automat modurile de stare în canal pentru dumneavoastră."
+
+#: ../modules/nickserv/ns_set_op.cpp
+msgid "Set whether you can be added to a channel access list."
+msgstr "Setați dacă puteți fi adăugat(ă) la o listă de accese a vreunui canal."
+
+#: ../modules/nickserv/ns_cert.cpp
+msgid "Set whether you should automatically be logged in when you connect using a known SSL certificate."
+msgstr "Setați dacă ar trebui să fiți autentificat(ă) automat atunci când vă conectați utilizând un certificat SSL cunoscut."
+
 #: ../modules/nickserv/ns_set.cpp
 msgid "Set your nickname password"
-msgstr "Setează parola pseudonimului dumneavoastră"
+msgstr "Setați parola pseudonimului dumneavoastră"
 
 #: ../modules/botserv/bs_set.cpp
 msgid "Sets bot bans on #wibble to expire after 15 minutes."
@@ -6847,17 +6855,12 @@ msgstr ""
 
 #: ../modules/hostserv/hs_set.cpp
 msgid ""
-"Sets the vhost for all nicks in the same account as that of the given nick. If your IRCD supports vidents, then using SETALL <nick> <ident>@<hostmask> will set idents for users as well as vhosts.\n"
+"Sets the vhost for the given nick to the given host. If your IRCd supports vidents then you can also specify a user@host mask.\n"
 "\n"
-"* NOTE, this will not update the vhost for any nicks added to the account after this command was used."
-msgstr ""
-"Setează gazda virtuală să fe pentru toate pseudonimele din același cont, la fel ca cea a pseudonimului precizat. Dacă serverul dumneavoastră de IRCd acceptă schimbarea identității virtuale, atunci utilizarea comenzii SETALL <pseudonim> <ident>@<hostmask> va schimba și identitatea, împreună cu gazda virtuală.\n"
+"If SYNC is specified then the vhost will be synchronised to all nicks currently grouped to the account."
+msgstr "Setează gazda virtuală pentru pseudonimul precizat. Dacă serverul dumneavoastră de IRCd acceptă schimbarea identității virtuale atunci puteți specifica o mască user@host.\n"
 "\n"
-"* Rețineți totuși că această comandă nu va actualiza gazda virtuală pentru pseudonimele adăugate contului după utilizarea acestei comenzi."
-
-#: ../modules/hostserv/hs_set.cpp
-msgid "Sets the vhost for the given nick to that of the given hostmask. If your IRCD supports vidents, then using SET <nick> <ident>@<hostmask> set idents for users as well as vhosts."
-msgstr "Setează gazda virtuală pentru pseudonimul precizat, la masca de gazdă aleasă. Dacă serverul dumneavoastră de IRCd acceptă schimbarea identității virtuale, atunci utilizarea comenzii SET <pseudonim> <ident>@<hostmask> va schimba și identitatea, împreună cu gazda virtuală."
+"Dacă este specificat SYNC atunci gazda virtuală va fi sincronizată cu toate pseudonimele grupate în contul dumneavoastră."
 
 #: ../modules/operserv/os_set.cpp
 msgid "Sets various global services options. Option names currently defined are:"
@@ -6874,10 +6877,6 @@ msgstr "Setează diverse opțiuni ale pseudonimului. opțiunea poate fi după 
 #: ../modules/chanserv/cs_mode.cpp
 msgid "Sets voice status on all users in the channel."
 msgstr "Setează starea voce pentru toți utilizatorii din canal."
-
-#: ../modules/nickserv/ns_set_op.cpp
-msgid "Sets whether services should set channel status modes on you automatically."
-msgstr "Setează dacă serviciile ar trebui să seteze automat modurile de stare în canal pentru dumneavoastră."
 
 #: ../modules/chanserv/cs_set.cpp
 msgid "Sets whether the given channel will expire. Setting this to ON prevents the channel from expiring."
@@ -6904,10 +6903,6 @@ msgstr "Setează dacă pseudonimul precizat va expira. Setarea acestei opțiuni 
 #: ../modules/nickserv/ns_set_op.cpp
 msgid "Sets whether you can be added to a channel access list."
 msgstr "Setează dacă puteți fi adăugat(ă) la o listă de accese a vreunui canal."
-
-#: ../modules/nickserv/ns_cert.cpp
-msgid "Sets whether you should automatically be logged in when you connect using a known SSL certificate."
-msgstr "Setează dacă ar trebui să fiți autentificat(ă) automat atunci când vă conectați utilizând un certificat SSL cunoscut."
 
 #: ../modules/nickserv/ns_cert.cpp
 #, c-format
@@ -7071,6 +7066,10 @@ msgstr "Suspendă un pseudonim înregistrat, ceea ce împiedică utilizarea aces
 msgid "Suspension expires"
 msgstr "Suspendarea expiră"
 
+#: ../modules/hostserv/hs_group.cpp
+msgid "Sync the vhost for all nicks in an account"
+msgstr "Sincronizați gazda virtuală pentru toate pseudonimele dintr-un cont"
+
 #: ../modules/chanserv/cs_sync.cpp
 msgid "Sync users channel modes"
 msgstr "Sincronizează modurile de canal ale utilizatorilor"
@@ -7078,10 +7077,6 @@ msgstr "Sincronizează modurile de canal ale utilizatorilor"
 #: ../modules/chanserv/cs_sync.cpp
 msgid "Syncs all modes set on users on the channel with the modes they should have based on their access."
 msgstr "Sincronizează toate modurile setate pentru utilizatorii din canal cu modurile pe care ar trebui să le aibă în funcție de accesul lor."
-
-#: ../modules/hostserv/hs_group.cpp
-msgid "Syncs the vhost for all nicks in an account"
-msgstr "Sincronizează gazda virtuală pentru toate pseudonimele dintr-un cont"
 
 #: ../src/command.cpp
 msgid "Syntax"
@@ -7198,6 +7193,10 @@ msgstr ""
 msgid "TAKE {vhost | entry-num}"
 msgstr "TAKE {gazdă-virtuală | număr-intrare}"
 
+#: ../modules/chanserv/cs_seen.cpp
+msgid "Tell you about the last time a user was seen"
+msgstr "Vă informează despre ultima dată când a fost văzut un utilizator"
+
 #: ../modules/nickserv/ns_identify.cpp
 #, c-format
 msgid "Tells %s that you are really the owner of this nick. Many commands require you to authenticate yourself with this command before you use them. The password should be the same one you sent with the REGISTER command."
@@ -7205,33 +7204,17 @@ msgstr "Informează %s că sunteți proprietarul real al acestui pseudonim. Mult
 
 #: ../modules/chanserv/cs_invite.cpp
 #, c-format
-msgid ""
-"Tells %s to invite you or an optionally specified nick into the given channel.\n"
-"\n"
-"By default, limited to AOPs or those with level 5 access and above on the channel."
-msgstr ""
-"Solicită de la %s să vă invite pe dumneavoastră sau pe un pseudonim specificat în canalul precizat.\n"
-"\n"
-"Implicit, se limitează la AOP sau la cei cu acces de nivel 5 ori superior în canal."
+msgid "Tells %s to invite you or an optionally specified nick into the given channel."
+msgstr "Solicită de la %s să vă invite într-un canal pe dumneavoastră sau pe un pseudonim opțional."
 
 #: ../modules/chanserv/cs_unban.cpp
 #, c-format
-msgid ""
-"Tells %s to remove all bans preventing you or the given user from entering the given channel. If no channel is given, all bans affecting you in channels you have access in are removed.\n"
-"\n"
-"By default, limited to AOPs or those with level 5 access and above on the channel."
-msgstr ""
-"Solicită de la %s să înlăture toate blocările ce vă impiedică pe dumneavoastră sau pe utilizatorul precizat să accesați canalul specificat. Dacă nu este specificat un canal, sunt înlăturate toate blocările care vă afectează în canalele la care aveți acces.\n"
-"\n"
-"Implicit, se limitează la AOP sau la cei cu acces de nivel 5 ori superior în canal."
+msgid "Tells %s to remove all bans preventing you or the given user from entering the given channel. If no channel is given, all bans affecting you in channels you have access in are removed."
+msgstr "Solicită de la %s să înlăture toate blocările ce vă impiedică pe dumneavoastră sau pe utilizatorul precizat să accesați canalul specificat. Dacă nu este specificat un canal, sunt înlăturate toate blocările care vă afectează în canalele la care aveți acces."
 
 #: ../modules/operserv/os_jupe.cpp
 msgid "Tells services to jupiter a server -- that is, to create a fake \"server\" connected to services which prevents the real server of that name from connecting. The jupe may be removed using a standard SQUIT. If a reason is given, it is placed in the server information field; otherwise, the server information field will contain the text \"Juped by <nick>\", showing the nickname of the person who jupitered the server."
 msgstr "Solicită de la servicii să facă \"jupiter\" unui server - adică să creeze un server fals conectat la servicii, ceea ce împiedică serverul real cu acel nume să se conecteze. Acțiunea \"jupe\" poate fi înlăturată utilizând comanda standard SQUIT. Dacă este precizat un motiv, acesta este plasat în câmpul de informații al serverului; altfel va conține textul \"Juped by <pseudonim>\", afișând pseudonimul persoanei care a făcut \"jupiter\" serverului."
-
-#: ../modules/chanserv/cs_seen.cpp
-msgid "Tells you about the last time a user was seen"
-msgstr "Vă informează despre ultima dată când a fost văzut un utilizator"
 
 #: ../modules/operserv/os_shutdown.cpp
 msgid "Terminate services WITHOUT saving"
@@ -8053,8 +8036,8 @@ msgid "Unable to remove module %s."
 msgstr "Nu se poate înlătura modulul %s."
 
 #: ../modules/botserv/bs_assign.cpp
-msgid "Unassigns a bot from a channel"
-msgstr "Disociază un bot dintr-un canal"
+msgid "Unassign a bot from a channel"
+msgstr "Disociți un bot dintr-un canal"
 
 #: ../modules/botserv/bs_assign.cpp
 msgid "Unassigns a bot from a channel. When you use this command, the bot won't join the channel anymore. However, bot configuration for the channel is kept, so you will always be able to reassign a bot later without having to reconfigure it entirely."
@@ -8145,16 +8128,16 @@ msgid "Unsuspends a nickname which allows it to be used again."
 msgstr "Anulează suspendarea unui pseudonim, ceea ce permite utilizarea acestuia."
 
 #: ../modules/chanserv/cs_updown.cpp
-msgid "Updates a selected nicks status modes on a channel. If nick is omitted then your status is updated. If channel is omitted then your channel status is updated on every channel you are in."
-msgstr "Actualizează modurile de stare ale pseudonimului selectat într-un canal. Dacă pseudonimul este omis, atunci starea dumneavoastră este actualizată. Dacă canalul este omis, atunci starea dumneavoastră de canal este actualizată în fiecare canal în care vă aflați."
-
-#: ../modules/chanserv/cs_updown.cpp
-msgid "Updates a selected nicks status on a channel"
-msgstr "Actualizează starea pseudonimului selectat într-un canal"
+msgid "Update a selected nicks status on a channel"
+msgstr "Actualizați starea pseudonimului selectat într-un canal"
 
 #: ../modules/nickserv/ns_update.cpp
-msgid "Updates your current status, i.e. it checks for new memos"
-msgstr "Actualizează starea dumneavoastră actuală, adică verifică dacă există noi misive"
+msgid "Update your current status, i.e. it checks for new memos"
+msgstr "Actualizați starea dumneavoastră actuală, adică verifică dacă există noi misive"
+
+#: ../modules/chanserv/cs_updown.cpp
+msgid "Updates a selected nicks status modes on a channel. If nick is omitted then your status is updated. If channel is omitted then your channel status is updated on every channel you are in."
+msgstr "Actualizează modurile de stare ale pseudonimului selectat într-un canal. Dacă pseudonimul este omis, atunci starea dumneavoastră este actualizată. Dacă canalul este omis, atunci starea dumneavoastră de canal este actualizată în fiecare canal în care vă aflați."
 
 #: ../modules/nickserv/ns_update.cpp
 msgid "Updates your current status, i.e. it checks for new memos, sets needed channel modes and updates your vhost and your userflags (lastseentime, etc)."
@@ -8302,8 +8285,8 @@ msgid "VIEW [vhost-mask | entry-num | list]"
 msgstr "VIEW [mască | număr-intrare | listă]"
 
 #: ../modules/hostserv/hs_request.cpp
-msgid "Validates a previously requested vhost using DNS"
-msgstr "Validează o gazdă virtuală solicitată, utilizând DNS"
+msgid "Validate a previously requested vhost using DNS"
+msgstr "Validați o gazdă virtuală solicitată, utilizând DNS"
 
 #: ../modules/hostserv/hs_request.cpp
 msgid "Validates a previously requested vhost using DNS. If you own the domain you have requested as a vhost you can validate your ownership of it using a DNS TXT record to approve your own vhost."
@@ -8415,6 +8398,10 @@ msgstr ""
 msgid "Word"
 msgstr "Cuvânt"
 
+#: ../modules/chanserv/cs_xop.cpp
+msgid "XOP"
+msgstr "XOP"
+
 #: ../modules/nickserv/ns_group.cpp
 #, c-format
 msgid "You are already a member of the account of %s."
@@ -8448,6 +8435,10 @@ msgstr "Nu aveți permisiunea de a modifica limita de misive."
 #: ../modules/nickserv/ns_cert.cpp
 msgid "You are not using a client certificate."
 msgstr "Nu utilizați un certificat de client."
+
+#: ../modules/operserv/os_login.cpp
+msgid "You are now a Services Operator."
+msgstr "Sunteți acum Operator de Servicii."
 
 #: ../modules/operserv/os_set.cpp
 msgid "You are now a super admin."

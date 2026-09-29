@@ -1,0 +1,15 @@
+Salut!
+
+Ați solicitat schimbarea adresei de email asociată contului dumneavoastră {account} pe {network} din {old_email} în {new_email}.
+
+Vă rugăm să utilizați următoarea comandă în IRC pentru a confirma schimbarea adresei de email a dumneavoastră:
+
+> /msg NickServ CONFIRM EMAIL {code}
+
+Dacă această schimbare nu este confirmată, solicitarea dumneavoastră va expira automat în {expiry}.
+
+Dacă nu știți de ce v-a fost trimis acest mesaj email, vă rugăm să-l ignorați.
+
+Cu stimă,
+
+{network}

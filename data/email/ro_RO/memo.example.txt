@@ -1,0 +1,11 @@
+Salut!
+
+Contul dumneavoastră {receiver} pe {network} a primit o nouă misivă de la {sender}.
+
+> {text}
+
+Aceasta este misiva cu numărul {number}.
+
+Cu stimă,
+
+{network}

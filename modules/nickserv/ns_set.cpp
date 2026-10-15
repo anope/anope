@@ -96,6 +96,9 @@ public:
 		{
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
+				if (info.hide)
+					continue;
+
 				ServiceReference<Command> command("Command", info.name);
 				if (command)
 				{

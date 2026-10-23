@@ -4372,7 +4372,7 @@ msgstr ""
 
 #: ../modules/nickserv/ns_set_language.cpp ../src/language.cpp
 msgid "English"
-msgstr "Английский"
+msgstr "Русский"
 
 #: ../modules/chanserv/cs_entrymsg.cpp
 #, c-format

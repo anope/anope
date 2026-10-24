@@ -18,8 +18,10 @@ class HostServCore final
 	: public Module
 {
 	Reference<BotInfo> HostServ;
+	PrimitiveExtensibleItem<Anope::string> active_vhost;
 public:
 	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PSEUDOCLIENT | VENDOR)
+		, active_vhost(this, "active_vhost")
 	{
 		if (!IRCD || !IRCD->CanSetVHost)
 			throw ModuleException("Your IRCd does not support vhosts");
@@ -55,6 +57,7 @@ public:
 			IRCD->SendVHost(u, na->GetVHostIdent(), na->GetVHostHost());
 
 			u->vhost = na->GetVHostHost();
+			active_vhost.Set(u, u->vhost);
 			u->UpdateHost();
 
 			if (IRCD->CanSetVIdent && !na->GetVHostIdent().empty())
@@ -66,6 +69,23 @@ public:
 					na->GetVHostMask().c_str());
 			}
 		}
+	}
+
+	void OnNickLogout(User *u) override
+	{
+		const auto *vhost = active_vhost.Get(u);
+		if (!vhost)
+			return;
+
+		const bool matches = u->vhost.equals_cs(*vhost);
+		active_vhost.Unset(u);
+
+		if (!matches)
+			return;
+
+		u->vhost.clear();
+		IRCD->SendVHostDel(u);
+		u->UpdateHost();
 	}
 
 	void OnNickDrop(CommandSource &source, NickAlias *na) override
@@ -107,6 +127,7 @@ public:
 				IRCD->SendVHost(u, na->GetVHostIdent(), na->GetVHostHost());
 
 				u->vhost = na->GetVHostHost();
+				active_vhost.Set(u, u->vhost);
 				u->UpdateHost();
 
 				if (IRCD->CanSetVIdent && !na->GetVHostIdent().empty())
@@ -128,7 +149,10 @@ public:
 			User *u = User::Find(na->nick);
 
 			if (u && u->Account() == na->nc)
+			{
+				active_vhost.Unset(u);
 				IRCD->SendVHostDel(u);
+			}
 		}
 	}
 };

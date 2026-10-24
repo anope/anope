@@ -17,8 +17,11 @@
 class CommandHSOff final
 	: public Command
 {
+	ExtensibleRef<Anope::string> active_vhost;
+
 public:
 	CommandHSOff(Module *creator) : Command(creator, "hostserv/off", 0, 0)
+		, active_vhost("active_vhost")
 	{
 		this->SetDesc(_("Deactivate your assigned vhost"));
 		this->RequireUser(true);
@@ -37,6 +40,8 @@ public:
 		else
 		{
 			u->vhost.clear();
+			if (active_vhost)
+				active_vhost->Unset(u);
 			IRCD->SendVHostDel(u);
 			u->UpdateHost();
 			Log(LOG_COMMAND, source, this) << "to disable their vhost";

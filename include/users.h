@@ -264,7 +264,7 @@ public:
 	void SetAway(const Anope::string &msg = "", time_t ts = 0);
 
 	/** Determines whether this user is away. */
-	auto IsAway() const { return awaymsg.empty(); }
+	auto IsAway() const { return !awaymsg.empty(); }
 
 	/** Check if the user has a mode
 	 * @param name Mode name

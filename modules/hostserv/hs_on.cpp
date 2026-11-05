@@ -17,8 +17,11 @@
 class CommandHSOn final
 	: public Command
 {
+	ExtensibleRef<Anope::string> active_vhost;
+
 public:
 	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 0)
+		, active_vhost("active_vhost")
 	{
 		this->SetDesc(_("Activate your assigned vhost"));
 		this->RequireUser(true);
@@ -39,6 +42,8 @@ public:
 			Log(LOG_COMMAND, source, this) << "to enable their vhost of " << na->GetVHostMask();
 			IRCD->SendVHost(u, na->GetVHostIdent(), na->GetVHostHost());
 			u->vhost = na->GetVHostHost();
+			if (active_vhost)
+				active_vhost->Set(u, u->vhost);
 			if (IRCD->CanSetVIdent && !na->GetVHostIdent().empty())
 				u->SetVIdent(na->GetVHostIdent());
 			u->UpdateHost();

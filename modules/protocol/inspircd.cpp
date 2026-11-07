@@ -205,7 +205,7 @@ public:
 		ListLimits *limits = maxlist.Get(c);
 		if (limits)
 		{
-			auto limit = limits->find(cm->mchar);
+			auto limit = limits->find(cm->GetBaseMode()->mchar);
 			if (limit != limits->end())
 				return limit->second;
 		}

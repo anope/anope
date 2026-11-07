@@ -447,7 +447,7 @@ class CommandCSMode final
 							cannotset.Push(cm, mode_param, adding);
 							continue;
 						}
-						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c, cm) && ci->c->HasMode(cm->name) >= IRCD->GetMaxListFor(ci->c, cm))
+						if (cm->type == MODE_LIST && ci->c && IRCD->GetMaxListFor(ci->c, cm) && ci->c->CountModeList(cm->GetBaseMode()) >= IRCD->GetMaxListFor(ci->c, cm))
 						{
 							listfull.Push(cm, mode_param, adding);
 							continue;
@@ -691,7 +691,7 @@ class CommandCSMode final
 
 							if (adding)
 							{
-								if (IRCD->GetMaxListFor(ci->c, cm) && ci->c->HasMode(cm->name) < IRCD->GetMaxListFor(ci->c, cm))
+								if (IRCD->GetMaxListFor(ci->c, cm) && ci->c->CountModeList(cm->GetBaseMode()) < IRCD->GetMaxListFor(ci->c, cm))
 									ci->c->SetMode(NULL, cm, param);
 							}
 							else

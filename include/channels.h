@@ -155,6 +155,11 @@ public:
 	 */
 	size_t HasMode(const Anope::string &name, const Anope::string &param = "");
 
+	/** Counts the number of modes on the specified list.
+	 * @param cm The mode to count for.
+	 */
+	size_t CountModeList(ChannelMode *cm);
+
 	/** Set a mode internally on a channel, this is not sent out to the IRCd
 	 * @param setter The setter
 	 * @param cm The mode

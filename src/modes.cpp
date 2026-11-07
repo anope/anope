@@ -224,6 +224,12 @@ void ChannelModeVirtual<T>::Check()
 }
 
 template<typename T>
+ChannelMode *ChannelModeVirtual<T>::GetBaseMode()
+{
+	return basech ? basech->GetBaseMode() : this;
+}
+
+template<typename T>
 ChannelMode *ChannelModeVirtual<T>::Wrap(Anope::string &param)
 {
 	return basech;

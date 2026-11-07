@@ -99,7 +99,7 @@ public:
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 			return;
 		}
-		else if (IRCD->GetMaxListFor(c, cm) && c->HasMode(mode) >= IRCD->GetMaxListFor(c, cm))
+		else if (IRCD->GetMaxListFor(c, cm) && c->CountModeList(cm->GetBaseMode()) >= IRCD->GetMaxListFor(c, cm))
 		{
 			source.Reply(_("The %s list for %s is full."), mode.lower().c_str(), c->name.c_str());
 			return;

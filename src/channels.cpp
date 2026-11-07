@@ -208,6 +208,14 @@ size_t Channel::HasMode(const Anope::string &mname, const Anope::string &param)
 	return 0;
 }
 
+size_t Channel::CountModeList(ChannelMode *cm)
+{
+	auto total = modes.count(cm->name);
+	for (auto* cml : cm->listeners)
+		total += CountModeList(cml);
+	return total;
+}
+
 Anope::string Channel::GetModes(bool complete, bool plus)
 {
 	Anope::string res, params;

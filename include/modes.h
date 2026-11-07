@@ -138,6 +138,9 @@ public:
 
 	virtual void Check() { }
 
+	/** Retrieve the base mode for this mode. */
+	virtual ChannelMode *GetBaseMode() { return this; }
+
 	/** 'wrap' this channel mode and param to the underlying mode and param
 	 */
 	virtual ChannelMode *Wrap(Anope::string &param);
@@ -252,6 +255,8 @@ public:
 	~ChannelModeVirtual();
 
 	void Check() override;
+
+	ChannelMode *GetBaseMode() override;
 
 	ChannelMode *Wrap(Anope::string &param) override;
 

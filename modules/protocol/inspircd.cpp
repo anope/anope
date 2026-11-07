@@ -2028,10 +2028,10 @@ public:
 			}
 
 			const auto &value = params.size() > 3 ? params[3] : "";
-			if (params[1].equals_ci("maxlist"))
+			if (params[2].equals_ci("maxlist"))
 				HandleMaxList(c, value);
 
-			else if (params[1].equals_ci("mlock"))
+			else if (params[2].equals_ci("mlock"))
 				HandleMLock(c, value);
 		}
 		else if (isdigit(params[0][0]))

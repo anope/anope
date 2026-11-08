@@ -153,7 +153,7 @@ public:
 	 * @return The number of modes set
 	 * @param param The optional mode param
 	 */
-	size_t HasMode(const Anope::string &name, const Anope::string &param = "");
+	bool HasMode(const Anope::string &name, const Anope::string &param = "");
 
 	/** Counts the number of modes on the specified list.
 	 * @param cm The mode to count for.

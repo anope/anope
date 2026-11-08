@@ -195,17 +195,17 @@ bool Channel::HasUserStatus(User *u, const Anope::string &mname)
 	return HasUserStatus(u, anope_dynamic_static_cast<ChannelModeStatus *>(ModeManager::FindChannelModeByName(mname)));
 }
 
-size_t Channel::HasMode(const Anope::string &mname, const Anope::string &param)
+bool Channel::HasMode(const Anope::string &mname, const Anope::string &param)
 {
 	if (param.empty())
-		return modes.count(mname);
+		return modes.find(mname) != modes.end();
 
 	for (const auto &mode : this->GetModeList(mname))
 	{
 		if (mode.equals_ci(param))
-			return 1;
+			return true;
 	}
-	return 0;
+	return false;
 }
 
 size_t Channel::CountModeList(ChannelMode *cm)

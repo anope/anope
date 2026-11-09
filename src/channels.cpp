@@ -954,6 +954,30 @@ BotInfo *Channel::WhoSends() const
 	return NULL;
 }
 
+bool Channel::ClearModes(User* user, const Anope::string &mode, bool self)
+{
+	const auto it = IRCD->CanClearModes.find("BAN");
+	if (it != IRCD->CanClearModes.end() && (!self || it->second))
+	{
+		// We can ask the IRCd to clear modes.
+		IRCD->SendClearModes(WhoSends(), this, user, mode, self);
+		return true;
+	}
+
+	// We have to check for modes manually.
+	auto unbanned = false;
+	for (const auto &param : GetModeList(mode))
+	{
+		Entry entry(param, mode);
+		if (entry.Matches(user))
+		{
+			RemoveMode(nullptr, mode, entry.GetMask());
+			unbanned = true;
+		}
+	}
+	return unbanned;
+}
+
 Channel *Channel::Find(const Anope::string &name)
 {
 	auto it = ChannelList.find(name);

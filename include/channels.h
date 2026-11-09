@@ -313,6 +313,14 @@ public:
 	 */
 	BotInfo *WhoSends() const;
 
+	/* Clear all modes of the specified type that match the target user.
+	 * @param user The user to check.
+	 * @param mode The mode to remove.
+	 * @param self Whether the user is removing modes on themself.
+	 * @return True if the user was unbanned; otherwise, false.
+	 */
+	bool ClearModes(User* user, const Anope::string &mode, bool self);
+
 	/** Finds a channel
 	 * @param name The channel to find
 	 * @return The channel, if found

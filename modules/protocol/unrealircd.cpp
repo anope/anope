@@ -63,7 +63,7 @@ public:
 		CanSQLineChannel = true;
 		CanSZLine = true;
 		CanSVSHold = true;
-		CanClearModes.insert("BAN");
+		CanClearModes.emplace("BAN", false);
 		CanCertFP = true;
 		CanTagMessage = true;
 		RequiresID = true;
@@ -471,7 +471,7 @@ private:
 		return true;
 	}
 
-	void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode) override
+	void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode, bool self) override
 	{
 		auto *cm = ModeManager::FindChannelModeByName(mode);
 		if (!cm || !cm->mchar)

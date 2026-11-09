@@ -50,15 +50,8 @@ public:
 
 				for (const auto *mode : modes)
 				{
-					if (IRCD->CanClearModes.count(mode->name))
-					{
-						IRCD->SendClearModes(ci->WhoSends(), ci->c, source.GetUser(), mode->name);
+					if (ci->c->ClearModes(source.GetUser(), mode->name, true))
 						count++;
-						continue;
-					}
-
-					if (ci->c->Unban(source.GetUser(), mode->name, true))
-						++count;
 				}
 			}
 
@@ -102,18 +95,11 @@ public:
 		bool override = !source.AccessFor(ci).HasPriv("UNBAN") && source.HasPriv("chanserv/kick");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source, this, ci) << "to unban " << u2->nick;
 
+		const auto unban_self = (u2 == source.GetUser());
 		for (const auto *mode : modes)
-		{
-			if (IRCD->CanClearModes.count(mode->name))
-			{
-				IRCD->SendClearModes(ci->WhoSends(), ci->c, u2, mode->name);
-				continue;
-			}
+			ci->c->ClearModes(u2, mode->name, unban_self);
 
-			ci->c->Unban(u2, mode->name, source.GetUser() == u2);
-		}
-
-		if (u2 == source.GetUser())
+		if (unban_self)
 			source.Reply(_("You have been unbanned from \002%s\002."), ci->c->name.c_str());
 		else
 			source.Reply(_("\002%s\002 has been unbanned from \002%s\002."), u2->nick.c_str(), ci->c->name.c_str());

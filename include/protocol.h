@@ -122,7 +122,7 @@ public:
 	bool AmbiguousID = false;
 
 	/** Can we ask the server to remove list modes matching a user? */
-	std::set<Anope::string> CanClearModes;
+	Anope::map<bool> CanClearModes;
 
 	/** Can we send tag messages? */
 	bool CanTagMessage = false;
@@ -315,7 +315,7 @@ public:
 	 */
 	virtual void SendOper(User *u);
 
-	virtual void SendClearModes(const MessageSource &user, Channel *c, User *u, const Anope::string &mode) { }
+	virtual void SendClearModes(const MessageSource &user, Channel *c, User *u, const Anope::string &mode, bool self) { }
 
 	virtual bool IsNickValid(const Anope::string &);
 	virtual bool IsChannelValid(const Anope::string &);

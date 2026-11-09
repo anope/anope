@@ -266,13 +266,13 @@ public:
 		IRCD->SendPrivmsg(bi, target->GetUID(), msg, newtags);
 	}
 
-	void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode) override
+	void SendClearModes(const MessageSource &user, Channel *c, User* u, const Anope::string &mode, bool self) override
 	{
 		auto *cm = ModeManager::FindChannelModeByName(mode);
 		if (!cm || !cm->mchar)
 			return;
 
-		Uplink::Send(user, "SVSCMODE", u->GetUID(), c->name, cm->mchar);
+		Uplink::Send(user, "SVSCMODE", u->GetUID(), c->name, cm->mchar, self);
 	}
 
 	void SendQuit(User *u, const Anope::string &buf, const Anope::string &operbuf) override
@@ -1562,7 +1562,7 @@ struct IRCDMessageCapab final
 			for (auto *cm : ModeManager::GetChannelModes())
 			{
 				if (cm->type == MODE_LIST && cm->mchar)
-					IRCD->CanClearModes.insert(cm->name);
+					IRCD->CanClearModes.emplace(cm->name, true);
 			}
 
 			if (!ModeManager::FindUserModeByName("PRIV"))

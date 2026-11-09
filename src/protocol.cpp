@@ -396,7 +396,6 @@ void IRCDProto::SendContextNotice(BotInfo *bi, User *target, Channel *context, c
 {
 	auto newtags = tags;
 	newtags["+channel-context"] = context->name;
-	newtags["+draft/channel-context"] = context->name;
 	IRCD->SendNotice(bi, target->GetUID(), Anope::Format("[%s] %s", context->name.c_str(), msg.c_str()), newtags);
 }
 
@@ -404,7 +403,6 @@ void IRCDProto::SendContextPrivmsg(BotInfo *bi, User *target, Channel *context, 
 {
 	auto newtags = tags;
 	newtags["+channel-context"] = context->name;
-	newtags["+draft/channel-context"] = context->name;
 	IRCD->SendPrivmsg(bi, target->GetUID(), Anope::Format("[%s] %s", context->name.c_str(), msg.c_str()), newtags);
 }
 

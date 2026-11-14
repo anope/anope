@@ -1,5 +1,29 @@
 # Anope Change Log
 
+## Anope 2.1.28 (2026-11-15)
+
+## General Changes
+
+* Added a new Russian translation.
+
+* Added support for clickable confirmation links in the web interfac.
+
+* Fixed counting the number of modes that are already set on a channel.
+
+* Fixed parsing channel metadata on InspIRCd.
+
+* Fixed user away state being inverted in the RPC interface.
+
+* Updated the Romanian translation.
+
+* Updated the vendored libraries.
+
+## Developer Changes
+
+* Added `Channel::ClearModes` to automate clearing all modes on a target.
+
+* Updated the protocol interface to allow declaring that an IRCd has limited support for clearing modes on a user.
+
 ## Anope 2.1.27 (2026-09-15)
 
 ### General Changes

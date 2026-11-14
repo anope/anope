@@ -3,9 +3,9 @@ name: irctest
 # Last checked: 2026-06-29
 env:
   INSPIRCD_REF: v4.12.1  # 2026-09-25
-  IRCTEST_REF: 3989a9c2492c920b229d99ec66c31445c9860166  # 2026-08-30
-  SOLANUM_REF: 9106d1b08e318e1eb83e09c4171daf7f99396f97  # 2026-10-18
-  UNREALIRCD_REF: 7a3f9df5ca0425fa83afd809432f7789196d8c1a  # 2026-09-11
+  IRCTEST_REF: 7d5d761b7b67f9031daf7784e743d630def22a96  # 2026-10-31
+  SOLANUM_REF: 92afd03482ae6b0df1c5ba1d6b8886d2d626dbf3  # 2026-11-14
+  UNREALIRCD_REF: 9d961cf8afb91ab26806b0857179471bd9d1278b  # 2026-11-14
 
 on:
   pull_request:
@@ -105,12 +105,9 @@ jobs:
 
     - name: Build
       run: |-
-        sudo apt-get install --update build-essential libltdl-dev --assume-yes
-        ./autogen.sh
-        ./configure \
-          --enable-fhs-paths \
-          --prefix $HOME/software/solanum
-        make -j$(($(getconf _NPROCESSORS_ONLN) + 1)) install
+        sudo apt-get install --update build-essential libltdl-dev meson --assume-yes
+        meson setup ${{ github.workspace }}/build --prefix $HOME/software/solanum -Dfhs_paths=true -Dbuildtype=debug
+        meson install -C ${{ github.workspace }}/build
 
     - name: Make artifact
       run: |-

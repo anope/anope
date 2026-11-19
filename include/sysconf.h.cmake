@@ -38,8 +38,14 @@
 // The default module directory.
 #define DEFAULT_MODULE_DIR "@MODULE_DIR@"
 
+// Whether the arc4random_uniform() function is available.
+#cmakedefine01 HAVE_ARC4RANDOM_UNIFORM
+
 // Whether the clock_gettime() function is available.
 #cmakedefine01 HAVE_CLOCK_GETTIME
+
+// Whether the getentropy() function is available.
+#cmakedefine01 HAVE_GETENTROPY
 
 // Whether Anope was built with localization support.
 #cmakedefine01 HAVE_LOCALIZATION

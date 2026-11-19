@@ -130,7 +130,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
 endif()
 
 # Check for the existence of the following functions
+check_function_exists(arc4random_uniform HAVE_ARC4RANDOM_UNIFORM)
 check_function_exists(clock_gettime HAVE_CLOCK_GETTIME)
+check_function_exists(getentropy HAVE_GETENTROPY)
 check_function_exists(umask HAVE_UMASK)
 check_function_exists(epoll_wait HAVE_EPOLL)
 check_function_exists(poll HAVE_POLL)

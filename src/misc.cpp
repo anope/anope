@@ -32,6 +32,9 @@
 #ifndef _WIN32
 #include <sys/socket.h>
 #include <netdb.h>
+# ifdef __APPLE__
+#  include <sys/random.h>
+# endif
 #endif
 
 NumberList::NumberList(const Anope::string &list, bool descending) : desc(descending)
@@ -1080,10 +1083,20 @@ Anope::string Anope::Random(size_t len)
 
 int Anope::RandomNumber()
 {
+#if HAVE_GETENTROPY
+	int result;
+	if (getentropy(&result, sizeof(result)) == 0)
+		return result;
+#endif
+
+#if HAVE_ARC4RANDOM_UNIFORM
+	return (int)arc4random_uniform((uint32_t)RAND_MAX + 1U);
+#else
 	static std::random_device device;
 	static std::mt19937 engine(device());
 	static std::uniform_int_distribution<int> dist(INT_MIN, INT_MAX);
 	return dist(engine);
+#endif
 }
 
 // Implementation of https://en.wikipedia.org/wiki/Levenshtein_distance

@@ -32,13 +32,7 @@ public:
 		}
 		else if (m.type == "C")
 		{
-			auto decoded = Anope::B64Decode(m.data[0]);
-
-			auto user = sess->GetUserInfo();
-			if (!decoded.empty())
-				user += " [" + decoded + "]";
-
-			Log(this->owner, "sasl", Config->GetClient("NickServ")) << user << " unidentified using SASL ANONYMOUS";
+			Log(this->owner, "sasl", Config->GetClient("NickServ")) << sess->GetUserInfo() << " unidentified using SASL ANONYMOUS";
 			SASL::service->Succeed(sess, nullptr);
 		}
 		return true;

@@ -384,11 +384,13 @@ ChanAccess *ChannelInfo::GetAccess(unsigned index) const
 	return acc;
 }
 
-static void FindMatchesRecurse(ChannelInfo *ci, const User *u, const NickCore *account, unsigned int depth, std::vector<ChanAccess::Path> &paths, ChanAccess::Path &path)
+static void FindMatchesRecurse(ChannelInfo *ci, const User *u, const NickCore *account, unsigned int depth,
+	std::vector<ChanAccess::Path> &paths, ChanAccess::Path &path, std::set<ChannelInfo *> &checked)
 {
 	if (depth > ChanAccess::MAX_DEPTH)
 		return;
 
+	checked.insert(ci);
 	for (unsigned int i = 0; i < ci->GetAccessCount(); ++i)
 	{
 		ChanAccess *a = ci->GetAccess(i);
@@ -401,20 +403,21 @@ static void FindMatchesRecurse(ChannelInfo *ci, const User *u, const NickCore *a
 
 			paths.push_back(next_path);
 		}
-		else if (next)
+		else if (next && !checked.count(next))
 		{
 			ChanAccess::Path next_path = path;
 			next_path.push_back(a);
 
-			FindMatchesRecurse(next, u, account, depth + 1, paths, next_path);
+			FindMatchesRecurse(next, u, account, depth + 1, paths, next_path, checked);
 		}
 	}
 }
 
 static void FindMatches(AccessGroup &group, ChannelInfo *ci, const User *u, const NickCore *account)
 {
+	std::set<ChannelInfo *> checked;
 	ChanAccess::Path path;
-	FindMatchesRecurse(ci, u, account, 0, group.paths, path);
+	FindMatchesRecurse(ci, u, account, 0, group.paths, path, checked);
 }
 
 AccessGroup ChannelInfo::AccessFor(const User *u, bool updateLastUsed)

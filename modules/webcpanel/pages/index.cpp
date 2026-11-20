@@ -93,8 +93,6 @@ class WebpanelRequest : public IdentifyRequest
 bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply)
 {
 	TemplateFileServer::Replacements replacements;
-	const Anope::string &user = message.post_data["username"], &pass = message.post_data["password"];
-
 	replacements["TITLE"] = page_title;
 
 	if (!WebPanel::IsAllowedOrigin(message))
@@ -103,6 +101,8 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 		return true;
 	}
 
+	const Anope::string user = WebPanel::GetRequestData(message.post_data, "username");
+	const Anope::string pass = WebPanel::GetRequestData(message.post_data, "password");
 	if (!user.empty() && !pass.empty())
 	{
 		// Rate limit check.

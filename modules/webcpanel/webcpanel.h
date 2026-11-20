@@ -33,6 +33,8 @@ namespace WebPanel
 
 	extern bool CheckParams(const std::vector<Anope::string> &params);
 
+	extern Anope::string GetRequestData(const std::map<Anope::string, Anope::string> &data, const Anope::string &key);
+
 	extern bool IsAllowedOrigin(const HTTPMessage &message);
 }
 

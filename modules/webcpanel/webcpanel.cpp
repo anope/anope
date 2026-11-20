@@ -253,6 +253,18 @@ namespace WebPanel
 		return true;
 	}
 
+	Anope::string GetRequestData(const std::map<Anope::string, Anope::string> &data, const Anope::string &key)
+	{
+		std::map<Anope::string, Anope::string>::const_iterator dit = data.find(key);
+		if (dit == data.end() || dit->second.length() > 512)
+			return ""; // No data or too long.
+
+		return dit->second
+			.replace_all_cs('\0', ' ')
+			.replace_all_cs('\r', ' ')
+			.replace_all_cs('\n', ' ');
+	}
+
 	bool IsAllowedOrigin(const HTTPMessage &message)
 	{
 		if (allowed_origins.empty())

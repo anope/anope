@@ -15,24 +15,25 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTPProvider *server, const Anope::str
 {
 	if (message.post_data.empty() == false)
 	{
-		if (message.post_data.count("email") > 0)
+		const Anope::string email = WebPanel::GetRequestData(message.post_data, "email");
+		if (!email.empty())
 		{
-			if (message.post_data["email"] != na->nc->email)
+			if (email != na->nc->email)
 			{
-				if (!message.post_data["email"].empty() && !Mail::Validate(message.post_data["email"]))
+				if (!Mail::Validate(email))
 					replacements["ERRORS"] = "Invalid email";
 				else
 				{
-					na->nc->email = message.post_data["email"];
+					na->nc->email = email;
 					replacements["MESSAGES"] = "Email updated";
 				}
 			}
 		}
-		if (message.post_data.count("greet") > 0)
+
+		const Anope::string post_greet = WebPanel::GetRequestData(message.post_data, "greet");
+		if (!post_greet.empty())
 		{
 			Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
-			const Anope::string &post_greet = HTTPUtils::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
-
 			if (post_greet.empty())
 				na->nc->Shrink<Anope::string>("greet");
 			else if (!greet || post_greet != *greet)

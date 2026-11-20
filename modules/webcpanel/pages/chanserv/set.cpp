@@ -14,12 +14,12 @@ WebCPanel::ChanServ::Set::Set(const Anope::string &cat, const Anope::string &u) 
 
 bool WebCPanel::ChanServ::Set::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-	const Anope::string &chname = message.get_data["channel"];
 	bool can_set = false;
 	TemplateFileServer page("chanserv/set.html");
 
 	BuildChanList(na, replacements);
 
+	const Anope::string chname = WebPanel::GetRequestData(message.get_data, "channel");
 	if (chname.empty())
 	{
 		page.Serve(server, page_name, client, message, reply, replacements);

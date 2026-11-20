@@ -25,23 +25,29 @@ bool WebCPanel::OperServ::Akill::OnRequest(HTTPProvider *server, const Anope::st
 		if (akills->GetCount() == 0)
 			replacements["AKILLS"] = "No Akills to display.";
 
-		if (message.post_data.count("mask") > 0 && message.post_data.count("expiry") > 0 && message.post_data.count("reason") > 0)
+		const Anope::string expiry = WebPanel::GetRequestData(message.post_data, "expiry");
+		const Anope::string mask = WebPanel::GetRequestData(message.post_data, "mask");
+		const Anope::string reason = WebPanel::GetRequestData(message.post_data, "reason");
+		if (!expiry.empty() && !mask.empty() && !reason.empty())
 		{
 			std::vector<Anope::string> params;
 			std::stringstream cmdstr;
 			params.push_back("ADD");
-			cmdstr << "+" << HTTPUtils::URLDecode(message.post_data["expiry"]);
-			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["mask"]);
-			cmdstr << " " << HTTPUtils::URLDecode(message.post_data["reason"]);
+			cmdstr << "+" << expiry;
+			cmdstr << " " << mask;
+			cmdstr << " " << reason;
 			params.push_back(cmdstr.str());
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
 		}
 
-		if (message.get_data["del"] == "1" && message.get_data.count("number") > 0)
+
+
+		const Anope::string number = WebPanel::GetRequestData(message.get_data, "number");
+		if (message.get_data.count("del") && !number.empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back("DEL");
-			params.push_back(HTTPUtils::URLDecode(message.get_data["number"]));
+			params.push_back(number);
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "OperServ", "operserv/akill", params, replacements);
 		}
 

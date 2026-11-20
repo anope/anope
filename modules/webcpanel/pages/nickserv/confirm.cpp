@@ -15,7 +15,7 @@ bool WebCPanel::NickServ::Confirm::OnRequest(HTTPProvider *server, const Anope::
 {
 
 	std::vector<Anope::string> params;
-	params.push_back(message.post_data["code"]);
+	params.push_back(WebPanel::GetRequestData(message.post_data, "code"));
 
 	WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/confirm", params, replacements);
 

@@ -13,19 +13,21 @@ WebCPanel::NickServ::Access::Access(const Anope::string &cat, const Anope::strin
 
 bool WebCPanel::NickServ::Access::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-	if (message.post_data.count("access") > 0)
+	const Anope::string access = WebPanel::GetRequestData(message.post_data, "access");
+	const Anope::string mask = WebPanel::GetRequestData(message.get_data, "mask");
+	if (!access.empty())
 	{
 		std::vector<Anope::string> params;
 		params.push_back("ADD");
-		params.push_back(message.post_data["access"]);
+		params.push_back(access);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/access", params, replacements);
 	}
-	else if (message.get_data.count("del") > 0 && message.get_data.count("mask") > 0)
+	else if (message.get_data.count("del") && mask.empty())
 	{
 		std::vector<Anope::string> params;
 		params.push_back("DEL");
-		params.push_back(message.get_data["mask"]);
+		params.push_back(mask);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/access", params, replacements);
 	}

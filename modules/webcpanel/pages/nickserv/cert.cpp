@@ -14,19 +14,21 @@ WebCPanel::NickServ::Cert::Cert(const Anope::string &cat, const Anope::string &u
 
 bool WebCPanel::NickServ::Cert::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-	if (message.post_data.count("certfp") > 0)
+	const Anope::string certfp = WebPanel::GetRequestData(message.post_data, "certfp");
+	const Anope::string mask = WebPanel::GetRequestData(message.get_data, "mask");
+	if (!certfp.empty())
 	{
 		std::vector<Anope::string> params;
 		params.push_back("ADD");
-		params.push_back(message.post_data["certfp"]);
+		params.push_back(certfp);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);
 	}
-	else if (message.get_data.count("del") > 0 && message.get_data.count("mask") > 0)
+	else if (message.get_data.count("del") && !mask.empty())
 	{
 		std::vector<Anope::string> params;
 		params.push_back("DEL");
-		params.push_back(message.get_data["mask"]);
+		params.push_back(mask);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "NickServ", "nickserv/cert", params, replacements);
 	}

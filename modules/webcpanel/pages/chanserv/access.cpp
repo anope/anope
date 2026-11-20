@@ -15,10 +15,10 @@ WebCPanel::ChanServ::Access::Access(const Anope::string &cat, const Anope::strin
 bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
 	TemplateFileServer Page("chanserv/access.html");
-	const Anope::string &chname = message.get_data["channel"];
 
 	BuildChanList(na, replacements);
 
+	const Anope::string chname = WebPanel::GetRequestData(message.get_data, "channel");
 	if (chname.empty())
 	{
 		Page.Serve(server, page_name, client, message, reply, replacements);
@@ -46,18 +46,22 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 
 	replacements["ACCESS_LIST"] = "YES";
 
+	const Anope::string paccess = WebPanel::GetRequestData(message.post_data, "access");
+	const Anope::string pmask = WebPanel::GetRequestData(message.post_data, "mask");
+
 	if (u_access.HasPriv("ACCESS_CHANGE") || has_priv)
 	{
-		if (message.get_data["del"].empty() == false && message.get_data["mask"].empty() == false)
+		const Anope::string mask = WebPanel::GetRequestData(message.get_data, "mask");
+		if (message.get_data.count("del") && !mask.empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
 			params.push_back("DEL");
-			params.push_back(message.get_data["mask"]);
+			params.push_back(mask);
 
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/access", params, replacements);
 		}
-		else if (message.post_data["mask"].empty() == false && message.post_data["access"].empty() == false && message.post_data["provider"].empty() == false)
+		else if (!pmask.empty() && !paccess.empty() && message.post_data.count("provider"))
 		{
 			const Anope::string &provider = message.post_data["provider"];
 
@@ -66,8 +70,8 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 				std::vector<Anope::string> params;
 				params.push_back(ci->name);
 				params.push_back("ADD");
-				params.push_back(message.post_data["mask"]);
-				params.push_back(message.post_data["access"]);
+				params.push_back(pmask);
+				params.push_back(paccess);
 
 				WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/access", params, replacements);
 			}
@@ -76,17 +80,17 @@ bool WebCPanel::ChanServ::Access::OnRequest(HTTPProvider *server, const Anope::s
 				std::vector<Anope::string> params;
 				params.push_back(ci->name);
 				params.push_back("ADD");
-				params.push_back(message.post_data["mask"]);
+				params.push_back(pmask);
 
-				WebPanel::RunCommandWithName(client, na->nc, "ChanServ", "chanserv/xop", message.post_data["access"], params, replacements);
+				WebPanel::RunCommandWithName(client, na->nc, "ChanServ", "chanserv/xop", paccess, params, replacements);
 			}
 			else if (provider == "chanserv/flags")
 			{
 				std::vector<Anope::string> params;
 				params.push_back(ci->name);
 				params.push_back("MODIFY");
-				params.push_back(message.post_data["mask"]);
-				params.push_back(message.post_data["access"]);
+				params.push_back(pmask);
+				params.push_back(paccess);
 
 				WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/flags", params, replacements);
 			}

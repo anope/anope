@@ -27,6 +27,8 @@
 #include <netdb.h>
 #endif
 
+#include <limits>
+
 NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
 {
 	Anope::string error;
@@ -46,7 +48,11 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 			{
 				unsigned num = convertTo<unsigned>(token, error, false);
 				if (error.empty())
+				{
 					numbers.insert(num);
+					if (numbers.size() >= MAX_NUMBERS)
+						return;
+				}
 			}
 			catch (const ConvertException &)
 			{
@@ -70,8 +76,15 @@ NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(tr
 				unsigned num1 = convertTo<unsigned>(token.substr(0, t), error, false);
 				unsigned num2 = convertTo<unsigned>(token.substr(t + 1), error2, false);
 				if (error.empty() && error2.empty())
+				{
+					num2 = std::min<unsigned>(std::numeric_limits<unsigned>::max() - 1, num2);
 					for (unsigned i = num1; i <= num2; ++i)
+					{
 						numbers.insert(i);
+						if (numbers.size() >= MAX_NUMBERS)
+							return;
+					}
+				}
 			}
 			catch (const ConvertException &)
 			{

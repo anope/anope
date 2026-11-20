@@ -30,6 +30,9 @@ class CoreExport NumberList
 	std::set<unsigned> numbers;
 
 	bool desc;
+
+	static const unsigned int MAX_NUMBERS = 9999;
+
  public:
 	/** Processes a numbered list
 	 * @param list The list

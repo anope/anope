@@ -134,6 +134,7 @@ ChannelInfo::ChannelInfo(const ChannelInfo &ci) : Serializable("ChannelInfo"),
 
 	this->access->clear();
 	this->akick->clear();
+	this->memos = MemoInfo();
 
 	FOREACH_MOD(OnCreateChan, (this));
 }

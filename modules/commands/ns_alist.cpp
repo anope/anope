@@ -95,9 +95,12 @@ class CommandNSAList : public Command
 					continue;
 
 				ChanAccess *a = p[0];
-				entry["Access"] = entry["Access"] + ", " + a->AccessSerialize();
+
+				Anope::string &accessmsg = entry["Access"];
+				if (!accessmsg.empty())
+					accessmsg += ", ";
+				accessmsg += a->AccessSerialize();
 			}
-			entry["Access"] = entry["Access"].substr(2);
 			entry["Description"] = ci->desc;
 			list.AddEntry(entry);
 		}

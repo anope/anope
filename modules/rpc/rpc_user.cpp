@@ -277,7 +277,7 @@ public:
 		{
 			if (!command.empty())
 				command.push_back(' ');
-			command.append(request.data[i]);
+			command.append(Anope::ReplaceUnsafe(request.data[i]));
 		}
 
 		User *u = nullptr;

@@ -47,7 +47,7 @@ public:
 		}
 
 		for (const auto &message : request.data)
-			Global::service->SendSingle(message);
+			Global::service->SendSingle(Anope::ReplaceUnsafe(message));
 		return true;
 	}
 };
@@ -78,7 +78,7 @@ public:
 
 		std::vector<Anope::string> messages(request.data.begin() + 1, request.data.end());
 		for (const auto &message : messages)
-			Global::service->SendSingle(message, nullptr, nullptr, s);
+			Global::service->SendSingle(Anope::ReplaceUnsafe(message), nullptr, nullptr, s);
 		return true;
 	}
 };
@@ -108,7 +108,7 @@ public:
 			return true;
 		}
 
-		u->SendMessage(bi, request.data[2]);
+		u->SendMessage(bi, Anope::ReplaceUnsafe(request.data[2]));
 		return true;
 	}
 };

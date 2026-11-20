@@ -99,6 +99,12 @@ namespace Anope
 	 */
 	extern CoreExport Anope::string RemoveFormatting(const Anope::string &text);
 
+	/** Replace characters that are unsafe in an IRC wire message with a space character.
+	 * @param text A string to replace unsafe characters within.
+	 * @return A copy of \p text with all unsafe characters replaced.
+	 */
+	extern CoreExport Anope::string ReplaceUnsafe(const Anope::string &text);
+
 	/** Replaces template variables within a string with values from a map.
 	 * @param str The string to template from.
 	 * @param vars The variables to replace within the string.

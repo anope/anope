@@ -1032,6 +1032,18 @@ Anope::string Anope::RemoveFormatting(const Anope::string &buf)
 	return newbuf;
 }
 
+Anope::string Anope::ReplaceUnsafe(const Anope::string &text)
+{
+	Anope::string newtext;
+	for (auto chr : text)
+	{
+		if (chr == '\0' || chr == '\n' || chr == '\r')
+			chr = ' ';
+		newtext.push_back(chr);
+	}
+	return newtext;
+}
+
 Anope::string Anope::Resolve(const Anope::string &host, int type)
 {
 	std::vector<Anope::string> results = Anope::ResolveMultiple(host, type);

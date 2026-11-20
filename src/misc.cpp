@@ -25,6 +25,9 @@
 #ifndef _WIN32
 #include <sys/socket.h>
 #include <netdb.h>
+# ifdef __APPLE__
+#  include <sys/random.h>
+# endif
 #endif
 
 #include <limits>
@@ -783,6 +786,21 @@ Anope::string Anope::Random(size_t len)
 	};
 	Anope::string buf;
 	for (size_t i = 0; i < len; ++i)
-		buf.append(chars[rand() % sizeof(chars)]);
+		buf.append(chars[Anope::RandomNumber() % sizeof(chars)]);
 	return buf;
+}
+
+int Anope::RandomNumber()
+{
+#ifdef HAVE_GETENTROPY
+	int result;
+	if (getentropy(&result, sizeof(result)) == 0)
+		return result;
+#endif
+
+#ifdef HAVE_ARC4RANDOM_UNIFORM
+	return (int)arc4random_uniform((uint32_t)RAND_MAX + 1U);
+#else
+	return rand();
+#endif
 }

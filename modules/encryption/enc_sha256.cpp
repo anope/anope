@@ -246,7 +246,7 @@ class ESHA256 : public Module
 	void NewRandomIV()
 	{
 		for (int i = 0; i < 8; ++i)
-			iv[i] = static_cast<uint32_t>(rand());
+			iv[i] = static_cast<uint32_t>(Anope::RandomNumber());
 	}
 
 	/* returns the IV as base64-encrypted string */

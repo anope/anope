@@ -241,7 +241,7 @@ class NickServCore : public Module, public NickServService
 			int i = 0;
 			do
 			{
-				guestnick = guestprefix + stringify(static_cast<uint16_t>(rand()));
+				guestnick = guestprefix + stringify(static_cast<uint16_t>(Anope::RandomNumber()));
 				if (guestnick.length() > nicklen)
 					guestnick = guestnick.substr(0, nicklen);
 			}

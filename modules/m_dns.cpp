@@ -663,7 +663,7 @@ class MyManager : public Manager, public Timer
 	std::map<unsigned short, Request *> requests;
 
 	MyManager(Module *creator) : Manager(creator), Timer(300, Anope::CurTime, true), serial(Anope::CurTime), tcpsock(NULL), udpsock(NULL),
-		listen(false), cur_id(rand())
+		listen(false), cur_id(Anope::RandomNumber())
 	{
 	}
 

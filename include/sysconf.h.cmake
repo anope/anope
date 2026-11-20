@@ -14,6 +14,8 @@
 #cmakedefine HAVE_EVENTFD 1
 #cmakedefine HAVE_EPOLL 1
 #cmakedefine HAVE_POLL 1
+#cmakedefine HAVE_ARC4RANDOM_UNIFORM 1
+#cmakedefine HAVE_GETENTROPY 1
 #cmakedefine GETTEXT_FOUND 1
 
 #ifdef HAVE_CSTDINT

@@ -559,6 +559,9 @@ namespace Anope
 	 * @param len The length of the string returned
 	 */
 	extern CoreExport Anope::string Random(size_t len);
+
+	/** Generate a random number. */
+	extern CoreExport int RandomNumber();
 }
 
 /** sepstream allows for splitting token separated lists.

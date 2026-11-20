@@ -301,7 +301,7 @@ uint64_t NickCore::GetId()
 		// Generate a random key for SipHash.
 		char key[16];
 		for (size_t i = 0; i < sizeof(key); ++i)
-			key[i] = rand() % CHAR_MAX;
+			key[i] = Anope::RandomNumber() % CHAR_MAX;
 
 		uint64_t newid = Anope::SipHash24(secretid.c_str(), secretid.length(), key);
 		nickcoreid_map::const_iterator it = NickCoreIdList.find(newid);

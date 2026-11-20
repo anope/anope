@@ -349,7 +349,8 @@ void LogInfo::ProcessMessage(const Log *l)
 			return;
 	}
 
-	const Anope::string &buffer = l->BuildPrefix() + l->buf.str();
+	Anope::string buffer = l->BuildPrefix() + l->buf.str();
+	buffer = buffer.replace_all_cs('\0', ' ').replace_all_cs('\r', ' ').replace_all_cs('\n', ' ');
 
 	FOREACH_MOD(OnLogMessage, (this, l, buffer));
 

@@ -70,15 +70,12 @@ class CommandNSConfirm : public Command
 				nc->Shrink<bool>("UNCONFIRMED");
 				FOREACH_MOD(OnNickConfirm, (source.GetUser(), nc));
 
-				if (source.GetUser())
+				NickAlias *na = NickAlias::Find(nc->display);
+				if (na && source.GetUser()) // na should always be available here.
 				{
-					NickAlias *na = NickAlias::Find(source.GetNick());
-					if (na)
-					{
-						IRCD->SendLogin(source.GetUser(), na);
-						if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nc == source.GetAccount() && !na->nc->HasExt("UNCONFIRMED"))
-							source.GetUser()->SetMode(source.service, "REGISTERED");
-					}
+					IRCD->SendLogin(source.GetUser(), na);
+					if (!Config->GetModule("nickserv")->Get<bool>("nonicknameownership") && na->nick.equals_ci(source.GetNick()) && !na->nc->HasExt("UNCONFIRMED"))
+						source.GetUser()->SetMode(source.service, "REGISTERED");
 				}
 			}
 			else

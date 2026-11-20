@@ -103,10 +103,17 @@ public:
 
 bool WebCPanel::Index::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply)
 {
-	TemplateFileServer::Replacements replacements;
-	const Anope::string &user = message.post_data["username"], &pass = message.post_data["password"];
+	if (!WebPanel::IsAllowedOrigin(message))
+	{
+		client->SendError(HTTP::BAD_REQUEST, "Invalid request origin.");
+		return true;
+	}
 
+	TemplateFileServer::Replacements replacements;
 	replacements["TITLE"] = page_title;
+
+	const Anope::string user = WebPanel::GetRequestData(message.post_data, "username");
+	const Anope::string pass = WebPanel::GetRequestData(message.post_data, "password");
 
 	// Redirect if already logged in
 	ServiceReference<Panel> panel("Panel", "webcpanel");

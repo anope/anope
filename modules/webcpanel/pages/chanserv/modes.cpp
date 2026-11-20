@@ -20,12 +20,11 @@ WebCPanel::ChanServ::Modes::Modes(const Anope::string &cat, const Anope::string 
 
 bool WebCPanel::ChanServ::Modes::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-	const Anope::string &chname = message.get_data["channel"];
-	const Anope::string &mode = message.get_data["m"];
 	TemplateFileServer Page("chanserv/modes.html");
 
 	BuildChanList(na, replacements);
 
+	const Anope::string chname = WebPanel::GetRequestData(message.get_data, "channel");
 	if (chname.empty())
 	{
 		Page.Serve(server, page_name, client, message, reply, replacements);
@@ -69,6 +68,7 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTP::Provider *server, const Anope::
 			replacements["LISTMODES"] = cm->mchar;
 	}
 
+	const Anope::string mode = WebPanel::GetRequestData(message.get_data, "m");
 	if (mode.empty())
 	{
 		Page.Serve(server, page_name, client, message, reply, replacements);
@@ -79,22 +79,24 @@ bool WebCPanel::ChanServ::Modes::OnRequest(HTTP::Provider *server, const Anope::
 	ChannelMode *cm = ModeManager::FindChannelModeByChar(mode[0]);
 	if (cm)
 	{
-		if (!message.get_data["del"].empty() && !message.get_data["mask"].empty())
+		const Anope::string mask = WebPanel::GetRequestData(message.get_data, "mask");
+		const Anope::string pmask = WebPanel::GetRequestData(message.post_data, "mask");
+		if (message.get_data.count("del") && !mask.empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
 			params.emplace_back("SET");
 			params.push_back("-" + Anope::string(cm->mchar));
-			params.push_back(message.get_data["mask"]);
+			params.push_back(mask);
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
 		}
-		else if (!message.post_data["mask"].empty())
+		else if (!pmask.empty())
 		{
 			std::vector<Anope::string> params;
 			params.push_back(ci->name);
 			params.emplace_back("SET");
 			params.push_back("+" + Anope::string(cm->mchar));
-			params.push_back(message.post_data["mask"]);
+			params.push_back(pmask);
 			WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/mode", params, replacements);
 		}
 

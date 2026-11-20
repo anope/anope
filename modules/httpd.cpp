@@ -264,7 +264,7 @@ public:
 			for (const auto &[name, value] : cookie)
 				buf += " " + name + "=" + value + ";";
 
-			buf.erase(buf.length() - 1);
+			buf += " HttpOnly; SameSite=Strict";
 
 			this->WriteClient(buf);
 		}

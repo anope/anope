@@ -32,7 +32,10 @@ private:
 	std::set<unsigned> numbers;
 
 	bool desc;
+
 public:
+	static const unsigned int MAX_NUMBERS = 9999;
+
 	/** Processes a numbered list
 	 * @param list The list
 	 * @param descending True to make HandleNumber get called with numbers in descending order

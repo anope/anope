@@ -24,6 +24,29 @@ extern Module *me;
 
 extern Anope::string template_base, page_title;
 
+namespace WebPanel
+{
+	/** Run a command
+	 * @param client HTTP client command is being issued for
+	 * @param User name to run command as, probably nc->display unless nc == NULL
+	 * @param nc Nick core to run command from
+	 * @param service Service for source.owner and source.service
+	 * @param c Command to run (as a service name)
+	 * @param params Command parameters
+	 * @param r Replacements, reply from command goes back here into key
+	 * @param key The key to put the replies into r
+	 */
+	extern void RunCommand(HTTP::Client *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
+
+	extern void RunCommandWithName(HTTP::Client *client, NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
+
+	extern bool CheckParams(const std::vector<Anope::string> &params);
+
+	extern Anope::string GetRequestData(const std::map<Anope::string, Anope::string, ci::less> &data, const Anope::string &key);
+
+	extern bool IsAllowedOrigin(const HTTP::Message &message);
+}
+
 struct SubSection final
 {
 	Anope::string name;
@@ -95,6 +118,13 @@ public:
 
 	bool OnRequest(HTTP::Provider *provider, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply) override final
 	{
+		if (!WebPanel::IsAllowedOrigin(message))
+		{
+			reply.error = HTTP::BAD_REQUEST;
+			reply.Write("Invalid request origin.");
+			return true;
+		}
+
 		ServiceReference<Panel> panel("Panel", "webcpanel");
 		NickAlias *na;
 
@@ -152,23 +182,6 @@ public:
 	/* What get data should be appended to links in the navbar */
 	virtual std::set<Anope::string> GetData() { return std::set<Anope::string>(); }
 };
-
-namespace WebPanel
-{
-	/** Run a command
-	 * @param client HTTP client command is being issued for
-	 * @param User name to run command as, probably nc->display unless nc == NULL
-	 * @param nc Nick core to run command from
-	 * @param service Service for source.owner and source.service
-	 * @param c Command to run (as a service name)
-	 * @param params Command parameters
-	 * @param r Replacements, reply from command goes back here into key
-	 * @param key The key to put the replies into r
-	 */
-	extern void RunCommand(HTTP::Client *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
-
-	extern void RunCommandWithName(HTTP::Client *client, NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
-}
 
 #include "pages/index.h"
 #include "pages/logout.h"

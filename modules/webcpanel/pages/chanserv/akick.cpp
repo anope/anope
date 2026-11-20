@@ -21,11 +21,11 @@ WebCPanel::ChanServ::Akick::Akick(const Anope::string &cat, const Anope::string 
 
 bool WebCPanel::ChanServ::Akick::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-	const Anope::string &chname = message.get_data["channel"];
 	TemplateFileServer Page("chanserv/akick.html");
 
 	BuildChanList(na, replacements);
 
+	const Anope::string chname = WebPanel::GetRequestData(message.get_data, "channel");
 	if (chname.empty())
 	{
 		Page.Serve(server, page_name, client, message, reply, replacements);
@@ -53,23 +53,27 @@ bool WebCPanel::ChanServ::Akick::OnRequest(HTTP::Provider *server, const Anope::
 
 	replacements["AKICK"] = "YES";
 
-	if (!message.get_data["del"].empty() && !message.get_data["mask"].empty())
+	const Anope::string mask = WebPanel::GetRequestData(message.get_data, "mask");
+	const Anope::string pmask = WebPanel::GetRequestData(message.post_data, "mask");
+	if (message.get_data.count("del") && !mask.empty())
 	{
 		std::vector<Anope::string> params;
 		params.push_back(ci->name);
-		params.emplace_back("DEL");
-		params.push_back(message.get_data["mask"]);
+		params.push_back("DEL");
+		params.push_back(mask);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/akick", params, replacements);
 	}
-	else if (!message.post_data["mask"].empty())
+	else if (!pmask.empty())
 	{
 		std::vector<Anope::string> params;
 		params.push_back(ci->name);
-		params.emplace_back("ADD");
-		params.push_back(message.post_data["mask"]);
-		if (!message.post_data["reason"].empty())
-			params.push_back(message.post_data["reason"]);
+		params.push_back("ADD");
+		params.push_back(pmask);
+
+		const Anope::string reason = WebPanel::GetRequestData(message.post_data, "reason");
+		if (!reason.empty())
+			params.push_back(reason);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "ChanServ", "chanserv/akick", params, replacements);
 	}

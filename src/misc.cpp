@@ -24,6 +24,7 @@
 
 #include <cerrno>
 #include <climits>
+#include <limits>
 #include <numeric>
 #include <random>
 #include <filesystem>
@@ -55,7 +56,11 @@ NumberList::NumberList(const Anope::string &list, bool descending) : desc(descen
 			if (auto num = Anope::TryConvert<unsigned>(token, &error))
 			{
 				if (error.empty())
+				{
 					numbers.insert(num.value());
+					if (numbers.size() >= MAX_NUMBERS)
+						return;
+				}
 			}
 			else
 			{
@@ -81,8 +86,15 @@ NumberList::NumberList(const Anope::string &list, bool descending) : desc(descen
 				auto num1 = n1.value();
 				auto num2 = n2.value();
 				if (error.empty() && error2.empty())
+				{
+					num2 = std::min<unsigned>(std::numeric_limits<unsigned>::max() - 1, num2);
 					for (unsigned i = num1; i <= num2; ++i)
+					{
 						numbers.insert(i);
+						if (numbers.size() >= MAX_NUMBERS)
+							return;
+					}
+				}
 			}
 			else
 			{

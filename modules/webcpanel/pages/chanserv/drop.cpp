@@ -21,13 +21,13 @@ WebCPanel::ChanServ::Drop::Drop(const Anope::string &cat, const Anope::string &u
 
 bool WebCPanel::ChanServ::Drop::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-
-	if (message.post_data.count("channel") > 0 && message.post_data.count("confChan") > 0)
+	const Anope::string channel = WebPanel::GetRequestData(message.post_data, "channel");
+	const Anope::string confchan = WebPanel::GetRequestData(message.post_data, "confChan");
+	if (!channel.empty() && !confchan.empty())
 	{
-		if (message.post_data["channel"] == message.post_data["confChan"])
+		if (channel == confchan)
 		{
 			std::vector<Anope::string> params;
-			const Anope::string &channel = HTTP::URLDecode(message.post_data["channel"]);
 			params.push_back(channel);
 			params.push_back(channel);
 
@@ -48,10 +48,9 @@ bool WebCPanel::ChanServ::Drop::OnRequest(HTTP::Provider *server, const Anope::s
 		}
 	}
 
-	if (message.get_data.count("channel") > 0)
+	const Anope::string chname = WebPanel::GetRequestData(message.get_data, "channel");
+	if (!chname.empty())
 	{
-		const Anope::string &chname = message.get_data["channel"];
-
 		replacements["CHANNEL_DROP"] = chname;
 		replacements["ESCAPED_CHANNEL"] = HTTP::URLEncode(chname);
 	}

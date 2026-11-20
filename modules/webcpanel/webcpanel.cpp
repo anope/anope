@@ -16,6 +16,7 @@
 
 Module *me;
 Anope::string template_base, page_title;
+std::vector<Anope::string> allowed_origins;
 
 class ModuleWebCPanel final
 	: public Module
@@ -69,6 +70,7 @@ public:
 		const auto &block = Config->GetModule(this);
 		template_base = Anope::ExpandData(block.Get<const Anope::string>("template_dir", "webcpanel/templates/default"));
 		page_title = block.Get<const Anope::string>("title", "Anope IRC Services");
+		spacesepstream(block.Get<const Anope::string>("allowed_origins")).GetTokens(allowed_origins);
 
 		provider.SetServiceName(block.Get<const Anope::string>("server", "httpd/main"));
 		if (!provider)
@@ -236,12 +238,55 @@ public:
 
 namespace WebPanel
 {
+	bool CheckParams(const std::vector<Anope::string> &params)
+	{
+		static Anope::string invalid("\r\n\0", 3);
+		for (std::vector<Anope::string>::const_iterator it = params.begin(); it != params.end(); ++it)
+		{
+			if (it->length() > 512 || it->find_first_of(invalid) != Anope::string::npos)
+				return false;
+		}
+		return true;
+	}
+
+	Anope::string GetRequestData(const std::map<Anope::string, Anope::string, ci::less> &data, const Anope::string &key)
+	{
+		const auto dit = data.find(key);
+		if (dit == data.end() || dit->second.length() > 512)
+			return ""; // No data or too long.
+
+		return Anope::ReplaceUnsafe(dit->second);
+	}
+
+	bool IsAllowedOrigin(const HTTP::Message &message)
+	{
+		if (allowed_origins.empty())
+			return true; // No allowed origins specified.
+
+		std::map<Anope::string, Anope::string, ci::less>::const_iterator it = message.headers.find("Origin");
+		if (it == message.headers.end())
+			return true; // Not a POST.
+
+		for (std::vector<Anope::string>::const_iterator allowed_origin = allowed_origins.begin(); allowed_origin != allowed_origins.end(); ++allowed_origin)
+		{
+			if (Anope::Match(it->second, *allowed_origin))
+				return true;
+		}
+		return false;
+	}
+
 	void RunCommand(HTTP::Client *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
 		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)
 		{
 			r[key] = "Unable to find command " + c;
+			return;
+		}
+
+		if (!CheckParams(params))
+		{
+			r[key] = "Unsafe characters found in input";
 			return;
 		}
 
@@ -286,6 +331,12 @@ namespace WebPanel
 		if (!cmd)
 		{
 			r[key] = "Unable to find command " + c;
+			return;
+		}
+
+		if (!CheckParams(params))
+		{
+			r[key] = "Unsafe characters found in input";
 			return;
 		}
 

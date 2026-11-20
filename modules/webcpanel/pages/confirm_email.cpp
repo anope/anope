@@ -17,15 +17,18 @@
 bool WebCPanel::ConfirmEmail::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply)
 {
 	TemplateFileServer::Replacements replacements;
-    const Anope::string &confirm_type = message.get_data["type"], &nick = message.get_data["nick"], &code = message.get_data["code"];
+
+    const auto confirm_type = WebPanel::GetRequestData(message.get_data, "type");
+    const auto nick = WebPanel::GetRequestData(message.get_data, "nick");
+    const auto code = WebPanel::GetRequestData(message.get_data, "code");
 
     auto fail = [&]() {
         replacements["INVALID_LOGIN"] = "Invalid confirmation link. Please contact an IRC operator for further assistance.";
         TemplateFileServer page("login.html");
 
-        Log(LOG_NORMAL, "confirm_email") << "Invalid confirmation link with type: " << message.get_data["type"]
-            << " nick: " << message.get_data["nick"]
-            << " code: " << message.get_data["code"];
+        Log(LOG_NORMAL, "confirm_email") << "Invalid confirmation link with type: " << confirm_type
+            << " nick: " << nick
+            << " code: " << code;
 
         page.Serve(server, page_name, client, message, reply, replacements);
         return true;

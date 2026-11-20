@@ -20,7 +20,6 @@ WebCPanel::MemoServ::Memos::Memos(const Anope::string &cat, const Anope::string 
 
 bool WebCPanel::MemoServ::Memos::OnRequest(HTTP::Provider *server, const Anope::string &page_name, HTTP::Client *client, HTTP::Message &message, HTTP::Reply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
-	const Anope::string &chname = message.get_data["channel"];
 	ChannelInfo *ci;
 	const MemoInfo *mi;
 	Memo *m;
@@ -36,6 +35,7 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTP::Provider *server, const Anope::
 		}
 	}
 
+	const Anope::string chname = WebPanel::GetRequestData(message.get_data, "channel");
 	if (chname.empty())
 	{
 		replacements["MESSAGES"] = "No Channel specified, displaying the memos for your Nick";
@@ -58,30 +58,36 @@ bool WebCPanel::MemoServ::Memos::OnRequest(HTTP::Provider *server, const Anope::
 			mi = &na->nc->memos;
 		}
 	}
-	if (message.post_data.count("receiver") > 0 && message.post_data.count("message") > 0)
+
+	const Anope::string receiver = WebPanel::GetRequestData(message.post_data, "receiver");
+	const Anope::string msg = WebPanel::GetRequestData(message.post_data, "message");
+	if (!receiver.empty() && !msg.empty())
 	{
 		std::vector<Anope::string> params;
-		params.push_back(HTTP::URLDecode(message.post_data["receiver"]));
-		params.push_back(HTTP::URLDecode(message.post_data["message"]));
+		params.push_back(receiver);
+		params.push_back(msg);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "MemoServ", "memoserv/send", params, replacements, "CMDR");
 	}
-	if (message.get_data.count("del") > 0 && message.get_data.count("number") > 0)
+
+	const Anope::string num = WebPanel::GetRequestData(message.get_data, "number");
+	if (message.get_data.count("del") > 0 && !num.empty())
 	{
 		std::vector<Anope::string> params;
 		if (!chname.empty())
 			params.push_back(chname);
-		params.push_back(message.get_data["number"]);
+		params.push_back(num);
 
 		WebPanel::RunCommand(client, na->nc->display, na->nc, "MemoServ", "memoserv/del", params, replacements, "CMDR");
 	}
-	if (message.get_data.count("read") > 0 && message.get_data.count("number") > 0)
+
+	if (message.get_data.count("read") > 0 && !num.empty())
 	{
 		std::vector<Anope::string> params;
 		int number = -1;
 
-		if (auto num = Anope::TryConvert<int>(message.get_data["number"]))
-			number = num.value();
+		if (auto n = Anope::TryConvert<int>(num))
+			number = n.value();
 		else
 			replacements["MESSAGES"] = "ERROR - invalid parameter for NUMBER";
 

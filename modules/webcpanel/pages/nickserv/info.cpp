@@ -22,23 +22,24 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTP::Provider *server, const Anope::s
 {
 	if (!message.post_data.empty())
 	{
-		if (message.post_data.count("email") > 0)
+		const Anope::string email = WebPanel::GetRequestData(message.post_data, "email");
+		if (!email.empty())
 		{
-			if (message.post_data["email"] != na->nc->email)
+			if (email != na->nc->email)
 			{
-				if (!message.post_data["email"].empty() && !Mail::Validate(message.post_data["email"]))
+				if (!Mail::Validate(email))
 					replacements["ERRORS"] = "Invalid email";
 				else
 				{
-					na->nc->email = message.post_data["email"];
+					na->nc->email = email;
 					replacements["MESSAGES"] = "Email updated";
 				}
 			}
 		}
-		if (message.post_data.count("greet") > 0)
+		const Anope::string post_greet = WebPanel::GetRequestData(message.post_data, "greet");
+		if (!post_greet.empty())
 		{
-			auto *greet = na->nc->GetExt<Anope::string>("greet");
-			const Anope::string &post_greet = HTTP::URLDecode(message.post_data["greet"].replace_all_cs("+", " "));
+			Anope::string *greet = na->nc->GetExt<Anope::string>("greet");
 
 			if (post_greet.empty())
 				na->nc->Shrink<Anope::string>("greet");
@@ -76,13 +77,14 @@ bool WebCPanel::NickServ::Info::OnRequest(HTTP::Provider *server, const Anope::s
 			}
 			replacements["MESSAGES"] = "Protect updated";
 		}
-		if (na->nc->HasExt("PROTECT") && message.post_data.count("protect_after") > 0)
+
+		const auto protectafter = WebPanel::GetRequestData(message.post_data, "protect_after");
+		if (na->nc->HasExt("PROTECT") && !protectafter.empty())
 		{
 			auto &block = Config->GetModule("nickserv");
 			auto minprotect = block.Get<time_t>("minprotect", "10s");
 			auto maxprotect = block.Get<time_t>("maxprotect", "10m");
-
-			auto secs = Anope::TryConvert<time_t>(message.post_data["protect_after"]);
+			auto secs = Anope::TryConvert<time_t>(protectafter);
 			if (!secs)
 				replacements["ERRORS"] = "Protection delay must be a number of seconds";
 			else if (*secs < minprotect || *secs > maxprotect)

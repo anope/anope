@@ -97,6 +97,12 @@ bool WebCPanel::Index::OnRequest(HTTPProvider *server, const Anope::string &page
 
 	replacements["TITLE"] = page_title;
 
+	if (!WebPanel::IsAllowedOrigin(message))
+	{
+		client->SendError(HTTP_BAD_REQUEST, "Invalid request origin.");
+		return true;
+	}
+
 	if (!user.empty() && !pass.empty())
 	{
 		// Rate limit check.

@@ -13,6 +13,13 @@ WebCPanel::Logout::Logout(const Anope::string &u) : WebPanelProtectedPage("", u)
 
 bool WebCPanel::Logout::OnRequest(HTTPProvider *server, const Anope::string &page_name, HTTPClient *client, HTTPMessage &message, HTTPReply &reply, NickAlias *na, TemplateFileServer::Replacements &replacements)
 {
+	if (!WebPanel::IsAllowedOrigin(message))
+	{
+		reply.error = HTTP_BAD_REQUEST;
+		reply.Write("Invalid request origin.");
+		return true;
+	}
+
 	na->Shrink<Anope::string>("webcpanel_id");
 	na->Shrink<Anope::string>("webcpanel_ip");
 

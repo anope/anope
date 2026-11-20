@@ -9,6 +9,7 @@
 
 Module *me;
 Anope::string provider_name, template_name, template_base, page_title;
+std::vector<Anope::string> allowed_origins;
 
 class ModuleWebCPanel : public Module
 {
@@ -63,6 +64,7 @@ class ModuleWebCPanel : public Module
 		template_name = block->Get<const Anope::string>("template", "default");
 		template_base = Anope::DataDir + "/modules/webcpanel/templates/" + template_name;
 		page_title = block->Get<const Anope::string>("title", "Anope IRC Services");
+		spacesepstream(block->Get<const Anope::string>("allowed_origins")).GetTokens(allowed_origins);
 
 		provider = ServiceReference<HTTPProvider>("HTTPProvider", provider_name);
 		if (!provider)
@@ -249,6 +251,23 @@ namespace WebPanel
 				return false;
 		}
 		return true;
+	}
+
+	bool IsAllowedOrigin(const HTTPMessage &message)
+	{
+		if (allowed_origins.empty())
+			return true; // No allowed origins specified.
+
+		std::map<Anope::string, Anope::string, ci::less>::const_iterator it = message.headers.find("Origin");
+		if (it == message.headers.end())
+			return true; // Not a POST.
+
+		for (std::vector<Anope::string>::const_iterator allowed_origin = allowed_origins.begin(); allowed_origin != allowed_origins.end(); ++allowed_origin)
+		{
+			if (Anope::Match(it->second, *allowed_origin))
+				return true;
+		}
+		return false;
 	}
 
 	void RunCommand(HTTPClient *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)

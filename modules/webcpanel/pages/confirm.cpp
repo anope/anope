@@ -14,6 +14,13 @@ bool WebCPanel::Confirm::OnRequest(HTTPProvider *server, const Anope::string &pa
 
 	replacements["TITLE"] = page_title;
 
+	if (!WebPanel::IsAllowedOrigin(message))
+	{
+		reply.error = HTTP_BAD_REQUEST;
+		reply.Write("Invalid request origin.");
+		return true;
+	}
+
 	if (!user.empty() && !pass.empty())
 	{
 		std::vector<Anope::string> params;

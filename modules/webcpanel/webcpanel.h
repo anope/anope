@@ -155,6 +155,8 @@ namespace WebPanel
 	extern void RunCommand(HTTPClient *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
 
 	extern void RunCommandWithName(HTTPClient *client, NickCore *nc, const Anope::string &service, const Anope::string &c, const Anope::string &cmdname, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key = "MESSAGES");
+
+	extern bool CheckParams(const std::vector<Anope::string> &params);
 }
 
 #include "pages/index.h"

@@ -240,12 +240,29 @@ class ModuleWebCPanel : public Module
 
 namespace WebPanel
 {
+	bool CheckParams(const std::vector<Anope::string> &params)
+	{
+		static Anope::string invalid("\r\n\0", 3);
+		for (std::vector<Anope::string>::const_iterator it = params.begin(); it != params.end(); ++it)
+		{
+			if (it->length() > 512 || it->find_first_of(invalid) != Anope::string::npos)
+				return false;
+		}
+		return true;
+	}
+
 	void RunCommand(HTTPClient *client, const Anope::string &user, NickCore *nc, const Anope::string &service, const Anope::string &c, std::vector<Anope::string> &params, TemplateFileServer::Replacements &r, const Anope::string &key)
 	{
 		ServiceReference<Command> cmd("Command", c);
 		if (!cmd)
 		{
 			r[key] = "Unable to find command " + c;
+			return;
+		}
+
+		if (!CheckParams(params))
+		{
+			r[key] = "Unsafe characters found in input";
 			return;
 		}
 
@@ -289,6 +306,12 @@ namespace WebPanel
 		if (!cmd)
 		{
 			r[key] = "Unable to find command " + c;
+			return;
+		}
+
+		if (!CheckParams(params))
+		{
+			r[key] = "Unsafe characters found in input";
 			return;
 		}
 

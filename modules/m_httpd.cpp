@@ -262,7 +262,7 @@ class MyHTTPClient : public HTTPClient
 			for (HTTPReply::cookie::iterator it = msg->cookies[i].begin(), it_end = msg->cookies[i].end(); it != it_end; ++it)
 				buf += " " + it->first + "=" + it->second + ";";
 
-			buf.erase(buf.length() - 1);
+			buf += " HttpOnly; SameSite=Strict";
 
 			this->WriteClient(buf);
 		}

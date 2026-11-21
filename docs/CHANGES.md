@@ -1,6 +1,6 @@
 # Anope Change Log
 
-## Anope 2.1.28 (2026-11-15)
+## Anope 2.1.28 (2026-11-21)
 
 ### Security Changes
 

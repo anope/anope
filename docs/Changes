@@ -1,6 +1,22 @@
 Anope Version 2.0.21-git
 ------------------------
-No significant changes.
+Added origin filtering to the web panel.
+Changed the httpd module to use a stricter cookie policy.
+Fixed a crash caused by an unsafe substr in ns_alist.
+Fixed a crash caused by erroneously copying memos when cloning a channel.
+Fixed a hang caused by inefficient checking of whether a user has deep access on a channel.
+Fixed a hang caused by user-provided massive number ranges.
+Fixed build path configuration not being stored in cache variables.
+Fixed building with a rungroup set.
+Fixed bypassing unconfirmed status via grouping and ungrouping.
+Fixed directory creation on Windows.
+Fixed erroneously identifying users as the account of their nickname instead of the account they are identified as when confirming users.
+Fixed random numbers used for confirmation codes erroneously being predictable.
+Fixed the logging system not stripping characters that are unsafe on IRC before writing to the log.
+Fixed the webcpanel module not rejecting commands containing characters that are unsafe on IRC.
+Fixed the webcpanel module to properly sanitise get/post data.
+Fixed Windows shortcuts containing malformed paths.
+Updated the UnrealIRCd configuration syntax.
 
 Anope Version 2.0.20
 --------------------

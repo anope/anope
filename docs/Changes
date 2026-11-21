@@ -1,5 +1,5 @@
-Anope Version 2.0.21-git
-------------------------
+Anope Version 2.0.21
+--------------------
 Added origin filtering to the web panel.
 Changed the httpd module to use a stricter cookie policy.
 Fixed a crash caused by an unsafe substr in ns_alist.

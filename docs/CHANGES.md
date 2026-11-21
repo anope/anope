@@ -2,7 +2,35 @@
 
 ## Anope 2.1.28 (2026-11-15)
 
-## General Changes
+### Security Changes
+
+* Added origin filtering to the web panel.
+
+* Changed the httpd module to use a stricter cookie policy.
+
+* Fixed a crash caused by an unsafe substr in ns_alist.
+
+* Fixed a crash caused by erroneously copying memos when cloning a channel.
+
+* Fixed a crash caused by ungrouping nicknames.
+
+* Fixed a hang caused by inefficient checking of whether a user has deep access on a channel.
+
+* Fixed a hang caused by user-provided massive number ranges.
+
+* Fixed bypassing unconfirmed status via grouping and ungrouping.
+
+* Fixed random numbers used for confirmation codes erroneously being predictable.
+
+* Fixed the logging system not stripping characters that are unsafe on IRC before writing to the log.
+
+* Fixed the webcpanel module not rejecting commands containing characters that are unsafe on IRC.
+
+* Fixed the webcpanel module to properly sanitise get/post data.
+
+Many thanks to Bram Matthys (Syzop) from UnrealIRCd for their work finding, reporting, and testing fixes for the security issues fixed in this release. This security release would have not been possible without their help.
+
+### General Changes
 
 * Added a new Russian translation.
 
@@ -18,7 +46,7 @@
 
 * Updated the vendored libraries.
 
-## Developer Changes
+### Developer Changes
 
 * Added `Channel::ClearModes` to automate clearing all modes on a target.
 

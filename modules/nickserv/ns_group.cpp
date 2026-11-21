@@ -269,6 +269,7 @@ public:
 			auto *nc = new NickCore(na->nick);
 			na->nc = nc;
 			nc->aliases->push_back(na);
+			nc->na = na;
 
 			nc->pass = oldcore->pass;
 			if (!oldcore->email.empty())

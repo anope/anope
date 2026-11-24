@@ -256,7 +256,7 @@ public:
 			));
 		else if (subcommand.equals_ci("SUPERADMIN"))
 		{
-			if (Config->GetModule(this->owner).Get<bool>("superadmin"))
+			if (!Config->GetModule(this->owner).Get<bool>("superadmin"))
 				return false;
 
 			source.Reply(_(

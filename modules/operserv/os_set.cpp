@@ -197,7 +197,8 @@ public:
 			help.AddEntry("READONLY", _("Set read-only or read-write mode"));
 			help.AddEntry("DEBUG", _("Activate or deactivate debug mode"));
 			help.AddEntry("NOEXPIRE", _("Activate or deactivate no expire mode"));
-			help.AddEntry("SUPERADMIN", _("Activate or deactivate super admin mode"));
+			if (Config->GetModule(this->owner).Get<bool>("superadmin"))
+				help.AddEntry("SUPERADMIN", _("Activate or deactivate super admin mode"));
 			help.AddEntry("LIST", _("List the options"));
 
 			source.Reply(" ");
@@ -255,6 +256,9 @@ public:
 			));
 		else if (subcommand.equals_ci("SUPERADMIN"))
 		{
+			if (Config->GetModule(this->owner).Get<bool>("superadmin"))
+				return false;
+
 			source.Reply(_(
 				"Syntax: \002SUPERADMIN {ON | OFF}\002"
 				"\n\n"

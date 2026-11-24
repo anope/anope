@@ -70,11 +70,14 @@ public:
 		const auto &block = Config->GetModule(this);
 		template_base = Anope::ExpandData(block.Get<const Anope::string>("template_dir", "webcpanel/templates/default"));
 		page_title = block.Get<const Anope::string>("title", "Anope IRC Services");
-		spacesepstream(block.Get<const Anope::string>("allowed_origins")).GetTokens(allowed_origins);
 
 		provider.SetServiceName(block.Get<const Anope::string>("server", "httpd/main"));
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is httpd loaded?");
+
+		spacesepstream(block.Get<const Anope::string>("allowed_origins")).GetTokens(allowed_origins);
+		if (allowed_origins.empty())
+			throw ModuleException("You must specify one or more allowed origins");
 
 		provider->RegisterPage(&this->style_css);
 		provider->RegisterPage(&this->logo_png);

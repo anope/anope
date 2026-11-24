@@ -170,7 +170,7 @@ class CommandCSFlags final
 					}
 
 					mask = targnc->display;
-					if (description.empty())
+					if (description.empty() || description.equals_ci("*"))
 						description = targ->nick;
 				}
 				else
@@ -316,10 +316,14 @@ class CommandCSFlags final
 		ServiceReference<AccessProvider> provider("AccessProvider", "access/flags");
 		if (!provider)
 			return;
+
 		auto *access = anope_dynamic_static_cast<FlagsChanAccess *>(provider->Create());
 		access->SetMask(mask, ci);
 		access->creator = source.GetNick();
-		access->description = current && description.empty() ? current->description : description;
+		if (current && description.empty())
+			access->description = current->description;
+		else if (!description.equals_ci("*"))
+			access->description = description;
 		access->last_seen = current ? current->last_seen : 0;
 		access->created = Anope::CurTime;
 		access->flags = current_flags;
@@ -612,7 +616,9 @@ public:
 				"If the mask has no more flags, then the mask is removed from the access list. "
 				"Additionally, you may use +* or -* to add or remove all flags, respectively. You are "
 				"only able to modify the access list if you have the proper permission on the channel, "
-				"and even then you can only give other people access to the equivalent of what your access is."
+				"and even then you can only give other people access to the equivalent of what your access "
+				"is. The description can be set to * to clear the current description if you are updating "
+				"an existing entry."
 				"\n\n"
 				"The \002LIST\002 command allows you to list existing entries on the channel access list. "
 				"If a mask is given, the mask is wildcard matched against all existing entries on the "

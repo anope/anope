@@ -314,7 +314,7 @@ namespace WebPanel
 
 			void SendMessage(BotInfo *source, const Anope::string &msg) override
 			{
-				re[k] = msg.replace_all_cs("\x1A", "\x20");
+				re[k] = msg.replace_all_cs("\x1B", "\x20");
 			}
 		}
 		my_reply(r, key);
@@ -361,7 +361,7 @@ namespace WebPanel
 
 			void SendMessage(BotInfo *source, const Anope::string &msg) override
 			{
-				re[k] = msg.replace_all_cs("\x1A", "\x20");
+				re[k] = msg.replace_all_cs("\x1B", "\x20");
 			}
 		}
 		my_reply(r, key);

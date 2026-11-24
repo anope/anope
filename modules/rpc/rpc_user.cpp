@@ -238,7 +238,7 @@ private:
 
 		void SendMessage(BotInfo *source, const Anope::string &msg) override
 		{
-			root.Reply(Anope::RemoveFormatting(msg.replace_all_cs("\x1A", "\x20")));
+			root.Reply(Anope::RemoveFormatting(msg.replace_all_cs("\x1B", "\x20")));
 		};
 	};
 

@@ -8,7 +8,6 @@ modules/ldap.cpp
 modules/mysql.cpp
 modules/regex_pcre2.cpp
 modules/regex_posix.cpp
-modules/regex_tre.cpp
 modules/sqlite.cpp
 modules/ssl_gnutls.cpp
 modules/ssl_openssl.cpp

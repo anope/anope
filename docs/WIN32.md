@@ -23,7 +23,7 @@ cd C:\Users\Example\Downloads\anope-2.1
 
 ---
 
-If you want to build with multiple-language support or want to use the enc_argon2, mysql, regex_pcre2, regex_posix, regex_tre, sqlite, or ssl_openssl extra modules you will now need to install the third-party dependencies using Conan. Before you can do this you need to create a Conan profile for C++17 using the following command:
+If you want to build with multiple-language support or want to use the enc_argon2, mysql, regex_pcre2, regex_posix, sqlite, or ssl_openssl extra modules you will now need to install the third-party dependencies using Conan. Before you can do this you need to create a Conan profile for C++17 using the following command:
 
 ```cmd
 conan profile detect

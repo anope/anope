@@ -812,7 +812,7 @@ class ProtoHybrid : public Module
 		message_tmode(this),
 		message_uid(this)
 	{
-		if (Config->GetModule(this))
+		if (!Config->GetModule(this)->GetName().empty())
 			this->AddModes();
 	}
 

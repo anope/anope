@@ -318,8 +318,15 @@ class ProtoCharybdis : public Module
 	void AddModes()
 	{
 		/* Add user modes */
+		ModeManager::AddUserMode(new UserMode("DEAF", 'D'));
+		ModeManager::AddUserMode(new UserMode("CALLERID", 'g'));
+		ModeManager::AddUserMode(new UserMode("INVIS", 'i'));
+		ModeManager::AddUserMode(new UserModeOperOnly("LOCOPS", 'l'));
+		ModeManager::AddUserMode(new UserModeOperOnly("OPER", 'o'));
 		ModeManager::AddUserMode(new UserMode("NOFORWARD", 'Q'));
 		ModeManager::AddUserMode(new UserMode("REGPRIV", 'R'));
+		ModeManager::AddUserMode(new UserModeOperOnly("SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserMode("WALLOPS", 'w'));
 		ModeManager::AddUserMode(new UserModeOperOnly("OPERWALLS", 'z'));
 		ModeManager::AddUserMode(new UserModeNoone("SSL", 'Z'));
 
@@ -327,15 +334,28 @@ class ProtoCharybdis : public Module
 		ModeManager::AddChannelMode(new ChannelModeList("QUIET", 'q'));
 
 		/* Add channel modes */
+		ModeManager::AddChannelMode(new ChannelModeOperOnly("ADMINONLY", 'A'));
 		ModeManager::AddChannelMode(new ChannelMode("BLOCKCOLOR", 'c'));
 		ModeManager::AddChannelMode(new ChannelMode("NOCTCP", 'C'));
 		ModeManager::AddChannelMode(new ChannelModeParam("REDIRECT", 'f'));
 		ModeManager::AddChannelMode(new ChannelMode("ALLOWFORWARD", 'F'));
 		ModeManager::AddChannelMode(new ChannelMode("ALLINVITE", 'g'));
+		ModeManager::AddChannelMode(new ChannelMode("INVITE", 'i'));
 		ModeManager::AddChannelMode(new ChannelModeParam("JOINFLOOD", 'j'));
+		ModeManager::AddChannelMode(new ChannelModeKey('k'));
+		ModeManager::AddChannelMode(new ChannelModeParam("LIMIT", 'l', true));
 		ModeManager::AddChannelMode(new ChannelModeLargeBan("LBAN", 'L'));
-		ModeManager::AddChannelMode(new ChannelMode("PERM", 'P'));
+		ModeManager::AddChannelMode(new ChannelMode("MODERATED", 'm'));
+		ModeManager::AddChannelMode(new ChannelMode("NOEXTERNAL", 'n'));
+		ModeManager::AddChannelMode(new ChannelModeOperOnly("OPERONLY", 'O'));
+		ModeManager::AddChannelMode(new ChannelMode("PRIVATE", 'p'));
+		ModeManager::AddChannelMode(new ChannelModeOperOnly("PERM", 'P'));
 		ModeManager::AddChannelMode(new ChannelMode("NOFORWARD", 'Q'));
+		ModeManager::AddChannelMode(new ChannelMode("REGISTEREDONLY", 'r'));
+		ModeManager::AddChannelMode(new ChannelMode("SECRET", 's'));
+		ModeManager::AddChannelMode(new ChannelMode("SSL", 'S'));
+		ModeManager::AddChannelMode(new ChannelMode("TOPIC", 't'));
+		ModeManager::AddChannelMode(new ChannelMode("NONOTICE", 'T'));
 		ModeManager::AddChannelMode(new ChannelMode("OPMODERATED", 'z'));
 	}
 

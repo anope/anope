@@ -360,7 +360,7 @@ class ProtoRatbox : public Module
 		if (!hybrid)
 			throw ModuleException("No protocol interface for hybrid");
 
-		if (!Config->GetModule(this)->GetName().empty())
+		if (IRCD == &ircd_proto)
 			this->AddModes();
 	}
 
